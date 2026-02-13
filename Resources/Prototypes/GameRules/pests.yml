@@ -114,10 +114,10 @@
       - id: MobMothroach
         weight: 0.20
       - id: MobSquackroach # Goobstation
-        weight: 0.1
-      - id: MobLootbug # Goobstation
-        weight: 0.3
-      - id: MobMoproach
+        weight: 0.1 #Maid edit start
+  #    - id: MobLootbug # Goobstation
+  #      weight: 0.3
+      - id: MobMoproach #Maid edit end
         weight: 0.01
 
 - type: entity
@@ -166,12 +166,12 @@
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
       children:
-      - id: MobSnail
-        weight: 0.84
-      - id: MobSnailSpeed
-        weight: 0.08
-      - id: MobSnailMoth
-        weight: 0.08
+    #  - id: MobSnail #Maid edit start
+    #    weight: 0.84
+    #  - id: MobSnailSpeed
+    #    weight: 0.08
+    #  - id: MobSnailMoth
+    #    weight: 0.08
       # Goobstation
-      - id: MobSnailInstantDeath
-        weight: 0.0004
+    #  - id: MobSnailInstantDeath
+    #    weight: 0.0004 #Maid edit end

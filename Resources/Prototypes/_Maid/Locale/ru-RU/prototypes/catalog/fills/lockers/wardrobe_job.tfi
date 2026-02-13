@@ -1,0 +1,11 @@
+ent-WardrobeLibrarianFilled = { ent-WardrobeLibrarian }
+    .desc = В этом шкафчике храниятся форма и вещи библиотекаря.
+    .suffix = Заполненный
+
+ent-WardrobeReporterFilled = { ent-WardrobeReporter}
+    .desc = В этом шкафчике храниятся одежда и вещи репортера.
+    .suffix = Заполненный
+
+ent-WardrobeMusicianFilled = { ent-WardrobeMusician}
+    .desc = В этом шкафчике храниятся вещи музыканта.
+    .suffix = Заполненный

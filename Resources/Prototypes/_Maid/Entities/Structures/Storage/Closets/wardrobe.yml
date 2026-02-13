@@ -1,0 +1,14 @@
+- type: entity
+  id: WardrobeLibrarian
+  parent: WardrobeGreen
+  name: librarian wardrobe
+
+- type: entity
+  id: WardrobeReporter
+  parent: WardrobeGreen
+  name: reporter wardrobe
+
+- type: entity
+  id: WardrobeMusician
+  parent: WardrobeGreen
+  name: musician wardrobe

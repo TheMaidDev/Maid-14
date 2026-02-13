@@ -1,0 +1,69 @@
+- type: entity
+  id: WardrobeLibrarianFilled
+  suffix: Filled
+  parent: WardrobeLibrarian
+  description: "You can build a robot out of this locker."
+  components:
+  - type: EntityTableContainerFill
+    containers:
+      entity_storage: !type:NestedSelector
+        tableId: FillWardrobeGreen
+
+- type: entityTable
+  id: FillWardrobeLibrarian
+  table: !type:AllSelector
+    children:
+    - id: ClothingEyesGlasses
+    - id: ClothingNeckScarfStripedGreen
+    - id: ClothingShoesBootsLaceup
+    - id: ClothingUniformJumpsuitLibrarian
+      count: 2
+    - id: ClothingUniformJumpskirtLibrarian
+      count: 2
+    - id: BooksBag
+      count: 2
+   
+
+
+- type: entity
+  id: WardrobeReporterFilled
+  suffix: Filled
+  parent: WardrobeReporter
+  description: "You can build a robot out of this locker."
+  components:
+  - type: EntityTableContainerFill
+    containers:
+      entity_storage: !type:NestedSelector
+        tableId: FillWardrobeGreen
+
+- type: entityTable
+  id: FillWardrobeReporter
+  table: !type:AllSelector
+    children:
+    - id: MicrophoneInstrument
+    - id: ClothingUniformJumpsuitReporter
+
+- type: entity
+  id: WardrobeMusicianFilled
+  suffix: Filled
+  parent: WardrobeMusician
+  description: "You can build a robot out of this locker."
+  components:
+  - type: EntityTableContainerFill
+    containers:
+      entity_storage: !type:NestedSelector
+        tableId: FillWardrobeGreen
+
+- type: entityTable
+  id: FillWardrobeMusician
+  table: !type:AllSelector
+    children:
+    - id: MicrophoneInstrument
+    - id: MusicBoxInstrument
+    - id: GlockenspielInstrument
+    - id: XylophoneInstrument
+    - id: SaxophoneInstrument
+    - id: AccordionInstrument
+
+
+

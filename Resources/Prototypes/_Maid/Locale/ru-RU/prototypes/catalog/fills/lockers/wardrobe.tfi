@@ -1,0 +1,8 @@
+ent-WardrobeLibrarian = гардероб библиотекорая
+    .desc = { ent-WardrobeGreen.desc }
+
+ent-WardrobeReporter = гардероб репортера
+    .desc = { ent-WardrobeGreen.desc }
+
+ent-WardrobeMusician = гардероб музыканта
+    .desc = { ent-WardrobeGreen.desc }

@@ -543,16 +543,16 @@
   components:
   - type: Body
     prototype: Mouse
-  - type: GhostRole
-    makeSentient: true
-    allowSpeech: false
-    allowMovement: true
-    name: ghost-role-information-snail-name
-    description: ghost-role-information-snail-description
-    rules: ghost-role-information-freeagent-rules
-    mindRoles:
-    - MindRoleGhostRoleFreeAgentHarmless
-  - type: GhostTakeoverAvailable
+  #- type: GhostRole #Maid edit start
+  #  makeSentient: true
+  #  allowSpeech: false
+  #  allowMovement: true
+  #  name: ghost-role-information-snail-name
+  #  description: ghost-role-information-snail-description
+  #  rules: ghost-role-information-freeagent-rules
+  #  mindRoles:
+  #  - MindRoleGhostRoleFreeAgentHarmless
+  #- type: GhostTakeoverAvailable #Maid edit end
   - type: Emoting
   - type: Sprite
     drawdepth: SmallMobs
@@ -687,9 +687,9 @@
   id: MobSnailInstantDeath
   suffix: Smite
   components:
-  - type: GhostRole
-    mindRoles:
-    - MindRoleGhostRoleFreeAgent
+ # - type: GhostRole #Maid edit start
+ #   mindRoles:
+ #   - MindRoleGhostRoleFreeAgent #Maid edit end
   - type: MobStateActions
     actions:
       Alive:
@@ -706,10 +706,10 @@
   id: MobSnailSpeed
   suffix: Speed
   components:
-  - type: GhostRole
-    name: ghost-role-information-snailspeed-name
-    description: ghost-role-information-snailspeed-description
-    rules: ghost-role-information-freeagent-rules
+ # - type: GhostRole #Maid edit start
+  #  name: ghost-role-information-snailspeed-name
+   # description: ghost-role-information-snailspeed-description
+   # rules: ghost-role-information-freeagent-rules #Maid edit end
   - type: Sprite
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
@@ -734,12 +734,12 @@
   name: Snoth
   components:
   - type: Body
-    prototype: Mothroach
-  - type: GhostRole
-    name: ghost-role-information-snoth-name
-    description: ghost-role-information-snoth-description
-    rules: ghost-role-information-freeagent-rules
-  - type: Sprite
+    prototype: Mothroach #Maid edit start
+ # - type: GhostRole
+ #   name: ghost-role-information-snoth-name
+ #   description: ghost-role-information-snoth-description
+ #   rules: ghost-role-information-freeagent-rules
+  - type: Sprite #Maid edit end
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: snoth

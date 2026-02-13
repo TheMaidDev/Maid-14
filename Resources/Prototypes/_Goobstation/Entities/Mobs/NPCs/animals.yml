@@ -245,16 +245,16 @@
         - SmallMobMask
         layer:
         - SmallMobLayer
-  - type: GhostRole
-    makeSentient: true
-    allowSpeech: true
-    allowMovement: true
-    name: ghost-role-information-lootbug-name
-    description: ghost-role-information-lootbug-description
-    rules: ghost-role-information-freeagent-rules
-    mindRoles:
-    - MindRoleGhostRoleFreeAgent
-  - type: GhostTakeoverAvailable
+ # - type: GhostRole #Maid edit start
+ #   makeSentient: true
+ #   allowSpeech: true
+ #  allowMovement: true
+ #  name: ghost-role-information-lootbug-name
+ #  description: ghost-role-information-lootbug-description
+ #   rules: ghost-role-information-freeagent-rules
+ #   mindRoles:
+ #   - MindRoleGhostRoleFreeAgent
+ # - type: GhostTakeoverAvailable #Maid edit end
   - type: Speech
     speechVerb: SmallMob
     speechSounds: Squeak
