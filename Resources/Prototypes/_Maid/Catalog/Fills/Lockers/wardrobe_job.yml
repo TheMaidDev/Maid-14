@@ -2,12 +2,12 @@
   id: WardrobeLibrarianFilled
   suffix: Filled
   parent: WardrobeLibrarian
-  description: "You can build a robot out of this locker."
+  description: "A sturdy green locker containing librarian uniforms and accessories."
   components:
   - type: EntityTableContainerFill
     containers:
       entity_storage: !type:NestedSelector
-        tableId: FillWardrobeGreen
+        tableId: FillWardrobeLibrarian
 
 - type: entityTable
   id: FillWardrobeLibrarian
@@ -22,19 +22,17 @@
       count: 2
     - id: BooksBag
       count: 2
-   
-
 
 - type: entity
   id: WardrobeReporterFilled
   suffix: Filled
   parent: WardrobeReporter
-  description: "You can build a robot out of this locker."
+  description: "A sturdy green locker containing reporter uniforms and broadcasting equipment."
   components:
   - type: EntityTableContainerFill
     containers:
       entity_storage: !type:NestedSelector
-        tableId: FillWardrobeGreen
+        tableId: FillWardrobeReporter
 
 - type: entityTable
   id: FillWardrobeReporter
@@ -47,12 +45,12 @@
   id: WardrobeMusicianFilled
   suffix: Filled
   parent: WardrobeMusician
-  description: "You can build a robot out of this locker."
+  description: "A sturdy green locker containing musician uniforms and various instruments."
   components:
   - type: EntityTableContainerFill
     containers:
       entity_storage: !type:NestedSelector
-        tableId: FillWardrobeGreen
+        tableId: FillWardrobeMusician
 
 - type: entityTable
   id: FillWardrobeMusician
@@ -64,6 +62,3 @@
     - id: XylophoneInstrument
     - id: SaxophoneInstrument
     - id: AccordionInstrument
-
-
-

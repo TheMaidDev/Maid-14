@@ -1,4 +1,4 @@
-ent-WardrobeLibrarian = гардероб библиотекорая
+ent-WardrobeLibrarian = гардероб библиотекаря
     .desc = { ent-WardrobeGreen.desc }
 
 ent-WardrobeReporter = гардероб репортера

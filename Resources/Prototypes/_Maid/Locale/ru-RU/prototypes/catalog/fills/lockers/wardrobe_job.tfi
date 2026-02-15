@@ -1,11 +1,11 @@
 ent-WardrobeLibrarianFilled = { ent-WardrobeLibrarian }
-    .desc = В этом шкафчике храниятся форма и вещи библиотекаря.
+    .desc = В этом шкафчике хранятся форма и вещи библиотекаря.
     .suffix = Заполненный
 
-ent-WardrobeReporterFilled = { ent-WardrobeReporter}
+ent-WardrobeReporterFilled = { ent-WardrobeReporter }
     .desc = В этом шкафчике хранятся одежда и вещи репортера.
     .suffix = Заполненный
 
-ent-WardrobeMusicianFilled = { ent-WardrobeMusician}
+ent-WardrobeMusicianFilled = { ent-WardrobeMusician }
     .desc = В этом шкафчике хранятся вещи музыканта.
     .suffix = Заполненный
