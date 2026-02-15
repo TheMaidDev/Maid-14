@@ -174,4 +174,4 @@
     #    weight: 0.08
       # Goobstation
       - id: MobSnailInstantDeath
-      weight: 0.0004 #Maid edit end
+        weight: 0.0004 #Maid edit end
