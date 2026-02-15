@@ -3,9 +3,9 @@ ent-WardrobeLibrarianFilled = { ent-WardrobeLibrarian }
     .suffix = Заполненный
 
 ent-WardrobeReporterFilled = { ent-WardrobeReporter}
-    .desc = В этом шкафчике храниятся одежда и вещи репортера.
+    .desc = В этом шкафчике хранятся одежда и вещи репортера.
     .suffix = Заполненный
 
 ent-WardrobeMusicianFilled = { ent-WardrobeMusician}
-    .desc = В этом шкафчике храниятся вещи музыканта.
+    .desc = В этом шкафчике хранятся вещи музыканта.
     .suffix = Заполненный
