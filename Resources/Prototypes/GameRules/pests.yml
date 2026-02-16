@@ -168,12 +168,13 @@
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
       children:
-    #  - id: MobSnail #Maid edit start
-    #    weight: 0.84
-    #  - id: MobSnailSpeed
-    #    weight: 0.08
-    #  - id: MobSnailMoth
-    #    weight: 0.08
-      # Goobstation
+#Maid edit start
+#      - id: MobSnail
+#        weight: 0.84
+#      - id: MobSnailSpeed
+#        weight: 0.08
+#      - id: MobSnailMoth
+#        weight: 0.08
+#Maid edit end
       - id: MobSnailInstantDeath
         weight: 0.0004 #Maid edit end
