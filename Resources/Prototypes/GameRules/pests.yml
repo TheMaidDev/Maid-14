@@ -114,10 +114,12 @@
       - id: MobMothroach
         weight: 0.20
       - id: MobSquackroach # Goobstation
-        weight: 0.1 #Maid edit start
-  #    - id: MobLootbug # Goobstation
-  #      weight: 0.3
-      - id: MobMoproach #Maid edit end
+        weight: 0.1 
+#Maid edit start
+#      - id: MobLootbug
+#        weight: 0.3
+#Maid edit end
+      - id: MobMoproach 
         weight: 0.01
 
 - type: entity
