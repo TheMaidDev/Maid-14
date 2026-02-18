@@ -17,11 +17,12 @@
     - id: ClothingNeckScarfStripedGreen
     - id: ClothingShoesBootsLaceup
     - id: ClothingUniformJumpsuitLibrarian
-      count: 2
+    - id: ClothingUniformJumpsuitLibrarian     
     - id: ClothingUniformJumpskirtLibrarian
-      count: 2
+    - id: ClothingUniformJumpskirtLibrarian
     - id: BooksBag
-      count: 2
+    - id: BooksBag
+
 
 - type: entity
   id: WardrobeReporterFilled
