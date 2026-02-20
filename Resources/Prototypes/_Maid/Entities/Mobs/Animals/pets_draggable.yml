@@ -1,0 +1,262 @@
+- type: entity
+  id: MobCorgiIan
+  parent: MobCorgiIan
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 40 
+    dragSpeedMultiplier: 0.7
+    canDragMobs: true
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobCorgiIanOld
+  parent: MobCorgiIanOld
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 35  
+    dragSpeedMultiplier: 0.65
+    canDragMobs: true
+    staminaDrainPerSecond: 7
+
+- type: entity
+  id: MobCorgiIanPup
+  parent: MobCorgiIanPup
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 15  
+    dragSpeedMultiplier: 0.9
+    canDragMobs: false
+    staminaDrainPerSecond: 4
+
+- type: entity
+  id: MobCorgiLisa
+  parent: MobCorgiLisa
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 38
+    dragSpeedMultiplier: 0.7
+    canDragMobs: true
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobCorgiMouse
+  parent: MobCorgiMouse
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 5  
+    dragSpeedMultiplier: 0.9
+    canDragMobs: false
+    staminaDrainPerSecond: 3
+
+- type: entity
+  id: MobCatRuntime
+  parent: MobCatRuntime
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 22  
+    dragSpeedMultiplier: 0.8
+    canDragMobs: true
+    staminaDrainPerSecond: 7
+
+- type: entity
+  id: MobCatException
+  parent: MobCatException
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 22
+    dragSpeedMultiplier: 0.8
+    canDragMobs: true
+    staminaDrainPerSecond: 7
+
+- type: entity
+  id: MobCatFloppa
+  parent: MobCatFloppa
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 24  
+    dragSpeedMultiplier: 0.8
+    canDragMobs: true
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobBandito
+  parent: MobBandito
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 8
+    dragSpeedMultiplier: 0.85
+    canDragMobs: false
+    staminaDrainPerSecond: 4
+
+- type: entity
+  id: MobBingus
+  parent: MobBingus
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 20
+    dragSpeedMultiplier: 0.8
+    canDragMobs: true
+    staminaDrainPerSecond: 7
+
+- type: entity
+  id: MobMcGriff
+  parent: MobMcGriff
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 42  
+    dragSpeedMultiplier: 0.7
+    canDragMobs: true
+    staminaDrainPerSecond: 5
+
+- type: entity
+  id: MobPaperwork
+  parent: MobPaperwork
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 30  
+    dragSpeedMultiplier: 0.3  
+    canDragMobs: true
+    staminaDrainPerSecond: 4
+
+- type: entity
+  id: MobWalter
+  parent: MobWalter
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 15
+    dragSpeedMultiplier: 0.8
+    canDragMobs: false
+    staminaDrainPerSecond: 5
+
+- type: entity
+  id: MobPossumMorty
+  parent: MobPossumMorty
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 12
+    dragSpeedMultiplier: 0.7
+    canDragMobs: false
+    staminaDrainPerSecond: 5
+
+- type: entity
+  id: MobPossumMortyOld
+  parent: MobPossumMortyOld
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 12
+    dragSpeedMultiplier: 0.6
+    canDragMobs: false
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobPossumPoppy
+  parent: MobPossumPoppy
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 12
+    dragSpeedMultiplier: 0.7
+    canDragMobs: false
+    staminaDrainPerSecond: 5
+
+- type: entity
+  id: MobRaccoonMorticia
+  parent: MobRaccoonMorticia
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 18  # Енот
+    dragSpeedMultiplier: 0.8
+    canDragMobs: true
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobAlexander
+  parent: MobAlexander
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 70
+    dragSpeedMultiplier: 0.55
+    canDragMobs: true
+    staminaDrainPerSecond: 4
+
+- type: entity
+  id: MobFoxRenault
+  parent: MobFoxRenault
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 25
+    dragSpeedMultiplier: 0.75
+    canDragMobs: true
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobHamsterHamlet
+  parent: MobHamsterHamlet
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 3 
+    dragSpeedMultiplier: 0.9
+    canDragMobs: false  
+    staminaDrainPerSecond: 2
+  - type: Stamina
+    critThreshold: 40  
+    staminaRegeneration: 5
+
+- type: entity
+  id: MobSpiderShiva
+  parent: MobSpiderShiva
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 35  
+    dragSpeedMultiplier: 0.7
+    canDragMobs: true
+    staminaDrainPerSecond: 5
+
+- type: entity
+  id: MobKangarooWillow
+  parent: MobKangarooWillow
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 55
+    dragSpeedMultiplier: 0.6
+    canDragMobs: true
+    staminaDrainPerSecond: 5
+
+- type: entity
+  id: MobSlimesPet
+  parent: MobSlimesPet
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 45  
+    dragSpeedMultiplier: 0.7
+    canDragMobs: true
+    staminaDrainPerSecond: 4
+
+- type: entity
+  id: MobMonkeyPunpun
+  parent: MobMonkeyPunpun
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 30
+    dragSpeedMultiplier: 0.7
+    canDragMobs: true
+    staminaDrainPerSecond: 6
+
+- type: entity
+  id: MobCrabAtmos
+  parent: MobCrabAtmos
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 15
+    dragSpeedMultiplier: 0.6  
+    canDragMobs: false
+    staminaDrainPerSecond: 4
+
+- type: entity
+  id: MobPollyParrot
+  parent: MobPollyParrot
+  components:
+  - type: AnimalDraggable
+    maxDragWeight: 2  
+    dragSpeedMultiplier: 0.9
+    canDragMobs: false
+    staminaDrainPerSecond: 3
