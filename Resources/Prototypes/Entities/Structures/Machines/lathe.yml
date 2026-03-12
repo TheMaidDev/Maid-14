@@ -600,6 +600,7 @@
     - ShuttleBoards
     # Goobstation Packs
     - SharedBoards
+    - MechBoardsSecurity # Maid
   - type: MaterialStorage
     whitelist:
       tags:

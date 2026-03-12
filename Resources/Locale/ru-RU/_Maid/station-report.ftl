@@ -1,0 +1,18 @@
+station-report-text =
+    {"["}color=#1b67a5]▀████▀ [head=2]Официальный документ[/head]
+    ▄████▄ [head=3]Тема: Отчёт станции[/head]
+    ▄█▄▄█▄ [head=3]Проверяющий: Представитель NanoTrasen[/head]
+    {"["}/color]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    • [color=#9fed58][bold]Общий отчёт[/bold][/color]
+    >[mono][/mono]
+    • [color=#ff5c5c][bold]Отчёт службы безопасности[/bold][/color]
+    >[mono][/mono]
+    • [color=#d28150][bold]Отчёт отдела логистики[/bold][/color]
+    >[mono][/mono]
+    • [color=#f2e052][bold]Отчёт инженерного отдела[/bold][/color]
+    >[mono][/mono]
+    • [color=#5b97bc][bold]Отчёт медицинского отдела[/bold][/color]
+    >[mono][/mono]
+    • [color=#c96dbf][bold]Отчёт научного отдела[/bold][/color]
+    >[mono][/mono]
+    Подписано: [color=Green]Имя представителя Nanotrasen[/color]

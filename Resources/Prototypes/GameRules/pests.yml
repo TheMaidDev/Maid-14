@@ -83,8 +83,6 @@
       - id: MobMouse2
       - id: MobMouseCancer # Goobstation
         weight: 0.05
-      - id: MobLootbug # Goobstation
-        weight: 0.25
     specialEntries:
     - id: SpawnPointGhostRatKing
       prob: 0.001
@@ -115,8 +113,6 @@
         weight: 0.20
       - id: MobSquackroach # Goobstation
         weight: 0.1
-      - id: MobLootbug # Goobstation
-        weight: 0.3
       - id: MobMoproach
         weight: 0.01
 
@@ -139,10 +135,6 @@
     chaosScore: 20
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
-      children:
-      - id: MobSnail
-      - id: MobSnailSpeed
-      - id: MobSnailMoth
 
 - type: entity
   id: SnailMigration
@@ -165,13 +157,13 @@
     chaosScore: 30
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
-      children:
-      - id: MobSnail
-        weight: 0.84
-      - id: MobSnailSpeed
-        weight: 0.08
-      - id: MobSnailMoth
-        weight: 0.08
+#      children:              # Maid
+#      - id: MobSnail
+#        weight: 0.84
+#      - id: MobSnailSpeed
+#        weight: 0.08
+#      - id: MobSnailMoth
+#        weight: 0.08
       # Goobstation
-      - id: MobSnailInstantDeath
-        weight: 0.0004
+#      - id: MobSnailInstantDeath
+#        weight: 0.0004

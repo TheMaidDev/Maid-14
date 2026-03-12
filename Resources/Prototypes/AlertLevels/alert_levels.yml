@@ -91,7 +91,7 @@
       announcement: alert-level-green-announcement
       color: Green
       emergencyLightColor: LawnGreen
-      shuttleTime: 600
+      shuttleTime: 900 # Maid
     blue:
       announcement: alert-level-blue-announcement
       sound: /Audio/Misc/bluealert.ogg
@@ -119,7 +119,7 @@
       color: Red
       emergencyLightColor: Red
       forceEnableEmergencyLights: true
-      shuttleTime: 600 #No reduction in time as we don't have swiping for red alert like in /tg/. Shuttle times are intended to create friction, so having a way to brainlessly bypass that would be dumb.
+      shuttleTime: 300 # Maid
     gamma:
       announcement: alert-level-gamma-announcement
       selectable: false
@@ -131,6 +131,7 @@
       color: PaleVioletRed
       emergencyLightColor: PaleVioletRed
       forceEnableEmergencyLights: true
+      shuttleTime: 300 # Maid
     delta:
       announcement: alert-level-delta-announcement
       selectable: false
@@ -142,7 +143,7 @@
       color: DarkRed
       emergencyLightColor: Orange
       forceEnableEmergencyLights: true
-      shuttleTime: 1200
+      shuttleTime: 300 # Maid
     epsilon:
       announcement: alert-level-epsilon-announcement
       selectable: false
@@ -154,7 +155,7 @@
       color: DarkViolet
       emergencyLightColor: DarkViolet
       forceEnableEmergencyLights: true
-      shuttleTime: 1200
+      shuttleTime: 300 # Maid
 #    omicron: # Goobstation
 #      announcement: alert-level-omicron-announcement
 #      selectable: false

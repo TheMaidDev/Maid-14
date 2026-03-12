@@ -33,19 +33,21 @@
     - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/PainShockMale3.ogg
     - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/PainShockMale4.ogg
 
-- type: soundCollection
-  id: CritWhimpersMale
-  files:
-    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale1.ogg
-    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale2.ogg
-    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale3.ogg
-    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale4.ogg
+# Maid
+#- type: soundCollection
+#  id: CritWhimpersMale
+#  files:
+#    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale1.ogg
+#    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale2.ogg
+#    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale3.ogg
+#    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveMale4.ogg
 
-- type: soundCollection
-  id: PainShockWhimpersMale
-  files:
-    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAlivePainedMale1.ogg
-    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAlivePainedMale2.ogg
+# Maid
+#- type: soundCollection
+#  id: PainShockWhimpersMale
+#  files:
+#    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAlivePainedMale1.ogg
+#    - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAlivePainedMale2.ogg
 
 # Pain screams (female)
 - type: soundCollection
@@ -71,17 +73,19 @@
   - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/PainShockFemale2.ogg
   - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/PainShockFemale3.ogg
 
-- type: soundCollection
-  id: CritWhimpersFemale
-  files:
-  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveFemale1.ogg
-  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveFemale2.ogg
-  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveFemale3.ogg
+# Maid
+#- type: soundCollection
+#  id: CritWhimpersFemale
+#  files:
+#  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveFemale1.ogg
+#  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveFemale2.ogg
+#  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAliveFemale3.ogg
 
-- type: soundCollection
-  id: PainShockWhimpersFemale
-  files:
-  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAlivePainedFemale1.ogg
+# Maid
+#- type: soundCollection
+#  id: PainShockWhimpersFemale
+#  files:
+#  - /Audio/_Shitmed/ReBELL/BrutalDeathRattles/StillAlivePainedFemale1.ogg
 
 # Organ damage gaggling
 - type: soundCollection

@@ -529,7 +529,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
         // find possible targets on screen even if not reachable
         // TODO: Duplicated in SpriteSystem and TargetOutlineSystem. Should probably be cached somewhere for a frame?
         var mousePos = _eyeManager.PixelToMap(_inputManager.MouseScreenPosition);
-        var expansion = new Vector2(1.5f, 1.5f);
+        var expansion = new Vector2(0.15f, 0.15f); // Maid
 
         var bounds = new Box2(mousePos.Position - expansion, mousePos.Position + expansion);
         var pvsEntities = _lookup.GetEntitiesIntersecting(mousePos.MapId, bounds);

@@ -193,7 +193,7 @@
       - ActionCritSuccumb
       - ActionCritFakeDeath
       - ActionCritLastWords
-  - type: Deathgasp
+#  - type: Deathgasp # Maid
   - type: HealthExaminable
     examinableTypes:
     - Blunt

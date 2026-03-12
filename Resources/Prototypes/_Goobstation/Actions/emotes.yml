@@ -27,6 +27,16 @@
   - does a flip
   - does a flip.
   - does a flip!
+  # Maid
+  - делает сальто
+  - делает сальто.
+  - делает сальто!
+  - кувыркается
+  - кувыркается.
+  - кувыркается!
+  - делает кульбит
+  - делает кульбит.
+  - делает кульбит!
   event: !type:AnimationFlipEmoteEvent
 
 - type: emote
@@ -71,6 +81,16 @@
   - spins
   - spins.
   - spins!
+  # Maid
+  - крутится
+  - крутится.
+  - крутится!
+  - кружится
+  - кружится.
+  - кружится!
+  - вертится
+  - вертится.
+  - вертится!
   event: !type:AnimationSpinEmoteEvent
 
 - type: emote
@@ -82,4 +102,14 @@
   - jumps
   - jumps.
   - jumps!
+  # Maid
+  - прыгает
+  - прыгает.
+  - прыгает!
+  - скачет
+  - скачет.
+  - скачет!
+  - подпрыгивает
+  - подпрыгивает.
+  - подпрыгивает!
   event: !type:AnimationJumpEmoteEvent

@@ -40,6 +40,7 @@ using Robust.Shared.Input;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Content.Shared._NF.Interaction.Components;
+using Content.Shared.Tag; // Maid
 
 namespace Content.Client.UserInterface.Systems.Hands;
 
@@ -50,6 +51,7 @@ public sealed class HandsUIController : UIController, IOnStateEntered<GameplaySt
 
     [UISystemDependency] private readonly HandsSystem _handsSystem = default!;
     [UISystemDependency] private readonly UseDelaySystem _useDelay = default!;
+    [UISystemDependency] private readonly TagSystem _tagSystem = default!; // Maid
 
     private readonly List<HandsContainer> _handsContainers = new();
     private readonly Dictionary<string, int> _handContainerIndices = new();
@@ -512,6 +514,14 @@ public sealed class HandsUIController : UIController, IOnStateEntered<GameplaySt
                     hand.CooldownDisplay.Visible = false;
                     continue;
                 }
+
+                if (_entities.HasComponent<TagComponent>(hand.Entity) &&      // Maid
+                    _tagSystem.HasTag(hand.Entity.Value, "Stunbaton"))
+                {
+                    hand.CooldownDisplay.Visible = false;
+                    continue;
+                }
+
                 var delay = _useDelay.GetLastEndingDelay((hand.Entity.Value, useDelay));
 
                 hand.CooldownDisplay.Visible = true;

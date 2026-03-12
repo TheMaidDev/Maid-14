@@ -73,6 +73,9 @@ using Robust.Shared.Containers;
 using Robust.Shared.Enums;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Content.Shared.Nuke; // Maid
+using Robust.Shared.GameObjects; // Maid
+using Robust.Shared.GameObjects.Components; // Maid 
 
 namespace Content.Server.Bed.Cryostorage;
 
@@ -221,6 +224,8 @@ public sealed class CryostorageSystem : SharedCryostorageSystem
         if (!TryComp<CryostorageComponent>(cryostorageEnt, out var cryostorageComponent))
             return;
 
+        TryReturnNukeDiskToCaptainLocker(ent.Owner, station); // Maid
+
         // if we have a session, we use that to add back in all the job slots the player had.
         if (userId != null)
         {
@@ -238,8 +243,9 @@ public sealed class CryostorageSystem : SharedCryostorageSystem
                 }
 
                 _stationJobs.TryRemovePlayerJobs(uniqueStation, userId.Value, stationJobs);
+            
             }
-        }
+        }      
 
         _audio.PlayPvs(cryostorageComponent.RemoveSound, ent);
 
@@ -289,6 +295,76 @@ public sealed class CryostorageSystem : SharedCryostorageSystem
             ), Loc.GetString("earlyleave-cryo-sender"),
             playDefaultSound: false
         );
+    }
+    
+    private void TryReturnNukeDiskToCaptainLocker(EntityUid player, EntityUid? station) // Maid
+    {
+        var disk = FindNukeDiskOwnedByPlayer(player);
+        if (disk == null)
+            return;
+
+        var captainLocker = FindCaptainLocker(station);
+        if (captainLocker == null)
+            return;
+
+    // Сначала пробуем положить внутрь шкафчика.
+        if (_container.TryGetContainer(captainLocker.Value, "entity_storage", out var container))
+        {
+            if (_container.Insert(disk.Value, container))
+                return;
+        }
+
+        _transform.SetCoordinates(disk.Value, Transform(captainLocker.Value).Coordinates);
+    }    
+
+    private EntityUid? FindNukeDiskOwnedByPlayer(EntityUid player) // Maid
+    {
+        var query = EntityQueryEnumerator<NukeDiskComponent, TransformComponent>();
+
+        while (query.MoveNext(out var diskUid, out _, out var xform))
+        {
+            var current = xform.ParentUid;
+
+            while (current != EntityUid.Invalid)
+            {
+                if (current == player)
+                    return diskUid;
+
+                current = Transform(current).ParentUid;
+            }
+        }
+
+        return null;
+    }
+
+    private EntityUid? FindCaptainLocker(EntityUid? station) // Maid
+    {
+        var query = EntityQueryEnumerator<MetaDataComponent>();
+
+        while (query.MoveNext(out var uid, out var meta))
+        {
+            var proto = meta.EntityPrototype?.ID;
+            if (proto == null)
+                continue;
+
+            // Проверяем станцию
+            if (station != null)
+            {
+                var owningStation = _station.GetOwningStation(uid);
+                if (owningStation != station)
+                    continue;
+            }
+
+            if (proto == "LockerCaptain"
+                || proto == "LockerCaptainFilled"
+                || proto == "ClosetCaptain"
+                || proto == "ClosetCaptainFilled")
+            {
+                return uid;
+            }
+        }
+
+        return null;
     }
 
     private void HandleCryostorageReconnection(Entity<CryostorageContainedComponent> entity)

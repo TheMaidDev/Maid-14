@@ -427,7 +427,7 @@
     stateBaseClosed: shotguncase
     stateDoorOpen: shotguncase_open
     stateDoorClosed: shotguncase_door
-  - type: AccessReader
+#  - type: AccessReader # Maid
   - type: Construction
     graph: GunSafe
     node: done

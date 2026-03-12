@@ -187,8 +187,8 @@
       collection: Weh
     Hew:
       collection: Hew
-    Gasp:
-      collection: MaleGasp
+#    Gasp:   # Maid
+#      collection: MaleGasp
     DefaultDeathgasp:
       collection: MaleDeathGasp
     Gulp: # Goob
@@ -1010,7 +1010,7 @@
       collection: Hew
     Honk:
       collection: BikeHorn
-    Gasp:
-      collection: MaleGasp
+#    Gasp:    # Maid
+#      collection: MaleGasp
     DefaultDeathgasp:
       collection: WawaDeath

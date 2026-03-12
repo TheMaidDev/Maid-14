@@ -374,12 +374,12 @@ namespace Content.Shared.Examine
             var hasDescription = false;
             var metadata = MetaData(entity);
 
-            //Add an entity description if one is declared
-            if (!string.IsNullOrEmpty(metadata.EntityDescription))
-            {
-                message.AddText(metadata.EntityDescription);
-                hasDescription = true;
-            }
+            // remove direct entity description from generic examine 
+            // if (!string.IsNullOrEmpty(metadata.EntityDescription))
+            // {
+            //    message.AddText(metadata.EntityDescription);
+            //    hasDescription = true;
+            // }
 
             message.PushColor(Color.DarkGray);
 

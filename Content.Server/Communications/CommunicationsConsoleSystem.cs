@@ -242,20 +242,15 @@ namespace Content.Server.Communications
             // Ensure that we can communicate with the shuttle (either call or recall)
             if (!comp.CanShuttle)
                 return false;
-
+                
             // Calling shuttle checks
             if (_roundEndSystem.ExpectedCountdownEnd is null)
                 return true;
 
-            // Recalling shuttle checks
-            var recallThreshold = _cfg.GetCVar(CCVars.EmergencyRecallTurningPoint);
-
-            // shouldn't really be happening if we got here
-            if (_roundEndSystem.ShuttleTimeLeft is not { } left
-                || _roundEndSystem.ExpectedShuttleLength is not { } expected)
+            if (_roundEndSystem.ShuttleTimeLeft is not { } timeLeft)
                 return false;
 
-            return !(left.TotalSeconds / expected.TotalSeconds < recallThreshold);
+            return timeLeft > TimeSpan.FromSeconds(90); // Maid
         }
 
         private void OnSelectAlertLevelMessage(EntityUid uid, CommunicationsConsoleComponent comp, CommunicationsConsoleSelectAlertLevelMessage message)

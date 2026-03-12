@@ -254,13 +254,13 @@
   components:
   - type: AmbientSound
     range: 2
-  - type: PointLight
-    radius: 1.5
-    energy: 1
-    color: "#ff6900"
-    netsync: false
-    castShadows: false
-    offset: 0, -0.2
+#  - type: PointLight # Maid
+#    radius: 1.5
+#    energy: 1
+#    color: "#ff6900"
+#    netsync: false
+ #   castShadows: false
+  #  offset: 0, -0.2 
   - type: Clickable
   - type: ContainerFill
     containers:
@@ -281,7 +281,7 @@
     layers:
     - state: substation_wall
     - state: substation_wall_static # Maid
-      shader: unshaded
+#      shader: unshaded   # Maid
   - type: Battery
     maxCharge: 2000000
     startingCharge: 0

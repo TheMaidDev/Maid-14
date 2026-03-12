@@ -749,12 +749,12 @@
       - state: inhand-left
         color: "#C12D30"
         sprite: Clothing/Uniforms/Jumpsuit/color.rsi
-      - state: overlay-inhand-left
+#      - state: overlay-inhand-left     # Maid
       right:
       - state: inhand-right
         color: "#C12D30"
         sprite: Clothing/Uniforms/Jumpsuit/color.rsi
-      - state: overlay-inhand-right
+#      - state: overlay-inhand-right    # Maid
 
 - type: entity
   parent: ClothingUniformBase
