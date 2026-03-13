@@ -110,6 +110,7 @@
   parent: LockerBaseSecure
   name: captain's locker
   components:
+  - type: CaptainLocker
   - type: Appearance
   - type: EntityStorageVisuals
     stateBaseClosed: cap
@@ -427,7 +428,8 @@
     stateBaseClosed: shotguncase
     stateDoorOpen: shotguncase_open
     stateDoorClosed: shotguncase_door
-#  - type: AccessReader # Maid
+  - type: AccessReader
+    access: [["Armory"]]
   - type: Construction
     graph: GunSafe
     node: done
@@ -440,9 +442,6 @@
   id: GunSafeBaseSecure
   parent: GunSafe
   suffix: Armory, Locked
-  components:
-  - type: AccessReader
-    access: [["Armory"]]
 
 # Genpop Storage
 - type: entity

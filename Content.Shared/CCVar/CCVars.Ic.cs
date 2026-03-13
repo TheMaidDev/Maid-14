@@ -34,6 +34,12 @@ public sealed partial class CCVars
         CVarDef.Create("ic.flavor_text", true, CVar.SERVER | CVar.REPLICATED); // Maid
 
     /// <summary>
+    ///     Minimum seconds left to allow shuttle recall.
+    /// </summary>
+    public static readonly CVarDef<int> EmergencyRecallFixedThreshold =
+        CVarDef.Create("emergency.recall_fixed_threshold", 90, CVar.SERVER);
+
+    /// <summary>
     ///     Sets the maximum length for flavor text (character descriptions).
     /// </summary>
     public static readonly CVarDef<int> MaxFlavorTextLength =

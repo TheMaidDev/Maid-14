@@ -250,7 +250,10 @@ namespace Content.Server.Communications
             if (_roundEndSystem.ShuttleTimeLeft is not { } timeLeft)
                 return false;
 
-            return timeLeft > TimeSpan.FromSeconds(90); // Maid
+            // Maid edit start
+            var recallThresholdSeconds = _cfg.GetCVar(CCVars.EmergencyRecallFixedThreshold);
+            return timeLeft.TotalSeconds > recallThresholdSeconds;
+            // Maid edit end
         }
 
         private void OnSelectAlertLevelMessage(EntityUid uid, CommunicationsConsoleComponent comp, CommunicationsConsoleSelectAlertLevelMessage message)

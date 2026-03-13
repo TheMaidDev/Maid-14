@@ -172,7 +172,11 @@ public sealed partial class PainSystem : EntitySystem
                 if (TryComp<HumanoidAppearanceComponent>(args.Target, out var humanoid))
                     sex = humanoid.Sex;
 
-                PlayPainSoundWithCleanup(args.Target, nerveSys, nerveSys.CritWhimpers[sex], AudioParams.Default.WithVolume(-12f));
+                // Maid edit start
+                if (nerveSys.CritWhimpers.TryGetValue(sex, out var critWhimper))
+                    PlayPainSoundWithCleanup(args.Target, nerveSys, critWhimper, AudioParams.Default.WithVolume(-12f));
+                // Maid edit end
+
                 nerveSys.NextCritScream = _timing.CurTime + _random.Next(nerveSys.CritScreamsIntervalMin, nerveSys.CritScreamsIntervalMax);
                 break;
 
@@ -185,7 +189,7 @@ public sealed partial class PainSystem : EntitySystem
     private void UpdateNerveSystemNerves(EntityUid uid, EntityUid body, NerveSystemComponent component)
     {
         component.Nerves.Clear();
-        foreach (var bodyPart in _body.GetBodyChildren(body))
+        foreach (var bodyPart in _body.GetBodyChildren(body))if (TryComp<HumanoidAppearanceComponent>(uid, out var humanoid))
         {
             if (!TryComp<NerveComponent>(bodyPart.Id, out var nerve))
                 continue;

@@ -374,12 +374,13 @@ namespace Content.Shared.Examine
             var hasDescription = false;
             var metadata = MetaData(entity);
 
-            // remove direct entity description from generic examine 
-            // if (!string.IsNullOrEmpty(metadata.EntityDescription))
-            // {
-            //    message.AddText(metadata.EntityDescription);
-            //    hasDescription = true;
-            // }
+            // Maid edit start
+            if (!string.IsNullOrEmpty(metadata.EntityDescription))
+            {
+               message.AddText(metadata.EntityDescription);
+               hasDescription = true;
+            }
+            // Maid edit end
 
             message.PushColor(Color.DarkGray);
 

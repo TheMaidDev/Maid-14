@@ -151,50 +151,50 @@ public sealed partial class NerveSystemComponent : Component
     };
 
     [DataField]
-    public Dictionary<Sex, SoundSpecifier> CritWhimpers = new();        // Maid
-//    {
-//        {
-//            Sex.Male, new SoundCollectionSpecifier("CritWhimpersMale")
-//            {
-//                Params = AudioParams.Default,
-//            }
-//        },
-//        {
-//            Sex.Female, new SoundCollectionSpecifier("CritWhimpersFemale")
-//            {
-//                Params = AudioParams.Default,
-//            }
-//        },
-//        {
-//            Sex.Unsexed, new SoundCollectionSpecifier("CritWhimpersMale") // yeah
-//            {
-//                Params = AudioParams.Default,
-//            }
-//        },
-//    };
+    public Dictionary<Sex, SoundSpecifier> CritWhimpers = new()
+    {
+        {
+            Sex.Male, new SoundCollectionSpecifier("CritWhimpersMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Female, new SoundCollectionSpecifier("CritWhimpersFemale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Unsexed, new SoundCollectionSpecifier("CritWhimpersMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+    };
 
     [DataField]
-    public Dictionary<Sex, SoundSpecifier> PainShockWhimpers = new();     // Maid
-//    {        
-//        {
-//            Sex.Male, new SoundCollectionSpecifier("PainShockWhimpersMale")
-//            {
-//                Params = AudioParams.Default,
-//            }
-//        },
-//        {
-//            Sex.Female, new SoundCollectionSpecifier("PainShockWhimpersFemale")
-//            {
-//                Params = AudioParams.Default,
-//            }
-//        },
-//        {
-//            Sex.Unsexed, new SoundCollectionSpecifier("PainShockWhimpersMale") // yeah
-//            {
-//                Params = AudioParams.Default,
-//            }
-//        },
-//    };
+    public Dictionary<Sex, SoundSpecifier> PainShockWhimpers = new()
+    {        
+        {
+            Sex.Male, new SoundCollectionSpecifier("PainShockWhimpersMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Female, new SoundCollectionSpecifier("PainShockWhimpersFemale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+        {
+            Sex.Unsexed, new SoundCollectionSpecifier("PainShockWhimpersMale")
+            {
+                Params = AudioParams.Default,
+            }
+        },
+    };
 
     [DataField]
     public Dictionary<Sex, SoundSpecifier> OrganDestructionReflexSounds = new()

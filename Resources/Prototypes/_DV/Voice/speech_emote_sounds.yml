@@ -85,8 +85,8 @@
       collection: CatMeows # Goobstation - effect standardization
     Coo: #Floofstation
       collection: HarpyCoos
-#    Gasp: # Maid
-#      collection: FemaleGasp
+    Gasp: 
+      collection: FemaleGasp
     DefaultDeathgasp:
       collection: FemaleDeathGasp
     Gulp: # Goob
@@ -169,8 +169,8 @@
       collection: CatMeows # Goobstation - effect standardization
     Coo: #Floofstation
       collection: HarpyCoos
-#    Gasp: # Maid
-#      collection: MaleGasp
+    Gasp: 
+      collection: MaleGasp
     DefaultDeathgasp:
       collection: MaleDeathGasp
     Gulp: # Goob
@@ -229,8 +229,8 @@
       collection: VulpkaninHowls
     CatMeow:
       collection: CatMeows # Goobstation - effect standardization
-#    Gasp: # Maid
-#      collection: FemaleGasp
+    Gasp: 
+      collection: FemaleGasp
     DefaultDeathgasp:
       collection: FemaleDeathGasp
     Gulp: # Goob
@@ -279,8 +279,8 @@
       collection: VulpkaninHowls
     CatMeow:
       collection: CatMeows # Goobstation - effect standardization
-#    Gasp: # Maid
-#      collection: MaleGasp
+    Gasp: 
+      collection: MaleGasp
     DefaultDeathgasp:
       collection: MaleDeathGasp
     Gulp: # Goob
@@ -337,8 +337,8 @@
       path: /Audio/Animals/mouse_squeak.ogg
     CatMeow:
       collection: CatMeows # Goobstation - effect standardization
-#    Gasp: # Maid
-#      collection: MaleGasp
+    Gasp: 
+      collection: MaleGasp
     DefaultDeathgasp:
       collection: MaleDeathGasp
     Gulp: # Goob
@@ -377,8 +377,8 @@
       path: /Audio/Animals/mouse_squeak.ogg
     CatMeow:
       collection: CatMeows # Goobstation - effect standardization
-#    Gasp: # Maid
-#      collection: FemaleGasp
+    Gasp: 
+      collection: FemaleGasp
     DefaultDeathgasp:
       collection: FemaleDeathGasp
     Gulp: # Goob
@@ -415,8 +415,8 @@
       collection: MaleYawn
     Hiss:
       path: /Audio/Animals/snake_hiss.ogg
-#    Gasp: # Maid
-#      collection: MaleGasp
+    Gasp: 
+      collection: MaleGasp
     DefaultDeathgasp:
       collection: MothDeathGasp
     Sigh:
@@ -459,8 +459,8 @@
       collection: Hew
     Hiss:
       path: /Audio/Animals/snake_hiss.ogg
-#    Gasp: Maid
-#      collection: FemaleGasp
+    Gasp:
+      collection: FemaleGasp
     DefaultDeathgasp:
       collection: MothDeathGasp
     Gnash:
@@ -501,8 +501,8 @@
       collection: Hew
     Hiss:
       path: /Audio/Animals/snake_hiss.ogg
-#    Gasp: # Maid
-#      collection: MaleGasp
+    Gasp: 
+      collection: MaleGasp
     DefaultDeathgasp:
       collection: MothDeathGasp
     Gnash:

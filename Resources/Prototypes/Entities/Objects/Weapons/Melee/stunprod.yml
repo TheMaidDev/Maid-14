@@ -80,6 +80,7 @@
     maxCharge: 360
     startingCharge: 360
   - type: UseDelay
+    hidecooldownDisplay: True # Maid
     delays: # Goobstation
       stunbaton:
         length: 2.5

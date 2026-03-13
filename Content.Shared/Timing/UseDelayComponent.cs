@@ -42,6 +42,8 @@ public sealed partial class UseDelayComponent : Component
     /// </remarks>
     [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(1);
+    [DataField]
+    public bool HideCooldownDisplay = false;
 }
 
 [Serializable, NetSerializable]

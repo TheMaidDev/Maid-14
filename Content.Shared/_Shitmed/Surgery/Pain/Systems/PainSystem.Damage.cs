@@ -688,13 +688,35 @@ public partial class PainSystem
                 {
                     // Play screaming with less chance
                     if (_random.Prob(0.34f))
+                    {
                         PlayPainSound(body, nerveSys, nerveSys.PainShockScreams[sex], AudioParams.Default.WithVolume(12f));
+                    }
                     else
+                    {
+                        // Maid edit start
                         // Whimpering
-                        PlayPainSound(body,
-                            nerveSys,                    // Pained or normal
-                            _random.Prob(0.34f) ? nerveSys.PainShockWhimpers[sex] : nerveSys.CritWhimpers[sex],
-                            AudioParams.Default.WithVolume(-12f));
+                        SoundSpecifier? whimperSound = null;
+
+                        if (_random.Prob(0.34f))
+                        {
+                            if (nerveSys.PainShockWhimpers.TryGetValue(sex, out var painShockWhimper))
+                                whimperSound = painShockWhimper;
+                        }
+                        else
+                        {
+                            if (nerveSys.CritWhimpers.TryGetValue(sex, out var critWhimper))
+                                whimperSound = critWhimper;
+                        }
+
+                        if (whimperSound != null)
+                        {
+                            PlayPainSound(body,
+                                nerveSys,
+                                whimperSound,
+                                AudioParams.Default.WithVolume(-12f));
+                        }
+                        // Maid edit end
+                    }
                 }
 
                 nerveSys.NextCritScream = _timing.CurTime + _random.Next(nerveSys.CritScreamsIntervalMin, nerveSys.CritScreamsIntervalMax);

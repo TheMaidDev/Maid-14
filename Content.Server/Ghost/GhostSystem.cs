@@ -210,27 +210,7 @@ namespace Content.Server.Ghost
             SubscribeLocalEvent<ToggleGhostVisibilityToAllEvent>(OnToggleGhostVisibilityToAll);
 
             SubscribeLocalEvent<GhostComponent, GetVisMaskEvent>(OnGhostVis);
-        }
-
-        public override void Update(float frameTime) // Maid
-        {
-            base.Update(frameTime);
-
-            var query = EntityQueryEnumerator<GhostComponent>();
-            while (query.MoveNext(out var uid, out var ghost))
-            {
-                if (Deleted(uid) || Terminating(uid))
-                    continue;
-
-                if (TryComp<ActorComponent>(uid, out _))
-                    continue;
-
-                if ((_gameTiming.CurTime - ghost.TimeOfDeath).TotalSeconds < 5)
-                    continue;
-
-                QueueDel(uid); // Maid cleanup
-            }
-        }        
+        }      
 
         private void OnGhostVis(Entity<GhostComponent> ent, ref GetVisMaskEvent args)
         {
