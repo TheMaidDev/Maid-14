@@ -1,0 +1,278 @@
+- type: entity
+  name: One-Star
+  id: MobOneStar
+  parent: [ BaseMob ]
+  description: It's like it's staring right through you.
+  suffix: "Лютый Дизбаланс"
+  components:
+  - type: Sprite
+    drawdepth: Mobs
+    sprite: Mobs/Silicon/onestar.rsi
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: onestar_boss
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: onestar_boss_screen
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: onestar_boss
+      Dead:
+        Base: onestar_boss_wrecked
+  - type: MobState        
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      1500: Dead
+    allowRevives: false
+    showOverlays: true
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 1
+        density: 3000
+        mask:
+        - MobMask
+        layer:
+        - MobLayer    
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Metallic
+  - type: StatusEffects
+    allowed:
+    - SlowedDown
+  - type: TypingIndicator
+    proto: robot
+  - type: Speech
+    speechVerb: Robotic
+    speechSounds: Borg
+    allowedEmotes: # Goobstation - Cyborg emote sounds
+    - Laugh
+    - Sigh
+    - Crying
+    - Whistle
+  - type: Vocal
+    sounds:
+      Unsexed: UnisexSilicon
+    wilhelmProbability: 0
+  - type: FootstepModifier
+    footstepSoundCollection:
+      collection: FootstepBorg
+  - type: ItemTogglePointLight
+  - type: ZombieImmune
+  - type: Repairable
+    doAfterDelay: 40            
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 0.75
+    baseSprintSpeed: 0.75 
+  - type: BallisticAmmoProvider
+    proto: CartridgeLightRifle
+    capacity: 10000
+  - type: Gun
+    fireRate: 24
+    useKey: false
+    selectedMode: FullAuto
+    availableModes:
+    - FullAuto
+    soundGunshot: /Audio/Weapons/Guns/Gunshots/lmg.ogg
+  - type: CombatMode
+  - type: NoSlip
+  - type: HandheldLight
+    toggleOnInteract: false
+    wattage: 0.2
+    blinkingBehaviourId: blinking
+    radiatingBehaviourId: radiating
+  - type: LightBehaviour
+    behaviours:
+      - !type:FadeBehaviour
+        id: radiating
+        maxDuration: 2.0
+        startValue: 3.0
+        endValue: 2.0
+        isLooped: true
+        reverseWhenFinished: true
+      - !type:PulseBehaviour
+        id: blinking
+        interpolate: Nearest
+        maxDuration: 1.0
+        startValue: 0.1
+        endValue: 2.0
+        isLooped: true
+  - type: ToggleableVisuals
+    spriteLayer: light  
+  - type: PointLight
+    enabled: false
+    mask: /Textures/Effects/LightMasks/cone.png
+    autoRot: true
+    radius: 16
+    netsync: false
+  - type: ProtectedFromStepTriggers
+  - type: LanguageKnowledge # Einstein Engines - Languages
+    speaks:
+    - TauCetiBasic
+    - RobotTalk
+    understands:
+    - TauCetiBasic
+    - RobotTalk  
+  - type: Puller
+    needsHands: false
+  - type: HealthExaminable
+    examinableTypes:
+      - Blunt
+      - Slash
+      - Piercing
+      - Heat
+      - Shock    
+
+
+- type: entity
+  name: One-Star
+  id: MobOneStarbalance
+  parent: [ MobOneStar ]
+  suffix: "Балансная Версия"
+  components:  
+  - type: Gun
+    fireRate: 4
+    useKey: false
+    selectedMode: FullAuto
+    availableModes:
+    - FullAuto
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      750: Dead    
+
+- type: entity
+  name: One-Star
+  id: MobOneStarRocket
+  parent: [ MobOneStar ]
+  suffix: "Лютый Дизбаланс + Ракеты"
+  components:
+  - type: BallisticAmmoProvider
+    proto: CartridgeRocket
+    capacity: 100
+  - type: Gun
+    fireRate: 1.5
+    useKey: false
+    selectedMode: FullAuto
+    soundGunshot: /Audio/Weapons/Guns/Gunshots/rocket_launcher.ogg    
+    availableModes:
+    - FullAuto
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      750: Dead
+
+     
+- type: entity
+  name: One-Star
+  id: MobOneStarMelee
+  parent: [ BaseMob ]
+  description: It's like it's staring right through you.
+  suffix: "Лютый Дизбаланс + Ближний бой"
+  components:
+  - type: Sprite
+    drawdepth: Mobs
+    sprite: Mobs/Silicon/onestar.rsi
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: onestar_boss
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: onestar_boss_screen
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: onestar_boss
+      Dead:
+        Base: onestar_boss_wrecked
+  - type: MobState        
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      3000: Dead
+    allowRevives: false
+    showOverlays: true
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 1
+        density: 3000
+        mask:
+        - MobMask
+        layer:
+        - MobLayer    
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Metallic
+  - type: StatusEffects
+    allowed:
+    - SlowedDown
+  - type: TypingIndicator
+    proto: robot
+  - type: Speech
+    speechVerb: Robotic
+    speechSounds: Borg
+    allowedEmotes: # Goobstation - Cyborg emote sounds
+    - Laugh
+    - Sigh
+    - Crying
+    - Whistle
+  - type: Vocal
+    sounds:
+      Unsexed: UnisexSilicon
+    wilhelmProbability: 0
+  - type: FootstepModifier
+    footstepSoundCollection:
+      collection: FootstepBorg
+  - type: ItemTogglePointLight
+  - type: ZombieImmune
+  - type: Repairable
+    doAfterDelay: 40            
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 0.75
+    baseSprintSpeed: 0.75 
+  - type: NoSlip
+  - type: HandheldLight
+    toggleOnInteract: false
+    wattage: 0.2
+    blinkingBehaviourId: blinking
+    radiatingBehaviourId: radiating
+    isLooped: true
+  - type: ToggleableVisuals
+    spriteLayer: light  
+  - type: PointLight
+    enabled: false
+    mask: /Textures/Effects/LightMasks/cone.png
+    autoRot: true
+    radius: 16
+    netsync: false
+  - type: ProtectedFromStepTriggers
+  - type: LanguageKnowledge # Einstein Engines - Languages
+    speaks:
+    - TauCetiBasic
+    - RobotTalk
+    understands:
+    - TauCetiBasic
+    - RobotTalk  
+  - type: Puller
+    needsHands: false
+  - type: HealthExaminable
+    examinableTypes:
+      - Blunt
+      - Slash
+      - Piercing
+      - Heat
+      - Shock
+  - type: MeleeWeapon
+    damage:
+      types:
+        Blunt: 150
+        Structural: 200
+    range: 4
+    attackRate: 0.4
+    altDisarm: false
+  - type: CombatMode  
