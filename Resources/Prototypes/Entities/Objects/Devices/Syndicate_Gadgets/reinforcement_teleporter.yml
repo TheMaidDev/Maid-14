@@ -103,9 +103,9 @@
     - MindRoleGhostRoleFamiliar
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 7200 #2 hours # Maid 5 -> 2
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 7200 #2 hours # Maid 5 -> 2
   - type: GhostRoleMobSpawner
     prototype: MobHumanSyndicateAgentSpy
     selectablePrototypes: ["SyndicateAgentMedic", "SyndicateAgentSpy", "SyndicateAgentThief"]
@@ -126,9 +126,9 @@
     - MindRoleGhostRoleTeamAntagonist
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 7200 #2 hours # Maid 5 -> 2
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 7200 #2 hours # Maid 5 -> 2
   - type: GhostRoleMobSpawner
     prototype: MobHumanSyndicateAgentNukeops
 
@@ -146,9 +146,9 @@
     - MindRoleGhostRoleFamiliar
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 7200 #2 hours # Maid 5 -> 2
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 7200 #2 hours # Maid 5 -> 2
   - type: GhostRoleMobSpawner
     prototype: MobMonkeySyndicateAgent
     selectablePrototypes: ["SyndicateMonkey", "SyndicateKobold"]
@@ -178,9 +178,9 @@
     - MindRoleGhostRoleFamiliar
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 10800 #3 hours # Maid 5 -> 3 cats must roleplay
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 10800 #3 hours # Maid 5 -> 3 cat's must roleplay too
   - type: GhostRoleMobSpawner
     prototype: MobCatSyndy
   - type: EmitSoundOnUse
@@ -201,8 +201,8 @@
       - MindRoleGhostRoleSilicon
       raffle:
         settings: default
-      requirements: # Goobstation - ghost roles requirements
-      - !type:OverallPlaytimeRequirement
-        time: 10800 #3 hours # Maid 5 -> 3
+#      requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#      - !type:OverallPlaytimeRequirement
+#        time: 10800 #3 hours # Maid 5 -> 3
     - type: GhostRoleMobSpawner
       prototype: PlayerBorgSyndicateAssaultBattery

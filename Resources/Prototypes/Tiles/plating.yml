@@ -32,7 +32,7 @@
 - type: tile
   id: Plating
   name: tiles-plating
-  sprite: /Textures/Tiles/plating.png
+  sprite: /Textures/_Maid/Tiles/plating.png #Maid
   baseTurf: Lattice
   isSubfloor: true
   # Goobstation - Fireaxe plating prying

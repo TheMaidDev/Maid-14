@@ -44,14 +44,14 @@
   - type: AntagImmune
   - type: Speech
     speechVerb: HolierThanThou
-  - type: GhostRole
-    requirements:
-    - !type:DepartmentTimeRequirement
-      department: Security
-      time: 36000 # Ten Hours
-    - !type:DepartmentTimeRequirement
-      department: Command
-      time: 108000 # Thirty hours. Fuck you.
+  - type: GhostRole # Maid - TimeReq if off 23.03.2026
+#    requirements:
+#    - !type:DepartmentTimeRequirement
+#      department: Security
+#      time: 36000 # Ten Hours
+#    - !type:DepartmentTimeRequirement
+#      department: Command
+#      time: 108000 # Thirty hours. Fuck you.
 
 # Navy Officer
 

@@ -113,9 +113,9 @@
     - MindRoleGhostRoleSoloAntagonist
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 3600 #1 hour # Maid 5 -> 1
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 3600 #1 hour # Maid 5 -> 1
   - type: GhostRoleMobSpawner
     prototype: MobRatKing
   - type: Sprite
@@ -204,9 +204,9 @@
     rules: ghost-role-information-loneop-rules
     mindRoles:
     - MindRoleGhostRoleSoloAntagonist
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement # Maid DepartmentTimeRequirement -> OverallPlaytimeRequirement
-      time: 18000 #5 hours
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement # Maid DepartmentTimeRequirement -> OverallPlaytimeRequirement
+#      time: 18000 #5 hours
   - type: Sprite
     sprite: Markers/jobs.rsi
     layers:
@@ -261,9 +261,9 @@
     rules: ghost-role-information-space-dragon-rules
     mindRoles:
     - MindRoleGhostRoleTeamAntagonist
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 3600 #1 hour # Maid 5 -> 1
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 3600 #1 hour # Maid 5 -> 1
   - type: Sprite
     layers:
     - state: green
@@ -283,9 +283,9 @@
     - MindRoleGhostRoleSoloAntagonist
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement
-      time: 10800 #3 hours # Maid 5 -> 3
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement
+#      time: 10800 #3 hours # Maid 5 -> 3
   - type: Sprite
     sprite: Markers/jobs.rsi
     layers:

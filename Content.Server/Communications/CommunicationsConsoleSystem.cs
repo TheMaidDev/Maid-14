@@ -49,6 +49,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server._Maid.TTS;
 using Content.Server.Administration.Logs;
 using Content.Server.AlertLevel;
 using Content.Server.Chat.Systems;
@@ -58,6 +59,7 @@ using Content.Server.RoundEnd;
 using Content.Server.Screens.Components;
 using Content.Server.Shuttles.Systems;
 using Content.Server.Station.Systems;
+using Content.Shared._Maid.TTS;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.CCVar;
@@ -327,6 +329,11 @@ namespace Content.Server.Communications
 
             _chatSystem.DispatchStationAnnouncement(uid, msg, title, colorOverride: comp.Color);
 
+            if (TryComp<TTSComponent>(message.Actor, out var ttsComponent)) // Maid
+            {
+                var ttsEv = new TTSAnnouncementEvent(message.Message, ttsComponent.VoicePrototypeId, uid, comp.Global);
+                RaiseLocalEvent(ttsEv);
+            }
             _adminLogger.Add(LogType.Chat, LogImpact.Low, $"{ToPrettyString(message.Actor):player} has sent the following station announcement: {msg}");
 
         }

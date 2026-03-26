@@ -465,3 +465,23 @@ Entries:
       message: Слои на IPC
   id: 38
   time: '2026-03-19T17:48:17.0000000+00:00'
+- author: anonymaidys
+  changes:
+    - type: Tweak
+      message: Декали теперь больше подходят к тайлам.
+    - type: Tweak
+      message: Некоторые тайлы возвращены к образцам 2024 года.
+  id: 39
+  time: '2026-03-23T16:29:11.0000000+00:00'
+- author: Warete
+  changes:
+    - type: Add
+      message: Озвучка объявлений консоли коммуникации с ТТС игрока.
+  id: 40
+  time: '2026-03-23T16:29:45.0000000+00:00'
+- author: HSKveez
+  changes:
+    - type: Fix
+      message: Гарпии больше не ломаются при выборе телосложения
+  id: 41
+  time: '2026-03-24T16:00:51.0000000+00:00'

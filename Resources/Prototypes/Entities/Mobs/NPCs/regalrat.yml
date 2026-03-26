@@ -254,9 +254,9 @@
     - MindRoleGhostRoleSoloAntagonist
     raffle:
       settings: default
-    requirements: # Goobstation - ghost roles requirements
-    - !type:OverallPlaytimeRequirement # Maid 5 -> 1
-        time: 3600 #1 hour
+#    requirements: # Goobstation - ghost roles requirements # Maid Disabled 23.03.2026
+#    - !type:OverallPlaytimeRequirement # Maid 5 -> 1
+#        time: 3600 #1 hour
   - type: GhostTakeoverAvailable
   - type: Tag
     tags:
