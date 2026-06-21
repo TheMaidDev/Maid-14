@@ -33,7 +33,7 @@ else                                                # If session does not exist
     tmux set-option -t "$SESSION" pane-border-status top         # Enable pane border status display
     tmux set-option -t "$SESSION" pane-border-format "#{@title}" # Display custom @title in pane border
 
-    tmux rename-window -t "$SESSION":0 "Server | Client # Ctrl-b then ←/→ to switch panes" # Set window title with hint
+    tmux rename-window -t "$SESSION":0 "Server | Client # (Ctrl-b: ←/→ switch | d detach)" # Set window title with hint
 fi
 
 if [ -n "$TMUX" ]; then              # Check if already inside a tmux session
