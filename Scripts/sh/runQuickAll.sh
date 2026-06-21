@@ -41,3 +41,5 @@ if [ -n "$TMUX" ]; then              # Check if already inside a tmux session
 else                                 # If not inside tmux
     tmux attach -t "$SESSION"        # Attach to session in new tmux client
 fi
+
+tmux set-option -t "$SESSION":0 mouse on # Enable tmux mouse support for window 0 only
