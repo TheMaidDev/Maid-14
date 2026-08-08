@@ -44,3 +44,7 @@ lathe-category-command = Командование
 lathe-category-hats = Шляпы
 lathe-category-jumpsuits = Комбинезоны
 lathe-category-neck = Шея
+# start Maid edit
+lathe-category-dresses = Платья
+lathe-category-shoes = Обувь
+# end

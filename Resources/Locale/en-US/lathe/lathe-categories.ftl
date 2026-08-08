@@ -59,3 +59,7 @@ lathe-category-command = Command
 lathe-category-hats = Hats
 lathe-category-jumpsuits = Jumpsuits
 lathe-category-neck = Neck
+# start Maid edit
+lathe-category-dresses = Dresses
+lathe-category-shoes = Shoes
+# end

@@ -167,3 +167,13 @@
 - type: latheCategory
   id: Neck
   name: lathe-category-neck
+# start Maid edit
+- type: latheCategory
+  id: Dresses
+  name: lathe-category-dresses
+
+- type: latheCategory
+  id: Shoes
+  name: lathe-category-shoes
+
+# end

@@ -937,6 +937,18 @@
     - Bedsheets
     # Goobstation Packs
     - ClothingCasualJumpsuits
+    # start Maid edit
+    - ClothingColorUniforms
+    - ClothingCasualWear
+    - ClothingDresses
+    - ClothingDeptExtras
+    - ClothingHats
+    - ClothingScarves
+    - ClothingShoes
+    - ClothingRobes
+    - ClothingCoats
+    - ClothingSkirts
+    # end
   - type: EmagLatheRecipes
     emagStaticPacks:
     - ClothingCentComm
