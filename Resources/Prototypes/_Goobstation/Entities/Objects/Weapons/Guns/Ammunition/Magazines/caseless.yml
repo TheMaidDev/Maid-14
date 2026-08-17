@@ -8,7 +8,7 @@
 
 - type: entity
   id: MagazinePistolCaselessRifleEmpty
-  name: pistol magazine (9.5mm any)
+  name: pistol magazine (9.5mm) # MAID feat-sprite-porting-3
   parent: BaseMagazinePistolCaselessRifle
   components:
   - type: BallisticAmmoProvider
@@ -16,7 +16,7 @@
 
 - type: entity
   id: MagazineCaselessRifleEmpty
-  name: magazine (9.5mm any)
+  name: magazine (9.5mm) # MAID feat-sprite-porting-3
   parent: BaseMagazineCaselessRifle
   components:
   - type: BallisticAmmoProvider

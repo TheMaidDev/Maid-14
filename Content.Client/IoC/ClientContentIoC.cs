@@ -119,6 +119,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Client._RMC14.LinkAccount;
+using Content.Client._White.Reputation;
+using Content.Client._White.Trail.Line.Manager;
 using Content.Client.Administration.Managers;
 using Content.Client.Changelog;
 using Content.Client.Chat.Managers;
@@ -184,6 +186,8 @@ namespace Content.Client.IoC
             collection.Register<TitleWindowManager>();
             collection.Register<LinkAccountManager>(); // RMC14
             collection.Register<ClientsidePlaytimeTrackingManager>();
+            collection.Register<ITrailLineManager, TrailSplineManager>(); // WD bullet trails
+            collection.Register<ReputationManager>(); // WD OOC reputation
         }
     }
 }

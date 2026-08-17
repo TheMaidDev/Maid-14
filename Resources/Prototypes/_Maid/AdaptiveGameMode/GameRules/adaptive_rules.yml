@@ -1,0 +1,172 @@
+- type: entity
+  parent: BaseGameRule
+  id: AdaptiveRule
+  components:
+  - type: GameRule
+    minPlayers: 0
+  - type: AdaptiveRule
+    roundstartTargetBudgetBase:
+      chaos: 0
+      combat: 0
+    roundstartTargetBudgetSlope:
+    - time: 7200
+      value:
+        chaos: 5
+        combat: 0
+    - time: 9000
+      value:
+        chaos: 20
+        combat: 40
+    - time: 10800
+      value:
+        chaos: 50
+        combat: 100
+    roundstartRules:
+    - id: Zombie
+      baseWeight: 10
+    - id: Changeling
+      baseWeight: 10
+    - id: CorporateAgent
+      baseWeight: 10
+    - id: Nukeops
+      baseWeight: 10
+    - id: Wizard
+      baseWeight: 10
+    - id: Revolutionary
+      baseWeight: 10
+    - id: Traitor
+      baseWeight: 10
+
+    midroundSpawnTimer: # How often we spawn rules
+      min: 180 # 3 min
+      max: 600 # 10 min
+
+    midroundSpawnSkipProb: 0.6 # With what chance we skip spawning rule
+
+    scoreDifferenceMultiplierDecay: 850
+    scoreDifferenceMultiplierMin: 0.15
+
+    midroundRules:
+    - id: ZombieOutbreak
+      baseWeight: 10
+      conditions:
+      - !type:AdaptiveRuleCooldownCondition
+        cooldown: 900 # 15 min
+      - !type:AdaptiveRuleMaxOccurenceCondition
+        amount: 2
+    - id: AnomalySpawn
+      baseWeight: 10
+    - id: BingleSpawn
+      baseWeight: 10
+    - id: BluespaceArtifact
+      baseWeight: 10
+    - id: BluespaceLocker
+      baseWeight: 10
+    - id: BureaucraticError
+      baseWeight: 10
+    - id: ChangelingMidround
+      baseWeight: 10
+    - id: DragonSpawn
+      baseWeight: 10
+    - id: DuoAbductorSpawn
+      baseWeight: 4
+    - id: GasLeak
+      baseWeight: 10
+    - id: GiftsEngineering
+      baseWeight: 10
+    - id: GiftsFireProtection
+      baseWeight: 10
+    - id: GiftsJanitor
+      baseWeight: 10
+    - id: GiftsMedical
+      baseWeight: 10
+    - id: GiftsPizzaPartyLarge
+      baseWeight: 10
+    - id: GiftsPizzaPartySmall
+      baseWeight: 10
+    - id: GiftsSecurityGuns
+      baseWeight: 10
+    - id: GiftsSecurityRiot
+      baseWeight: 10
+    - id: GiftsSpacingSupplies
+      baseWeight: 10
+    - id: GiftsVendingRestock
+      baseWeight: 10
+    - id: IonStorm
+      baseWeight: 10
+    - id: KingRatMigration
+      baseWeight: 10
+    - id: LoneAbductorSpawn
+      baseWeight: 4
+    - id: LoneOpsSpawn
+      baseWeight: 10
+    - id: MimicVendorRule
+      baseWeight: 10
+    - id: MothroachSpawn
+      baseWeight: 10
+    - id: MouseMigration
+      baseWeight: 10
+    - id: NinjaSpawn
+      baseWeight: 10
+    - id: ParadoxCloneSpawn
+      baseWeight: 10
+    - id: PowerGridCheck
+      baseWeight: 10
+    - id: RandomSentience
+      baseWeight: 10
+    - id: SleeperAgents
+      baseWeight: 10
+    - id: SlimesSpawn
+      baseWeight: 10
+    - id: SnakeSpawn
+      baseWeight: 10
+    - id: SolarFlare
+      baseWeight: 10
+#    - id: SpacePirates
+#      baseWeight: 10
+    - id: SpiderClownSpawn
+      baseWeight: 10
+    - id: SpiderSpawn
+      baseWeight: 10
+    - id: UnknownShuttleCargoLost
+      baseWeight: 10
+    - id: UnknownShuttleCruiser
+      baseWeight: 10
+    - id: UnknownShuttleCryptid
+      baseWeight: 10
+    - id: UnknownShuttleDisasterEvacPod
+      baseWeight: 10
+    - id: UnknownShuttleEternal
+      baseWeight: 10
+    - id: UnknownShuttleFlatline
+      baseWeight: 10
+    - id: UnknownShuttleFrontierProspector
+      baseWeight: 10
+    - id: UnknownShuttleGym
+      baseWeight: 10
+    - id: UnknownShuttleInstigator
+      baseWeight: 10
+    - id: UnknownShuttleJoe
+      baseWeight: 10
+    - id: UnknownShuttleLambordeere
+      baseWeight: 10
+    - id: UnknownShuttleMeatZone
+      baseWeight: 10
+    - id: UnknownShuttleMicroshuttle
+      baseWeight: 10
+    - id: UnknownShuttleNTIncorporation
+      baseWeight: 10
+    - id: UnknownShuttleSpacebus
+      baseWeight: 10
+    - id: UnknownShuttleSyndieEvacPod
+      baseWeight: 10
+    - id: UnknownShuttleTravelingCuisine
+      baseWeight: 10
+    - id: WraithMidround
+      baseWeight: 10
+    - id: ClosetSkeleton
+      baseWeight: 10
+    - id: CockroachMigration
+      baseWeight: 10
+    - id: DerelictCyborgSyndicateSpawn
+      baseWeight: 10

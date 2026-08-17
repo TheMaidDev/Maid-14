@@ -59,7 +59,8 @@
     containers:
       ballistic-ammo: !type:Container
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
+#    sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
@@ -171,7 +172,7 @@
 
 - type: entity
   id: MagazinePistolSubMachineGunTopMountedEmpty
-  name: WT550 magazine (.35 auto top-mounted any)
+  name: WT550 magazine (.35 auto top-mounted) # MAID feat-sprite-porting-3
   parent: MagazinePistolSubMachineGunTopMounted
   description: Unconventional 30-round top feeding magazine for the WT550 SMG.
   components:
@@ -201,7 +202,7 @@
 
 - type: entity
   id: MagazinePistolEmpty
-  name: pistol magazine (.35 auto any)
+  name: pistol magazine (.35 auto) # MAID feat-sprite-porting-3
   suffix: empty
   parent: MagazinePistol
   description: 12-round single-stack magazine for pistols. #goobstation
@@ -304,7 +305,7 @@
 
 - type: entity
   id: MagazinePistolHighCapacityEmpty
-  name: machine pistol magazine (.35 auto any)
+  name: machine pistol magazine (.35 auto) # MAID feat-sprite-porting-3
   suffix: empty
   parent: BaseMagazinePistolHighCapacity
   components:
@@ -411,7 +412,7 @@
 
 - type: entity
   id: MagazinePistolSubMachineGunEmpty
-  name: SMG magazine (.35 auto any)
+  name: SMG magazine (.35 auto) # MAID feat-sprite-porting-3
   suffix: empty
   parent: BaseMagazinePistolSubMachineGun
   description: 30-round double-stack magazine for submachine guns.

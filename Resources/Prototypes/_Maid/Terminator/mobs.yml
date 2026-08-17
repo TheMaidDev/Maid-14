@@ -1,0 +1,218 @@
+- type: entity
+  abstract: true
+  id: MobTerminatorBase
+  components:
+  - type: ZombieImmune
+  - type: FlashImmunity
+
+- type: entity
+  parent: [MobHuman, MobTerminatorBase]
+  id: MobHumanTerminator
+  name: exterminator
+  components:
+  - type: AutoImplant
+    implants:
+    - TerminatorOverheatImplant
+  - type: Barotrauma
+    damage:
+      types:
+        Blunt: 0.1
+  - type: Stamina
+    decay: 6
+    cooldown: 1
+    critThreshold: 400
+  - type: StatusEffects
+    allowed:
+    - Stun
+    - KnockedDown
+    - SlowedDown
+    - Stutter
+    - BloodLoss
+    - Electrocution
+    - SlurredSpeech
+    - RatvarianLanguage
+    - PressureImmunity
+    - Muted
+    - ForcedSleep
+    - StaminaModifier
+    - RadiationProtection
+  - type: MobState
+    allowedStates:
+    - Alive
+    - Dead
+  - type: SpawnOnGib
+    prototype: MobTerminatorEndoskeleton
+    transferMind: true
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+  - type: Flammable
+    damage:
+      types:
+        Heat: 6.0
+  - type: Temperature
+    heatDamageThreshold: 390
+    coldDamageThreshold: 240
+  - type: Damageable
+    damageModifierSet: TerminatorFlesh
+  - type: Body
+    prototype: TerminatorFlesh
+    requiredLegs: 2
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTypeTrigger
+        damageType: Heat
+        damage: 100
+      behaviors:
+      - !type:PopupBehavior
+        popup: terminator-endoskeleton-burn-popup
+        popupType: LargeCaution
+      - !type:GibBehavior
+    - trigger:
+        !type:DamageTrigger
+        damage: 200
+      behaviors:
+      - !type:PopupBehavior
+        popup: terminator-endoskeleton-gib-popup
+        popupType: LargeCaution
+      - !type:GibBehavior
+  - type: SlowOnDamage
+    speedModifierThresholds:
+      70: 0.8
+      90: 0.6
+  - type: MeleeWeapon
+    damage:
+      types:
+        Blunt: 10
+        Structural: 10
+  - type: RandomHumanoidAppearance
+  - type: Tag
+    tags:
+    - CanPilot
+    - FootstepSound
+    - DoorBumpOpener
+    - Unimplantable
+
+- type: entity
+  parent:
+  - MobCombat
+  - MobDamageable
+  - MobSiliconBase
+  - MobTerminatorBase
+  id: MobTerminatorEndoskeleton
+  name: nt-800 "exterminator" endoskeleton
+  description: The inner powerhouse of Susnet's infiltrator androids.
+  components:
+  - type: StatusEffects
+    allowed:
+      - Stutter
+      - Electrocution
+      - StaminaModifier
+      - RadiationProtection
+  - type: FloatingVisuals
+  - type: Grabbable
+  - type: AutoImplant
+    implants:
+    - TerminatorSelfExplodeImplant
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 2.0
+    baseSprintSpeed: 3.2
+  - type: Sprite
+    drawdepth: Mobs
+    layers:
+      - map: [ "movement" ]
+        state: full
+        sprite: Mobs/Species/Terminator/parts.rsi
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 500
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      100: Dead
+  - type: Repairable
+    doAfterDelay: 15
+    allowSelfRepair: false
+  - type: TypingIndicator
+    proto: robot
+  - type: Speech
+    speechSounds: Pai
+  - type: Damageable
+    damageModifierSet: TerminatorCybernetic
+  - type: Explosive
+    explosionType: Minibomb
+    totalIntensity: 20
+    intensitySlope: 5
+    maxIntensity: 10
+    canCreateVacuum: false
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:ExplodeBehavior
+      - !type:PlaySoundBehavior
+        sound: /Audio/Effects/bone_rattle.ogg
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          HeadTerminator:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: Flammable
+    fireSpread: false
+    canResistFire: true
+    damage:
+      types:
+        Heat: 0
+  - type: MeleeWeapon
+    animation: WeaponArcPunch
+    wideAnimation: WeaponArcThrust
+    altDisarm: false
+    angle: 20
+    damage:
+      types:
+        Blunt: 15
+        Structural: 5
+  - type: Puller
+    needsHands: false
+  - type: Prying
+    pryPowered: true
+    force: true
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - MindTransferTarget
+    - Unimplantable
+
+
+- type: entity
+  parent: BaseItem
+  id: HeadTerminator
+  name: nt-800 skull
+  description: Its red eyes have powered down... for now.
+  components:
+    - type: Sprite
+      sprite: Mobs/Species/Terminator/parts.rsi
+      state: skull_icon
+    - type: Icon
+      sprite: Mobs/Species/Terminator/parts.rsi
+      state: skull_icon
+    - type: StaticPrice
+      price: 4000
+    - type: Tag
+      tags:
+        - MindTransferTarget
+        - Head

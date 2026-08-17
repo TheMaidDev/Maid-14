@@ -32,8 +32,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: lethal
 
 # Normal Slug
@@ -52,8 +52,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-alt-1
-      map: ["enum.GunVisualLayers.Mag"]
+#    - state: mag-alt-1 # Maid
+#      map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: slug
 
 # Incendiary
@@ -68,8 +68,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: incendiary
 
 # Uranium
@@ -88,8 +88,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-alt-1
-      map: ["enum.GunVisualLayers.Mag"]
+#    - state: mag-alt-1 # Maid
+#      map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: uranium
 
 # Beanbag
@@ -105,8 +105,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: beanbag
 
 # Practice
@@ -122,8 +122,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: practice
 
 
@@ -139,8 +139,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: incendiary
       color: "#cfff77"
 
@@ -156,8 +156,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#    - state: mag-1 # Maid
+#      map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: incendiary
       color: "#009eff"
 
@@ -173,8 +173,8 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: incendiary
       color: "#fff94d"
 
@@ -190,6 +190,6 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
     - state: sarin

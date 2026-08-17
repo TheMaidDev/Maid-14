@@ -37,6 +37,32 @@
     - /Audio/Voice/Skeleton/skeleton_scream.ogg
     - /Audio/Voice/Reptilian/reptilian_scream.ogg
     - /Audio/_Floofstation/Voice/Avali/avali_scream.ogg
+    - /Audio/Voice/Arachnid/arachnid_scream.ogg
+    - /Audio/Voice/Diona/diona_scream.ogg
+    - /Audio/Voice/Plasmaman/plasmaman_scream_1.ogg
+    - /Audio/Voice/Plasmaman/plasmaman_scream_2.ogg
+    - /Audio/Voice/Plasmaman/plasmaman_scream_3.ogg
+    - /Audio/Voice/Slime/slime_scream_f1.ogg
+    - /Audio/Voice/Slime/slime_scream_f2.ogg
+    - /Audio/Voice/Slime/slime_scream_m1.ogg
+    - /Audio/Voice/Slime/slime_scream_m2.ogg
+    - /Audio/Voice/Zombie/zombie-1.ogg
+    - /Audio/Voice/Zombie/zombie-2.ogg
+    - /Audio/Voice/Zombie/zombie-3.ogg
+    - /Audio/Voice/Cluwne/cluwnelaugh1.ogg
+    - /Audio/Voice/Cluwne/cluwnelaugh2.ogg
+    - /Audio/Voice/Cluwne/cluwnelaugh3.ogg
+    - /Audio/Machines/robotscream_1.ogg
+    - /Audio/Machines/robotscream_2.ogg
+    - /Audio/Machines/robotscream_3.ogg
+    - /Audio/Machines/robotscream_4.ogg
+    - /Audio/Machines/robotscream_5.ogg
+    - /Audio/Machines/robotscream_6.ogg
+    - /Audio/Machines/robotscream_7.ogg
+    - /Audio/Machines/robotscream_8.ogg
+    - /Audio/Machines/robotscream_9.ogg
+    - /Audio/Voice/Xenoborg/xenoborg_scream.ogg
+    - /Audio/Voice/Vox/shriek1.ogg
 
 
 - type: soundCollection
@@ -52,6 +78,16 @@
     - /Audio/Animals/ferret_happy.ogg
     - /Audio/Voice/Moth/moth_laugh.ogg
     - /Audio/_Floofstation/Voice/Avali/avali_laugh.ogg
+    - /Audio/Voice/Arachnid/arachnid_laugh.ogg
+    - /Audio/Voice/Silicon/syndieborg_laugh.ogg
+    - /Audio/Voice/Slime/slime_laugh_f1.ogg
+    - /Audio/Voice/Slime/slime_laugh_m1.ogg
+    - /Audio/Voice/Slime/slime_laugh_m2.ogg
+    - /Audio/Voice/Xenoborg/xenoborg_laugh_1.ogg
+    - /Audio/Voice/Xenoborg/xenoborg_laugh_2.ogg
+    - /Audio/Voice/Xenoborg/xenoborg_laugh_3.ogg
+    - /Audio/Voice/Xenoborg/xenoborg_laugh_4.ogg
+    - /Audio/Voice/Vox/vox_laugh.ogg
 
 - type: soundCollection
   id: HarpyHisses
@@ -133,6 +169,9 @@
     - /Audio/Items/ring.ogg
     - /Audio/Machines/ding.ogg
     - /Audio/_Maid/Machines/warning_buzzer.ogg #MAID Sound porting
+    - /Audio/Machines/double_ring.ogg
+    - /Audio/Machines/anomaly_sync_connect.ogg
+    - /Audio/Misc/cryo_warning.ogg
 
 - type: soundCollection
   id: HarpyHonks
@@ -173,6 +212,7 @@
     - /Audio/Magic/fireball.ogg
     - /Audio/Magic/forcewall.ogg
     - /Audio/Magic/knock.ogg
+    - /Audio/Voice/Reptilian/reptilian_tailthump.ogg
 
 - type: soundCollection
   id: HarpyBeeps
@@ -211,6 +251,8 @@
     - /Audio/Machines/microwave_done_beep.ogg
     - /Audio/Machines/scan_finish.ogg
     - /Audio/Machines/vending_jingle.ogg
+    - /Audio/Machines/timer.ogg
+    - /Audio/Machines/sonar-ping.ogg
 
 - type: soundCollection
   id: HarpyRevs
@@ -219,6 +261,7 @@
     - /Audio/Machines/blender.ogg
     - /Audio/Machines/juicer.ogg
     - /Audio/Machines/reclaimer_startup.ogg
+    - /Audio/Misc/zip.ogg
 
 - type: soundCollection
   id: HarpyClicks
@@ -244,12 +287,14 @@
     - /Audio/Machines/diagnoser_printing.ogg
     - /Audio/Machines/uniformprinter.ogg
     - /Audio/Machines/vaccinator_running.ogg
+    - /Audio/Machines/terminal_insert_disc.ogg
 
 - type: soundCollection
   id: HarpySqueak
   files:
     - /Audio/Voice/Moth/moth_squeak.ogg
     - /Audio/Animals/mouse_squeak.ogg
+    - /Audio/Animals/fox_squeak.ogg
 
 - type: soundCollection
   id: HarpyCaws
@@ -268,3 +313,9 @@
     - /Audio/_Starlight/Voice/Resomi/resomi_chirp3.ogg
     - /Audio/_Starlight/Voice/Resomi/resomi_chirp4.ogg
     - /Audio/_Starlight/Voice/Resomi/resomi_chirp5.ogg
+    - /Audio/Voice/Talk/Silicon/borg_ask.ogg
+    - /Audio/Voice/Talk/Silicon/borg_exclaim.ogg
+    - /Audio/Voice/Talk/Silicon/borg.ogg
+    - /Audio/Voice/Talk/Silicon/syndieborg_ask.ogg
+    - /Audio/Voice/Talk/Silicon/syndieborg_exclaim.ogg
+    - /Audio/Voice/Talk/Silicon/syndieborg.ogg

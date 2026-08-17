@@ -69,3 +69,21 @@ command-description-scale-get = Получает масштаб спрайта �
 command-description-scale-multiply = Умножает масштаб спрайта сущности на указанный коэффициент (без изменения коллизии).
 command-description-scale-multiplyvector = Умножает масштаб спрайта сущности на указанный 2D-вектор (без изменения коллизии).
 command-description-scale-multiplywithfixture = Умножает масштаб спрайта сущности на указанный коэффициент (включая коллизию).
+command-description-adaptivebalancing-showstatsui =
+    Открывает интерфейс статистики и балансировки адаптивного режима.
+command-description-adaptivebalancing-calculatesexpectedscores =
+    Вычисляет ожидаемые адаптивные очки для игровых правил на основе количества игроков.
+command-description-adaptivebalancing-calculatebalancetable =
+    Генерирует Markdown-таблицу баланса всех адаптивных очков.
+command-description-adaptive-gettargetbudget =
+    Возвращает целевой бюджет очков для текущего игрового правила.
+command-description-adaptive-calculatescore =
+    Вычисляет текущие очки боя и хаоса.
+command-description-adaptive-getchaos =
+    Извлекает очки хаоса из текущего события очков.
+command-description-adaptive-getcombat =
+    Извлекает очки боя из текущего события очков.
+command-description-adaptive-getaverage =
+    Извлекает среднее значение очков из текущего события очков.
+command-description-adaptive-get =
+    Возвращает активный компонент AdaptiveRuleComponent.

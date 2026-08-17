@@ -2118,6 +2118,62 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
 
         #endregion
 
+        public async Task SetPlayerReputation(Guid player, float value)
+        {
+            await using var db = await GetDb();
+
+            var reputation = await db.DbContext.PlayerReputations
+                .SingleOrDefaultAsync(p => p.UserId == player);
+
+            if (reputation == null)
+            {
+                db.DbContext.PlayerReputations.Add(new PlayerReputation
+                {
+                    UserId = player,
+                    Reputation = value,
+                });
+            }
+            else
+            {
+                reputation.Reputation = value;
+            }
+
+            await db.DbContext.SaveChangesAsync();
+        }
+
+        public async Task ModifyPlayerReputation(Guid player, float value)
+        {
+            await using var db = await GetDb();
+
+            var reputation = await db.DbContext.PlayerReputations
+                .SingleOrDefaultAsync(p => p.UserId == player);
+
+            if (reputation == null)
+            {
+                db.DbContext.PlayerReputations.Add(new PlayerReputation
+                {
+                    UserId = player,
+                    Reputation = value,
+                });
+            }
+            else
+            {
+                reputation.Reputation += value;
+            }
+
+            await db.DbContext.SaveChangesAsync();
+        }
+
+        public async Task<float> GetPlayerReputation(Guid player)
+        {
+            await using var db = await GetDb();
+
+            var reputation = await db.DbContext.PlayerReputations
+                .SingleOrDefaultAsync(p => p.UserId == player);
+
+            return reputation?.Reputation ?? 0f;
+        }
+
         public abstract Task SendNotification(DatabaseNotification notification);
 
         // SQLite returns DateTime as Kind=Unspecified, Npgsql actually knows for sure it's Kind=Utc.

@@ -13,6 +13,7 @@ using Content.Shared.Silicons.Borgs.Components;
 using Content.Shared.StatusEffect;
 using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Melee.Events;
+using Content.Shared.Wieldable.Components;
 
 namespace Content.Server._EinsteinEngines.TelescopicBaton;
 
@@ -33,6 +34,11 @@ public sealed class KnockdownOnHitSystem : EntitySystem
 
         if (!entity.Comp.KnockdownOnHeavyAttack && args.Direction != null)
             return;
+
+        // MAID BEGIN tagilla hammer
+        if (entity.Comp.RequireWield && (!TryComp<WieldableComponent>(entity, out var wield) || !wield.Wielded))
+            return;
+        // MAID END tagilla hammer
 
         var ev = new KnockdownOnHitAttemptEvent(false, entity.Comp.DropItems); // Goob edit
         RaiseLocalEvent(entity, ref ev);

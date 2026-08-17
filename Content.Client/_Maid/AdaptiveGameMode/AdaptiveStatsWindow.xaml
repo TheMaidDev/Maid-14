@@ -1,0 +1,30 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:chart="clr-namespace:Content.Client._Maid.UserInterface.Chart"
+               Title="Adaptive Rule Balancing Statistics"
+               MinSize="700 600"
+               SetSize="800 650">
+    <BoxContainer Orientation="Vertical" Margin="10">
+        <!-- Top bar -->
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 10" HorizontalExpand="True">
+            <Label Name="InfoLabel" Text="Round ID: N/A | Stats: N/A" VerticalAlignment="Center" HorizontalExpand="True" />
+            <Label Text="Round: " VerticalAlignment="Center" />
+            <OptionButton Name="RoundSelect" MinSize="80 24" />
+            <Control MinSize="10 0" />
+            <CheckBox Name="ToggleTracking" Text="Track Stats" VerticalAlignment="Center" />
+            <Control MinSize="10 0" />
+            <Button Name="CalculateButton" Text="Force Recalculate" />
+        </BoxContainer>
+
+        <Label Text="Score Timeline (Click point to view contributing entities)" Margin="0 0 0 5" />
+        <chart:ChartRenderer Name="Chart" MinHeight="250" HorizontalExpand="True" />
+
+        <Control MinSize="0 10" />
+        <Label Name="TableTitle" Text="No calculation run selected. Hover/click points in the chart." Margin="0 5" />
+
+        <!-- Table scroll container -->
+        <ScrollContainer VerticalExpand="True" HorizontalExpand="True">
+            <GridContainer Name="TableGrid" Columns="6" HorizontalExpand="True" />
+        </ScrollContainer>
+    </BoxContainer>
+</DefaultWindow>

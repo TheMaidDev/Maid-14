@@ -1,0 +1,44 @@
+- type: entity
+  name: egun
+  parent: BaseWeaponBattery
+  id: WeaponEgun
+  description: Egun
+  components:
+    - type: Sprite
+      sprite: _Maid/Objects/Weapons/Guns/Battery/egun.rsi
+      layers:
+        - state: base
+          map: ["enum.GunVisualLayers.Base"]
+        - state: mag-twomode1-4
+          shader: unshaded
+    - type: Clothing
+      sprite: _Maid/Objects/Weapons/Guns/Battery/egun.rsi
+      quickEquip: false
+      slots:
+      - Belt
+      - suitStorage
+    - type: Gun
+      soundGunshot:
+        path: /Audio/Weapons/Guns/Gunshots/taser2.ogg
+      soundMode:
+        path: /Audio/_Maid/Weapons/Guns/Misc/egun_toggle.ogg
+    - type: ProjectileBatteryAmmoProvider
+      proto: BulletDisabler
+      fireCost: 49
+    - type: BatteryWeaponFireModes
+      fireModes:
+      - proto: BulletDisabler
+        fireCost: 49
+      - proto: BulletTrailLaser
+        fireCost: 99
+    - type: MagazineVisuals
+      magState: mag
+      steps: 5
+      zeroVisible: true
+    - type: Appearance
+    - type: StaticPrice
+      price: 800
+    - type: Item
+      size: Large
+      shape:
+      - 0, 0, 3, 1

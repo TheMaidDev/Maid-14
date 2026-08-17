@@ -15,6 +15,14 @@
     exclusiveAntag: true
     subtype: role-subtype-wizard
   - type: WizardRole
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 10
+    chaosScore: 15
+    conditions:
+    - !type:AdaptiveScoreControlledCondition
+    - !type:AdaptiveScoreAliveCondition
+  # MAID END adaptive scores
 
 - type: entity
   parent: BaseMindRoleAntag

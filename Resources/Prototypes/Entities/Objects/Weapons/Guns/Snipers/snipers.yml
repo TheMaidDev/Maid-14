@@ -185,21 +185,32 @@
   id: WeaponSniperMosin
   description: A true relic, the Kardashev-Mosin has served in nearly every armed conflict since its creation 670 years ago. The bolt-action design of the rifle remains virtually identical to its original design, whether used for hunting, sniping, or endless trench warfare. Loads 10 rounds of .30 rifle.
   components:
+# Maid edit start
+#  - type: Sprite
+#    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood.rsi
+#    layers:
+#    - state: base
+#    - state: base1
+#      map: [ "enum.SolutionContainerLayers.Fill" ]
+#      visible: false
+#  - type: Appearance
+#  - type: SolutionContainerVisuals
+#    maxFillLevels: 1
+#    fillBaseName: base
+#    inHandsFillBaseName: -fill-
+#    inHandsMaxFillLevels: 1
+#    equippedFillBaseName: -fill-
+#    equippedMaxFillLevels: 1
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood.rsi
     layers:
-    - state: base
-    - state: base1
-      map: [ "enum.SolutionContainerLayers.Fill" ]
-      visible: false
-  - type: Appearance
-  - type: SolutionContainerVisuals
-    maxFillLevels: 1
-    fillBaseName: base
-    inHandsFillBaseName: -fill-
-    inHandsMaxFillLevels: 1
-    equippedFillBaseName: -fill-
-    equippedMaxFillLevels: 1
+    - state: icon
+      map: [ "enum.GunVisualLayers.Base" ]
+    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood-icons.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood-inhands.rsi
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood-inhands.rsi
+# Maid edit end
   - type: MeleeWeapon
     wideAnimationRotation: -135
     animationRotation: -135 # WWDP
@@ -213,26 +224,30 @@
   - type: MeleeRequiresWield
   - type: AltFireMelee
     attackType: Heavy
-  - type: SolutionContainerManager
-    solutions:
-      melee:
-        maxVol: 2
-  - type: MeleeChemicalInjector
-    solution: melee
-  - type: RefillableSolution
-    solution: melee
-  - type: InjectableSolution
-    solution: melee
-  - type: SolutionTransfer
-    maxTransferAmount: 2
+# Maid edit start
+#  - type: SolutionContainerManager
+#    solutions:
+#      melee:
+#        maxVol: 2
+#  - type: MeleeChemicalInjector
+#    solution: melee
+#  - type: RefillableSolution
+#    solution: melee
+#  - type: InjectableSolution
+#    solution: melee
+#  - type: SolutionTransfer
+#    maxTransferAmount: 2
+  # Maid edit start
   - type: Sharp
     butcherDelayModifier: 2 #It's a bayonet
   - type: GunRequiresWield
   - type: StaticPrice
     price: 500
-  - type: Item  # Goob edit
-    size: Large
-    storedRotation: 45
+# Maid edit start
+#  - type: Item  # Goob edit
+#    size: Large
+#    storedRotation: 45
+# Maid edit end
 
 - type: entity
   name: Hristov

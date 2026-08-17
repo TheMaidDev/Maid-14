@@ -77,6 +77,10 @@
   # Goobstation
   - type: GameRule
     chaosScore: 25
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStaticGameruleEntity
+    prototype: SpawnPointGhostRatKing
+  # MAID END adaptive scores
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
       children:

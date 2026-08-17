@@ -43,7 +43,7 @@
     items:
     - LauncherLollypopRegenerating
     - LauncherLollypopRegeneratingTricordazine
-    - LauncherLollypopRegeneratingMystery # I <3 GAMBLING
+#    - LauncherLollypopRegeneratingMystery # I <3 GAMBLING # Maid
   - type: BorgModuleIcon
     icon: { sprite: _Goobstation/Actions/actions_borg.rsi, state: lollypop-module }
 

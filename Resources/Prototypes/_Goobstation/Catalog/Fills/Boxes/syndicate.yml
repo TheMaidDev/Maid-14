@@ -30,9 +30,11 @@
   description: A box full of Donk co. candy. What could be inside?
   components:
   - type: StorageFill
-    contents:
-    - id: FoodSnackLollypopWrappedMysteryEvil
-      amount: 9
+# Maid edit start
+#    contents:
+#    - id: FoodSnackLollypopWrappedMysteryEvil
+#      amount: 9
+# Maid edit end
   - type: Sprite
     layers:
     - state: box_of_doom

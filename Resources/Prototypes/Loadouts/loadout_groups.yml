@@ -213,9 +213,9 @@
   # GoobStation Start
   - CardBoxBlack
   - CardBoxNanotrasen
-  - FoodSnackLollypopWrapped
-  - FoodSnackLollypopWrappedRainbow
-  - FoodSnackLollypopWrappedCarp
+#  - FoodSnackLollypopWrapped # Maid
+#  - FoodSnackLollypopWrappedRainbow # Maid
+#  - FoodSnackLollypopWrappedCarp # Maid
   # Goobstation End
   - TowelColorBlack
   - TowelColorDarkBlue

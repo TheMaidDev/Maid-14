@@ -72,10 +72,12 @@
 
 # Modules
 
-- type: latheRecipe
-  parent: BaseBorgModuleRecipe
-  id: BorgModuleLollypop
-  result: BorgModuleLollypop
+# Maid edit start
+#- type: latheRecipe
+#  parent: BaseBorgModuleRecipe
+#  id: BorgModuleLollypop
+#  result: BorgModuleLollypop
+# Maid edit end
 
 # AI
 - type: latheRecipe

@@ -1,0 +1,20 @@
+- type: entity
+  name: laser bolt
+  id: BulletTrailLaser
+  parent: BulletLaser
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Heat: 23
+  - type: PointLight
+    radius: 1.4
+    color: red
+    energy: 0.7
+  - type: Trail
+    color: "#FF0033DD"
+    scale: 0.08
+    frequency: 0.02
+    lifetime: 0.5
+    lerpTime: 0.05

@@ -1,0 +1,79 @@
+{
+    "version": 1,
+    "license": "CC-BY-SA-3.0",
+    "copyright": "Taken from White at https://github.com/frosty-dev/white",
+    "size": {
+        "x": 32,
+        "y": 32
+    },
+    "states": [
+        {
+            "name": "icon"
+        },
+        {
+            "name": "base"
+        },
+        {
+            "name": "mag-twomode1-0",
+            "delays": [
+                [
+                    0.3,
+                    0.3
+                ]
+            ]
+        },
+        {
+            "name": "mag-twomode1-1"
+        },
+        {
+            "name": "mag-twomode1-2"
+        },
+        {
+            "name": "mag-twomode1-3"
+        },
+        {
+            "name": "mag-twomode1-4"
+        },
+        {
+            "name": "mag-twomode2-0",
+            "delays": [
+                [
+                    0.3,
+                    0.3
+                ]
+            ]
+        },
+        {
+            "name": "mag-twomode2-1"
+        },
+        {
+            "name": "mag-twomode2-2"
+        },
+        {
+            "name": "mag-twomode2-3"
+        },
+        {
+            "name": "mag-twomode2-4"
+        },
+        {
+            "name": "inhand-left",
+            "directions": 4
+        },
+        {
+            "name": "inhand-right",
+            "directions": 4
+        },
+        {
+            "name": "laser-inhand-left",
+            "directions": 4
+        },
+        {
+            "name": "laser-inhand-right",
+            "directions": 4
+        },
+        {
+            "name": "equipped-BACKPACK",
+            "directions": 4
+        }
+    ]
+}

@@ -82,6 +82,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Server.Announcements;
 using Content.Server.Discord;
+using Content.Server._White.Reputation; // WD
 using Content.Server.GameTicking.Events;
 using Content.Server.Ghost;
 using Content.Server.Maps;
@@ -120,6 +121,7 @@ namespace Content.Server.GameTicking
         [Dependency] private readonly DiscordWebhook _discord = default!;
         [Dependency] private readonly RoleSystem _role = default!;
         [Dependency] private readonly ITaskManager _taskManager = default!;
+        [Dependency] private readonly ReputationSystem _repSys = default!; // WD
 
         private static readonly Counter RoundNumberMetric = Metrics.CreateCounter(
             "ss14_round_number",
@@ -676,6 +678,11 @@ namespace Content.Server.GameTicking
 
                 #endregion
                 // END
+
+                // WD-Tweak-Start
+                if (userId != null)
+                    _repSys.TryModifyReputationOnRoundEnd(userId.Value, out _, out _);
+                // WD-Tweak-End
 
                 var playerEndRoundInfo = new RoundEndMessageEvent.RoundEndPlayerInfo()
                 {

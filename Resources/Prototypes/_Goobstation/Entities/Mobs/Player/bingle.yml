@@ -45,6 +45,14 @@
   components:
   - type: Bingle
     upgradedID: MobBingleUpgraded
+  # MAID BEGIN bingle score
+  - type: AdaptiveScoreStatic
+    chaosScore: -3
+    combatScore: 0
+    conditions:
+    - !type:AdaptiveScoreControlledCondition
+    - !type:AdaptiveScoreAliveCondition
+  # MAID END bingle score
   - type: GhostTakeoverAvailable
   - type: GhostRole
     name: ghost-role-information-bingle-name

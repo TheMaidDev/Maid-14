@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: entity
+  id: ExplosionEffectShockWave
+  name: shockwave
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 0.5
+  - type: ExplosionShockWave
+    falloffPower: 30
+    sharpness: 15
+    width: 1.3
+
+# Weaker ring used for small explosions.
+- type: entity
+  parent: ExplosionEffectShockWave
+  id: ExplosionEffectShockWaveSmall
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 0.35
+  - type: ExplosionShockWave
+    falloffPower: 60
+    sharpness: 20
+    width: 1.0
+
+# Wide, slow ring used for big explosions.
+- type: entity
+  parent: ExplosionEffectShockWave
+  id: ExplosionEffectShockWaveLarge
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 0.8
+  - type: ExplosionShockWave
+    falloffPower: 15
+    sharpness: 10
+    width: 1.6

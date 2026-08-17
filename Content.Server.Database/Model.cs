@@ -189,6 +189,7 @@ namespace Content.Server.Database
         public DbSet<RMCLinkedAccountLogs> RMCLinkedAccountLogs { get; set; } = default!;
         public DbSet<RMCPatronLobbyMessage> RMCPatronLobbyMessages { get; set; } = default!;
         public DbSet<RMCPatronRoundEndNTShoutout> RMCPatronRoundEndNTShoutouts { get; set; } = default!;
+        public DbSet<PlayerReputation> PlayerReputations { get; set; } = default!; // WD edit
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -577,6 +578,15 @@ namespace Content.Server.Database
 
         public abstract int CountAdminLogs();
     }
+
+    // WD-Tweak-Start
+    public class PlayerReputation
+    {
+        public int Id { get; set; }
+        public Guid UserId { get; set; }
+        public float Reputation { get; set; }
+    }
+    // WD-Tweak-End
 
     public class Preference
     {

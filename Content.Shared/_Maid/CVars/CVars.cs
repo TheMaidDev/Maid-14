@@ -72,5 +72,11 @@ public sealed class MaidCVars
     public static readonly CVarDef<bool> RoundEndWeapons =
         CVarDef.Create("maid.round_end_weapons_enabled", true, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     Enable collecting adaptive rule balancing statistics.
+    /// </summary>
+    public static readonly CVarDef<bool> AdaptiveStatistics =
+        CVarDef.Create("maid.adaptive_statistics", false, CVar.SERVERONLY);
+
     #endregion
 }

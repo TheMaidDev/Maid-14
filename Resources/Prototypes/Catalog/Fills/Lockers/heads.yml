@@ -186,11 +186,11 @@
 #    - id: RubberStampQm
 #    - id: LavalandShuttleConsoleCircuitboard # Goobstation - Mining Shuttle Board
 #    # - id: AstroNavCartridge #Maid
-#    - id: CargoTechFabCircuitboard # Goobstation - Cargo Techfab #Maid edit start
 #    # - id: MailTeleporterMachineCircuitboard # GoobStation port of DeltaV mail
 #    # - id: ClothingHandsKnuckleDustersQM # Goobstation - ROCK THAT MF!!
 #    # - id: SalvageJobBoardComputerCircuitboard # Goobstation - This doesn't really have a use right now but it's there incase it ever gets use again
 #    # - id: CargoMegaphone # goob - loudspeaker #Maid edit end
+    - id: CargoTechFabCircuitboard # Goobstation - Cargo Techfab #Maid
 # Maid edit end
 
 - type: entity
@@ -354,8 +354,8 @@
     #    - id: ClothingUniformJumpsuitHoP
     #    # - id: WeaponDisabler
     #    # - id: ClothingEyesHudCommand
-    #    - id: ServiceTechFabCircuitboard # Goobstation - Service Techfab
-    #    # - id: CommandMegaphone # goob - loudspeakers #Maid edit end
+    #    # - id: CommandMegaphone # goob - loudspeakers
+    - id: ServiceTechFabCircuitboard # Goobstation - Service Techfab
     - id: HoPIDCard
     - id: ClothingHeadsetCommand
     - id: BoxPDA
@@ -591,10 +591,10 @@
     #    - id: AnomalyLocator # GoobStation - adding anomaly locator to the RD locker to reduce the amount of anoms that crit
     #    - id: CigarCase
     #      prob: 0.15 # GoobStation - RD needs cigs for uhh... science...
-    #    - id: ScienceTechFabCircuitboard # Goobstation - Science Techfab
     #    # - id: ClothingBeltGeminiHoloProjector # Goobstation - Who better to do science with than yourself? #Maid
     #    - id: XenobiologyBountyComputerCircuitboard # Goobstation
     #    # - id: MMI # Goobstation #Maid
+    - id: ScienceTechFabCircuitboard # Goobstation - Science Techfab
     - id: ResearchComputerCircuitboard
     - id: ProtolatheMachineCircuitboard
     - id: CircuitImprinterMachineCircuitboard
@@ -688,6 +688,8 @@
     - id: BoxEncryptionKeySecurity
     - id: HoloprojectorSecurity
     - id: MagazinePistol
+    - id: BoxMindshield # MAID BoxMindshield
+    - id: WeaponPistolMk58
 # Maid edit end
 
 # Hardsuit table, used for suit storage as well

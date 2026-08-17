@@ -15,6 +15,14 @@
     roleType: SoloAntagonist
     subtype: role-subtype-devil
   - type: DevilRole
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 0
+    chaosScore: 5
+    conditions:
+    - !type:AdaptiveScoreControlledCondition
+    - !type:AdaptiveScoreAliveCondition
+  # MAID END adaptive scores
 
 - type: entity
   parent: BaseMindRoleAntag
@@ -27,6 +35,14 @@
     roleType: SoloAntagonist
     subtype: role-subtype-changeling
   - type: ChangelingRole
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 12
+    chaosScore: 12
+    conditions:
+    - !type:AdaptiveScoreControlledCondition
+    - !type:AdaptiveScoreAliveCondition
+  # MAID END adaptive scores
 
 - type: entity
   parent: BaseMindRoleAntag

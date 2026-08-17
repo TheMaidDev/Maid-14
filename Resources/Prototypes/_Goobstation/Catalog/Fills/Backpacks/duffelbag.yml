@@ -91,12 +91,14 @@
     contents:
     - id: LollyChop
     - id: ClothingHeadHatPropeller
-    - id: FoodSnackLollypopWrappedMysteryEvil
-      amount: 5
-    - id: FoodSnackLollypopWrappedOmnizine
-      amount: 3
-    - id: FoodSnackLollypopWrapped
-      amount: 10
+# Maid edit start
+#    - id: FoodSnackLollypopWrappedMysteryEvil
+#      amount: 5
+#    - id: FoodSnackLollypopWrappedOmnizine
+#      amount: 3
+#    - id: FoodSnackLollypopWrapped
+#      amount: 10
+# Maid edit end
     - id: FoodSnackChocolate
       amount: 3
     - id: PlushieCarp
@@ -112,10 +114,12 @@
   components:
   - type: StorageFill
     contents:
-    - id: FoodSnackLollypopWrappedMysteryEvil
-      amount: 35
-    - id: FoodSnackLollypopWrappedOmnizine
-      amount: 5
+# Maid edit start
+#    - id: FoodSnackLollypopWrappedMysteryEvil
+#      amount: 35
+#    - id: FoodSnackLollypopWrappedOmnizine
+#      amount: 5
+# Maid edit end
     - id: FoodSnackChocolate
       amount: 5
 

@@ -126,7 +126,7 @@
 #    NitrousOxideTankFilled: 2 #Maid
   emaggedInventory:
     SyringeMicroplastics: 2 #Technically a medicine
-    FoodSnackLollypopWrappedLexorin: 3
-    FoodSnackLollypopWrappedMysteryEvil: 5 # Goobstation - end
+#    FoodSnackLollypopWrappedLexorin: 3 # Maid
+#    FoodSnackLollypopWrappedMysteryEvil: 5 # Goobstation - end # Maid
   contrabandInventory:
     FoodApple: 1

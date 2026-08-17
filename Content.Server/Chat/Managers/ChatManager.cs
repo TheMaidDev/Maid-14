@@ -199,6 +199,8 @@ using Robust.Shared.Player;
 using Robust.Shared.Replays;
 using Robust.Shared.Utility;
 using Content.Server._RMC14.LinkAccount; // RMC - Patreon
+using Content.Server._White.Reputation;
+using Content.Shared._White;
 
 namespace Content.Server.Chat.Managers;
 
@@ -432,8 +434,20 @@ internal sealed partial class ChatManager : IChatManager
             return;
         }
 
+        // WD-Tweak-Start
+        var reputation = "";
+        if (_configurationManager.GetCVar(WhiteCVars.ReputationShowInOoc)
+            && _entityManager.TrySystem<ReputationManager>(out var repManager)
+            && repManager.GetCachedPlayerReputation(player.UserId, out var repValue)
+            && repValue != null)
+        {
+            var color = repValue >= 0 ? "green" : "red";
+            reputation = $"[color={color}]({repValue})[/color]";
+        }
+        // WD-Tweak-End
+
         Color? colorOverride = null;
-        var wrappedMessage = Loc.GetString("chat-manager-send-ooc-wrap-message", ("playerName",player.Name), ("message", FormattedMessage.EscapeText(message)));
+        var wrappedMessage = Loc.GetString("chat-manager-send-ooc-wrap-message", ("playerName",player.Name), ("message", FormattedMessage.EscapeText(message)), ("rep", reputation)); // WD-Tweak
         if (_adminManager.HasAdminFlag(player, AdminFlags.NameColor))
         {
             var prefs = _preferencesManager.GetPreferences(player.UserId);
@@ -442,7 +456,7 @@ internal sealed partial class ChatManager : IChatManager
         if (  _netConfigManager.GetClientCVar(player.Channel, CCVars.ShowOocPatronColor) &&
             _linkAccount.GetPatron(player)?.Tier != null) // RMC - Patreon
         {
-            wrappedMessage = Loc.GetString("chat-manager-send-ooc-patron-wrap-message", ("patronColor", "#aa00ff"),("playerName", player.Name), ("message", FormattedMessage.EscapeText(message))); // RMC - Patreon
+            wrappedMessage = Loc.GetString("chat-manager-send-ooc-patron-wrap-message", ("patronColor", "#aa00ff"),("playerName", player.Name), ("message", FormattedMessage.EscapeText(message)), ("rep", reputation)); // WD-Tweak
         }
 
         //TODO: player.Name color, this will need to change the structure of the MsgChatMessage

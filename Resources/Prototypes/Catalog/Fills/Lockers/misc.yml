@@ -363,9 +363,10 @@
     #      prob: 0.65
     #      orGroup: carp
     - !type:GroupSelector
+      prob: 0.35
       children:
       - id: PlushieCarp
-        prob: 0.2
+        weight: 0.2
       #    - id: ClothingHeadHatGnome
       #      prob: 0.2
       - id: PlushieHolocarp
@@ -410,6 +411,7 @@
     #    - id: null
     #      prob: 0.95
     - !type:GroupSelector
+      prob: 0.05
       children:
       - id: ClothingUniformJumpskirtOperative
         weight: 0.005
@@ -441,6 +443,7 @@
     #      prob: 0.15
     #      orGroup: stockparts
     - !type:GroupSelector
+      prob: 0.35
       children:
       - id: MicroManipulatorStockPart
         weight: 0.15
@@ -451,6 +454,7 @@
     #    - id: null
     #      prob: 0.88
     - !type:GroupSelector
+      prob: 0.12
       children:
       - id: MaterialWoodPlank
         weight: 0.01
@@ -485,6 +489,7 @@
     #      prob: 0.90
     #      orGroup: medicalmaintloot
     - !type:GroupSelector
+      prob: 0.1
       children:
       - id: Gauze
         weight: 0.01
@@ -521,6 +526,7 @@
     #      prob: 0.999
     #      orGroup: securitymaintloot
     - !type:GroupSelector
+      prob: 0.001
       children:
       - id: ClothingOuterArmorRiot
         weight: 0.00005
@@ -556,6 +562,7 @@
     #      prob: 0.999
     #      orGroup: encryptionkeymaintloot
     - !type:GroupSelector
+      prob: 0.001
       children:
       - id: EncryptionKeyService
         weight: 0.0003
@@ -576,6 +583,7 @@
     #      prob: 0.999
     #      orGroup: implantermaintloot
     - !type:GroupSelector
+      prob: 0.001
       children:
       - id: BikeHornImplanter
         weight: 0.0002
@@ -610,6 +618,7 @@
     #      prob: 0.999
     #      orGroup: meleeweaponsmaintloot
     - !type:GroupSelector
+      prob: 0.001
       children:
       - id: CombatKnife
         weight: 0.0001
@@ -652,6 +661,7 @@
     #      prob: 0.0003
     #      orGroup: hardsuitmaintloot
     - !type:GroupSelector
+      prob: 0.001
       children:
       - id: ClothingOuterHardsuitEVA
         weight: 0.0003
@@ -667,6 +677,7 @@
     #      prob: 0.99
     #      orGroup: cashmaintloot
     - !type:GroupSelector
+      prob: 0.01
       children:
       - id: SpaceCash100
         weight: 0.005

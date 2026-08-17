@@ -31,7 +31,7 @@
     ears: ClothingHeadsetAltCentCom
     eyes: ClothingEyesGlassesCentComm
     pocket1: WeaponDisabler
-    pocket2: FoodSnackLollypopWrappedCentComm # Come on, it's a trademark at this point.
+#    pocket2: FoodSnackLollypopWrappedCentComm # Come on, it's a trademark at this point. # Maid
   storage:
     back:
     - Flash

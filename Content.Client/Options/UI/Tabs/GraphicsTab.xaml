@@ -34,7 +34,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <CheckBox Name="ViewportLowResCheckBox" Text="{Loc 'ui-options-vp-low-res'}" />
                 <CheckBox Name="ParallaxLowQualityCheckBox" Text="{Loc 'ui-options-parallax-low-quality'}" />
                 <CheckBox Name="AmbientOcclusionCheckBox" Text="{Loc 'ui-options-ambient-occlusion'}" />
-
+                <!-- WD-Tweak-Start -->
+                <CheckBox Name="ShowTrailsCheckBox"
+                          Text="{Loc 'ui-options-show-trails'}"
+                          ToolTip="{Loc 'ui-options-show-trails-tooltip'}" />
+                <CheckBox Name="ShowShockWaveCheckBox"
+                          Text="{Loc 'ui-options-show-explosion-shockwave'}"
+                          ToolTip="{Loc 'ui-options-show-explosion-shockwave-tooltip'}" />
+                <!-- WD-Tweak-End -->
                 <!-- Interface -->
                 <Label Text="{Loc 'ui-options-interface-label'}" StyleClasses="LabelKeyText"/>
                 <ui:OptionDropDown Name="DropDownUIScale" Title="{Loc 'ui-options-scale-label'}" />

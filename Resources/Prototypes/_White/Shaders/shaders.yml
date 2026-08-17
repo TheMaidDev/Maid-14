@@ -33,3 +33,8 @@
     colorJitter: 0.8
     alphaJitter: 1
     hue: 0.48
+
+- type: shader
+  id: ShockWave
+  kind: source
+  path: "/Textures/_White/Shaders/shock_wave.swsl"

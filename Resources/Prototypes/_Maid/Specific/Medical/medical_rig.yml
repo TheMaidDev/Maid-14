@@ -1,0 +1,9 @@
+﻿- type: entity
+  parent: ClothingBeltStorageBase
+  id: ClothingBeltMedicalRig
+  name: medical webbing
+  components:
+  - type: Sprite
+    sprite: _Maid/Clothing/Belt/paramedwebbing.rsi
+  - type: Clothing
+    sprite: _Maid/Clothing/Belt/paramedwebbing.rsi

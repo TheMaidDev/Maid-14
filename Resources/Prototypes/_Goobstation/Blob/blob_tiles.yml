@@ -45,6 +45,11 @@
   description: The most important part of the Blob. This is the brain and heart of the Blob.
   save: false
   components:
+  - type: AdaptiveScoreStatic
+    combatScore: 30
+    chaosScore: 15
+    conditionTables:
+    - OnStationGrid
   - type: Temperature
     heatDamage:
       types:

@@ -28,4 +28,9 @@ public sealed partial class KnockdownOnHitComponent : Component
 
     [DataField]
     public bool KnockdownOnHeavyAttack = true; // Goobstation
+
+    // MAID BEGIN tagilla hammer
+    [DataField]
+    public bool RequireWield;
+    // MAID END tagilla hammer
 }

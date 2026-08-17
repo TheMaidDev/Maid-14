@@ -29,9 +29,9 @@
     FoodSnackSus: 3
     FoodSnackSemki: 3
   contrabandInventory:
-    FoodSnackLollypopWrapped: 3
-    FoodSnackSwirlLollipop: 2
+#    FoodSnackLollypopWrapped: 3 # Maid
+#    FoodSnackSwirlLollipop: 2 # Maid
     FoodSnackSyndi: 3
-  emaggedInventory:
-    FoodSnackLollypopWrappedMysteryEvil: 2 # Goobstation
+#  emaggedInventory: # Maid
+#    FoodSnackLollypopWrappedMysteryEvil: 2 # Goobstation # Maid
 

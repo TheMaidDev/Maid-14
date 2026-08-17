@@ -194,7 +194,7 @@
   - BorgModuleTopicals
   - BorgModuleRescue
   - BorgModuleSurgery
-  - BorgModuleLollypop # Goobstation
+#  - BorgModuleLollypop # Goobstation # Maid
 
   lawset: Medical # DeltaV: Custom lawset
 
@@ -254,7 +254,7 @@
   # - BorgModuleClowning # goobedit
   - BorgModuleGardening
   - BorgModuleHarvesting
-  - BorgModuleLollypop # Goobstation
+#  - BorgModuleLollypop # Goobstation # Maid
 
   lawset: Clown # DeltaV: Custom lawset
 

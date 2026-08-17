@@ -42,3 +42,8 @@ ent-GunSafeSubMachineGunWt550 = оружейный сейф WT550
 ent-GunSafeLaserCarbine = оружейный сейф лазерных карабинов
     .suffix = Лазерный карабин
     .desc = { ent-GunSafe.desc }
+# Maid
+ent-GunSafeTempGun = сейф с температурными пушками
+    .suffix = Температурная пушка
+    .desc = { ent-GunSafe.desc }
+# Maid end

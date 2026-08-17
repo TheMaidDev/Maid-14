@@ -104,6 +104,35 @@
   id: FillLockerWarden
   table: !type:AllSelector
     children:
+    # Maid edit start
+#    - id: FlashlightSeclite
+#    - id: WeaponDisabler # Goobstation (Disablers in belts)
+#    - id: ClothingBeltSecurityFilled
+#    - id: Flash
+#    - id: ClothingEyesGlassesSecurity
+#    - id: ClothingHandsGlovesCombat
+#    - id: ClothingShoesBootsJack
+#    - id: ClothingOuterCoatWarden
+#    # - id: ClothingOuterWinterWarden
+#    - id: RubberStampWarden
+#    - id: DoorRemoteArmory
+#    #- id: HoloprojectorSecurity Goob, its in your belt
+#    - id: BookSpaceLaw
+#    - id: MagazinePistol
+#    - id: WeaponPistolMk58
+#    # - id: ClothingBackpackElectropack
+#    #   amount: 2
+#    # - id: RemoteSignaller
+#    #   amount: 2
+##   - id: Binoculars
+##   - id: WeaponEnergyShotgun # Goobstation
+#    - id: ClothingHandsGlovesKravMaga # Goobstation - Martial Arts
+#    # - id: BoxLethalInjection # Goobstation
+#    - id: ClothingHeadsetAltWarden # Goobstation
+#    # - id: Multitool # Goobstation
+#    # - id: Wrench # Goobstation
+##    - id: ContrabandDetectorFlatpack # Goobstation
+#    # - id: SecurityMegaphone # goob - loudspeakers
     - id: FlashlightSeclite
     - id: WeaponDisabler # Goobstation (Disablers in belts)
     - id: ClothingBeltSecurityFilled
@@ -112,26 +141,16 @@
     - id: ClothingHandsGlovesCombat
     - id: ClothingShoesBootsJack
     - id: ClothingOuterCoatWarden
-    # - id: ClothingOuterWinterWarden
     - id: RubberStampWarden
     - id: DoorRemoteArmory
-    #- id: HoloprojectorSecurity Goob, its in your belt
+    - id: HoloprojectorSecurity
     - id: BookSpaceLaw
     - id: MagazinePistol
+    - id: BoxMindshield # MAID BoxMindshield
     - id: WeaponPistolMk58
-    # - id: ClothingBackpackElectropack
-    #   amount: 2
-    # - id: RemoteSignaller
-    #   amount: 2
-#   - id: Binoculars
-#   - id: WeaponEnergyShotgun # Goobstation
     - id: ClothingHandsGlovesKravMaga # Goobstation - Martial Arts
-    # - id: BoxLethalInjection # Goobstation
     - id: ClothingHeadsetAltWarden # Goobstation
-    # - id: Multitool # Goobstation
-    # - id: Wrench # Goobstation
-#    - id: ContrabandDetectorFlatpack # Goobstation
-    # - id: SecurityMegaphone # goob - loudspeakers
+    # Maid edit end
 
 - type: entityTable
   id: FillLockerWardenHarduit
@@ -155,18 +174,51 @@
   id: FillLockerSecurity
   table: !type:AllSelector
     children:
+# Maid edit start
+#    - id: FlashlightSeclite
+#      prob: 0.8
+#    #- id: WeaponDisabler # Goobstation (Disablers in belts)
+#    - id: ClothingUniformJumpsuitSecGrey
+#      prob: 0.3
+#    - id: ClothingHeadHelmetBasicAlt
+#    - id: ClothingOuterArmorBasic
+#    #- id: ClothingBeltSecurityFilled Goob, see GroupSelector below
+#    - id: Flash
+#      prob: 0.5
+#    - id: ClothingEyesGlassesSecurity
+#    # - id: ClothingHeadsetSecurity, Goob, over ear headsets
+#    - id: ClothingHandsGlovesColorBlack
+#    - id: ClothingShoesBootsJack
+#    - id: WeaponPistolMk58
+#    - id: WeaponDisabler
+#    - id: MagazinePistol
+#    - id: WeaponMeleeNeedle
+#      prob: 0.1
+#    #- id: HoloprojectorSecurity, Goobstation, it's in every belt
+#    #  prob: 0.6
+#    - id: BookSpaceLaw
+#      prob: 0.5
+#    - id: ClothingHeadsetAltSecurityRegular # Goobstation
+#    # - id: PanicButton # Goobstation
+#    # - id: PepperSpray # Goobstation
+#    # Goobstation - Martial Arts - start #Maid edit
+#    #- !type:GroupSelector
+#    # children:
+#    # - id: ClothingBeltSecurityFilled
+#    #   weight: 0.5
+#    # - id: ClothingBeltCorporateJudoFilled
+#    #   weight: 0.5
+#    # Goobstation - Martial Arts - end
     - id: FlashlightSeclite
       prob: 0.8
-    #- id: WeaponDisabler # Goobstation (Disablers in belts)
     - id: ClothingUniformJumpsuitSecGrey
       prob: 0.3
     - id: ClothingHeadHelmetBasicAlt
     - id: ClothingOuterArmorBasic
-    #- id: ClothingBeltSecurityFilled Goob, see GroupSelector below
+    - id: ClothingBeltSecurityFilled
     - id: Flash
       prob: 0.5
     - id: ClothingEyesGlassesSecurity
-    # - id: ClothingHeadsetSecurity, Goob, over ear headsets
     - id: ClothingHandsGlovesColorBlack
     - id: ClothingShoesBootsJack
     - id: WeaponPistolMk58
@@ -174,21 +226,12 @@
     - id: MagazinePistol
     - id: WeaponMeleeNeedle
       prob: 0.1
-    #- id: HoloprojectorSecurity, Goobstation, it's in every belt
-    #  prob: 0.6
+    - id: HoloprojectorSecurity
+      prob: 0.6
     - id: BookSpaceLaw
       prob: 0.5
     - id: ClothingHeadsetAltSecurityRegular # Goobstation
-    # - id: PanicButton # Goobstation
-    # - id: PepperSpray # Goobstation
-    # Goobstation - Martial Arts - start #Maid edit
-    #- !type:GroupSelector
-    # children:
-    # - id: ClothingBeltSecurityFilled
-    #   weight: 0.5
-    # - id: ClothingBeltCorporateJudoFilled
-    #   weight: 0.5
-    # Goobstation - Martial Arts - end
+# Maid edit end
 
 - type: entity
   id: LockerBrigmedicFilled
@@ -247,20 +290,41 @@
   id: FillLockerDetective
   table: !type:AllSelector
     children:
-    # - id: ClothingEyesGlassesNoir
+    #Maid edit start
+#    # - id: ClothingEyesGlassesNoir
+#    - id: ClothingHeadHatFedoraBrown
+#    - id: ClothingEyesGlassesSunglasses
+#    - id: ClothingNeckTieDet
+#    - !type:GroupSelector #Goob, if you want the other one, get it from detvend
+#      children:
+#      - id: ClothingOuterVestDetective
+#        weight: 0.5
+#      - id: ClothingOuterCoatDetectiveLoadout
+#        weight: 0.5
+#    - id: WeaponRevolverInspector
+#    - id: SpeedLoaderMagnum
+#      amount: 2
+#    - id: FlippoEngravedLighter
+#    - id: FlashlightSeclite
+#    - id: ForensicScanner
+#    - id: LogProbeCartridge
+#    - id: BoxForensicPad
+#    - id: DrinkDetFlask
+#    - id: ClothingHandsGlovesForensic
+#    - id: RubberStampDetective
+#    - id: HoloprojectorSecurity
+#    - id: BoxEvidenceMarkers
+#    - id: HandLabeler
+#    # - id: BloodTrak # Goobstation
+#    #      - id: Betty # Goobstation # Maid - ne rabotaet huinya
+#    - id: BoxTapeRecorder # DeltaV
+#    - id: PoliceBaton # Goobstation
+    - id: ClothingEyesGlassesSecurity
+      prob: 0.3
     - id: ClothingHeadHatFedoraBrown
-    - id: ClothingEyesGlassesSunglasses
     - id: ClothingNeckTieDet
-    - !type:GroupSelector #Goob, if you want the other one, get it from detvend
-      children:
-      - id: ClothingOuterVestDetective
-        weight: 0.5
-      - id: ClothingOuterCoatDetectiveLoadout
-        weight: 0.5
-    - id: WeaponRevolverInspector
-    - id: SpeedLoaderMagnum
-      amount: 2
-    - id: FlippoEngravedLighter
+    - id: ClothingOuterVestDetective
+    - id: ClothingOuterCoatDetectiveLoadout
     - id: FlashlightSeclite
     - id: ForensicScanner
     - id: LogProbeCartridge
@@ -270,11 +334,9 @@
     - id: RubberStampDetective
     - id: HoloprojectorSecurity
     - id: BoxEvidenceMarkers
-    - id: HandLabeler
-    # - id: BloodTrak # Goobstation
-    #      - id: Betty # Goobstation # Maid - ne rabotaet huinya
-    - id: BoxTapeRecorder # DeltaV
-    - id: PoliceBaton # Goobstation
+    - id: ClothingBeltHolsterFilled
+    - id: ClothingEyesGlassesSecurity
+# Maid edit end
 
 - type: entity
   id: ClosetBombFilled
@@ -290,12 +352,23 @@
   id: FillClosetBomb
   table: !type:AllSelector
     children:
+# Maid edit start
+#    - id: ClothingHeadHelmetBombSuit
+#    - id: ClothingOuterSuitBomb
+#    - id: Wirecutter
+#    - id: Screwdriver
+#    - id: Multitool
+#      #prob: 0.5 # Goobstation
     - id: ClothingHeadHelmetBombSuit
     - id: ClothingOuterSuitBomb
+    # NT is cheap, what can you do...
     - id: Wirecutter
+      prob: 0.9
     - id: Screwdriver
+      prob: 0.9
     - id: Multitool
-      #prob: 0.5 # Goobstation
+      prob: 0.5
+# Maid edit end
 
 - type: entity
   parent: [GunSafeBaseSecure, BaseSecurityContraband]
@@ -446,6 +519,23 @@
     - id: WeaponLaserCarbine
       amount: 3
     - id: WeaponTemperatureGun # Goobstation
-      amount: 2
+      amount: 3 # Maidпо
     - id: WeaponEnergyIonRifle # Goobstation
       amount: 2
+
+- type: entity
+  parent: [GunSafeBaseSecure, BaseSecurityContraband]
+  id: GunSafeTempGun
+  name: temperature gun safe
+  components:
+  - type: EntityTableContainerFill
+    containers:
+      entity_storage: !type:NestedSelector
+        tableId: FillGunSafeTempGun
+
+- type: entityTable
+  id: FillGunSafeTempGun
+  table: !type:AllSelector
+    children:
+    - id: WeaponTemperatureGun # Goobstation
+      amount: 3 # Maidпо

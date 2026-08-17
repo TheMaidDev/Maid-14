@@ -38,7 +38,6 @@ public sealed partial class TriggerSystem
                 EntityManager.PredictedSpawn(ent.Comp.Proto, mapCoords);
             else if (_net.IsServer)
                 Spawn(ent.Comp.Proto, mapCoords);
-
         }
         else
         {

@@ -16,6 +16,17 @@
   name: derelict syndicate assasult cyborg
   description: A lean, mean killing machine with access to a variety of deadly modules. This one is in a state of great disrepair.
   components:
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore:
+      base: 3
+      target: 0
+      in: 600
+    chaosScore:
+      base: 3
+      target: 0
+      in: 600
+  # MAID END adaptive scores
   - type: Sprite
     sprite: _Goobstation/Mobs/Silicon/chassis.rsi
     layers:

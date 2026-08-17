@@ -100,6 +100,13 @@
       collection: RadiationPulse
       params:
         volume: 5
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    chaosScore: 3
+    combatScore: 0
+    conditionTables:
+    - OnStationGrid
+  # MAID END adaptive scores
   - type: AmbientSound
     range: 5
     volume: -5

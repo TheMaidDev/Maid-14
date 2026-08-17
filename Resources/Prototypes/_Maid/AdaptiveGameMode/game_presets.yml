@@ -1,0 +1,10 @@
+- type: gamePreset
+  id: Adaptive
+  alias:
+  - adaptive
+  name: gamemode-adaptive-title
+  showInVote: true
+  description: gamemode-adaptive-description
+  rules:
+  - AdaptiveRule
+  - BasicRoundstartVariation

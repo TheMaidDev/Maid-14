@@ -22,6 +22,10 @@
   components:
   - type: DynamicRuleCost # MAID dynamic game mode
     cost: 15 # MAID dynamic game mode
+  # MAID BEGIN abductor score
+  - type: AdaptiveScoreStaticGameruleEntity
+    prototype: MobLoneAbductor
+  # MAID END abductor score
   - type: StationEvent
     earliestStart: 15
     reoccurrenceDelay: 45
@@ -124,6 +128,11 @@
   components:
   - type: DynamicRuleCost # MAID dynamic game mode
     cost: 16 # MAID dynamic game mode
+  # MAID BEGIN abductor score
+  - type: AdaptiveScoreStaticGameruleEntity
+    prototype: MobAbductorScientist
+    count: 2
+  # MAID END abductor score
   - type: StationEvent
     earliestStart: 15
     reoccurrenceDelay: 45

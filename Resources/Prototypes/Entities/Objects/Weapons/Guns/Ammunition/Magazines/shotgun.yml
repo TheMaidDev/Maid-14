@@ -77,7 +77,7 @@
 
 - type: entity
   id: MagazineShotgunEmpty
-  name: ammo drum (12 Gauge shells any) # Goobstation
+  name: ammo drum (12 Gauge shells) # MAID feat-sprite-porting-3
   suffix: empty
   parent: BaseMagazineShotgun
   components:

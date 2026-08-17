@@ -1,0 +1,15 @@
+ent-PartTerminatorBase = часть тела nt-800
+ent-ChestTerminator = грудная клетка nt-800
+ent-GroinTerminator = пах nt-800
+ent-HeadTerminator = череп nt-800
+    .desc = Его красные глаза погасли... пока что.
+ent-LeftArmTerminator = левая рука nt-800
+ent-RightArmTerminator = правая рука nt-800
+ent-LeftHandTerminator = левая кисть nt-800
+ent-RightHandTerminator = правая кисть nt-800
+ent-LeftLegTerminator = левая нога nt-800
+ent-RightLegTerminator = правая нога nt-800
+ent-LeftFootTerminator = левая стопа nt-800
+ent-RightFootTerminator = правая стопа nt-800
+ent-MobTerminatorEndoskeleton = эндоскелет nt-800 «Терминатор»
+    .desc = Внутреннее ядро андроидов-инфильтраторов Susnet.

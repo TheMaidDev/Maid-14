@@ -1,0 +1,42 @@
+﻿- type: entity
+  parent: BaseStorageItem
+  id: ZipBase
+  abstract: true
+  components:
+  - type: Item
+    size: Small
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,2,2
+
+- type: entity
+  parent: ZipBase
+  id: ZipLock
+  name: zip lock
+  description: Designed for storing evidence.
+  components:
+  - type: Item
+    sprite: _Maid/Objects/Misc/ziplocks.rsi
+    shape:
+    - 0,0,1,0
+  - type: Sprite
+    sprite: _Maid/Objects/Misc/ziplocks.rsi
+    state: icon
+
+- type: entity
+  name: zip lock box
+  parent: BoxCardboard
+  id: BoxZipLocks
+  description: A box full of zip locks.
+  components:
+  - type: Storage
+    maxItemSize: Normal
+  - type: StorageFill
+    contents:
+    - id: ZipLock
+      amount: 4
+  - type: Sprite
+    layers:
+    - state: box_security
+    - state: ziplock

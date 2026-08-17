@@ -274,7 +274,7 @@
       weight: 0.5
    # - id: OxygenTankFilled #Goobstation
     - id: WelderIndustrial
-    - id: FoodSnackLollypopWrappedMystery # Goobstation
+#    - id: FoodSnackLollypopWrappedMystery # Goobstation # Maid
     - id: WeaponGrapplingGun
     - !type:GroupSelector
       children:
@@ -310,9 +310,9 @@
     - id: WelderIndustrialAdvanced #Goobstation
     - id: SeismicCharge
     - id: MineralScanner
-    - id: FoodSnackLollypopWrappedMysteryEvil # Goobstation
-    - id: FoodSnackLollypopWrappedOmnizine # Goobstation
-      weight: 0.5
+#    - id: FoodSnackLollypopWrappedMysteryEvil # Goobstation #Maid
+#    - id: FoodSnackLollypopWrappedOmnizine # Goobstation #Maid
+#      weight: 0.5
     - !type:GroupSelector # Goobstation
       children:
       - id: DoubleEmergencyOxygenTankFilled

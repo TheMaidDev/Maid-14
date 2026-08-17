@@ -161,6 +161,16 @@
   parent: [ SimpleMobBase, MobCombat ]
   description: He's da rat. He make da roolz.
   components:
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 3
+    chaosScore: 5
+    conditions:
+    - !type:AdaptiveScoreControlledCondition
+    - !type:AdaptiveScoreAliveCondition
+    conditionTables:
+    - OnStationGrid
+  # MAID END adaptive scores
   - type: VentCrawler # goobstation - Ventcrawl
   - type: CombatMode
   - type: MovementSpeedModifier
@@ -358,6 +368,13 @@
   description: He's da mini rat. He don't make da roolz.
   categories: [ HideSpawnMenu ] #Must be configured to a King or the AI breaks.
   components:
+  - type: AdaptiveScoreStatic
+    combatScore: 0.5
+    chaosScore: 0
+    conditions:
+    - !type:AdaptiveScoreAliveCondition
+    conditionTables:
+    - OnStationGrid
   - type: VentCrawler # goobstation - Ventcrawl
   - type: CombatMode
   - type: MovementSpeedModifier

@@ -1,0 +1,46 @@
+# Terminator
+- type: entity
+  parent: BaseGameRule
+  id: TerminatorSpawn
+  components:
+  - type: StationEvent
+    weight: 8
+    earliestStart: 30
+    minimumPlayers: 15
+    maxOccurrences: 1
+    duration: null
+    chaos:
+      Hostile: 120
+      Combat: 120
+      Death: 180
+      Medical: 180
+    eventType: HostilesSpawn
+  - type: GameRule
+    chaosScore: 300
+  - type: AntagSpawner
+    prototype: MobHumanTerminator
+  - type: AntagRandomSpawn
+  - type: AntagObjectives
+    objectives:
+    - TerminateObjective
+    - ShutDownObjective
+  - type: TerminatorRule
+    targetBlacklist:
+      components:
+      - AntagImmune
+      - BorgBrain
+  - type: AntagSelection
+    agentName: terminator-round-end-agent-name
+    definitions:
+    - spawnerPrototype: SpawnPointGhostTerminator
+      min: 1
+      max: 1
+      pickPlayer: false
+      mindRoles:
+      - MindRoleTerminator
+      briefing:
+        text: terminator-role-greeting
+        color: red
+  - type: Tag
+    tags:
+    - MidroundAntag

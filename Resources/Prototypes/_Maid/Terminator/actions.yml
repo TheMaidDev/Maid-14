@@ -1,0 +1,11 @@
+- type: entity
+  parent: [BaseSuicideAction, BaseImplantAction]
+  id: ActionActivateTerminatorOverheat
+  name: Activate Overheat Implant
+  description: Activates your internal overheat implant, rapidly driving your internal temperature beyond safe limits.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+    itemIconStyle: BigAction
+    priority: -20
+    icon: Interface/Actions/firestarter.png

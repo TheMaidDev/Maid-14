@@ -84,7 +84,7 @@
 
 - type: entity
   id: MagazineMagnumEmpty
-  name: pistol magazine (.45 magnum any)
+  name: pistol magazine (.45 magnum) # MAID feat-sprite-porting-3
   suffix: empty
   parent: BaseMagazineMagnum
   description: 7-round single stack pistol magazine.
@@ -208,7 +208,7 @@
 
 - type: entity
   id: MagazineMagnumSubMachineGunEmpty
-  name: SMG magazine (.45 magnum any)
+  name: SMG magazine (.45 magnum) # MAID feat-sprite-porting-3
   suffix: empty
   parent: BaseMagazineMagnumSubMachineGun
   components:

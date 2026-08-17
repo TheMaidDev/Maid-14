@@ -35,11 +35,52 @@
     component:
     - type: StationAiVision
       range: 4
+# MAID BEGIN feat-sprite-porting-3
+  - type: SurveillanceBodyCamera
+  - type: ItemToggle
+  - type: ToggleClothing
+    action: ToggleBodyCamera
+  - type: ToggleCellDraw
+  - type: PowerCellDraw
+    drawRate: 0.3
+    enabled: false
+  - type: ItemTogglePrefix
+    prefixOn: on
+    prefixOff: off
+  - type: ToggleClothingPrefix
+    prefixOn: null
+    prefixOff: off
+  - type: PowerCellSlot
+    cellSlotId: cell_slot
+  - type: ContainerContainer
+    containers:
+      cell_slot: !type:ContainerSlot
+  - type: ItemSlots
+    slots:
+      cell_slot:
+        name: power-cell-slot-component-slot-name-default
+        startingItem: PowerCellMedium
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.ToggleableVisuals.Enabled:
+        enum.ToggleableVisuals.Layer:
+          True: { state: active-animated }
+          False: { state: unpowered }
   - type: Sprite
-    sprite: _Goobstation/Clothing/Neck/Misc/nopro.rsi
+    sprite: _Maid/Objects/Specific/Security/body-camera.rsi
+    layers:
+      - state: unpowered
+      - state: active-animated
+        map: ["active"]
+        visible: false
   - type: Clothing
-    sprite: _Goobstation/Clothing/Neck/Misc/nopro.rsi
+    sprite: _Maid/Objects/Specific/Security/body-camera.rsi
+    equippedPrefix: off
     quickEquip: true
+  - type: Item
+    heldPrefix: off
+# MAID END feat-sprite-porting-3
 
 - type: entity
   parent: ClothingNeckBase

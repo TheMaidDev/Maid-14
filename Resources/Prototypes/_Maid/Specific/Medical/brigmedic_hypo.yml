@@ -1,0 +1,10 @@
+﻿- type: entity
+  parent: Hypospray
+  id: BrigmedicHypospray
+  name: brigmedic hypospray
+  description: An injector (most often) of medicines in liquid form, it has a small inscription on it "PROPERTY OF A BRIGMEDIC, HANDS OFF!"
+  components:
+  - type: Sprite
+    sprite: _Maid/Specific/Medical/brigmedic_hypo.rsi
+  - type: Item
+    sprite: _Maid/Specific/Medical/brigmedic_hypo.rsi

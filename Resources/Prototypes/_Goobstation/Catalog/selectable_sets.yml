@@ -36,7 +36,7 @@
   - SoapOmega
   - Syringe
   - DrinkShaker
-  - FoodSnackLollypopWrappedSyndicate
+#  - FoodSnackLollypopWrappedSyndicate # Maid
 
 - type: selectableSet
   id: ThiefBreacherSet

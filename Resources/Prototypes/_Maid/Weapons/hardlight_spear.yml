@@ -1,0 +1,122 @@
+﻿- type: entity
+  parent: BaseImplantOnlyImplanterSyndi
+  id: HardlightSpearImplanter
+  suffix: hardlight spear
+  components:
+  - type: Implanter
+    implant: HardlightSpearImplant
+
+- type: entity
+  parent: BaseSubdermalImplant
+  id: HardlightSpearImplant
+  name: hardlight spear implant
+  description: This implant creates hardlight spear in your hands.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SubdermalImplant
+    implantAction: HardlightSpearImplantAction
+  - type: TriggerOnActivateImplant
+  - type: SpawnUniqueItemOnTrigger
+    proto: SpearHardlight
+    tryPutInHands: true
+    targetUser: true
+
+- type: entity
+  parent: BaseImplantAction
+  id: HardlightSpearImplantAction
+  name: Summon light spear
+  description: Summons light spear
+  components:
+  - type: Action
+    itemIconStyle: BigAction
+    priority: -20
+    icon:
+      sprite: _Maid/Weapons/hardlight_spear.rsi
+      state: spear
+    useDelay: 60
+
+
+- type: entity
+  parent: Spear
+  id: SpearHardlight
+  name: hardlight spear
+  description: A spear made out of hardened light.
+  components:
+  - type: Sprite
+    sprite: _Maid/Weapons/hardlight_spear.rsi
+    layers:
+    - state: spear
+  - type: SolutionContainerVisuals
+    maxFillLevels: 0
+    inHandsMaxFillLevels: 0
+    equippedMaxFillLevels: 0
+    fillBaseName: null
+    inHandsFillBaseName: null
+    equippedFillBaseName: null
+  - type: MeleeWeapon
+    damage:
+      types:
+        Piercing: 9
+        Heat: 9
+    soundHit:
+      path: /Audio/Weapons/smash.ogg
+  - type: DamageOtherOnHit
+    damage:
+      types:
+        Piercing: 10
+        Heat: 10
+  - type: Wieldable
+  - type: IncreaseDamageOnWield
+    damage:
+      types:
+        Piercing: 4
+        Heat: 4
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 30 #excess damage avoids cost of spawning entities.
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: EmbeddableProjectile
+    offset: 0.15,0.15
+    deleteOnRemove: true
+  # - type: HardlightSpear # Almost entire HardlightSpear logic can be implemented data driven
+  - type: TriggerOnDrop
+    keyOut: timer
+  - type: TriggerOnCollide
+    fixtureID: fix1
+    keyOut: timer
+    maxTriggers: 1
+
+  - type: TimerTrigger
+    delay: 2
+    keyOut: disappear
+    keysIn:
+    - timer
+
+  - type: DeleteOnTrigger
+    keysIn:
+    - disappear
+
+  - type: PassThroughGlass
+
+  - type: PointLight
+    radius: 1.5
+    energy: 2
+    color: yellow
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape: !type:PolygonShape
+          vertices:
+          - -0.20,-0.10
+          - -0.10,-0.20
+          - 0.40,0.30
+          - 0.30,0.40
+        density: 20
+        mask:
+        - Opaque
+        restitution: 0.3
+        friction: 0.2

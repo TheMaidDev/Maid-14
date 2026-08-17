@@ -1763,7 +1763,7 @@
         - ReagentId: Heroin # Goobstation
           Quantity: 2
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/poppy.rsi
+    sprite: _Maid/Objects/Specific/Hydroponics/poppy.rsi # MAID feat-sprite-porting-3
   - type: Produce
     seedId: poppy
   - type: Extractable

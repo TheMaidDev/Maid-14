@@ -41,6 +41,11 @@ public sealed class CargoGiftsRule : StationEventSystem<CargoGiftsRuleComponent>
         stationEvent.StartAnnouncement = str;
 
         base.Added(uid, component, gameRule, args);
+        // MAID BEGIN adaptive scores
+        /*
+        Spawn("AdaptiveScoreGiftEvent", Transform(uid).Coordinates);
+        */
+        // MAID END adaptive scores
     }
 
     /// <summary>

@@ -133,3 +133,21 @@ command-description-scale-multiplyvector =
     Multiply an entity's sprite size with a certain 2d vector (without changing its fixture).
 command-description-scale-multiplywithfixture =
     Multiply an entity's sprite size with a certain factor (including its fixture).
+command-description-adaptivebalancing-showstatsui =
+    Opens the adaptive game mode statistics and balance UI.
+command-description-adaptivebalancing-calculatesexpectedscores =
+    Calculates expected adaptive scores for game rules given a player count.
+command-description-adaptivebalancing-calculatebalancetable =
+    Generates a Markdown balance table of all adaptive scores.
+command-description-adaptive-gettargetbudget =
+    Returns the target score budget for the current game rule.
+command-description-adaptive-calculatescore =
+    Calculates the current combat and chaos scores.
+command-description-adaptive-getchaos =
+    Extracts the chaos score from the current score event.
+command-description-adaptive-getcombat =
+    Extracts the combat score from the current score event.
+command-description-adaptive-getaverage =
+    Extracts the average score from the current score event.
+command-description-adaptive-get =
+    Returns the active AdaptiveRuleComponent.

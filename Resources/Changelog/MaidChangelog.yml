@@ -883,3 +883,93 @@ Entries:
       message: /Resources/Audio/StationEvents/peacemakers.ogg
   id: 79
   time: '2026-08-05T16:35:10.0000000+00:00'
+- author: Urames
+  changes:
+    - type: Fix
+      message: Исправлены шансы на лут в шкафах
+    - type: Add
+      message: >-
+        Портировано наполнение из старого билда для LockerDetectiveFilled,
+        LockerSecurityFilled. Добавлен GunSafeTempGun + локализация. Добавлены
+        WeaponPistolMk58 в разные шкафы.
+  id: 80
+  time: '2026-08-08T08:59:45.0000000+00:00'
+- author: Pik1ta
+  changes:
+    - type: Add
+      message: Большое количество звуков которые могут издавать Гарпии. Покаркайте!
+  id: 81
+  time: '2026-08-08T16:03:14.0000000+00:00'
+- author: Urames
+  changes:
+    - type: Remove
+      message: Очень много леденцов
+  id: 82
+  time: '2026-08-13T12:36:53.0000000+00:00'
+- author: Inconnu
+  changes:
+    - type: Add
+      message: Добавлены волны от взрывов
+    - type: Add
+      message: Добавлены следы от пуль
+    - type: Add
+      message: Добавлена репутация в ООС
+  id: 83
+  time: '2026-08-13T12:38:36.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Add
+      message: Добавлен E-Gun (двухрежимный энергетический пистолет)
+    - type: Add
+      message: Добавлен молот Тагиллы со звуками удара
+    - type: Add
+      message: Портированы боди-камеры службы безопасности
+    - type: Add
+      message: >-
+        Добавлено световое копьё (hardlight spear), гипоспрей бригмедика,
+        медицинский разгрузочный жилет
+    - type: Add
+      message: Добавлены зип-локи, секретные документы и шляпа гнома
+    - type: Tweak
+      message: Убрано слово "any" (любой) из названий магазинов патронов
+    - type: Tweak
+      message: Обновлены спрайты коробок и плащей ГСБ
+    - type: Tweak
+      message: Портирован старый спрайт мака
+  id: 84
+  time: '2026-08-13T12:39:53.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Add
+      message: Мид-раунд антаг-роль Терминатор
+    - type: Add
+      message: Компонент HeatOverTime
+  id: 85
+  time: '2026-08-13T12:42:08.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Add
+      message: Адаптивный игровой режим
+  id: 86
+  time: '2026-08-15T17:28:59.0000000+00:00'
+- author: Urames
+  changes:
+    - type: Add
+      message: Портированы спрайы магазинов для МК58, Лектера, Дрозда и АКМС
+    - type: Add
+      message: >-
+        Портированы спрайты оружия Гадюки, Бульдога, АКМС'а, Лектера,
+        Кардашёв-Мосина, L6 SAW'а, Кобры, Двустволки, Дрозда, Антикварного
+        пистолета, C-20R, Протокинетика и Обреза
+  id: 87
+  time: '2026-08-15T17:34:14.0000000+00:00'
+- author: Urames
+  changes:
+    - type: Add
+      message: >-
+        Портировано наполнение ДетекШкафа из старого билда. Портирован спрайт
+        пожарного костюма из старого билда.  Добавлены CargoTechFabCircuitboard,
+        ScienceTechFabCircuitboard, ServiceTechFabCircuitboard в наполнения
+        шкафов.
+  id: 88
+  time: '2026-08-16T08:52:12.0000000+00:00'

@@ -263,7 +263,7 @@
       - id: BalloonCorgi
       - id: MysteryFigureBox
       - id: RubberChicken
-      - id: FoodSnackLollypopWrappedMysteryNeutral # Goobstation - Lollypops!
+#      - id: FoodSnackLollypopWrappedMysteryNeutral # Goobstation - Lollypops! # Maid
       - id: RevolutionaryManifesto # Einstein Engines - Revolutionary Manifesto
       # Cult
       - !type:AllSelector
@@ -318,7 +318,7 @@
       - id: WristwatchGold
       - id: RubberStampGreytide
       - id: ClothingShoesWizardSkates #GoobStation - Wizard Skates
-      - id: FoodSnackLollypopWrappedMysteryEvil # Goobstation - Lollypops!
+#      - id: FoodSnackLollypopWrappedMysteryEvil # Goobstation - Lollypops! # Maid
       - id: MysteryLighterBox
       - id: GoldenPersonalAI
 

@@ -1,0 +1,13 @@
+- type: entity
+  id: ToggleBodyCamera
+  parent: BaseToggleAction
+  name: Toggle body camera.
+  description: Toggles body camera.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+    itemIconStyle: BigAction
+    priority: -20
+    icon:
+      sprite: _Maid/Objects/Specific/Security/body-camera.rsi
+      state: unpowered

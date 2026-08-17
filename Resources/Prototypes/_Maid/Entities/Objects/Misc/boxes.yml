@@ -1,0 +1,14 @@
+- type: entity
+  parent: BoxCardboard
+  id: BoxMindshield
+  name: mindshield implanters box
+  description: A box full of implants.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MindShieldImplanter
+      amount: 4
+  - type: Sprite
+    layers:
+    - state: box
+    - state: syringe

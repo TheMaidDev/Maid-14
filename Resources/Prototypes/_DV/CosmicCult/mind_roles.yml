@@ -9,6 +9,11 @@
     roleType: TeamAntagonist
     subtype: role-subtype-cosmic-cultist
   - type: CosmicCultRole
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 0
+    chaosScore: 0
+  # MAID END adaptive scores
 
 # Ascendant Event
 - type: entity

@@ -1,0 +1,35 @@
+- type: entity
+  parent: BaseMindRoleAntag
+  id: MindRoleTerminator
+  name: Terminator Role
+  components:
+  - type: MindRole
+    antagPrototype: Terminator
+    exclusiveAntag: true
+    roleType: SoloAntagonist
+    subtype: role-subtype-terminator
+  - type: TerminatorRole
+
+- type: antag
+  id: Terminator
+  name: roles-antag-terminator-name
+  antagonist: true
+  setPreference: false
+  objective: roles-antag-terminator-objective
+
+- type: entity
+  categories: [ HideSpawnMenu, Spawner ]
+  parent: BaseAntagSpawner
+  id: SpawnPointGhostTerminator
+  components:
+  - type: GhostRole
+    name: ghost-role-information-exterminator-name
+    description: ghost-role-information-exterminator-description
+    rules: ghost-role-information-exterminator-rules
+    mindRoles:
+    - MindRoleGhostRoleSoloAntagonist
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Mobs/Species/Terminator/parts.rsi
+      state: full

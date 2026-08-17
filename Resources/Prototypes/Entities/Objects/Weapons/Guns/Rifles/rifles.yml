@@ -165,13 +165,26 @@
   id: WeaponRifleAk
   description: A somewhat battered combat rifle of a design originating from old Earth. Favored by criminals, militias, and terrorists due to its famed reliability and easy-to-manufacture design. Feeds from .30 rifle magazines.
   components:
+# Maid edit start
+#  - type: Sprite
+#    sprite: _Maid/Objects/Weapons/Guns/Rifles/ak.rsi
+#    layers:
+#      - state: base
+#        map: ["enum.GunVisualLayers.Base"]
+#      - state: mag-0
+#        map: ["enum.GunVisualLayers.Mag"]
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Rifles/ak.rsi
+    sprite: _Maid/Objects/Weapons/Guns/Rifles/ak-icons.rsi
     layers:
-      - state: base
-        map: ["enum.GunVisualLayers.Base"]
-      - state: mag-0
-        map: ["enum.GunVisualLayers.Mag"]
+    - state: base
+      map: [ "enum.GunVisualLayers.Base" ]
+    - state: mag-0
+      map: [ "enum.GunVisualLayers.Mag" ]
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Guns/Rifles/ak-inhands.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Guns/Rifles/ak-inhands.rsi
+# Maid edit end
   - type: Gun
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/rifle2.ogg
@@ -261,14 +274,16 @@
   description: A high end military grade assault rifle. Uses .20 rifle ammo.
   components:
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter-icons.rsi # Maid
     layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
       - state: mag-0
         map: ["enum.GunVisualLayers.Mag"]
   - type: Clothing
-    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter-inhands.rsi # Maid
   - type: Gun
     fireRate: 5
     soundGunshot:

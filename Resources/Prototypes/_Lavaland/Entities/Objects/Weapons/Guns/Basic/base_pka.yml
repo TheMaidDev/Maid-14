@@ -4,9 +4,11 @@
   parent: BaseItem
   components:
   - type: Sprite
-    sprite: Objects/Weapons/Guns/Basic/kinetic_accelerator.rsi
+#    sprite: Objects/Weapons/Guns/Basic/kinetic_accelerator.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Basic/kinetic_accelerator.rsi # Maid
   - type: Item
-    sprite: Objects/Weapons/Guns/Basic/kinetic_accelerator.rsi
+#    sprite: Objects/Weapons/Guns/Basic/kinetic_accelerator.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Basic/kinetic_accelerator.rsi # Maid
     size: Large
     shape:
     - 0,0,1,1

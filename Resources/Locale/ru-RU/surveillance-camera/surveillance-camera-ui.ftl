@@ -9,3 +9,6 @@ surveillance-camera-monitor-ui-status-disconnected = Отключено
 surveillance-camera-monitor-ui-no-subnets = Нет подсетей
 surveillance-camera-setup = Настроить
 surveillance-camera-setup-ui-set = Установить
+surveillance-body-camera-on = { $item } начинает мигать
+surveillance-body-camera-off = { $item } перестает мигать
+

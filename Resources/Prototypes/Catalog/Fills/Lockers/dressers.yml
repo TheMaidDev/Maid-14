@@ -151,6 +151,7 @@
       - id: ClothingUniformJumpsuitHosFormal
       - id: ClothingOuterWinterHoS
       - id: ClothingNeckCloakHos
+      - id: ClothingNeckCloakHosClassic # MAID feat-sprite-porting-3
 
 - type: entity
   id: DresserQuarterMasterFilled

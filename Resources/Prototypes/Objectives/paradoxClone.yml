@@ -37,4 +37,11 @@
     requireDead: true
   - type: TargetObjective
     title: objective-condition-kill-head-title # kill <name>, <job>
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 3
+    chaosScore: 3
+    conditionTables:
+    - ObjectiveNotCompleted
+  # MAID END adaptive scores
 

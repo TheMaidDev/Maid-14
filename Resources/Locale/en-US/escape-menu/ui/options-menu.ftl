@@ -435,3 +435,8 @@ ui-options-admin-enable-overlay-starting-job = Show starting job
 ui-options-admin-overlay-merge-distance = Stack merge distance
 ui-options-admin-overlay-ghost-fade-distance = Ghost overlay fade range from mouse
 ui-options-admin-overlay-ghost-hide-distance = Ghost overlay hide range from mouse
+
+ui-options-show-trails = Show bullet trails
+ui-options-show-trails-tooltip = Draws a trail behind flying bullets.
+ui-options-show-explosion-shockwave = Show explosion shockwave
+ui-options-show-explosion-shockwave-tooltip = Distorts the screen with an expanding ring on explosion.

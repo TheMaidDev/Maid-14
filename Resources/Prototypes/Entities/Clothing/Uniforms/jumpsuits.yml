@@ -482,17 +482,19 @@
   - type: Clothing
     sprite: _Maid/Clothing/Uniforms/Jumpsuit/hos.rsi
   - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left
-        color: "#C12D30"
-        sprite: Clothing/Uniforms/Jumpsuit/color.rsi
-      - state: overlay-inhand-left
-      right:
-      - state: inhand-right
-        color: "#C12D30"
-        sprite: Clothing/Uniforms/Jumpsuit/color.rsi
-      - state: overlay-inhand-right
+# MAID BEGIN feat-sprite-porting-3
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left
+#        color: "#C12D30"
+#        sprite: Clothing/Uniforms/Jumpsuit/color.rsi
+#      - state: overlay-inhand-left
+#      right:
+#      - state: inhand-right
+#        color: "#C12D30"
+#        sprite: Clothing/Uniforms/Jumpsuit/color.rsi
+#      - state: overlay-inhand-right
+# MAID END
 
 - type: entity
   parent: [ClothingUniformBase, BaseCommandContraband]

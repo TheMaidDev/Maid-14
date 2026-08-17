@@ -45,7 +45,8 @@
     containers:
       ballistic-ammo: !type:Container
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_mag.rsi #Maid
+#    sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_mag.rsi #Maid
+    sprite: Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_mag.rsi #Maid
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
@@ -81,7 +82,7 @@
 
 - type: entity # Goobstation
   id: MagazineLightRifleBoxEmpty
-  name: "L6 SAW magazine box (.30 rifle any)"
+  name: "L6 SAW magazine box (.30 rifle)" # MAID feat-sprite-porting-3
   parent: MagazineLightRifleBox
   components:
   - type: BallisticAmmoProvider
@@ -110,7 +111,7 @@
 
 - type: entity
   id: MagazineLightRifleEmpty
-  name: "magazine (.30 rifle any)"
+  name: "magazine (.30 rifle)" # MAID feat-sprite-porting-3
   suffix: empty
   parent: MagazineLightRifle
   description: Curved 30-round double stack magazine for combat rifles.

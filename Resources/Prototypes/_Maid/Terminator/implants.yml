@@ -1,0 +1,55 @@
+- type: entity
+  parent: BaseSubdermalImplant
+  id: TerminatorOverheatImplant
+  name: overheat implant
+  description: This implant rapidly overheats the user's body upon activation or upon death.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SubdermalImplant
+    implantationTimeMultiplier: 4
+    permanent: true
+    implantAction: ActionActivateTerminatorOverheat
+  - type: TriggerOnActivateImplant
+  - type: AddComponentsOnTrigger
+    removeExisting: false
+    targetUser: true
+    components:
+    - type: HeatOverTime
+      heat: 500
+      fireStacks: 0.5
+      interval: 1
+      ignoreHeatResistance: true
+      fireProtectionPenetration: 1
+      multiplierIncrease: 1
+  - type: PopupOnTrigger
+    popup: terminator-overheat-popup
+  - type: Tag
+    tags:
+    - SubdermalImplant
+    - HideContextMenu
+
+# Copy of MicroBombImplant, but decreased damage and no explosion on gib
+- type: entity
+  parent: BaseSubdermalImplant
+  id: TerminatorSelfExplodeImplant
+  name: micro-bomb implant
+  description: This implant detonates the user upon activation or upon death.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SubdermalImplant
+    implantationTimeMultiplier: 4
+    permanent: true
+    implantAction: ActionActivateMicroBomb
+  - type: TriggerOnActivateImplant
+  - type: ExplodeOnTrigger
+  - type: Explosive
+    explosionType: MicroBomb
+    totalIntensity: 120
+    intensitySlope: 5
+    maxIntensity: 30
+    canCreateVacuum: false
+  - type: Tag
+    tags:
+    - SubdermalImplant
+    - HideContextMenu
+    - MicroBomb

@@ -134,6 +134,7 @@ using Content.Server.NPC.Pathfinding;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Camera;
 using Content.Shared.CCVar;
+using Content.Shared._White;
 using Content.Shared.Damage;
 using Content.Shared.Database;
 using Content.Shared.Explosion;
@@ -194,6 +195,12 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     public const ushort DefaultTileSize = 1;
 
     public const int MaxExplosionAudioRange = 30;
+
+    // WD-Tweak-Start
+    private static readonly EntProtoId ShockWaveSmall = "ExplosionEffectShockWaveSmall";
+    private static readonly EntProtoId ShockWave = "ExplosionEffectShockWave";
+    private static readonly EntProtoId ShockWaveLarge = "ExplosionEffectShockWaveLarge";
+    // WD-Tweak-End
 
     /// <summary>
     ///     The "default" explosion prototype.
@@ -485,6 +492,8 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         // camera shake
         CameraShake(iterationIntensity.Count * 4f, pos, queued.TotalIntensity);
 
+        SpawnShockWave(pos, queued.TotalIntensity); // WD-Tweak
+
         //For whatever bloody reason, sound system requires ENTITY coordinates.
         var mapEntityCoords = _transformSystem.ToCoordinates(_mapSystem.GetMap(pos.MapId), pos);
 
@@ -557,4 +566,21 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
                 _recoilSystem.KickCamera(uid, -delta.Normalized() * effect);
         }
     }
+
+    // WD-Tweak-Start
+    private void SpawnShockWave(MapCoordinates epicenter, float totalIntensity)
+    {
+        if (!_cfg.GetCVar(WhiteCVars.ExplosionShockWaveEnabled))
+            return;
+
+        var proto = totalIntensity switch
+        {
+            < 10f => ShockWaveSmall,
+            > 200f => ShockWaveLarge,
+            _ => ShockWave,
+        };
+
+        Spawn(proto, epicenter);
+    }
+    // WD-Tweak-End
 }

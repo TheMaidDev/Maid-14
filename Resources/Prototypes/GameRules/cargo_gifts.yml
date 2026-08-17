@@ -48,6 +48,13 @@
       path: /Audio/_Maid/Announcements/announce.ogg # Maid
   - type: CargoGiftsRule
     sender: cargo-gift-default-sender
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    chaosScore:
+      base: -2
+      target: 0
+      in: 300
+  # MAID END adaptive scores
 
 - type: entity
   id: GiftsPizzaPartySmall

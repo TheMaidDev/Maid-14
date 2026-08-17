@@ -2955,6 +2955,21 @@
   id: MobSpiderAngryBase
   abstract: true
   components:
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore:
+      base: 3
+      target: 0
+      in: 420
+    chaosScore:
+      base: 1
+      target: 0
+      in: 420
+    conditions:
+    - !type:AdaptiveScoreAliveCondition
+    conditionTables:
+    - OnStationGrid
+  # MAID END adaptive scores
   - type: NpcFactionMember
     factions:
       - Xeno

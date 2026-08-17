@@ -212,6 +212,24 @@
       path: /Audio/Weapons/Guns/Hits/bullet_hit.ogg
   - type: TimedDespawn
     lifetime: 10
+  # WD-Tweak-Start
+  - type: BulletTrail
+    splineIteratorType: CatmullRom
+    splineRendererType: Continuous
+    creationMethod: OnMove
+    lengthStep: 0.1
+    scale: 0.03, 0.0
+    lifetime: 0.5
+    randomWalk: 0.03, 0.001
+    gravity: 0.001, 0.005
+    gradientIteratorType: Bezier
+    gradient:
+    - 1, 1, 1, 0
+    - 1, 1, 1, 2
+    - 1, 1, 1, 0
+    - 1, 1, 1, 0
+    optionsConcealable: true
+    # WD-Tweak-End
 
 - type: entity
   id: BaseBulletTrigger # Trigger-on-collide bullets

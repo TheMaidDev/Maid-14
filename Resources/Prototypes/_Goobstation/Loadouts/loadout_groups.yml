@@ -1200,12 +1200,14 @@
   loadouts:
   - CaptainGloves
 
-- type: loadoutGroup
-  id: CaptainMask
-  name: loadout-group-captain-mask
-  minLimit: 0
-  loadouts:
-  - CaptainMask
+# Maid edit start
+#- type: loadoutGroup
+#  id: CaptainMask
+#  name: loadout-group-captain-mask
+#  minLimit: 0
+#  loadouts:
+#  - CaptainMask
+# Maid edit end
 
 # roboticist
 

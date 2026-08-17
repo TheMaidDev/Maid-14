@@ -1,0 +1,45 @@
+- type: body
+  id: TerminatorFlesh
+  name: exterminator
+  root: chest
+  slots:
+    head:
+      part: HeadHuman
+      connections:
+      - chest
+    chest:
+      part: ChestHuman
+      connections:
+      - groin
+      - right arm
+      - left arm
+      - head
+    groin:
+      part: GroinHuman
+      connections:
+      - right leg
+      - left leg
+    right arm:
+      part: RightArmHuman
+      connections:
+      - right hand
+    left arm:
+      part: LeftArmHuman
+      connections:
+      - left hand
+    right hand:
+      part: RightHandHuman
+    left hand:
+      part: LeftHandHuman
+    right leg:
+      part: RightLegHuman
+      connections:
+      - right foot
+    left leg:
+      part: LeftLegHuman
+      connections:
+      - left foot
+    right foot:
+      part: RightFootHuman
+    left foot:
+      part: LeftFootHuman

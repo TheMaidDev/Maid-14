@@ -396,3 +396,8 @@ ui-options-filter-nearest = Ближайший (без сглаживания)
 ui-options-filter-bilinear = Билинейный (со сглаживанием)
 ui-options-highlight-volume = Громкость звука при упоминании:
 ui-options-highlight-sound = Воспроизводить звук при упоминании
+
+ui-options-show-trails = Отображать следы от пуль
+ui-options-show-trails-tooltip = Рисует след за летящими пулями.
+ui-options-show-explosion-shockwave = Отображать ударную волну
+ui-options-show-explosion-shockwave-tooltip = Искажает экран расходящимся кольцом при взрыве.

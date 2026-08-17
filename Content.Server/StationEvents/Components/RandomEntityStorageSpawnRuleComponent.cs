@@ -24,4 +24,6 @@ public sealed partial class RandomEntityStorageSpawnRuleComponent : Component
     /// </summary>
     [DataField(required: true)]
     public EntProtoId Prototype;
+
+    // TODO: Nullable prototype, add static score and "override" field (ignore auto calculation)
 }

@@ -8,6 +8,16 @@
   name: Wraith
   description: A VERY spooky ghostie.
   components:
+  # MAID BEGIN adaptive scores
+  - type: AdaptiveScoreStatic
+    combatScore: 3
+    chaosScore: 10
+    conditions:
+    - !type:AdaptiveScoreControlledCondition
+    - !type:AdaptiveScoreAliveCondition
+    conditionTables:
+    - OnStationMap
+  # MAID END adaptive scores
   - type: MindContainer
     showExamineInfo: true #show that its dead
   - type: PassiveDamage #passive Healing

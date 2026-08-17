@@ -10,22 +10,24 @@
   suffix: mystery, good
   components:
   - type: Bin
-    initialContents:
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
-    - FoodSnackLollypopWrappedMystery
+    # Maid edit start
+#    initialContents:
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+#    - FoodSnackLollypopWrappedMystery
+# Maid edit end
     whitelist:
       tags:
       - FoodSnack

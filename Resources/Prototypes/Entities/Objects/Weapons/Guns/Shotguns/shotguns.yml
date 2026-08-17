@@ -84,7 +84,8 @@
     # If you update this also update the bulldog's size.
     size: Large
   - type: Clothing
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun-inhands.rsi # Maid
     quickEquip: false
     slots:
     - Back
@@ -141,7 +142,8 @@
   description: An automatic magazine-fed shotgun for close-quarters combat. Kicks like a mule on steroids. Uses 12 Gauge shotgun shells. # Goob edit
   components:
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/bulldog.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/Shotguns/bulldog.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/bulldog-icons.rsi # Maid
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
@@ -150,7 +152,8 @@
   - type: Item
     size: Large
   - type: Clothing
-    sprite: Objects/Weapons/Guns/Shotguns/bulldog.rsi
+   #    sprite: _Maid/Objects/Weapons/Guns/Shotguns/bulldog.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/bulldog-inhands.rsi # Maid
     quickEquip: false
     slots:
     - Back
@@ -185,7 +188,8 @@
   - type: MagazineAmmoProvider
   - type: MagazineVisuals
     magState: mag
-    steps: 1
+#    steps: 1 # Maid
+    steps: 4 # Maid
     zeroVisible: true
   - type: Appearance
   - type: StaticPrice
@@ -205,12 +209,14 @@
   description: An immortal classic. Uses 12 Gauge shotgun shells.
   components:
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun-icons.rsi # Maid
   - type: Item
     size: Normal
     shape:
     - 0,0,4,0
-    sprite: Objects/Weapons/Guns/Shotguns/db_shotgun_inhands_64x.rsi
+#    sprite: Objects/Weapons/Guns/Shotguns/db_shotgun_inhands_64x.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/db_shotgun-inhands.rsi
   - type: GunRequiresWield #remove when inaccuracy on spreads is fixed
   - type: Gun
     fireRate: 3
@@ -293,14 +299,17 @@
   description: Groovy! Uses 12 Gauge shotgun shells. # Goob edit
   components: # needs to be super inaccurate because you don't need to wield it
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn.rsi
+  #    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn_shotgun-icons.rsi # Maid
   - type: Clothing
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn_shotgun-inhands.rsi # Maid
   - type: Item
     size: Small
     shape: # Goobstation
     - 0,0,2,0
-    sprite: Objects/Weapons/Guns/Shotguns/sawn_inhands_64x.rsi
+#    sprite: Objects/Weapons/Guns/Shotguns/sawn_inhands_64x.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/sawn_shotgun-inhands.rsi # Maid
   - type: Gun
     fireRate: 3
   - type: GunSpreadModifier

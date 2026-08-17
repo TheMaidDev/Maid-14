@@ -174,15 +174,21 @@
   description: A classic and widespread submachine gun, infamous for its use by the Gorlex Marauders. One of the first homegrown Waffle Corp. designs, it remains in service today. Feeds from .35 SMG magazines.
   components:
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/SMGs/c20r.rsi
+#    sprite: _Maid/Objects/Weapons/Guns/SMGs/c20r.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/SMGs/c20r-icons.rsi # Maid
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-0
       map: ["enum.GunVisualLayers.Mag"]
   - type: Clothing
-    sprite: Objects/Weapons/Guns/SMGs/c20r.rsi
-#  - type: Wieldable # Goob - one-handed C20R - start
+#    sprite: Objects/Weapons/Guns/SMGs/c20r.rsi # Maid
+    sprite: _Maid/Objects/Weapons/Guns/SMGs/c20r-inhands.rsi # Maid
+# Maid edit start
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Guns/SMGs/c20r-inhands.rsi
+# Maid edit end
+  #  - type: Wieldable # Goob - one-handed C20R - start
 #    unwieldOnUse: false
 #  - type: GunWieldBonus
 #    minAngle: -19
@@ -201,12 +207,15 @@
     autoEject: true
   - type: MagazineVisuals
     magState: mag
-    steps: 6
+#    steps: 6 # Maid
+    steps: 4 # Maid
     zeroVisible: true
   - type: Appearance
-  - type: Item # Goobstation
-    shape:
-    - 0,0,2,1
+# Maid edit start
+#  - type: Item # Goobstation
+#    shape:
+#    - 0,0,2,1
+# Maid edit end
   - type: StaticPrice
     price: 5000
 
@@ -217,14 +226,16 @@
   description: A modern SMG manufactured by Nanotrasen’s Small Arms Division. It features an exceptional rate of fire in burst mode, useful for holding defensive angles or engaging hostiles at longer ranges. Feeds from .35 SMG magazines.
   components:
     - type: Sprite
-      sprite: _Maid/Objects/Weapons/Guns/SMGs/drozd.rsi
+#      sprite: _Maid/Objects/Weapons/Guns/SMGs/drozd.rsi # Maid
+      sprite: _Maid/Objects/Weapons/Guns/SMGs/drozd-icons.rsi # Maid
       layers:
         - state: base
           map: ["enum.GunVisualLayers.Base"]
         - state: mag-0
           map: ["enum.GunVisualLayers.Mag"]
     - type: Clothing
-      sprite: _Maid/Objects/Weapons/Guns/SMGs/drozd.rsi
+#      sprite: _Maid/Objects/Weapons/Guns/SMGs/drozd.rsi # Maid
+      sprite: _Maid/Objects/Weapons/Guns/SMGs/drozd-inhands.rsi
     - type: Wieldable
       unwieldOnUse: false
     - type: GunWieldBonus

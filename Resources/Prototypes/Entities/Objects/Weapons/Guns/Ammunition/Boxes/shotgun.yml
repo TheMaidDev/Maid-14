@@ -45,17 +45,19 @@
         path: /Audio/_Goobstation/Items/handling/ammobox_drop.ogg
     # Goobstation edit end
     - type: Sprite
-      sprite: Objects/Weapons/Guns/Ammunition/Boxes/shotgun.rsi
+      sprite: _Maid/Objects/Weapons/Guns/Ammunition/Boxes/shotgun.rsi # Maid
     - type: BallisticAmmoProvider
       mayTransfer: true
       whitelist:
         tags:
         - ShellShotgun
       capacity: 16
-    - type: MagazineVisuals
-      magState: mag
-      steps: 5
-      zeroVisible: false
+# Maid edit start
+#    - type: MagazineVisuals
+#      magState: mag
+#      steps: 5
+#      zeroVisible: false
+# Maid edit end
     - type: Appearance
 
 # Shotgun Shells
@@ -70,8 +72,8 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: beanbag
 
 - type: entity
@@ -85,8 +87,8 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: lethal
 
 - type: entity
@@ -104,8 +106,8 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-alt-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-alt-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: slug
 
 - type: entity
@@ -119,8 +121,8 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: flare
 
 - type: entity
@@ -134,8 +136,8 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: incendiary
 
 - type: entity
@@ -151,10 +153,10 @@
       zeroVisible: false
     - type: Sprite
       layers:
-      - state: base
-        map: ["enum.GunVisualLayers.Base"]
-      - state: mag-alt-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: base # Maid
+#        map: ["enum.GunVisualLayers.Base"] # Maid
+#      - state: mag-alt-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: uranium
 
 - type: entity
@@ -168,8 +170,8 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: practice
 
 - type: entity
@@ -183,6 +185,6 @@
       layers:
       - state: base
         map: ["enum.GunVisualLayers.Base"]
-      - state: mag-1
-        map: ["enum.GunVisualLayers.Mag"]
+#      - state: mag-1 # Maid
+#        map: ["enum.GunVisualLayers.Mag"] # Maid
       - state: tranquilizer

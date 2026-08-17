@@ -1,0 +1,11 @@
+- type: Tag
+  id: InteractiveBoard
+
+- type: Tag
+  id: InteractivePen
+
+- type: Tag
+  id: SurveillanceBodyCamera
+
+- type: Tag
+  id: PackedSoilTag
