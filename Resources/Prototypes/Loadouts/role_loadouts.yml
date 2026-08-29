@@ -119,7 +119,7 @@
 - type: roleLoadout
   id: JobCaptain
   groups:
-  - CaptainHead
+ #- CaptainHead #Maid
   - CaptainEnvirohelm # MAID plasmaman loadouts
   # - CaptainNeck #Maid
   - CaptainJumpsuit
@@ -145,7 +145,7 @@
   id: JobHeadOfPersonnel
   groups:
   - GroupTankHarness
-  - HoPHead
+ #- HoPHead #Maid
   - HoPEnvirohelm
   # - HoPNeck #Maid
   - HoPJumpsuit
@@ -208,7 +208,7 @@
   id: JobBartender
   groups:
   - GroupTankHarness
-  - BartenderHead
+ #- BartenderHead #Maid
   - BartenderEnvirohelm
   - BartenderJumpsuit
   - BartenderEnvirosuit
@@ -230,7 +230,7 @@
   id: JobServiceWorker
   groups:
   - BartenderOuterClothing #Maid
-  - BartenderHead #Maid
+ #- BartenderHead #Maid
   - ServiceWorkerEnvirohelm
   - GroupTankHarness
   - BartenderJumpsuit
@@ -252,7 +252,7 @@
   id: JobChef
   groups:
   - GroupTankHarness
-  - ChefHead
+ #- ChefHead #Maid
   - ChefEnvirohelm
   - ChefMask
   - ChefJumpsuit
@@ -275,7 +275,7 @@
   id: JobLibrarian
   groups:
   - BartenderOuterClothing #Maid
-  - BartenderHead #Maid
+ #- BartenderHead #Maid 
   - LibrarianEnvirohelm
   - GroupTankHarness
   - LibrarianJumpsuit
@@ -319,7 +319,7 @@
   id: JobChaplain
   groups:
   - GroupTankHarness
-  - ChaplainHead
+ #- ChaplainHead #Maid
   - ChaplainEnvirohelm
   - ChaplainMask
   # - ChaplainNeck #Maid
@@ -343,7 +343,7 @@
   id: JobJanitor
   groups:
   - GroupTankHarness
-  - JanitorHead
+ #- JanitorHead #Maid
   - JanitorEnvirohelm
   - JanitorJumpsuit
   - JanitorEnvirosuit
@@ -367,7 +367,7 @@
   id: JobBotanist
   groups:
   - GroupTankHarness
-  - BotanistHead
+ #- BotanistHead #Maid
   - BotanistEnvirohelm
   - BotanistJumpsuit
   - BotanistEnvirosuit
@@ -390,7 +390,7 @@
   canCustomizeName: true
   groups:
   - GroupTankHarness
-  - ClownHead
+ #- ClownHead #Maid
   - ClownEnvirohelm
   - ClownJumpsuit
   - ClownEnvirosuit
@@ -413,7 +413,7 @@
   canCustomizeName: true
   groups:
   - GroupTankHarness
-  - MimeHead
+ #- MimeHead #Maid
   - MimeEnvirohelm
   - MimeMask
   - MimeJumpsuit
@@ -436,7 +436,7 @@
 - type: roleLoadout
   id: JobMusician
   groups:
-  - BartenderHead #Maid
+ #- BartenderHead #Maid
   - MusicianEnvirohelm
   - GroupTankHarness
   - MusicianJumpsuit
@@ -461,7 +461,7 @@
   id: JobQuartermaster
   groups:
   - GroupTankHarness
-  - QuartermasterHead
+ #- QuartermasterHead #Maid
   - QuartermasterEnvirohelm
   # - QuartermasterNeck #Maid
   - QuartermasterJumpsuit
@@ -486,7 +486,7 @@
   id: JobCargoTechnician
   groups:
   - GroupTankHarness
-  - CargoTechnicianHead
+ #- CargoTechnicianHead #Maid
   - CargoTechnicianEnvirohelm
   - CargoTechnicianJumpsuit
   - CargoTechnicianEnvirosuit
@@ -509,7 +509,7 @@
   id: JobSalvageSpecialist
   groups:
   - CargoTechnicianOuterClothing #Maid
-  - CargoTechnicianHead #Maid
+ #- CargoTechnicianHead #Maid
   - SalvageEnvirohelm
   - CargoTechnicianJumpsuit #Maid
   - SalvageEnvirosuit
@@ -535,7 +535,7 @@
   id: JobChiefEngineer
   groups:
   - GroupTankHarness
-  - ChiefEngineerHead
+ #- ChiefEngineerHead #Maid
   - ChiefEngineerEnvirohelm
   - ChiefEngineerJumpsuit
   - ChiefEngineerEnvirosuit
@@ -560,7 +560,7 @@
   id: JobTechnicalAssistant
   groups:
   - StationEngineerOuterClothing #Maid
-  - StationEngineerHead #Maid
+ #- StationEngineerHead #Maid
   - TechnicalAssistantEnvirohelm
   - GroupTankHarness
   - TechnicalAssistantJumpsuit
@@ -581,7 +581,7 @@
   id: JobStationEngineer
   groups:
   - GroupTankHarness
-  - StationEngineerHead
+ #- StationEngineerHead #Maid
   - StationEngineerEnvirohelm
   - StationEngineerJumpsuit
   - StationEngineerEnvirosuit
@@ -604,7 +604,7 @@
   id: JobAtmosphericTechnician
   groups:
   - GroupTankHarness
-  - AtmosphericTechnicianHead # Goobstation
+ #- AtmosphericTechnicianHead # Goobstation #Maid Вырезано
   - AtmosEnvirohelm
   - AtmosphericTechnicianJumpsuit
   - AtmosEnvirosuit
@@ -627,7 +627,7 @@
   id: JobResearchDirector
   groups:
   - GroupTankHarness
-  - ResearchDirectorHead
+ #- ResearchDirectorHead #Maid
   - ResearchDirectorEnvirohelm
   # - ResearchDirectorNeck #Maid  
   - ResearchDirectorJumpsuit
@@ -654,7 +654,7 @@
   id: JobScientist
   groups:
   - GroupTankHarness
-  - ScientistHead
+ #- ScientistHead #Maid
   - ScientistEnvirohelm
   # - ScientistNeck #Maid
   - ScientistJumpsuit
@@ -681,7 +681,7 @@
   groups:
  # - ScientistGloves #Maid
   - ResearchAssistantEnvirogloves
-  - ScientistHead #Maid
+ #- ScientistHead #Maid
   - ResearchAssistantEnvirohelm
   - GroupTankHarness
   - ResearchAssistantJumpsuit
@@ -702,7 +702,7 @@
 - type: roleLoadout
   id: JobHeadOfSecurity
   groups:
-  - HeadofSecurityHead
+ #- HeadofSecurityHead #Maid
   - HeadofSecurityEnvirohelm
   # - HeadofSecurityNeck #Maid
   - HeadofSecurityJumpsuit
@@ -730,7 +730,7 @@
 - type: roleLoadout
   id: JobWarden
   groups:
-  - WardenHead
+ #- WardenHead #Maid
   - WardenEnvirohelm
   - WardenJumpsuit
   - WardenEnvirosuit
@@ -755,7 +755,7 @@
 - type: roleLoadout
   id: JobSecurityOfficer
   groups:
-  - SecurityHead
+  #- SecurityHead #Maid
   - SecurityOfficerEnvirohelm
   - SecurityJumpsuit
   - SecurityOfficerEnvirosuit
@@ -765,7 +765,7 @@
   - SecurityOuterClothing
   - SecurityShoes
   # - SecurityNeck #Maid
-  - SecurityPDA
+ # - SecurityPDA #Maid
  # - SecurityBelt #Maid
   - SurvivalSecurity
 #  - Trinkets #Maid
@@ -781,7 +781,7 @@
 - type: roleLoadout
   id: JobDetective
   groups:
-  - DetectiveHead
+ #- DetectiveHead #Maid
   - DetectiveEnvirohelm
   # - DetectiveNeck #Maid
   - DetectiveJumpsuit
@@ -805,7 +805,7 @@
 - type: roleLoadout
   id: JobSecurityCadet
   groups:
-  - SecurityHead #Maid
+ #- SecurityHead #Maid
   - SecurityCadetEnvirohelm
   - SecurityCadetJumpsuit
   - SecurityCadetEnvirosuit
@@ -829,7 +829,7 @@
   id: JobChiefMedicalOfficer
   groups:
   - GroupTankHarness
-  - ChiefMedicalOfficerHead
+ #- ChiefMedicalOfficerHead #Maid
   - ChiefMedicalOfficerEnvirohelm
  # - MedicalMask #Maid
   - ChiefMedicalOfficerJumpsuit
@@ -857,7 +857,7 @@
   id: JobMedicalDoctor
   groups:
   - GroupTankHarness
-  - MedicalDoctorHead
+ #- MedicalDoctorHead #Maid
   - MedicalDoctorEnvirohelm
   #- MedicalMask #Maid
   - MedicalDoctorJumpsuit
@@ -905,7 +905,7 @@
   id: JobChemist
   groups:
   - GroupTankHarness
-  - ChemistHead # Goobstation
+ #- ChemistHead # Goobstation #Maid вырезано
   - ChemistEnvirohelm
  # - MedicalMask #Maid
   - ChemistJumpsuit
@@ -929,7 +929,7 @@
   id: JobParamedic
   groups:
   - GroupTankHarness
-  - ParamedicHead
+ #- ParamedicHead #Maid
   - ParamedicEnvirohelm
  # - MedicalMask #Maid
   - ParamedicJumpsuit
@@ -954,7 +954,7 @@
 - type: roleLoadout
   id: JobZookeeper
   groups:
-  - ZookeeperHead
+ #- ZookeeperHead #Maid
   - ZookeeperEnvirohelm
   - ZookeeperJumpsuit
   - ZookeeperEnvirosuit
@@ -997,7 +997,7 @@
 - type: roleLoadout
   id: JobPsychologist
   groups:
-  - MedicalDoctorHead #Maid
+ #- MedicalDoctorHead #Maid
   - PsychologistEnvirohelm
  # - MedicalGloves #Maid
   - PsychologistEnvirogloves
