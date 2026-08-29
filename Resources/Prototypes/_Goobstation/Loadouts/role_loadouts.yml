@@ -184,14 +184,14 @@
   groups:
   - BrigmedicHead
   - BrigmedicEnvirohelm
-  - MedicalMask
+  #- MedicalMask #Maid
   - BrigmedicJumpsuit
   - BrigmedicEnvirosuit
   - BrigmedicOuterClothing
  # - MedicalGloves #Maid
   - BrigmedicEnvirogloves
   - BrigmedicBackpack
-  - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security
+ # - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security #Maid Вырезано
   - SecurityShoes
  # - SecurityNeck #Maid
   - SurvivalSecurity
@@ -241,7 +241,7 @@
    - GroupTankHarness
    - MedicalDoctorHead
    - VirologyEnvirohelm
-   - MedicalMask
+   #- MedicalMask #Maid
    - VirologistJumpsuit
    - VirologyEnvirosuit
    # - MedicalGloves #Maid

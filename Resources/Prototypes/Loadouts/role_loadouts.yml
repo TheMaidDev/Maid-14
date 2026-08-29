@@ -708,8 +708,8 @@
   - HeadofSecurityJumpsuit
   - HeadofSecurityEnvirosuit
   - SecurityBackpack
-  - SecurityMelee # Goobstation
-  - SecurityBelt
+  # - SecurityMelee # Goobstation #Maid Вырезано
+ # - SecurityBelt #Maid
   - HeadofSecurityOuterClothing
   - HeadofSecurityShoes # Goobstation edit
   - SurvivalSecurity
@@ -736,9 +736,9 @@
   - WardenEnvirosuit
   - WardenEnvirogloves
   - SecurityBackpack
-  - SecurityMelee # Goobstation
+ #  - SecurityMelee # Goobstation #Maid Вырезано
   # - SecurityNeck #Maid
-  - SecurityBelt
+ # - SecurityBelt #Maid
   - WardenOuterClothing
   - SecurityShoes
   - SurvivalSecurity
@@ -761,12 +761,12 @@
   - SecurityOfficerEnvirosuit
   - SecurityOfficerEnvirogloves
   - SecurityBackpack
-  - SecurityMelee # Goobstation
+ # - SecurityMelee # Goobstation #Maid Вырезано
   - SecurityOuterClothing
   - SecurityShoes
   # - SecurityNeck #Maid
   - SecurityPDA
-  - SecurityBelt
+ # - SecurityBelt #Maid
   - SurvivalSecurity
 #  - Trinkets #Maid
 #  - SecurityStar #Maid
@@ -811,7 +811,7 @@
   - SecurityCadetEnvirosuit
   - SecurityCadetEnvirogloves
   - SecurityBackpack
-  - SecurityMelee # Goobstation
+ #  - SecurityMelee # Goobstation #Maid Вырезано
   - SurvivalSecurity
   # - SecurityNeck #Maid
   - SecurityOuterClothing # Goobstation - Why not.
