@@ -162,12 +162,12 @@
   - GroupTankHarness
   - ScientistHead
   - ScientistEnvirohelm
-  - ScientistNeck
+ # - ScientistNeck #Maid
   - ScientistJumpsuit
   - ScientistEnvirosuit
   - ScientistBackpack
   - ScientistOuterClothing
-  - ScientistGloves
+ # - ScientistGloves #Maid
   - ScientistEnvirogloves
   - ScientistShoes
   - ScientistPDA
@@ -188,12 +188,12 @@
   - BrigmedicJumpsuit
   - BrigmedicEnvirosuit
   - BrigmedicOuterClothing
-  - MedicalGloves
+ # - MedicalGloves #Maid
   - BrigmedicEnvirogloves
   - BrigmedicBackpack
   - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security
   - SecurityShoes
-  - SecurityNeck
+ # - SecurityNeck #Maid
   - SurvivalSecurity
   # - Trinkets #Maid
   # - Animals #Maid
@@ -244,7 +244,7 @@
    - MedicalMask
    - VirologistJumpsuit
    - VirologyEnvirosuit
-   - MedicalGloves
+   # - MedicalGloves #Maid
    - VirologyEnvirogloves
    - VirologistBackpack
    - VirologistOuterClothing
