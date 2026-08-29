@@ -840,7 +840,7 @@
   - ChiefMedicalOfficerOuterClothing
   # - ChiefMedicalOfficerNeck #Maid
   - ChiefMedicalOfficerShoes
-  - MedicalEyewear
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -868,7 +868,7 @@
   - MedicalDoctorOuterClothing
   - MedicalShoes
   - MedicalDoctorPDA
-  - MedicalEyewear
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -890,7 +890,7 @@
   - MedicalInternJumpsuit
   - MedicalInternEnvirosuit
   - MedicalBackpack
-  - MedicalEyewear
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -939,7 +939,7 @@
   - MedicalBackpack
   - ParamedicOuterClothing
   - ParamedicShoes
-  - MedicalEyewear
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
