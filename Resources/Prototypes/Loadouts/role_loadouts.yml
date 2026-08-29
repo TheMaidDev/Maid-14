@@ -831,7 +831,7 @@
   - GroupTankHarness
   - ChiefMedicalOfficerHead
   - ChiefMedicalOfficerEnvirohelm
-  - MedicalMask
+ # - MedicalMask #Maid
   - ChiefMedicalOfficerJumpsuit
   - ChiefMedicalOfficerEnvirosuit
  # - MedicalGloves #Maid
@@ -859,7 +859,7 @@
   - GroupTankHarness
   - MedicalDoctorHead
   - MedicalDoctorEnvirohelm
-  - MedicalMask
+  #- MedicalMask #Maid
   - MedicalDoctorJumpsuit
   - MedicalDoctorEnvirosuit
  # - MedicalGloves #Maid
@@ -907,7 +907,7 @@
   - GroupTankHarness
   - ChemistHead # Goobstation
   - ChemistEnvirohelm
-  - MedicalMask
+ # - MedicalMask #Maid
   - ChemistJumpsuit
   - ChemistEnvirosuit
  # - MedicalGloves #Maid
@@ -931,7 +931,7 @@
   - GroupTankHarness
   - ParamedicHead
   - ParamedicEnvirohelm
-  - MedicalMask
+ # - MedicalMask #Maid
   - ParamedicJumpsuit
   - ParamedicEnvirosuit
  # - MedicalGloves #Maid
