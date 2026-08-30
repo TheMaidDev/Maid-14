@@ -93,6 +93,7 @@
     id: AtmosPDA
     belt: ClothingBeltUtilityEngineering
     ears: ClothingHeadsetEngineering
+    shoes: ClothingShoesColorWhite #Maid
   #storage:
     #back:
     #- Stuff

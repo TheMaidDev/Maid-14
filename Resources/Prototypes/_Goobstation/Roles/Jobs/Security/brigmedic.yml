@@ -25,7 +25,7 @@
   - Medicine
   access:  # EE parity, make corpsman able function.
   - Security
-  - Brig
+  - Brig 
   - Medical
   - Maintenance
   - Service
@@ -41,6 +41,11 @@
     components:
     - type: SurgerySpeedModifier
       speedModifier: 1.25 # Same as Paramedic
+
+- type: startingGear
+  id: SecurityOfficerGear
+  equipment:
+    shoes: ClothingShoesBootsJack #Maid
 
 - type: chameleonOutfit
   id: BrigmedicChameleonOutfit

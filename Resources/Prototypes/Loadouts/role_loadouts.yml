@@ -192,7 +192,7 @@
  # - PassengerGloves #Maid
   - AssistantEnvirogloves
   - PassengerOuterClothing
-  - PassengerShoes
+ #- PassengerShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -354,7 +354,7 @@
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
-  - JanitorPlunger
+ #- JanitorPlunger #Maid
 #  - Animals #Maid
   - GroupSpeciesBreathTool
   # Goobstation - EE Plasmeme Change.
@@ -397,7 +397,7 @@
   - ClownEnvirogloves
   - ClownBackpack
   - ClownOuterClothing
-  - ClownShoes
+# - ClownShoes #Maid
 #  - Glasses #Maid
   - SurvivalClown
 #  - Trinkets #Maid
@@ -469,7 +469,7 @@
   - QuartermasterEnvirogloves
   - CargoTechnicianBackpack
   - QuartermasterOuterClothing
-  - QuartermasterShoes
+ #- QuartermasterShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -493,7 +493,7 @@
   - CargoTechnicianEnvirogloves
   - CargoTechnicianBackpack
   - CargoTechnicianOuterClothing
-  - CargoTechnicianShoes
+ #- CargoTechnicianShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -518,7 +518,7 @@
   # - SalvageSpecialistNeck #Maid # Goobstation
   - SalvageSpecialistBackpack
   - SalvageSpecialistOuterClothing
-  - SalvageSpecialistShoes
+ #- SalvageSpecialistShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -543,7 +543,7 @@
   - StationEngineerBackpack
   # - ChiefEngineerNeck #Maid
   - ChiefEngineerOuterClothing
-  - ChiefEngineerShoes
+ #- ChiefEngineerShoes #Maid
   - SurvivalExtended
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -588,8 +588,8 @@
   - StationEngineerEnvirogloves
   - StationEngineerBackpack
   - StationEngineerOuterClothing
-  - StationEngineerShoes
-  - StationEngineerID
+ #- StationEngineerShoes #Maid
+# - StationEngineerID #Maid
   - SurvivalExtended
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -611,7 +611,7 @@
   - AtmosEnvirogloves
   - AtmosphericTechnicianBackpack
   - AtmosphericTechnicianOuterClothing
-  - AtmosphericTechnicianShoes
+ #- AtmosphericTechnicianShoes #Maid
   - SurvivalExtended
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -636,7 +636,7 @@
   - ResearchDirectorOuterClothing
  # - ScientistGloves #Maid
   - ResearchDirectorEnvirogloves
-  - ResearchDirectorShoes
+ #- ResearchDirectorShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -663,7 +663,7 @@
   - ScientistOuterClothing
  # - ScientistGloves #Maid
   - ScientistEnvirogloves
-  - ScientistShoes
+ #- ScientistShoes #Maid
  #- ScientistPDA #Maid
 #  - Glasses #Maid
   - Survival
@@ -801,6 +801,7 @@
   - SocksUnderwear # Maid changes - socks
   - Underwear #Maid
   - Bra #Maid
+  - SocksUnderwear # Maid
 
 - type: roleLoadout
   id: JobSecurityCadet
@@ -839,7 +840,7 @@
   - MedicalBackpack
   - ChiefMedicalOfficerOuterClothing
   # - ChiefMedicalOfficerNeck #Maid
-  - ChiefMedicalOfficerShoes
+ #- ChiefMedicalOfficerShoes #Maid
  # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
@@ -866,7 +867,7 @@
   - MedicalDoctorEnvirogloves
   - MedicalBackpack
   - MedicalDoctorOuterClothing
-  - MedicalShoes
+ #- MedicalShoes #Maid
  #- MedicalDoctorPDA #Maid
  # - MedicalEyewear #Maid
   - SurvivalMedical
@@ -914,7 +915,7 @@
   - ChemistEnvirogloves
   - ChemistBackpack
   - ChemistOuterClothing
-  - MedicalShoes
+ #- MedicalShoes #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -938,7 +939,7 @@
   - ParamedicEnvirogloves
   - MedicalBackpack
   - ParamedicOuterClothing
-  - ParamedicShoes
+# - ParamedicShoes #Maid
  # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid

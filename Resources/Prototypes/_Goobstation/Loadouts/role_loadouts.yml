@@ -169,7 +169,7 @@
   - ScientistOuterClothing
  # - ScientistGloves #Maid
   - ScientistEnvirogloves
-  - ScientistShoes
+ #- ScientistShoes #Maid
  #- ScientistPDA #Maid
   # - Glasses
   - Survival
@@ -192,7 +192,7 @@
   - BrigmedicEnvirogloves
   - BrigmedicBackpack
  # - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security #Maid Вырезано
-  - SecurityShoes #Maid
+ #- SecurityShoes #Maid
  # - SecurityNeck #Maid
   - SurvivalSecurity
   # - Trinkets #Maid
@@ -248,7 +248,7 @@
    - VirologyEnvirogloves
    - VirologistBackpack
    - VirologistOuterClothing
-   - MedicalShoes
+  #- MedicalShoes #maid
   #- VirologistPDA #Maid
    - SurvivalMedical
   #  - Trinkets #Maid
