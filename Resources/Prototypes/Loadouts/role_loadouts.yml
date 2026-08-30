@@ -188,7 +188,7 @@
   - AssistantEnvirosuit
   - CommonBackpack
   # - PassengerNeck #Maid
-  - PassengerFace
+ #- PassengerFace #Maid 
  # - PassengerGloves #Maid
   - AssistantEnvirogloves
   - PassengerOuterClothing
@@ -982,7 +982,7 @@
   - ReporterJumpsuit
   - ReporterEnvirosuit
   - ReporterEnvirogloves
-  - ReporterOuterClothing # Goobstation - Bodycams
+ #- ReporterOuterClothing # Goobstation - Bodycams #Maid Вырезано
   - CommonBackpack
 #  - Glasses #Maid
   - Survival

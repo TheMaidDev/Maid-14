@@ -331,7 +331,7 @@
   - CaptainJumpskirt
   - CaptainFormalSuit
   - CaptainFormalSkirt
-  - CaptainJumpsuitMilitary # goob
+ #- CaptainJumpsuitMilitary # goob #Maid вырезано 
 
 - type: loadoutGroup
   id: CaptainNeck
@@ -375,7 +375,7 @@
   loadouts:
   - HoPJumpsuit
   - HoPJumpskirt
-  - HoPJumpsuitMilitary # goob
+ #- HoPJumpsuitMilitary # goob #Maid вырезано
 
 - type: loadoutGroup
   id: HoPNeck
@@ -893,7 +893,7 @@
   - QuartermasterTurtleneck
   - QuartermasterTurtleneckSkirt
   - QuartermasterFormalSuit
-  - QuartermasterMJ # goob
+ #- QuartermasterMJ # goob #Maid
 
 - type: loadoutGroup
   id: QuartermasterNeck
@@ -1003,7 +1003,7 @@
   - ChiefEngineerJumpskirt
   - ChiefEngineerTurtleneck
   - ChiefEngineerTurtleneckSkirt
-  - ChiefEngineerMJ # goob
+ #- ChiefEngineerMJ # goob #maid вырезано
 
 - type: loadoutGroup
   id: ChiefEngineerNeck
@@ -1169,10 +1169,10 @@
   speciesBlacklist: [Plasmaman] # MAID species loadout restrictions
   name: loadout-group-research-director-jumpsuit
   loadouts:
-  - ResearchDirectorMJ #maid
+ #- ResearchDirectorMJ #maid
   - ResearchDirectorJumpsuit
   - ResearchDirectorJumpskirt
-  - ResearchDirectorMJ # goob
+ #- ResearchDirectorMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: ResearchDirectorOuterClothing
@@ -1491,7 +1491,7 @@
   - ChiefMedicalOfficerJumpskirt
   - ChiefMedicalOfficerTurtleneckJumpsuit
   - ChiefMedicalOfficerTurtleneckJumpskirt
-  - CMOMJ # goob
+ #- CMOMJ # goob #maid Вырезано
 
 - type: loadoutGroup
   id: ChiefMedicalOfficerOuterClothing
