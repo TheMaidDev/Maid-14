@@ -511,7 +511,7 @@
   - CargoTechnicianOuterClothing #Maid
  #- CargoTechnicianHead #Maid
   - SalvageEnvirohelm
-  - CargoTechnicianJumpsuit #Maid
+ # - CargoTechnicianJumpsuit #Maid
   - SalvageEnvirosuit
   - SalvageEnvirogloves
   - GroupTankHarness

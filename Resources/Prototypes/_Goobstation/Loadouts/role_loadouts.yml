@@ -163,7 +163,8 @@
  #- ScientistHead #Maid
   - ScientistEnvirohelm
  # - ScientistNeck #Maid
-  - ScientistJumpsuit
+  # - ScientistJumpsuit #Maid
+  - RoboticistJumpsuit #Maid
   - ScientistEnvirosuit
   - ScientistBackpack
   - ScientistOuterClothing

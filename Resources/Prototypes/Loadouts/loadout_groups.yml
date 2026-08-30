@@ -411,25 +411,25 @@
   loadouts:
   - GreyJumpsuit
   - GreyJumpskirt
-  - AncientJumpsuit
-  - RainbowJumpsuit
-  - RainbowJumpskirt
- # goob changes start
-  - GreyMJ
-  - BlackMJ
-  - BlueMJ
-  - DarkBlueMJ
-  - TealMJ
-  - GreenMJ
-  - DarkGreenMJ
-  - OrangeMJ
-  - PinkMJ
-  - RedMJ
-  - YellowMJ
-  - PurpleMJ
-  - LightBrownMJ
-  - BrownMJ
-  - MaroonMJ
+#   - AncientJumpsuit #Maid begin вырезано
+#   - RainbowJumpsuit
+#   - RainbowJumpskirt
+#  # goob changes start
+#   - GreyMJ
+#   - BlackMJ
+#   - BlueMJ
+#   - DarkBlueMJ
+#   - TealMJ
+#   - GreenMJ
+#   - DarkGreenMJ
+#   - OrangeMJ
+#   - PinkMJ
+#   - RedMJ
+#   - YellowMJ
+#   - PurpleMJ
+#   - LightBrownMJ
+#   - BrownMJ
+#   - MaroonMJ #Maid end вырезано
  # goob changes end
 
 - type: loadoutGroup
@@ -495,7 +495,7 @@
   - BartenderJumpsuit
   - BartenderJumpskirt
   - BartenderJumpsuitPurple
-  - ServiceMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: BartenderOuterClothing
@@ -528,7 +528,7 @@
   loadouts:
   - ChefJumpsuit
   - ChefJumpskirt
-  - ServiceMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: ChefOuterClothing
@@ -548,7 +548,7 @@
   - LibrarianJumpskirt
   - CuratorJumpsuit
   - CuratorJumpskirt
-  - ServiceMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: LawyerJumpsuit
@@ -565,7 +565,7 @@
   - LawyerJumpskirtRed
   - LawyerJumpsuitGood
   - LawyerJumpskirtGood
-  - ServiceMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: LawyerNeck
@@ -600,9 +600,9 @@
   loadouts:
   - ChaplainJumpsuit
   - ChaplainJumpskirt
-  - ChaplainRobesLight
-  - ChaplainRobesDark
-  - ServiceMJ # goob
+  # - ChaplainRobesLight #Maid вырезано
+  # - ChaplainRobesDark #Maid вырезано
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: ChaplainOuterClothing
@@ -637,7 +637,7 @@
   loadouts:
   - JanitorJumpsuit
   - JanitorJumpskirt
-  - ServiceMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: JanitorGloves
@@ -681,8 +681,8 @@
   - BotanistJumpsuit
   - BotanistJumpskirt
   - BotanistOveralls
-  - ServiceMJ # goob
-  - HydroMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
+  # - HydroMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: BotanistBackpack
@@ -717,8 +717,8 @@
   loadouts:
   - ClownSuit
   - ClownSkirt
-  - JesterSuit
-  - JesterAltSuit
+  # - JesterSuit #Maid вырезано
+  # - JesterAltSuit #Maid вырезано
 
 - type: loadoutGroup
   id: ClownBackpack
@@ -829,7 +829,7 @@
   loadouts:
   - MusicianJumpsuit
   - MusicianJumpskirt
-  - ServiceMJ # goob
+  # - ServiceMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: MusicianOuterClothing
@@ -933,9 +933,9 @@
   loadouts:
   - CargoTechnicianJumpsuit
   - CargoTechnicianJumpskirt
-  - CargoTechnicianJumpsuitMail # Goob/DeltaV - Mail
-  - CargoTechnicianJumpskirtMail # Goob/DeltaV - Mail
-  - CargoTechMJ # goob
+  # - CargoTechnicianJumpsuitMail # Goob/DeltaV - Mail #Maid вырезано
+  # - CargoTechnicianJumpskirtMail # Goob/DeltaV - Mail #Maid вырезано 
+  # - CargoTechMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: CargoTechnicianBackpack
@@ -1034,7 +1034,7 @@
   loadouts:
   - YellowJumpsuit
   - YellowJumpskirt
-  - EngiMJ # goob
+  # - EngiMJ # goob #Maid Вырезано
 
 - type: loadoutGroup
   id: StationEngineerHead
@@ -1054,10 +1054,10 @@
   loadouts:
   - StationEngineerJumpsuit
   - StationEngineerJumpskirt
-  - StationEngineerHazardsuit
-  - SeniorEngineerJumpsuit
-  - SeniorEngineerJumpskirt
-  - EngiMJ # goob
+  # - StationEngineerHazardsuit #Maid Вырезано
+  # - SeniorEngineerJumpsuit #Maid Вырезано
+  # - SeniorEngineerJumpskirt #Maid Вырезано
+  # - EngiMJ # goob #Maid Вырезано
 
 - type: loadoutGroup
   id: StationEngineerBackpack
@@ -1106,9 +1106,9 @@
   - AtmosphericTechnicianJumpsuit
   - AtmosphericTechnicianJumpskirt
   - AtmosphericTechnicianJumpsuitCasual
-  - SeniorEngineerJumpskirt  # Goobstation
-  - SeniorEngineerJumpsuit   # Goobstation
-  - AtmosMJ # goob
+  # - SeniorEngineerJumpskirt  # Goobstation #Maid Вырезано
+  # - SeniorEngineerJumpsuit   # Goobstation #Maid Вырезано
+  # - AtmosMJ # goob #Maid Вырезано
 
 - type: loadoutGroup
   id: AtmosphericTechnicianOuterClothing
@@ -1216,9 +1216,9 @@
   - ScientistJumpskirt
   #- RoboticistJumpsuit
   #- RoboticistJumpskirt
-  - SeniorResearcherJumpsuit
-  - SeniorResearcherJumpskirt
-  - ResearchMJ # goob
+  # - SeniorResearcherJumpsuit #Maid вырезано
+  # - SeniorResearcherJumpskirt #Maid вырезано
+  # - ResearchMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: ScientistBackpack
@@ -1273,7 +1273,7 @@
   loadouts:
   - WhiteJumpsuit
   - WhiteJumpskirt
-  - ResearchMJ # goob
+  # - ResearchMJ # goob #Maid Вырезано
 
 # Security
 - type: loadoutGroup
@@ -1362,9 +1362,9 @@
   - SecurityJumpskirt
   - SecurityJumpsuitGrey
   - SecurityJumpskirtGrey
-  - SeniorOfficerJumpsuit
-  - SeniorOfficerJumpskirt
-  - TrooperUniform
+  # - SeniorOfficerJumpsuit #Maid
+  # - SeniorOfficerJumpskirt #Maid
+  # - TrooperUniform #Maid
 
 - type: loadoutGroup
   id: SecurityBackpack
@@ -1522,9 +1522,9 @@
   name: loadout-group-medical-doctor-head
   minLimit: 0
   loadouts:
-  - MedicalBeret
-  - SeniorPhysicianBeret
-  - MedicalHeadMirror
+  # - MedicalBeret
+  # - SeniorPhysicianBeret
+  # - MedicalHeadMirror 
   - BlueSurgeryCap
   - GreenSurgeryCap
   - PurpleSurgeryCap
@@ -1537,12 +1537,12 @@
   loadouts:
   - MedicalDoctorJumpsuit
   - MedicalDoctorJumpskirt
-  - SeniorPhysicianJumpsuit
-  - SeniorPhysicianJumpskirt
+  # - SeniorPhysicianJumpsuit #Maid Вырезано
+  # - SeniorPhysicianJumpskirt #Maid Вырезано
   - MedicalBlueScrubs
   - MedicalGreenScrubs
   - MedicalPurpleScrubs
-  - MedicMJ # goob
+  # - MedicMJ # goob #Maid Вырезано
 
 - type: loadoutGroup
   id: MedicalDoctorOuterClothing
@@ -1599,7 +1599,7 @@
   loadouts:
   - WhiteJumpsuit
   - WhiteJumpskirt
-  - MedicMJ # goob
+  # - MedicMJ # goob #Maid Вырезано
 
 - type: loadoutGroup
   id: ChemistJumpsuit
@@ -1608,9 +1608,9 @@
   loadouts:
   - ChemistJumpsuit
   - ChemistJumpskirt
-  - SeniorPhysicianJumpsuit # Goobstation
-  - SeniorPhysicianJumpskirt # Goobstation
-  - ChemistMJ # goob
+  # - SeniorPhysicianJumpsuit # Goobstation #Maid Вырезано
+  # - SeniorPhysicianJumpskirt # Goobstation #Maid Вырезано
+  # - ChemistMJ # goob #Maid Вырезано
 
 - type: loadoutGroup
   id: ChemistOuterClothing
@@ -1647,9 +1647,9 @@
   loadouts:
   - ParamedicJumpsuit
   - ParamedicJumpskirt
-  - SeniorPhysicianJumpsuit # Goobstation
-  - SeniorPhysicianJumpskirt # Goobstation
-  - ParamedMJ # goob
+  # - SeniorPhysicianJumpsuit # Goobstation #Maid Вырезано
+  # - SeniorPhysicianJumpskirt # Goobstation #Maid Вырезано
+  # - ParamedMJ # goob  #Maid Вырезано
 
 - type: loadoutGroup
   id: ParamedicOuterClothing
@@ -1702,7 +1702,7 @@
   loadouts:
   - ReporterJumpsuit
   - JournalistJumpsuit
-  - ReporterDress
+  # - ReporterDress #Maid
 
 - type: loadoutGroup
   id: PsychologistJumpsuit
