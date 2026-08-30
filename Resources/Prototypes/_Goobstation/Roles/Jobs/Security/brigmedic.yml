@@ -42,11 +42,6 @@
     - type: SurgerySpeedModifier
       speedModifier: 1.25 # Same as Paramedic
 
-- type: startingGear
-  id: SecurityOfficerGear
-  equipment:
-    shoes: ClothingShoesBootsJack #Maid
-
 - type: chameleonOutfit
   id: BrigmedicChameleonOutfit
   job: Brigmedic

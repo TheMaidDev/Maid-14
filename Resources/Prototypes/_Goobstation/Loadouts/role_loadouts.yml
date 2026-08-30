@@ -193,7 +193,7 @@
   - BrigmedicEnvirogloves
   - BrigmedicBackpack
  # - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security #Maid Вырезано
- #- SecurityShoes #Maid
+  - SecurityShoes #Maid
  # - SecurityNeck #Maid
   - SurvivalSecurity
   # - Trinkets #Maid
