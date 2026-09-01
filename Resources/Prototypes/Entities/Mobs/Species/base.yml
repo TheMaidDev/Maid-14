@@ -421,7 +421,7 @@
       types:
         Blunt: 5
   - type: SleepEmitSound
-#  - type: SSDIndicator # Maid
+  - type: SSDIndicator
   - type: StandingState
   - type: Crawler
   - type: Dna
