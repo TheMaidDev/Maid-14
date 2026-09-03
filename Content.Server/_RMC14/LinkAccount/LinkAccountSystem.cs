@@ -103,6 +103,7 @@ public sealed class LinkAccountSystem : EntitySystem
 
     private void OnRoundEndTextAppend(RoundEndTextAppendEvent ev)
     {
+        return; //Maid вырезано
         if (_nextNTShoutout != null)
         {
             ev.AddLine("\n");
