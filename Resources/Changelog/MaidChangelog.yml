@@ -1227,3 +1227,9 @@ Entries:
       message: Возвращён SSDIndicator пешкам
   id: 113
   time: '2026-09-05T10:16:33.0000000+00:00'
+- author: Inconnu1337
+  changes:
+    - type: Add
+      message: Автозамена слов по списку в IC чате.
+  id: 114
+  time: '2026-09-05T19:37:53.0000000+00:00'
