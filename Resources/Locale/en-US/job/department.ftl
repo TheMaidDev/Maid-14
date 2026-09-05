@@ -21,5 +21,5 @@ department-Security = Security
 department-Science = Science
 department-Silicon = Silicon
 department-Specific = Station specific
-
+department-lawyer = Department of Justice
 department-Unknown = Unknown
