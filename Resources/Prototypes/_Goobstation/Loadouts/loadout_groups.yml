@@ -1346,7 +1346,7 @@
   loadouts:
   - RoboticistJumpsuit
   - RoboticistJumpskirt
-  - ResearchMJ # goob
+  # - ResearchMJ # goob #Maid вырезано
 
 - type: loadoutGroup
   id: RoboticistBackpack
@@ -1671,7 +1671,7 @@
   loadouts:
    - VirologistJumpsuit
    - VirologistJumpskirt
-   - VirologistMJ # goobin
+  #  - VirologistMJ # goobin #Maid Вырезано
 
 - type: loadoutGroup
   id: VirologistBackpack
