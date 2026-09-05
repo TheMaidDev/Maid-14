@@ -98,6 +98,7 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Content.Shared._Maid.GameTicking.Prototypes;
 
 namespace Content.Client.Lobby
 {
@@ -114,6 +115,7 @@ namespace Content.Client.Lobby
         [Dependency] private readonly IPrototypeManager _protoMan = default!; // Goobstation - credits
         [Dependency] private readonly LinkAccountManager _linkAccount = default!; // RMC - Patreon
         [Dependency] private readonly ClientsidePlaytimeTrackingManager _playtimeTracking = default!;
+        private ProtoId<AnimatedLobbyScreenPrototype>? _lastAnimatedScreen;
 
         private ISawmill _sawmill = default!; // Goobstation
         private ClientGameTicker _gameTicker = default!;
@@ -348,32 +350,63 @@ namespace Content.Client.Lobby
         }
 
         // Goobstation - heavily modified to add credits for lobby backgrounds
-        private void UpdateLobbyBackground()
+        private void UpdateLobbyBackground() // Tweak-Maid: Animated Lobby
         {
+            if (_gameTicker.AnimatedLobbyScreen != null)
+            {
+                if (_gameTicker.AnimatedLobbyScreen != _lastAnimatedScreen)
+                {
+                    var lobbyBackground = _protoMan.Index(_gameTicker.AnimatedLobbyScreen.Value);
+                    Lobby!.Background.SetRSI(_resourceCache.GetResource<RSIResource>(lobbyBackground.Path).RSI);
+                    _lastAnimatedScreen = _gameTicker.AnimatedLobbyScreen;
+
+                    // TODO: В будущем при рефакторе дизайна лобби можно добавить отображение имени и автора анимированного фона
+                    // var name = string.IsNullOrEmpty(lobbyBackground.Name)
+                    //     ? Loc.GetString("lobby-state-background-unknown-title")
+                    //     : lobbyBackground.Name;
+
+                    // var artist = string.IsNullOrEmpty(lobbyBackground.Artist)
+                    //     ? Loc.GetString("lobby-state-background-unknown-artist")
+                    //     : lobbyBackground.Artist;
+
+                    // var markup = Loc.GetString("lobby-state-background-text",
+                    //     ("backgroundName", name),
+                    //     ("backgroundArtist", artist));
+
+                    // Lobby!.LobbyBackground.SetMarkup(markup);
+                }
+                return;
+            }
+
+            _lastAnimatedScreen = null;
+
+            //Lobby!.LobbyBackground.SetMarkup(markup);
             if (_gameTicker.LobbyBackground != null)
             {
                 var lobbyBackground = _protoMan.Index(_gameTicker.LobbyBackground.Value);
-                Lobby!.Background.Texture = _resourceCache.GetResource<TextureResource>(lobbyBackground.Background);
+                Lobby!.Background.SetTexture(_resourceCache.GetResource<TextureResource>(lobbyBackground.Background).Texture);
 
-                var name = string.IsNullOrEmpty(lobbyBackground.Name)
-                    ? Loc.GetString("lobby-state-background-unknown-title")
-                    : lobbyBackground.Name;
+                // TODO: В будущем при рефакторе дизайна лобби можно добавить отображение имени и автора статического фона
+                // var name = string.IsNullOrEmpty(lobbyBackground.Name)
+                //     ? Loc.GetString("lobby-state-background-unknown-title")
+                //     : lobbyBackground.Name;
 
-                var artist = string.IsNullOrEmpty(lobbyBackground.Artist)
-                    ? Loc.GetString("lobby-state-background-unknown-artist")
-                    : lobbyBackground.Artist;
+                // var artist = string.IsNullOrEmpty(lobbyBackground.Artist)
+                //     ? Loc.GetString("lobby-state-background-unknown-artist")
+                //     : lobbyBackground.Artist;
 
-                var markup = Loc.GetString("lobby-state-background-text",
-                    ("backgroundName", name),
-                    ("backgroundArtist", artist));
+                // var markup = Loc.GetString("lobby-state-background-text",
+                //     ("backgroundName", name),
+                //     ("backgroundArtist", artist));
 
-                //Lobby!.LobbyBackground.SetMarkup(markup);
+                // Lobby!.LobbyBackground.SetMarkup(markup);
 
                 return;
             }
 
             _sawmill.Warning("_gameTicker.LobbyBackground was null! No lobby background selected.");
-            Lobby!.Background.Texture = null;
+            Lobby!.Background.SetRSI(null);
+            // Lobby!.Background.Texture = null;
             //Lobby!.LobbyBackground.SetMarkup(Loc.GetString("lobby-state-background-no-background-text"));
         }
 
