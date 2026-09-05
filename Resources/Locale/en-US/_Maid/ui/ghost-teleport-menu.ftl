@@ -1,0 +1,22 @@
+global-antagonist-dragon-name = Space Dragon
+global-antagonist-dragon-description = A dragon! I saw a dragon!!
+global-antagonist-slime-name = Slime
+global-antagonist-slime-description = A hungry blob of something both solid and liquid
+global-antagonist-spider-name = Giant Spider
+global-antagonist-spider-description = A human sized aggressive spider
+global-antagonist-spider-clown-name = Giant Honk Spider
+global-antagonist-spider-clown-description = A human sized aggressive clown spider. HONK!
+global-antagonist-rats-name = Giant Rat
+global-antagonist-rats-description = An always hungry and aggressive rat
+global-antagonist-unknown-name = Unknown
+global-antagonist-unknown-description = Suspicious!!
+
+ghost-teleport-menu-antagonists-label = Antagonists
+ghost-teleport-menu-alive-label = Alive
+ghost-teleport-menu-dead-label = Dead
+ghost-teleport-menu-ghosts-label = Ghosts
+ghost-teleport-menu-left-label = Left their body
+ghost-teleport-menu-locations-label = Locations and objects
+ghost-teleport-menu-count-label = Count
+ghost-teleport-menu-unknown-job = Unknown
+ghost-teleport-menu-unknown-department = Other

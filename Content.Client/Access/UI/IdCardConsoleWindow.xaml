@@ -55,5 +55,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         </GridContainer>
         <Control Name="AccessLevelControlContainer" />
         <!-- Goobstation End -->
+        <!-- Maid edit start -->
+        <Control MinSize="0 8" />
+        <GridContainer Name="CurrentJobIcon" Columns="2">
+            <Label Text="{Loc 'id-card-console-window-current-job-icon'}" />
+        </GridContainer>
+        <GridContainer Name="JobIconsGrid" Columns="10" HorizontalAlignment="Center">
+        </GridContainer>
+        <!-- Maid edit end -->
     </BoxContainer>
 </DefaultWindow>
