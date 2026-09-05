@@ -18,4 +18,6 @@ public interface IChatSanitizationManager
         EntityUid speaker,
         out string sanitized,
         [NotNullWhen(true)] out string? emote);
+
+    public string SanitizeOutSlang(string input); //Maid edit
 }

@@ -20,10 +20,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Content.Shared.CCVar;
 using Robust.Shared.Configuration;
+using Robust.Shared.ContentPack;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Chat.Managers;
 
@@ -114,17 +118,75 @@ public sealed class ChatSanitizationManager : IChatSanitizationManager
         Entry("[':", "chatsan-tearfully-smiles"),
         Entry("('=", "chatsan-tearfully-smiles"),
         Entry("['=", "chatsan-tearfully-smiles"),
+        //Maid edit start
+        Entry("о-о", "chatsan-wide-eyed"),
+        Entry("о.о", "chatsan-wide-eyed"),
+        Entry("0_о", "chatsan-wide-eyed"),
+        Entry("о/", "chatsan-waves"),
+        Entry("о7", "chatsan-salutes"),
+        //Maid edit end
     ];
+
+    //Maid edit start
+    /// <summary>
+    ///     Path to the slang dictionary used by <see cref="SanitizeOutSlang"/>.
+    /// </summary>
+    private static readonly ResPath SlangFilterPath = new("/_Maid/ChatFilters/slang.json");
+    private static readonly Regex SlangWordRegex =
+        new(@"(^\!|^\?|[\p{L}\d'`%-]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private FrozenDictionary<string, string> _slangToNormal = FrozenDictionary<string, string>.Empty;
+    //Maid edit end
 
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly ILocalizationManager _loc = default!;
+    [Dependency] private readonly IResourceManager _resources = default!; //Maid edit
+    [Dependency] private readonly ILogManager _logManager = default!; //Maid edit
 
     private bool _doSanitize;
 
     public void Initialize()
     {
         _configurationManager.OnValueChanged(CCVars.ChatSanitizerEnabled, x => _doSanitize = x, true);
+
+        LoadSlangDictionary(); //Maid edit
     }
+
+    //Maid edit start
+    private void LoadSlangDictionary()
+    {
+        var sawmill = _logManager.GetSawmill("chat.slang");
+
+        try
+        {
+            var filterData = _resources.ContentFileReadAllText(SlangFilterPath);
+            var parsed = JsonSerializer.Deserialize<Dictionary<string, string>>(filterData);
+
+            if (parsed == null)
+            {
+                sawmill.Error($"{SlangFilterPath} deserialized to null.");
+                return;
+            }
+
+            _slangToNormal = parsed.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception e)
+        {
+            sawmill.Error($"Failed to load {SlangFilterPath}: {e}");
+        }
+    }
+
+    public string SanitizeOutSlang(string input)
+    {
+        if (_slangToNormal.Count == 0 || string.IsNullOrEmpty(input))
+            return input;
+
+        return SlangWordRegex.Replace(input,
+            match => _slangToNormal.TryGetValue(match.Groups[1].Value, out var replacement)
+                ? replacement
+                : match.Value);
+    }
+    //Maid edit end
 
     /// <summary>
     ///     Remove the shorthands from the message, returning the last one found as the emote
