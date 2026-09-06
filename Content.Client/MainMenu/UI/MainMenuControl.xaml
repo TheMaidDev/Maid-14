@@ -28,36 +28,48 @@ SPDX-License-Identifier: MIT
                   SeparationOverride="3">
         <TextureRect Name="Logo"
                      Stretch="KeepCentered"/>
-        <GridContainer Columns="2">
-            <Label Text="{Loc 'main-menu-username-label'}" />
-            <LineEdit Name="UsernameBox"
-                      Access="Public"
-                      PlaceHolder="{Loc 'main-menu-username-text'}"
-                      HorizontalExpand="True" />
-            <Label Text="{Loc 'main-menu-address-label'}"/>
-            <LineEdit Name="AddressBox"
-                      Access="Public"
-                      Text="localhost"
-                      PlaceHolder="server address:port"
-                      HorizontalExpand="True" />
-        </GridContainer>
-        <Button Name="DirectConnectButton"
-                Access="Public"
-                Text="{Loc 'main-menu-direct-connect-button'}"
-                TextAlign="Center"
-                StyleIdentifier="mainMenu"/>
-        <Button Name="OptionsButton"
-                Access="Public"
-                Text="{Loc 'main-menu-options-button'}"
-                TextAlign="Center"
-                StyleIdentifier="mainMenu"/>
-        <Button Name="QuitButton"
-                Access="Public"
-                Text="{Loc 'main-menu-quit-button'}"
-                TextAlign="Center"
-                StyleIdentifier="mainMenu"/>
-        <clog:ChangelogButton
-            Name="ChangelogButton"
-            Access="Public"/>
+        <!-- Maid-Tweak-Start -->
+        <BoxContainer Name="BottomMenuContainer"
+                      Orientation="Vertical"
+                      HorizontalExpand="True"
+                      VerticalExpand="False"
+                      MinHeight="250"
+                      MaxHeight="300"
+                      MinWidth="350"
+                      MaxWidth="400"
+                      SeparationOverride="3">
+            <GridContainer Columns="2">
+                <Label Text="{Loc 'main-menu-username-label'}" />
+                <LineEdit Name="UsernameBox"
+                          Access="Public"
+                          PlaceHolder="{Loc 'main-menu-username-text'}"
+                          HorizontalExpand="True" />
+                <Label Text="{Loc 'main-menu-address-label'}"/>
+                <LineEdit Name="AddressBox"
+                          Access="Public"
+                          Text="localhost"
+                          PlaceHolder="server address:port"
+                          HorizontalExpand="True" />
+            </GridContainer>         
+            <Button Name="DirectConnectButton"
+                    Access="Public"
+                    Text="{Loc 'main-menu-direct-connect-button'}"
+                    TextAlign="Center"
+                    StyleIdentifier="mainMenu"/>      
+            <Button Name="OptionsButton"
+                    Access="Public"
+                    Text="{Loc 'main-menu-options-button'}"
+                    TextAlign="Center"
+                    StyleIdentifier="mainMenu"/>    
+            <Button Name="QuitButton"
+                    Access="Public"
+                    Text="{Loc 'main-menu-quit-button'}"
+                    TextAlign="Center"
+                    StyleIdentifier="mainMenu"/>      
+            <clog:ChangelogButton
+                Name="ChangelogButton"
+                Access="Public"/>   
+        </BoxContainer> 
+        <!-- Maid-Tweak-end -->
     </BoxContainer>
 </Control>
