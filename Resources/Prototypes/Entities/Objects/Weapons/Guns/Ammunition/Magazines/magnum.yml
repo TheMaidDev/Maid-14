@@ -41,12 +41,12 @@
   components:
   - type: Tag
     tags:
-      - MagazineMagnum
+    - MagazineMagnum
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgeMagnum
+      - CartridgeMagnum
     capacity: 7
 
 - type: entity
@@ -57,12 +57,12 @@
   components:
   - type: Tag
     tags:
-      - MagazineMagnumSubMachineGun
+    - MagazineMagnumSubMachineGun
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgeMagnum
+      - CartridgeMagnum
     capacity: 25
   - type: Item
     size: Small
@@ -97,12 +97,14 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      right:
-      - state: inhand-right-mag
+#Maid edit start
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      right:
+#      - state: inhand-right-mag
+#Maid edit end
 
 - type: entity
   id: MagazineMagnum
@@ -118,12 +120,14 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      right:
-      - state: inhand-right-mag
+#Maid edit start
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      right:
+#      - state: inhand-right-mag
+#Maid edit end
 
 - type: entity
   id: MagazineMagnumPractice
@@ -135,22 +139,25 @@
     proto: CartridgeMagnumPractice
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: practice #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#dbdbdb"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#dbdbdb"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#dbdbdb"
+# Maid edit start
+#    - state: stripe
+#      color: "#dbdbdb"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#dbdbdb"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#dbdbdb"
+# Maid edit end
 
 - type: entity
   id: MagazineMagnumUranium
@@ -162,22 +169,25 @@
     proto: CartridgeMagnumUranium
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: uranium #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#00cd42"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#00cd42"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#00cd42"
+#Maid edit end
+#    - state: stripe
+#      color: "#00cd42"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#00cd42"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#00cd42"
+#Maid edit start
 
 - type: entity
   id: MagazineMagnumAP
@@ -189,22 +199,25 @@
     proto: CartridgeMagnumAP
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: piercing #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#540000"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#540000"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#540000"
+#Maid edit start
+#    - state: stripe
+#      color: "#540000"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#540000"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#540000"
+#Maid edit end
 
 - type: entity
   id: MagazineMagnumSubMachineGunEmpty
