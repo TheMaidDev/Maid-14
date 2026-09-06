@@ -607,9 +607,9 @@
         acts: [ "Destruction" ]
   - type: IconSmooth
     key: woodtable
-  - type: Construction
-    graph: Table
-    node: TableWood
+  # - type: Construction #Maid 
+  #   graph: Table #Maid
+  #   node: TableWood #Maid
   - type: Tag
     tags:
     - Wooden
