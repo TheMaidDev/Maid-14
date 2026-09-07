@@ -35,6 +35,12 @@ SPDX-License-Identifier: MIT
                             Access="Public"
                             HorizontalAlignment="Center"
                             HorizontalExpand="True" />
+                    <!-- Maid-14-Tweak-Start -->
+                    <RichTextLabel Name="CloningChanceLabel"
+                            Access="Public"
+                            HorizontalAlignment="Center"
+                            HorizontalExpand="True" />
+                    <!-- Maid-14-Tweak-End -->
                 </BoxContainer>
                 <BoxContainer Name="GeneticScannerMissing" Margin="5 5 5 5" Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
                     <Label HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Loc 'cloning-console-window-no-scanner-detected-label'}" />

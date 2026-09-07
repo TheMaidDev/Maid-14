@@ -16,6 +16,7 @@ using Content.Server.Popups;
 using Content.Server.Power.EntitySystems;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Atmos;
+using Content.Shared.Atmos.Rotting; // Maid-14-Tweak
 using Content.Shared.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Chemistry.Components;
@@ -196,11 +197,13 @@ public sealed class CloningPodSystem : EntitySystem
         //     return false;
 
         // var cloningCost = (int)Math.Round(physics.FixturesMass);
-        var cloningCost = clonePod.BiomassCost;
+        var cloningCost = GetCloningCost(bodyToClone, clonePod);
         // Maid-14-Tweak-End
 
-        if (_configManager.GetCVar(CCVars.BiomassEasyMode))
-            cloningCost = (int)Math.Round(cloningCost * EasyModeCloningCost);
+        // Maid-14-Tweak-Start
+        var cellularDmg = GetCellularDamage(bodyToClone);
+        var failChance = Math.Clamp((1f - GetCloningChance(clonePod, cellularDmg)) * failChanceModifier, 0f, 1f);
+        // Maid-14-Tweak-End
 
         // biomass checks
         var biomassAmount = _material.GetMaterialAmount(uid, clonePod.RequiredMaterial);
@@ -215,25 +218,20 @@ public sealed class CloningPodSystem : EntitySystem
         // end of biomass checks
 
         // genetic damage checks
-        if (TryComp<DamageableComponent>(bodyToClone, out var damageable) &&
-            damageable.Damage.DamageDict.TryGetValue("Cellular", out var cellularDmg))
+        // Maid-14-Tweak-Start
+        if (cellularDmg > 0 && clonePod.ConnectedConsole != null)
+            _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value, Loc.GetString("cloning-console-cellular-warning", ("percent", Math.Round(100 - failChance * 100))), InGameICChatType.Speak, false);
+
+        if (_robustRandom.Prob(failChance))
         {
-            var chance = Math.Clamp((float)(cellularDmg / 100), 0, 1);
-            chance *= failChanceModifier;
-
-            if (cellularDmg > 0 && clonePod.ConnectedConsole != null)
-                _chatSystem.TrySendInGameICMessage(clonePod.ConnectedConsole.Value, Loc.GetString("cloning-console-cellular-warning", ("percent", Math.Round(100 - chance * 100))), InGameICChatType.Speak, false);
-
-            if (_robustRandom.Prob(chance))
-            {
-                clonePod.FailedClone = true;
-                UpdateStatus(uid, CloningPodStatus.Gore, clonePod);
-                AddComp<ActiveCloningPodComponent>(uid);
-                _material.TryChangeMaterialAmount(uid, clonePod.RequiredMaterial, -cloningCost);
-                clonePod.UsedBiomass = cloningCost;
-                return true;
-            }
+            clonePod.FailedClone = true;
+            UpdateStatus(uid, CloningPodStatus.Gore, clonePod);
+            AddComp<ActiveCloningPodComponent>(uid);
+            _material.TryChangeMaterialAmount(uid, clonePod.RequiredMaterial, -cloningCost);
+            clonePod.UsedBiomass = cloningCost;
+            return true;
         }
+        // Maid-14-Tweak-End
         // end of genetic damage checks
 
         if (!_cloning.TryCloning(bodyToClone, _transformSystem.GetMapCoordinates(bodyToClone), SettingsId, out var mob)) // spawn a new body
@@ -257,6 +255,50 @@ public sealed class CloningPodSystem : EntitySystem
         clonePod.UsedBiomass = cloningCost;
         return true;
     }
+
+    // Maid-14-Tweak-Start
+    public int GetCloningCost(EntityUid bodyToClone, CloningPodComponent clonePod)
+    {
+        var cost = clonePod.BiomassCost;
+
+        if (TryComp<PerishableComponent>(bodyToClone, out var perishable))
+        {
+            var totalRotTime = perishable.RotAccumulator;
+            if (TryComp<RottingComponent>(bodyToClone, out var rotting))
+                totalRotTime = perishable.RotAfter + rotting.TotalRotTime;
+
+            cost += (int)Math.Round(totalRotTime.TotalMinutes * clonePod.BiomassCostPerRotMinute);
+        }
+
+        cost = Math.Min(cost, Math.Max(clonePod.BiomassCost, clonePod.MaxBiomassCost));
+
+        if (_configManager.GetCVar(CCVars.BiomassEasyMode))
+            cost = (int)Math.Round(cost * EasyModeCloningCost);
+
+        return cost;
+    }
+
+    public float GetCellularDamage(EntityUid bodyToClone)
+    {
+        if (!TryComp<DamageableComponent>(bodyToClone, out var damageable)
+            || !damageable.Damage.DamageDict.TryGetValue("Cellular", out var cellularDmg))
+        {
+            return 0f;
+        }
+
+        return (float)cellularDmg;
+    }
+
+    public float GetCloningChance(CloningPodComponent clonePod, float cellularDmg)
+    {
+        if (clonePod.CloningChances.Count == 0 || clonePod.CellularDamagePerStep <= 0f)
+            return 1f;
+
+        var step = (int)(Math.Max(cellularDmg, 0f) / clonePod.CellularDamagePerStep);
+
+        return step >= clonePod.CloningChances.Count ? 0f : clonePod.CloningChances[step];
+    }
+    // Maid-14-Tweak-End
 
     public void UpdateStatus(EntityUid podUid, CloningPodStatus status, CloningPodComponent cloningPod)
     {

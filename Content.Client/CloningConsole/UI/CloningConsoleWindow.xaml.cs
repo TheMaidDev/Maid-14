@@ -73,6 +73,17 @@ namespace Content.Client.CloningConsole.UI
                 ScannerInfoLabel.SetMarkup(state.ScannerBodyInfo != null ?
                     Loc.GetString("cloning-console-window-scanner-id", ("scannerOccupantName", state.ScannerBodyInfo)) :
                     Loc.GetString("cloning-console-window-id-blank"));
+
+                // Maid-14-Tweak-Start
+                CloningChanceLabel.Visible = state.CloningStatus == ClonerStatus.Ready;
+
+                if (CloningChanceLabel.Visible)
+                {
+                    CloningChanceLabel.SetMarkup(Loc.GetString("cloning-console-window-clone-info",
+                        ("chance", state.CloningChance),
+                        ("biomass", state.BiomassCost)));
+                }
+                // Maid-14-Tweak-End
             }
             else
             {

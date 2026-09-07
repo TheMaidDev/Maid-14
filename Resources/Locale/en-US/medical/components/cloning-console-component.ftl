@@ -41,3 +41,4 @@ cloning-console-component-msg-no-mind = Not Ready: No Soul Activity Detected
 cloning-console-chat-error = ERROR: INSUFFICIENT BIOMASS. CLONING THIS BODY REQUIRES {$units} UNITS OF BIOMASS.
 cloning-console-uncloneable-trait-error = ERROR: CLONING IS IMPOSSIBLE DUE TO ABNORMAL BODY COMPOSITION.
 cloning-console-cellular-warning = WARNING: GENEFSCK CONFIDENCE SCORE IS {$percent}%. CLONING MAY HAVE UNEXPECTED RESULTS.
+cloning-console-window-clone-info = Cloning chance: [color=yellow]{$chance}%[/color] | Biomass required: [color=red]{$biomass}[/color]

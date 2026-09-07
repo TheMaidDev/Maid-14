@@ -44,6 +44,18 @@ public sealed partial class CloningPodComponent : Component
     // Maid-14-Tweak-Start
     [DataField]
     public int BiomassCost = 30;
+
+    [DataField]
+    public float BiomassCostPerRotMinute = 2f;
+
+    [DataField]
+    public int MaxBiomassCost = 150;
+
+    [DataField]
+    public float CellularDamagePerStep = 50f;
+
+    [DataField]
+    public List<float> CloningChances = new() { 0.8f, 0.55f, 0.32f, 0.16f };
     // Maid-14-Tweak-End
 
     /// <summary>

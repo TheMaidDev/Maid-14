@@ -19,7 +19,12 @@ namespace Content.Shared.Cloning.CloningConsole
         public readonly bool ScannerInRange;
         public readonly bool ClonerConnected;
         public readonly bool ClonerInRange;
-        public CloningConsoleBoundUserInterfaceState(string? scannerBodyInfo, string? cloningBodyInfo, bool mindPresent, ClonerStatus cloningStatus, bool scannerConnected, bool scannerInRange, bool clonerConnected, bool clonerInRange)
+        // Maid-14-Tweak-Start
+        public readonly int CloningChance;
+        public readonly int BiomassCost;
+        // Maid-14-Tweak-End
+        public CloningConsoleBoundUserInterfaceState(string? scannerBodyInfo, string? cloningBodyInfo, bool mindPresent, ClonerStatus cloningStatus, bool scannerConnected, bool scannerInRange, bool clonerConnected, bool clonerInRange,
+            int cloningChance, int biomassCost) // Maid-14-Tweak
         {
             ScannerBodyInfo = scannerBodyInfo;
             ClonerBodyInfo = cloningBodyInfo;
@@ -29,6 +34,10 @@ namespace Content.Shared.Cloning.CloningConsole
             ScannerInRange = scannerInRange;
             ClonerConnected = clonerConnected;
             ClonerInRange = clonerInRange;
+            // Maid-14-Tweak-Start
+            CloningChance = cloningChance;
+            BiomassCost = biomassCost;
+            // Maid-14-Tweak-End
         }
     }
 
