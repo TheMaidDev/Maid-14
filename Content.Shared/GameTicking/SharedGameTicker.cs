@@ -254,6 +254,10 @@ namespace Content.Shared.GameTicking
 
             public Dictionary<string, FixedPoint2> DamagePerGroup;
             #endregion
+
+            // Maid-14-Tweak-Start
+            public string? Reputation;
+            // Maid-14-Tweak-End
         }
 
         public string GamemodeTitle { get; }

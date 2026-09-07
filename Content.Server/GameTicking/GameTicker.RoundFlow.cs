@@ -679,10 +679,20 @@ namespace Content.Server.GameTicking
                 #endregion
                 // END
 
-                // WD-Tweak-Start
-                if (userId != null)
-                    _repSys.TryModifyReputationOnRoundEnd(userId.Value, out _, out _);
-                // WD-Tweak-End
+                // Maid-14-Tweak-Start
+                var reputation = "";
+                if (userId != null
+                    && _repSys.TryModifyReputationOnRoundEnd(userId.Value, out var repValue, out var repDelta)
+                    && repValue != null)
+                {
+                    var repColor = repValue >= 0 ? "green" : "red";
+                    var repChange = repDelta >= 0 ? $"+{repDelta}" : $"{repDelta}";
+                    reputation = Loc.GetString("round-end-summary-window-player-reputation",
+                        ("color", repColor),
+                        ("value", repValue.Value),
+                        ("change", repChange));
+                }
+                // Maid-14-Tweak-End
 
                 var playerEndRoundInfo = new RoundEndMessageEvent.RoundEndPlayerInfo()
                 {
@@ -704,7 +714,8 @@ namespace Content.Server.GameTicking
                     // Goob Station - End of Round Screen
                     LastWords = lastWords,
                     EntMobState = mobState,
-                    DamagePerGroup = damagePerGroup
+                    DamagePerGroup = damagePerGroup,
+                    Reputation = reputation // Maid-14-Tweak
                 };
                 listOfPlayerInfo.Add(playerEndRoundInfo);
             }
