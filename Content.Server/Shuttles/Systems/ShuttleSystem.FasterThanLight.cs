@@ -733,10 +733,15 @@ public sealed partial class ShuttleSystem
         {
             foreach (var child in toKnock)
             {
-                _stuns.TryUpdateParalyzeDuration(child, _hyperspaceKnockdownTime);
+                // Maid-14-Tweak-Start
+                if (!_standing.IsDown(child))
+                {
+                    _stuns.TryUpdateParalyzeDuration(child, _hyperspaceKnockdownTime);
 
-                // goob edit - stunmeta
-                _stuns.KnockdownOrStun(child, _hyperspaceKnockdownTime);
+                    // goob edit - stunmeta
+                    _stuns.KnockdownOrStun(child, _hyperspaceKnockdownTime);
+                }
+                // Maid-14-Tweak-End
 
                 // If the guy we knocked down is on a spaced tile, throw them too
                 if (grid != null)

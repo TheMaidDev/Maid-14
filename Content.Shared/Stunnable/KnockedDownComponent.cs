@@ -42,6 +42,11 @@ public sealed partial class KnockedDownComponent : Component
     [DataField, AutoNetworkedField]
     public ushort? DoAfterId;
 
+    // Maid-14-Tweak-Start
+    [DataField, AutoNetworkedField]
+    public bool AutoStanding;
+    // Maid-14-Tweak-End
+
     /// <summary>
     /// Friction modifier for knocked down players.
     /// Makes them accelerate and deccelerate slower.
