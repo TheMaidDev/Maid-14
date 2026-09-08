@@ -185,6 +185,7 @@
     eyes: ClothingEyesGlassesMeson
     ears: ClothingHeadsetAltEngineering # Goobstation
     belt: ClothingBeltUtilityEngineering
+    shoes: ClothingShoesColorBrown
   storage:
     back:
     - Flash

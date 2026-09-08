@@ -99,6 +99,7 @@
   equipment:
     id: PassengerPDA
     ears: ClothingHeadsetGrey
+    shoes: ClothingShoesColorBlack #Maid
   #storage:
     #back:
     #- Stuff

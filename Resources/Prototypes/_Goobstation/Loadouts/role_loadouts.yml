@@ -160,17 +160,18 @@
   id: JobRoboticist
   groups:
   - GroupTankHarness
-  - ScientistHead
+ #- ScientistHead #Maid
   - ScientistEnvirohelm
-  - ScientistNeck
-  - ScientistJumpsuit
+ # - ScientistNeck #Maid
+  # - ScientistJumpsuit #Maid
+  - RoboticistJumpsuit #Maid
   - ScientistEnvirosuit
   - ScientistBackpack
   - ScientistOuterClothing
-  - ScientistGloves
+ # - ScientistGloves #Maid
   - ScientistEnvirogloves
-  - ScientistShoes
-  - ScientistPDA
+ #- ScientistShoes #Maid
+ #- ScientistPDA #Maid
   # - Glasses
   - Survival
   # - Trinkets
@@ -182,18 +183,18 @@
 - type: roleLoadout
   id: JobBrigmedic
   groups:
-  - BrigmedicHead
+ #- BrigmedicHead #Maid
   - BrigmedicEnvirohelm
-  - MedicalMask
+  #- MedicalMask #Maid
   - BrigmedicJumpsuit
   - BrigmedicEnvirosuit
   - BrigmedicOuterClothing
-  - MedicalGloves
+ # - MedicalGloves #Maid
   - BrigmedicEnvirogloves
   - BrigmedicBackpack
-  - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security
-  - SecurityShoes
-  - SecurityNeck
+ # - SecurityMelee # EE parity, make corpsman able to carry weapons like the rest of security #Maid Вырезано
+  - SecurityShoes #Maid
+ # - SecurityNeck #Maid
   - SurvivalSecurity
   # - Trinkets #Maid
   # - Animals #Maid
@@ -239,17 +240,17 @@
   id: JobVirologist
   groups:
    - GroupTankHarness
-   - MedicalDoctorHead
+  #- MedicalDoctorHead #Maid
    - VirologyEnvirohelm
-   - MedicalMask
+   #- MedicalMask #Maid
    - VirologistJumpsuit
    - VirologyEnvirosuit
-   - MedicalGloves
+   # - MedicalGloves #Maid
    - VirologyEnvirogloves
    - VirologistBackpack
    - VirologistOuterClothing
-   - MedicalShoes
-   - VirologistPDA
+  #- MedicalShoes #maid
+  #- VirologistPDA #Maid
    - SurvivalMedical
   #  - Trinkets #Maid
    - GroupSpeciesBreathToolMedical

@@ -95,6 +95,8 @@
     jumpsuit: ClothingUniformJumpsuitSalvageSpecialist
     id: SalvagePDA
     ears: ClothingHeadsetCargo
+    shoes: ClothingShoesColorBrown #Maid
+
   storage: # DeltaV: Add mining voucher
     back:
     - MiningVoucher

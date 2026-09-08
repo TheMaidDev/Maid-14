@@ -179,6 +179,7 @@
     eyes: ClothingEyesGlassesSecurityContraDetect # Goobstation
     id: WardenPDA
     ears: ClothingHeadsetAltWarden # Goobstation
+    shoes: ClothingShoesBootsJack #Maid
     pocket1: WeaponPistolMk58
   storage:
     back:

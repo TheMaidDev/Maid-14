@@ -98,6 +98,7 @@
     eyes: ClothingEyesGlassesMeson
     belt: ClothingBeltUtilityEngineering
     ears: ClothingHeadsetEngineering
+    shoes: ClothingShoesBootsWork #Maid
   #storage:
     #back:
     #- Stuff
