@@ -291,12 +291,12 @@ public sealed class CloningPodSystem : EntitySystem
 
     public float GetCloningChance(CloningPodComponent clonePod, float cellularDmg)
     {
-        if (clonePod.CloningChances.Count == 0 || clonePod.CellularDamagePerStep <= 0f)
+        if (clonePod.CellularDamagePerPercent <= 0f)
             return 1f;
 
-        var step = (int)(Math.Max(cellularDmg, 0f) / clonePod.CellularDamagePerStep);
+        var lostPercent = Math.Max(cellularDmg, 0f) / clonePod.CellularDamagePerPercent;
 
-        return step >= clonePod.CloningChances.Count ? 0f : clonePod.CloningChances[step];
+        return Math.Clamp(1f - lostPercent / 100f, 0f, 1f);
     }
     // Maid-14-Tweak-End
 
