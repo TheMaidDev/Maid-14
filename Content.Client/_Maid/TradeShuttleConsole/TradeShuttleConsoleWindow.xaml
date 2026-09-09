@@ -1,0 +1,15 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+        xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Content.Client._Maid.TradeShuttleConsole.TradeShuttleConsoleWindow"
+        Title="Trade Shuttle Console"
+        SetSize="300 180">
+    <BoxContainer Orientation="Vertical" Margin="10">
+        <BoxContainer Orientation="Horizontal" Margin="5 0 5 5">
+            <Label Name="StatusLabel" HorizontalAlignment="Left"/>
+            <Label Name="ControlledShuttle" HorizontalAlignment="Right"/>
+        </BoxContainer>
+        <ProgressBar Name="TimerBar" HorizontalExpand="True" Margin="5 0 5 10" MinValue="0.0" MaxValue="1.0" Value="1.0" SetHeight="24"/>
+        <Button Name="ActionButton" Text="Recall" HorizontalExpand="True" SetHeight="48" Margin="5 0 5 0"/>
+    </BoxContainer>
+</controls:FancyWindow>

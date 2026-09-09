@@ -78,5 +78,13 @@ public sealed class MaidCVars
     public static readonly CVarDef<bool> AdaptiveStatistics =
         CVarDef.Create("maid.adaptive_statistics", false, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     If true doesn't allow to FTL on trade map while anyone alive is on shuttle
+    /// </summary>
+    public static readonly CVarDef<bool> DenyAliveTradeFTL =
+        CVarDef.Create("maid.deny_alive_trade_ftl", false, CVar.SERVERONLY);
+
     #endregion
+
+
 }

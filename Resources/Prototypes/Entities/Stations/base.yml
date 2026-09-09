@@ -117,13 +117,15 @@
       path: /Maps/Shuttles/cargo.yml
     - type: GridSpawn
       groups:
-        trade: !type:GridSpawnGroup
-          addComponents:
-            - type: ProtectedGrid
-            - type: TradeStation
-          paths:
-            - /Maps/_Goobstation/Shuttles/trading_outpost.yml #Goobstation
-          nameDataset: TradeStationNames
+        # MAID BEGIN trade shuttle
+        #trade: !type:GridSpawnGroup
+        #  addComponents:
+        #    - type: ProtectedGrid
+        #    - type: TradeStation
+        #  paths:
+        #    - /Maps/_Goobstation/Shuttles/trading_outpost.yml #Goobstation
+        #  nameDataset: TradeStationNames
+        # MAID END trade shuttle
         mining: !type:GridSpawnGroup
           paths:
           - /Maps/_Maid/Shuttles/mining.yml # Maid

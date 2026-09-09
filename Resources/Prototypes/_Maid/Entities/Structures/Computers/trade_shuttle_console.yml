@@ -1,0 +1,42 @@
+- type: entity
+  parent: BaseComputer
+  id: ComputerTradeShuttleConsole
+  name: trade shuttle console
+  description: Used to control and call the trade shuttle.
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: shuttle
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+  - type: TradeShuttleConsole
+  - type: ActivatableUI
+    key: enum.TradeShuttleConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.TradeShuttleConsoleUiKey.Key:
+        type: TradeShuttleConsoleMaidBoundUserInterface
+  - type: DeviceLinkSource
+    ports:
+    - TradeShuttleSource
+  - type: DeviceLinkSink
+    ports:
+    - TradeShuttleSink
+
+- type: sourcePort
+  id: TradeShuttleSource
+  name: signal-port-name-trade-shuttle-source
+  description: signal-port-description-trade-shuttle-source
+  defaultLinks: [TradeShuttleSink]
+
+- type: sinkPort
+  id: TradeShuttleSink
+  name: signal-port-name-trade-shuttle-sink
+  description: signal-port-description-trade-shuttle-sink
+
+
