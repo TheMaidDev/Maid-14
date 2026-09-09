@@ -1,0 +1,22 @@
+global-antagonist-dragon-name = Космический дракон
+global-antagonist-dragon-description = Дракон! Я видела дракона!!
+global-antagonist-slime-name = Слизень
+global-antagonist-slime-description = Голодный сгусток чего-то одновременно твёрдого и жидкого
+global-antagonist-spider-name = Гигантский паук
+global-antagonist-spider-description = Соразмерный с человеком агрессивный паук
+global-antagonist-spider-clown-name = Гигантский хонк-паук
+global-antagonist-spider-clown-description = Соразмерный с человеком агрессивный клоун-паук. ХОНК!
+global-antagonist-rats-name = Гигантская крыса
+global-antagonist-rats-description = Вечноголодная и агрессивная крыса
+global-antagonist-unknown-name = Неизвестно
+global-antagonist-unknown-description = Подозрительно!!
+
+ghost-teleport-menu-antagonists-label = Антагонисты
+ghost-teleport-menu-alive-label = Живые
+ghost-teleport-menu-dead-label = Мёртвые
+ghost-teleport-menu-ghosts-label = Призраки
+ghost-teleport-menu-left-label = Вышедшие из тела
+ghost-teleport-menu-locations-label = Локации и объекты
+ghost-teleport-menu-count-label = Количество
+ghost-teleport-menu-unknown-job = Неизвестно
+ghost-teleport-menu-unknown-department = Прочие

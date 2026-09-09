@@ -88,6 +88,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using Content.Server._Goobstation.Wizard.Systems;
@@ -120,6 +121,10 @@ using Content.Shared.Popups;
 using Content.Shared.Storage.Components;
 using Content.Shared.Tag;
 using Content.Shared._White.Xenomorphs.Infection;
+using Content.Shared._White.Antag;
+using Content.Shared.Humanoid;
+using Content.Shared.Roles;
+using Content.Shared.SSDIndicator;
 using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
@@ -171,8 +176,15 @@ namespace Content.Server.Ghost
         [Dependency] private readonly NameModifierSystem _nameMod = default!;
         [Dependency] private readonly GhostVisibilitySystem _ghostVisibility = default!;
         [Dependency] private readonly SharedBodySystem _bodySystem = default!; // Shitmed Change
+        [Dependency] private readonly SharedRoleSystem _roles = default!; //Maid edit
         private EntityQuery<GhostComponent> _ghostQuery;
         private EntityQuery<PhysicsComponent> _physicsQuery;
+
+        //Maid edit start
+        private static readonly ProtoId<DepartmentPrototype> SpecificDepartment = "Specific";
+        private static readonly ProtoId<AntagonistPrototype> UnknownAntagonist = "globalAntagonistUnknown";
+        private const int PlayerAntagonistWeight = -1;
+        //Maid edit end
 
         private static readonly ProtoId<TagPrototype> AllowGhostShownByEventTag = "AllowGhostShownByEvent";
         private static readonly ProtoId<DamageTypePrototype> AsphyxiationDamageType = "Asphyxiation";
@@ -400,7 +412,10 @@ namespace Content.Server.Ghost
                 return;
             }
 
-            var response = new GhostWarpsResponseEvent(GetPlayerWarps(entity).Concat(GetLocationWarps()).ToList());
+            //Maid edit start
+            GetPlayerAndAntagonistWarps(entity, out var players, out var antagonists);
+            var response = new GhostWarpsResponseEvent(players, GetLocationWarps(), antagonists);
+            //Maid edit end
             RaiseNetworkEvent(response, args.SenderSession.Channel);
         }
 
@@ -456,34 +471,126 @@ namespace Content.Server.Ghost
                 _physics.SetLinearVelocity(uid, Vector2.Zero, body: physics);
         }
 
-        private IEnumerable<GhostWarp> GetLocationWarps()
+        //Maid edit start
+        private List<GhostWarpPlace> GetLocationWarps()
         {
+            var warps = new List<GhostWarpPlace>();
             var allQuery = AllEntityQuery<WarpPointComponent>();
 
             while (allQuery.MoveNext(out var uid, out var warp))
             {
-                yield return new GhostWarp(GetNetEntity(uid), warp.Location ?? Name(uid), true);
+                warps.Add(new GhostWarpPlace(GetNetEntity(uid), warp.Location ?? Name(uid), Description(uid)));
             }
+
+            return warps;
         }
 
-        private IEnumerable<GhostWarp> GetPlayerWarps(EntityUid except)
+        private void GetPlayerAndAntagonistWarps(
+            EntityUid except,
+            out List<GhostWarpPlayer> players,
+            out List<GhostWarpGlobalAntagonist> antagonists)
         {
-            foreach (var player in _player.Sessions)
+            players = new List<GhostWarpPlayer>();
+            antagonists = new List<GhostWarpGlobalAntagonist>();
+
+            var listed = new HashSet<EntityUid>();
+
+            var query = AllEntityQuery<MindContainerComponent, MetaDataComponent>();
+            while (query.MoveNext(out var uid, out var mindContainer, out var meta))
             {
-                if (player.AttachedEntity is not {Valid: true} attached)
+                if (uid == except)
                     continue;
 
-                if (attached == except) continue;
+                var mind = mindContainer.Mind;
+                var isDead = _mobState.IsDead(uid);
 
-                TryComp<MindContainerComponent>(attached, out var mind);
+                if (!isDead && TryGetAntagRole(mind, out var antagRole))
+                {
+                    listed.Add(uid);
+                    antagonists.Add(new GhostWarpGlobalAntagonist(
+                        GetNetEntity(uid),
+                        meta.EntityName,
+                        Loc.GetString(antagRole.Name),
+                        Loc.TryGetString(antagRole.Objective, out var objective) ? objective : Loc.GetString(antagRole.Name),
+                        PlayerAntagonistWeight));
+                    continue;
+                }
 
-                var jobName = _jobs.MindTryGetJobName(mind?.Mind);
-                var playerInfo = $"{Comp<MetaDataComponent>(attached).EntityName} ({jobName})";
+                if (!HasComp<HumanoidAppearanceComponent>(uid) && !_ghostQuery.HasComp(uid))
+                    continue;
 
-                if (_mobState.IsAlive(attached) || _mobState.IsCritical(attached))
-                    yield return new GhostWarp(GetNetEntity(attached), playerInfo, false);
+                listed.Add(uid);
+
+                var departmentId = SpecificDepartment.Id;
+                var jobName = Loc.GetString("ghost-teleport-menu-unknown-job");
+
+                if (_jobs.MindTryGetJob(mind, out var jobPrototype))
+                {
+                    jobName = Loc.GetString(jobPrototype.Name);
+
+                    if (_jobs.TryGetDepartment(jobPrototype.ID, out var department))
+                        departmentId = department.ID;
+                }
+
+                var isLeft = mind != null
+                             && !isDead
+                             && TryComp<SSDIndicatorComponent>(uid, out var indicator)
+                             && indicator.IsSSD;
+
+                players.Add(new GhostWarpPlayer(
+                    GetNetEntity(uid),
+                    meta.EntityName,
+                    jobName,
+                    departmentId,
+                    _ghostQuery.HasComp(uid),
+                    isLeft,
+                    isDead,
+                    _mobState.IsAlive(uid)));
+            }
+
+            var antagMobs = AllEntityQuery<GlobalAntagonistComponent, MetaDataComponent>();
+            while (antagMobs.MoveNext(out var uid, out var antagonist, out var meta))
+            {
+                if (uid == except || listed.Contains(uid) || !_mobState.IsAlive(uid))
+                    continue;
+
+                if (!_prototypeManager.TryIndex(antagonist.AntagonistPrototype ?? UnknownAntagonist, out var proto)
+                    && !_prototypeManager.TryIndex(UnknownAntagonist, out proto))
+                {
+                    continue;
+                }
+
+                if (proto == null)
+                    continue;
+
+                antagonists.Add(new GhostWarpGlobalAntagonist(
+                    GetNetEntity(uid),
+                    meta.EntityName,
+                    Loc.GetString(proto.Name),
+                    Loc.GetString(proto.Description),
+                    proto.Weight));
             }
         }
+
+        private bool TryGetAntagRole(EntityUid? mind, [NotNullWhen(true)] out AntagPrototype? antag)
+        {
+            antag = null;
+
+            if (mind == null)
+                return false;
+
+            foreach (var role in _roles.MindGetAllRoleInfo(mind.Value))
+            {
+                if (!role.Antagonist)
+                    continue;
+
+                if (_prototypeManager.TryIndex<AntagPrototype>(role.Prototype, out antag))
+                    return true;
+            }
+
+            return false;
+        }
+        //Maid edit end
 
         #endregion
 

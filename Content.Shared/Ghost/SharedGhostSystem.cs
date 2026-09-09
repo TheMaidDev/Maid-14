@@ -191,22 +191,106 @@ namespace Content.Shared.Ghost
         public bool IsWarpPoint { get;  }
     }
 
+    //Maid edit start
+    [Serializable, NetSerializable]
+    public struct GhostWarpPlayer
+    {
+        public GhostWarpPlayer(
+            NetEntity entity,
+            string playerName,
+            string playerJobName,
+            string playerDepartmentId,
+            bool isGhost,
+            bool isLeft,
+            bool isDead,
+            bool isAlive)
+        {
+            Entity = entity;
+            Name = playerName;
+            JobName = playerJobName;
+            DepartmentId = playerDepartmentId;
+            IsGhost = isGhost;
+            IsLeft = isLeft;
+            IsDead = isDead;
+            IsAlive = isAlive;
+        }
+
+        public NetEntity Entity { get; }
+
+        public string Name { get; }
+        public string JobName { get; }
+        public string DepartmentId { get; }
+
+        public bool IsGhost { get; }
+        public bool IsLeft { get; }
+        public bool IsDead { get; }
+        public bool IsAlive { get; }
+    }
+
+    [Serializable, NetSerializable]
+    public struct GhostWarpGlobalAntagonist
+    {
+        public GhostWarpGlobalAntagonist(
+            NetEntity entity,
+            string playerName,
+            string groupName,
+            string groupDescription,
+            int groupWeight)
+        {
+            Entity = entity;
+            Name = playerName;
+            GroupName = groupName;
+            GroupDescription = groupDescription;
+            GroupWeight = groupWeight;
+        }
+
+        public NetEntity Entity { get; }
+
+        public string Name { get; }
+        public string GroupName { get; }
+        public string GroupDescription { get; }
+        public int GroupWeight { get; }
+    }
+
+    [Serializable, NetSerializable]
+    public struct GhostWarpPlace
+    {
+        public GhostWarpPlace(NetEntity entity, string name, string description)
+        {
+            Entity = entity;
+            Name = name;
+            Description = description;
+        }
+
+        public NetEntity Entity { get; }
+
+        public string Name { get; }
+        public string Description { get; }
+    }
+    //Maid edit end
+
     /// <summary>
     /// A server to client response for a <see cref="GhostWarpsRequestEvent"/>.
-    /// Contains players, and locations a ghost can warp to
+    /// Contains players, antagonists and locations a ghost can warp to
     /// </summary>
     [Serializable, NetSerializable]
     public sealed class GhostWarpsResponseEvent : EntityEventArgs
     {
-        public GhostWarpsResponseEvent(List<GhostWarp> warps)
+        //Maid edit start
+        public GhostWarpsResponseEvent(
+            List<GhostWarpPlayer> players,
+            List<GhostWarpPlace> places,
+            List<GhostWarpGlobalAntagonist> antagonists)
         {
-            Warps = warps;
+            Players = players;
+            Places = places;
+            Antagonists = antagonists;
         }
 
-        /// <summary>
-        /// A list of warp points.
-        /// </summary>
-        public List<GhostWarp> Warps { get; }
+        public List<GhostWarpPlayer> Players { get; }
+        public List<GhostWarpPlace> Places { get; }
+        public List<GhostWarpGlobalAntagonist> Antagonists { get; }
+        //Maid edit end
     }
 
     /// <summary>

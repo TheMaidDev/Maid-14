@@ -1,0 +1,35 @@
+- type: antagonist
+  id: globalAntagonistDragon
+  name: global-antagonist-dragon-name
+  description: global-antagonist-dragon-description
+  weight: 0
+
+- type: antagonist
+  id: globalAntagonistSlime
+  name: global-antagonist-slime-name
+  description: global-antagonist-slime-description
+  weight: 1
+
+- type: antagonist
+  id: globalAntagonistSpider
+  name: global-antagonist-spider-name
+  description: global-antagonist-spider-description
+  weight: 2
+
+- type: antagonist
+  id: globalAntagonistSpiderClown
+  name: global-antagonist-spider-clown-name
+  description: global-antagonist-spider-clown-description
+  weight: 3
+
+- type: antagonist
+  id: globalAntagonistRats
+  name: global-antagonist-rats-name
+  description: global-antagonist-rats-description
+  weight: 4
+
+- type: antagonist
+  id: globalAntagonistUnknown
+  name: global-antagonist-unknown-name
+  description: global-antagonist-unknown-description
+  weight: 100

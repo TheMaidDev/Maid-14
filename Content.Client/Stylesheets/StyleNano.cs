@@ -276,6 +276,18 @@ namespace Content.Client.Stylesheets
         public static readonly Color ButtonColorCautionPressed = Color.FromHex("#3e6c45");
         public static readonly Color ButtonColorCautionDisabled = Color.FromHex("#602a2a");
 
+        //Maid edit start
+        public static readonly Color ButtonColorCommandDepartment = Color.FromHex("#436BAD");
+        public static readonly Color ButtonColorSecurityDepartment = Color.FromHex("#BF5454");
+        public static readonly Color ButtonColorMedicalDepartment = Color.FromHex("#4494C8");
+        public static readonly Color ButtonColorEngineeringDepartment = Color.FromHex("#FDA55E");
+        public static readonly Color ButtonColorCargoDepartment = Color.FromHex("#9E6A34");
+        public static readonly Color ButtonColorScienceDepartment = Color.FromHex("#984EB4");
+        public static readonly Color ButtonColorCivilianDepartment = Color.FromHex("#40A166");
+        public static readonly Color ButtonColorSpecificDepartment = Color.FromHex("#969696");
+        public static readonly Color ButtonColorAntagonistDepartment = Color.FromHex("#7F4141");
+        //Maid edit end
+
         public static readonly Color ButtonColorGoodDefault = Color.FromHex("#3E6C45");
         public static readonly Color ButtonColorGoodHovered = Color.FromHex("#31843E");
         public static readonly Color ButtonColorGoodDisabled = Color.FromHex("#164420");
@@ -1492,7 +1504,7 @@ namespace Content.Client.Stylesheets
                     new SelectorElement(typeof(MenuButton), null, null, new[] {Button.StylePseudoClassNormal}),
                     new[]
                     {
-                        new StyleProperty(Button.StylePropertyModulateSelf, ButtonColorDefault),
+                        new StyleProperty(Button.StylePropertyModulateSelf, Color.FromHex("#29282f")), // Maid14
                     }),
 
                 new StyleRule(
@@ -1500,13 +1512,6 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty(Button.StylePropertyModulateSelf, ButtonColorDefaultRed),
-                    }),
-
-                new StyleRule(
-                    new SelectorElement(typeof(MenuButton), null, null, new[] {Button.StylePseudoClassNormal}),
-                    new[]
-                    {
-                        new StyleProperty(Button.StylePropertyModulateSelf, ButtonColorDefault),
                     }),
 
                 new StyleRule(
@@ -1885,6 +1890,53 @@ namespace Content.Client.Stylesheets
                 Element<Button>().Class("ButtonColorRed").Pseudo(ContainerButton.StylePseudoClassHover)
                     .Prop(Control.StylePropertyModulateSelf, ButtonColorHoveredRed),
                 // ---
+
+                //Maid edit start
+                Element<Button>().Class("ButtonColorCommandDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorCommandDepartment),
+                Element<Button>().Class("ButtonColorCommandDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorCommandDepartment),
+
+                Element<Button>().Class("ButtonColorSecurityDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorSecurityDepartment),
+                Element<Button>().Class("ButtonColorSecurityDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorSecurityDepartment),
+
+                Element<Button>().Class("ButtonColorMedicalDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorMedicalDepartment),
+                Element<Button>().Class("ButtonColorMedicalDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorMedicalDepartment),
+
+                Element<Button>().Class("ButtonColorEngineeringDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorEngineeringDepartment),
+                Element<Button>().Class("ButtonColorEngineeringDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorEngineeringDepartment),
+
+                Element<Button>().Class("ButtonColorScienceDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorScienceDepartment),
+                Element<Button>().Class("ButtonColorScienceDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorScienceDepartment),
+
+                Element<Button>().Class("ButtonColorCargoDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorCargoDepartment),
+                Element<Button>().Class("ButtonColorCargoDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorCargoDepartment),
+
+                Element<Button>().Class("ButtonColorCivilianDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorCivilianDepartment),
+                Element<Button>().Class("ButtonColorCivilianDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorCivilianDepartment),
+
+                Element<Button>().Class("ButtonColorSpecificDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorSpecificDepartment),
+                Element<Button>().Class("ButtonColorSpecificDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorSpecificDepartment),
+
+                Element<Button>().Class("ButtonColorAntagonistDepartment")
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorAntagonistDepartment),
+                Element<Button>().Class("ButtonColorAntagonistDepartment").Pseudo(ContainerButton.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, ButtonColorAntagonistDepartment),
+                //Maid edit end
 
                 // Green Button ---
                 Element<Button>().Class("ButtonColorGreen")

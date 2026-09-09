@@ -10,6 +10,9 @@
     weight: 8
     duration: 35
   - type: GameRule
-    chaosScore: 10 # Goob test fails otherwise wtf
+    delay:
+      min: 20
+      max: 80
+    chaosScore: 90 # Goob test fails otherwise wtf
   - type: RandomItemArtifactsRule
-    conversionChance: 0.01
+    conversionChance: 0.003

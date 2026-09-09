@@ -1201,3 +1201,63 @@ Entries:
       message: Звуки радиосвязи
   id: 109
   time: '2026-08-30T10:46:56.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Tweak
+      message: Предметы артефакты теперь происходят гораздо реже
+  id: 110
+  time: '2026-09-01T08:07:47.0000000+00:00'
+- author: Urames
+  changes:
+    - type: Fix
+      message: Теперь лектер видно в руках
+  id: 111
+  time: '2026-09-01T08:15:03.0000000+00:00'
+- author: Urames
+  changes:
+    - type: Tweak
+      message: В детекшкафе изменена гарнитура на полноразмерную гарнитуру.
+    - type: Fix
+      message: R6 боргов и зачарованная винтовка теперь имеют спрайты из старого билда.
+  id: 112
+  time: '2026-09-01T10:11:53.0000000+00:00'
+- author: Filo
+  changes:
+    - type: Tweak
+      message: Возвращён SSDIndicator пешкам
+  id: 113
+  time: '2026-09-05T10:16:33.0000000+00:00'
+- author: Inconnu1337
+  changes:
+    - type: Add
+      message: Автозамена слов по списку в IC чате.
+  id: 114
+  time: '2026-09-05T19:37:53.0000000+00:00'
+- author: antiWAFG1
+  changes:
+    - type: Add
+      message: Теперь юрист перенесён в отдел юстиции из сервиса.
+    - type: Remove
+      message: >-
+        У "pinpointer-science" удалён компонент "Whitelist" из-за которого
+        крашилась локалка.
+    - type: Remove
+      message: Из гринтекста удалена фраза "Нанотрейзен финансируется:"
+    - type: Tweak
+      message: Название ролей "Другие" изменено на "Особые для станции"
+    - type: Fix
+      message: Исправлен ui всех инструментов.
+    - type: Fix
+      message: 'Исправлен ui админского вызова эвака. '
+    - type: Fix
+      message: Исправлен баг что при разборе стола его нельзя собрать назад.
+  id: 115
+  time: '2026-09-07T14:41:54.0000000+00:00'
+- author: SchrodingerCutie
+  changes:
+    - type: Add
+      message: Добавлены анимированные фоны для лобби
+    - type: Add
+      message: Добавлены новые статичные арты для лобби
+  id: 116
+  time: '2026-09-07T14:51:26.0000000+00:00'

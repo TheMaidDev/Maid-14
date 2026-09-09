@@ -132,6 +132,7 @@ using Content.Shared._Goobstation.Wizard.Chuuni;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
+using Content.Shared._Maid.CVars; //Maid edit
 using Content.Shared.Chat;
 using Content.Shared._Starlight.CollectiveMind; // Goobstation - Starlight collective mind port
 using Content.Shared.Database;
@@ -1141,6 +1142,11 @@ public sealed partial class ChatSystem : SharedChatSystem
         newMessage = newMessage.Replace("/", ""); //Maid edit
 
         GetRadioKeycodePrefix(source, newMessage, out newMessage, out var prefix);
+
+        //Maid edit start
+        if (_configurationManager.GetCVar(MaidCVars.ChatSlangFilter))
+            newMessage = _sanitizer.SanitizeOutSlang(newMessage);
+        //Maid edit end
 
         // Sanitize it first as it might change the word order
         _sanitizer.TrySanitizeEmoteShorthands(newMessage, source, out newMessage, out emoteStr);

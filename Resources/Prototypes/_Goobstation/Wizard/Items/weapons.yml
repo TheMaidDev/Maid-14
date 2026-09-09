@@ -54,13 +54,21 @@
   id: WeaponBoltActionEnchanted
   description: Careful not to lose your head.
   components:
+#Maid edit start
   - type: Sprite
-    sprite: _Goobstation/Wizard/Objects/Weapons/enchanted_rifle.rsi
+    layers:
+    - state: icon
+      map: [ "enum.GunVisualLayers.Base" ]
+#Maid edit end
+#    sprite: _Goobstation/Wizard/Objects/Weapons/enchanted_rifle.rsi #Maid
+    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood-icons.rsi #Maid
   - type: Item
-    sprite: _Goobstation/Wizard/Objects/Weapons/enchanted_rifle.rsi
+#    sprite: _Goobstation/Wizard/Objects/Weapons/enchanted_rifle.rsi #Maid
+    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood-inhands.rsi #Maid
     size: Huge
   - type: Clothing
-    sprite: _Goobstation/Wizard/Objects/Weapons/enchanted_rifle.rsi
+#    sprite: _Goobstation/Wizard/Objects/Weapons/enchanted_rifle.rsi #Maid
+    sprite: _Maid/Objects/Weapons/Guns/Snipers/bolt_gun_wood-inhands.rsi #Maid
     quickEquip: false
     slots:
     - Back

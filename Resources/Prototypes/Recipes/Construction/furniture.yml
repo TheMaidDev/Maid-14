@@ -321,17 +321,17 @@
   conditions:
     - !type:TileNotBlocked
 
-- type: construction
-  id: TableWood
-  graph: Table
-  startNode: start
-  targetNode: TableWood
-  category: construction-category-furniture
-  objectType: Structure
-  placementMode: SnapgridCenter
-  canBuildInImpassable: false
-  conditions:
-    - !type:TileNotBlocked
+# - type: construction #Maid begin
+#   id: TableWood
+#   graph: Table
+#   startNode: start
+#   targetNode: TableWood
+#   category: construction-category-furniture
+#   objectType: Structure
+#   placementMode: SnapgridCenter
+#   canBuildInImpassable: false
+#   conditions:
+#     - !type:TileNotBlocked #Maid end
 
 - type: construction
   id: TableWoodBright

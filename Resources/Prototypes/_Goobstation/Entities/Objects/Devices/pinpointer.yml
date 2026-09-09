@@ -44,11 +44,11 @@
       visible: false
   - type: Icon
     state: pinpointer-science
-  - type: Pinpointer
-    targetName: artifacts
-    whitelist: # Goob edit: pinpointer whitelist
-      components:
-      - Artifact
+  - type: Pinpointer 
+    targetName: artifact
+    # whitelist: # Goob edit: pinpointer whitelist #Maid вырезано - крашит локалку
+    #   components: #Maid вырезано - крашит локалку
+    #   - Artifact #Maid вырезано - крашит локалку
 
 - type: entity
   name: borg pinpointer
