@@ -124,3 +124,15 @@ JobTechnicalAssistant = технический ассистент
 JobVisitor = посетитель
 JobWarden = смотритель
 JobZookeeper = зоотехник
+
+job-name-senior-engineer = бригадир
+job-name-senior-researcher = ведущий исследователь
+job-name-senior-physician = медицинский офицер
+job-name-senior-officer = ветеран СБ
+job-name-senior-salvage-specialist = охотник карго
+
+JobSeniorEngineer = бригадир
+JobSeniorResearcher = ведущий исследователь
+JobSeniorPhysician = медицинский офицер
+JobSeniorOfficer = ветеран СБ
+JobSeniorSalvageSpecialist = охотник карго

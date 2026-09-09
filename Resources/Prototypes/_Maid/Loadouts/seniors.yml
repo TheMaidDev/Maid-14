@@ -1,0 +1,192 @@
+- type: loadout
+  id: SeniorSalvageSpecialistJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSeniorSalvageSpecialist
+
+- type: loadout
+  id: SeniorSalvageSpecialistJumpskirt
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtSeniorSalvageSpecialist
+
+- type: loadout
+  id: SeniorSalvageSpecialistPDA
+  equipment:
+    id: SeniorSalvageSpecialistPDA
+
+- type: loadoutGroup
+  id: SeniorEngineerJobJumpsuit
+  speciesBlacklist: [Plasmaman]
+  name: loadout-group-senior-engineer-jumpsuit
+  loadouts:
+  - SeniorEngineerJumpsuit
+  - SeniorEngineerJumpskirt
+
+- type: loadoutGroup
+  id: SeniorEngineerJobID
+  name: loadout-group-senior-engineer-id
+  loadouts:
+  - SeniorEngineerPDA
+
+- type: loadoutGroup
+  id: SeniorPhysicianJobJumpsuit
+  speciesBlacklist: [Plasmaman]
+  name: loadout-group-senior-physician-jumpsuit
+  loadouts:
+  - SeniorPhysicianJumpsuit
+  - SeniorPhysicianJumpskirt
+
+- type: loadoutGroup
+  id: SeniorPhysicianJobID
+  name: loadout-group-senior-physician-id
+  loadouts:
+  - SeniorPhysicianPDA
+
+- type: loadoutGroup
+  id: SeniorResearcherJobJumpsuit
+  speciesBlacklist: [Plasmaman]
+  name: loadout-group-senior-researcher-jumpsuit
+  loadouts:
+  - SeniorResearcherJumpsuit
+  - SeniorResearcherJumpskirt
+
+- type: loadoutGroup
+  id: SeniorResearcherJobID
+  name: loadout-group-senior-researcher-id
+  loadouts:
+  - SeniorResearcherPDA
+
+- type: loadoutGroup
+  id: SeniorOfficerJobJumpsuit
+  speciesBlacklist: [Plasmaman]
+  name: loadout-group-senior-officer-jumpsuit
+  loadouts:
+  - SeniorOfficerJumpsuit
+  - SeniorOfficerJumpskirt
+
+- type: loadoutGroup
+  id: SeniorOfficerJobID
+  name: loadout-group-senior-officer-id
+  loadouts:
+  - SeniorOfficerPDA
+
+- type: loadoutGroup
+  id: SeniorSalvageSpecialistJobJumpsuit
+  speciesBlacklist: [Plasmaman]
+  name: loadout-group-senior-salvage-specialist-jumpsuit
+  loadouts:
+  - SeniorSalvageSpecialistJumpsuit
+  - SeniorSalvageSpecialistJumpskirt
+
+- type: loadoutGroup
+  id: SeniorSalvageSpecialistJobID
+  name: loadout-group-senior-salvage-specialist-id
+  loadouts:
+  - SeniorSalvageSpecialistPDA
+
+- type: roleLoadout
+  id: JobSeniorEngineer
+  groups:
+  - GroupTankHarness
+  - StationEngineerHead
+  - StationEngineerEnvirohelm
+  - SeniorEngineerJobJumpsuit
+  - StationEngineerEnvirosuit
+  - StationEngineerEnvirogloves
+  - StationEngineerBackpack
+  - StationEngineerOuterClothing
+  - StationEngineerShoes
+  - SeniorEngineerJobID
+  - SurvivalExtended
+  - GroupSpeciesBreathTool
+  - DefaultUnderwearWhite
+  - SocksUnderwear
+  - Underwear
+  - Bra
+
+- type: roleLoadout
+  id: JobSeniorPhysician
+  groups:
+  - GroupTankHarness
+  - MedicalDoctorHead
+  - MedicalDoctorEnvirohelm
+  - MedicalMask
+  - SeniorPhysicianJobJumpsuit
+  - MedicalDoctorEnvirosuit
+  - MedicalGloves
+  - MedicalDoctorEnvirogloves
+  - MedicalBackpack
+  - MedicalDoctorOuterClothing
+  - MedicalShoes
+  - SeniorPhysicianJobID
+  - MedicalEyewear
+  - SurvivalMedical
+  - GroupSpeciesBreathToolMedical
+  - DefaultUnderwearWhite
+  - SocksUnderwear
+  - Underwear
+  - Bra
+
+- type: roleLoadout
+  id: JobSeniorResearcher
+  groups:
+  - GroupTankHarness
+  - ScientistHead
+  - ScientistEnvirohelm
+  - ScientistNeck
+  - SeniorResearcherJobJumpsuit
+  - ScientistEnvirosuit
+  - ScientistBackpack
+  - ScientistOuterClothing
+  - ScientistGloves
+  - ScientistEnvirogloves
+  - ScientistShoes
+  - SeniorResearcherJobID
+  - Survival
+  - GroupSpeciesBreathTool
+  - DefaultUnderwearWhite
+  - SocksUnderwear
+  - Underwear
+  - Bra
+
+- type: roleLoadout
+  id: JobSeniorOfficer
+  groups:
+  - SecurityHead
+  - SecurityOfficerEnvirohelm
+  - SeniorOfficerJobJumpsuit
+  - SecurityOfficerEnvirosuit
+  - SecurityOfficerEnvirogloves
+  - SecurityBackpack
+  - SecurityMelee
+  - SecurityOuterClothing
+  - SecurityShoes
+  - SecurityNeck
+  - SeniorOfficerJobID
+  - SurvivalSecurity
+  - GroupSpeciesBreathToolSecurity
+  - DefaultUnderwearWhite
+  - SocksUnderwear
+  - Underwear
+  - Bra
+
+- type: roleLoadout
+  id: JobSeniorSalvageSpecialist
+  groups:
+  - CargoTechnicianOuterClothing
+  - CargoTechnicianHead
+  - SalvageEnvirohelm
+  - SeniorSalvageSpecialistJobJumpsuit
+  - SalvageEnvirosuit
+  - SalvageEnvirogloves
+  - GroupTankHarness
+  - SalvageSpecialistNeck
+  - SalvageSpecialistBackpack
+  - SalvageSpecialistOuterClothing
+  - SalvageSpecialistShoes
+  - SeniorSalvageSpecialistJobID
+  - Survival
+  - GroupSpeciesBreathTool
+  - DefaultUnderwearWhite
+  - SocksUnderwear
+  - Underwear
+  - Bra

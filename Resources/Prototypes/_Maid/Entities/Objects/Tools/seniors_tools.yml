@@ -1,0 +1,176 @@
+- type: entity
+  parent: Crowbar
+  id: ImprovedCrowbar
+  name: improved crowbar
+  components:
+  - type: StaticPrice
+    price: 1000
+  - type: Tool
+    speed: 2
+  - type: MeleeWeapon
+    damage:
+      types:
+        Blunt: 12
+        Structural: 7
+  - type: Sprite
+    sprite: _Maid/Objects/Tools/impcrowbar.rsi
+    state: icon
+  - type: Item
+    sprite: _Maid/Objects/Tools/impcrowbar.rsi
+    size: Small
+    storedRotation: -63
+
+- type: entity
+  parent: Wrench
+  id: ImprovedWrench
+  name: improved wrench
+  components:
+  - type: StaticPrice
+    price: 500
+  - type: Tool
+    speed: 2
+  - type: Sprite
+    sprite: _Maid/Objects/Tools/impwrench.rsi
+    state: icon
+  - type: Item
+    sprite: _Maid/Objects/Tools/impwrench.rsi
+    size: Small
+    storedRotation: -44
+  - type: MeleeWeapon
+    attackRate: 1.5
+    damage:
+      types:
+        Blunt: 9
+
+- type: entity
+  parent: BaseItem
+  id: ImprovedScrewdriver
+  name: improved screwdriver
+  description: Industrial grade torque in a small screwdriving package.
+  components:
+  - type: StaticPrice
+    price: 500
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Items/handling/screwdriver_pickup.ogg
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/Items/screwdriver_drop.ogg
+  - type: EmitSoundOnLand
+    sound:
+      path: /Audio/Items/screwdriver_drop.ogg
+  - type: Tag
+    tags:
+    - Screwdriver
+    - DroneUsable
+  - type: Sprite
+    sprite: _Maid/Objects/Tools/impscrewdriver.rsi
+    state: icon
+  - type: Item
+    sprite: _Maid/Objects/Tools/impscrewdriver.rsi
+    size: Small
+    storedRotation: -90
+  - type: UseDelay
+  - type: MeleeWeapon
+    animationRotation: -90
+    wideAnimationRotation: -90
+    attackRate: 1
+    damage:
+      types:
+        Piercing: 7
+    soundHit:
+      path: /Audio/Weapons/bladeslice.ogg
+  - type: Tool
+    speed: 2
+    qualities:
+    - Screwing
+    useSound:
+      collection: Screwdriver
+  - type: PhysicalComposition
+    materialComposition:
+      Steel: 100
+
+- type: entity
+  parent: BaseItem
+  id: ImprovedWirecutter
+  name: improved wirecutter
+  description: This kills the wire.
+  components:
+  - type: StaticPrice
+    price: 500
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Items/handling/wirecutter_pickup.ogg
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/Items/wirecutter_drop.ogg
+  - type: EmitSoundOnLand
+    sound:
+      path: /Audio/Items/wirecutter_drop.ogg
+  - type: Tag
+    tags:
+    - PlantSampleTaker
+    - Wirecutter
+    - DroneUsable
+  - type: Sprite
+    sprite: _Maid/Objects/Tools/impwirecutter.rsi
+    state: icon
+  - type: Item
+    sprite: _Maid/Objects/Tools/impwirecutter.rsi
+    size: Small
+    storedRotation: -90
+  - type: UseDelay
+  - type: MeleeWeapon
+    animationRotation: -90
+    wideAnimationRotation: -90
+    attackRate: 2
+    damage:
+      types:
+        Piercing: 5
+    soundHit:
+      path: /Audio/Items/wirecutter.ogg
+  - type: Tool
+    speed: 2
+    qualities:
+    - Cutting
+    useSound:
+      path: /Audio/Items/wirecutter.ogg
+  - type: PhysicalComposition
+    materialComposition:
+      Steel: 100
+
+- type: entity
+  parent: Welder
+  id: ImprovedWelder
+  name: improved welder
+  description: An oversized welding tool that burns hotter and holds more fuel than anything in the toolbox.
+  components:
+  - type: StaticPrice
+    price: 700
+  - type: SolutionContainerManager
+    solutions:
+      Welder:
+        reagents:
+        - ReagentId: WeldingFuel
+          Quantity: 300
+        maxVol: 300
+  - type: Sprite
+    sprite: _Maid/Objects/Tools/impwelder.rsi
+  - type: Item
+    sprite: _Maid/Objects/Tools/impwelder.rsi
+  - type: Tool
+    speed: 1.5
+
+- type: entity
+  id: ClothingBeltUtilityImproved
+  parent: ClothingBeltUtility
+  suffix: Brigadier
+  components:
+  - type: StorageFill
+    contents:
+    - id: ImprovedCrowbar
+    - id: ImprovedWrench
+    - id: ImprovedScrewdriver
+    - id: ImprovedWirecutter
+    - id: ImprovedWelder
+    - id: Multitool

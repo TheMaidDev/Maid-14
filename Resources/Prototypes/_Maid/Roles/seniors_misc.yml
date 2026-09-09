@@ -1,0 +1,22 @@
+- type: playTimeTracker
+  id: JobSeniorEngineer
+
+- type: playTimeTracker
+  id: JobSeniorOfficer
+
+- type: playTimeTracker
+  id: JobSeniorPhysician
+
+- type: playTimeTracker
+  id: JobSeniorResearcher
+
+- type: playTimeTracker
+  id: JobSeniorSalvageSpecialist
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconSeniorSalvageSpecialist
+  icon:
+    sprite: /Textures/_Maid/Interface/Misc/job_icons.rsi
+    state: ShaftMiner
+  jobName: job-name-senior-salvage-specialist

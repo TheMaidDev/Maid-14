@@ -1,0 +1,46 @@
+- type: entity
+  parent: ClothingUniformBase
+  id: ClothingUniformJumpsuitSeniorSalvageSpecialist
+  name: senior cargo jumpsuit
+  description: A sign of skill and prestige within the cargo department.
+  components:
+  - type: Sprite
+    sprite: Clothing/Uniforms/Jumpsuit/tacticool.rsi
+  - type: Clothing
+    sprite: Clothing/Uniforms/Jumpsuit/tacticool.rsi
+
+- type: entity
+  parent: ClothingUniformSkirtBase
+  id: ClothingUniformJumpskirtSeniorSalvageSpecialist
+  name: senior cargo jumpskirt
+  description: A sign of skill and prestige within the cargo department.
+  components:
+  - type: Sprite
+    sprite: Clothing/Uniforms/Jumpskirt/tacticool_s.rsi
+  - type: Clothing
+    sprite: Clothing/Uniforms/Jumpskirt/tacticool_s.rsi
+
+- type: entity
+  parent: IDCardStandard
+  id: SeniorSalvageSpecialistIDCard
+  name: senior cargo ID card
+  components:
+  - type: Sprite
+    layers:
+    - state: default
+    - state: department
+      color: "#B18644"
+    - state: subdepartment
+      color: "#C96DBF"
+    - state: shaftminer
+  - type: PresetIdCard
+    job: SeniorSalvageSpecialist
+
+- type: entity
+  parent: SalvagePDA
+  id: SeniorSalvageSpecialistPDA
+  name: senior cargo PDA
+  description: Smells like ash and expensive cigars.
+  components:
+  - type: Pda
+    id: SeniorSalvageSpecialistIDCard

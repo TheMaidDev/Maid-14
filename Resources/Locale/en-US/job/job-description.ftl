@@ -83,3 +83,9 @@ job-description-zookeeper = Put on a joyful display of cute animals and space ca
 job-description-command-maid = Clean the bridge, command rooms, and everything else that command tells you to.
 job-description-security-clown = Do security's job, but don't forget to do it with your clown spice.
 job-description-party-maker = Throw the biggest party ever at this station!
+
+job-description-senior-engineer = Teach new engineers the basics of the station engine, repairs, atmospherics and power.
+job-description-senior-researcher = Teach new scientists the basics of printing items and researching artifacts and anomalous objects.
+job-description-senior-physician = Teach new medics the basics of treating the wounded, chemistry, diagnosing the sick and dealing with the dead.
+job-description-senior-officer = Teach new officers the basics of searches, arrests, imprisonment and how to properly handle a firearm.
+job-description-senior-salvage-specialist = Show your colleagues how professionals strip wrecks and run expeditions.
