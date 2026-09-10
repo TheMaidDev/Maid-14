@@ -690,6 +690,9 @@ public sealed partial class ShuttleSystem
     {
         RemCompDeferred<FTLComponent>(entity);
         _console.RefreshShuttleConsoles(entity);
+
+        var @event = new FTLCooldownFinishEvent();
+        RaiseLocalEvent(entity, ref @event);
     }
 
     private void UpdateHyperspace()

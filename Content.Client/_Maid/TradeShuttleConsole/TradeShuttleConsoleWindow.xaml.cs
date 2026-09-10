@@ -54,15 +54,6 @@ public sealed partial class TradeShuttleConsoleWindow : FancyWindow
                 ActionButton.Text = Loc.GetString($"trade-shuttle-console-button-{(idle.OnTrade ? "call" : "recall")}");
                 SetFtlTimer(null);
                 break;
-            case TradeShuttleConsoleRechargeUIState recharge:
-                StatusLabel.Text = Loc.GetString(
-                    "trade-shuttle-console-status-recharge",
-                    ("location", location)
-                );
-                ActionButton.Disabled = false;
-                ActionButton.Text = Loc.GetString("trade-shuttle-console-button-recharge");
-                SetFtlTimer(recharge.ChargeTime);
-                break;
         }
     }
 

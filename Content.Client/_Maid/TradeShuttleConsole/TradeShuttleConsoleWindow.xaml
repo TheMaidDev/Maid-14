@@ -7,6 +7,7 @@
     <BoxContainer Orientation="Vertical" Margin="10">
         <BoxContainer Orientation="Horizontal" Margin="5 0 5 5">
             <Label Name="StatusLabel" HorizontalAlignment="Left"/>
+            <BoxContainer HorizontalExpand="True"></BoxContainer>
             <Label Name="ControlledShuttle" HorizontalAlignment="Right"/>
         </BoxContainer>
         <ProgressBar Name="TimerBar" HorizontalExpand="True" Margin="5 0 5 10" MinValue="0.0" MaxValue="1.0" Value="1.0" SetHeight="24"/>

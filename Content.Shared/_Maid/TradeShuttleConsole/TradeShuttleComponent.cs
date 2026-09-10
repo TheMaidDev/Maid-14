@@ -12,4 +12,7 @@ public sealed partial class TradeShuttleComponent : Component
 {
     [DataField]
     public MapId TradeMap;
+
+    [DataField]
+    public EntityUid? Console;
 }

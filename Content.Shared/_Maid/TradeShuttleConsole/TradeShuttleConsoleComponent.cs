@@ -18,12 +18,6 @@ public class TradeShuttleConsoleUIState : BoundUserInterfaceState
 }
 
 [Serializable, NetSerializable]
-public sealed class TradeShuttleConsoleRechargeUIState : TradeShuttleConsoleUIState
-{
-    public required StartEndTime ChargeTime;
-}
-
-[Serializable, NetSerializable]
 public sealed class TradeShuttleConsoleFtlInProgressUIState : TradeShuttleConsoleUIState
 {
     public required StartEndTime FtlTime;

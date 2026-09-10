@@ -72,13 +72,8 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
         SubscribeLocalEvent<TradeShuttleComponent, FTLCompletedEvent>(OnFTLFinish);
         SubscribeLocalEvent<TradeShuttleComponent, BeforeFTLStartedEvent>(OnBeforeFTLStarted);
         SubscribeLocalEvent<TradeShuttleComponent, FTLStartedEvent>(OnFTLStarted);
-
-        _entityManager.Spawn()
+        SubscribeLocalEvent<TradeShuttleComponent, FTLCooldownFinishEvent>(OnFTLCooldownFinish);
     }
-
-    private const float RechargeTime = 10;
-
-
 
     private void AttemptToLink(Entity<TradeShuttleComponent> ent, ref LinkAttemptEvent args)
     {
@@ -192,7 +187,9 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
         if (!Resolve(map.Owner, ref map.Comp))
             return;
 
-        AddComp<TradeShuttleComponent>(shuttle);
+        var comp = AddComp<TradeShuttleComponent>(shuttle);
+        comp.TradeMap = tradeMap;
+        comp.Console = console;
 
         var startupTime = _shuttleSystem.DefaultStartupTime;
         var duration = _shuttleSystem.DefaultTravelTime;
@@ -220,11 +217,18 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
         )
             return;
 
-        var stationTransform = Transform(station);
+        if (_stationSystem.GetLargestGrid(station.Owner) is not { } stationGrid)
+            return;
+
+        var stationTransform = Transform(stationGrid);
         if (stationTransform.MapUid is not { } mapUid)
             return;
 
-        AddComp<TradeShuttleComponent>(shuttle);
+        var tradeShuttleComponent = EnsureComp<TradeShuttleComponent>(shuttle);
+
+        if (tradeShuttleComponent.TradeMap == MapId.Nullspace)
+            tradeShuttleComponent.TradeMap = Transform(shuttle).MapID;
+        tradeShuttleComponent.Console ??= console;
 
         var startupTime = _shuttleSystem.DefaultStartupTime;
         var duration = _shuttleSystem.DefaultTravelTime;
@@ -291,16 +295,16 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
 
     private void OnFTLStarted(Entity<TradeShuttleComponent> ent, ref FTLStartedEvent args)
     {
-        if (!TryComp(ent.Owner, out TradeShuttleConsoleComponent? trade))
+        if (ent.Comp.Console is not { } console)
             return;
 
         if (!TryComp(ent.Owner, out FTLComponent? ftlComponent))
             return;
 
-        UpdateUI((ent.Owner, trade), new TradeShuttleConsoleFtlInProgressUIState()
+        UpdateUI(console, new TradeShuttleConsoleFtlInProgressUIState()
         {
-            FtlTime = StartEndTime.FromCurTime(_gameTiming, ftlComponent.TravelTime),
-            FtlState = FTLState.Travelling,
+            FtlTime = ftlComponent.StateTime,
+            FtlState = ftlComponent.State,
             ControlledShuttle = Name(ent.Owner),
             OnTrade = false,
         });
@@ -309,17 +313,60 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
     private void OnFTLFinish(Entity<TradeShuttleComponent> ent, ref FTLCompletedEvent args)
     {
         if (HasComp<TradeMapComponent>(args.MapUid)) // We FTLed onto trade
-        {
-            // TODO: Fill bough things
-        }
+            OnFTLOntoTrade(ent);
         else // We FTL-ed onto station
-        {
-            RemComp<TradeShuttleComponent>(ent.Owner);
-        }
+            OnFTLOntoStation(ent);
     }
 
-    private void UpdateUI(Entity<TradeShuttleConsoleComponent?> console, TradeShuttleConsoleUIState state)
+    private void OnFTLOntoStation(Entity<TradeShuttleComponent> ent)
     {
+        if (!TryComp(ent.Owner, out FTLComponent? ftl))
+            return;
+
+        UpdateUI(ent.Comp.Console, new TradeShuttleConsoleFtlInProgressUIState
+        {
+            FtlState = ftl.State,
+            FtlTime = ftl.StateTime,
+            ControlledShuttle = Name(ent.Owner),
+            OnTrade = false,
+        });
+    }
+
+    private void OnFTLCooldownFinish(Entity<TradeShuttleComponent> ent, ref FTLCooldownFinishEvent args)
+    {
+        var isTradeMap = ent.Comp.TradeMap == Transform(ent).MapID;
+
+        UpdateUI(ent.Comp.Console, new TradeShuttleConsoleIdleUIState
+        {
+            ControlledShuttle = Name(ent),
+            OnTrade = isTradeMap,
+        });
+
+        if (!isTradeMap)
+            RemComp<TradeShuttleComponent>(ent.Owner);
+    }
+
+    private void OnFTLOntoTrade(Entity<TradeShuttleComponent> ent)
+    {
+        if (!TryComp(ent.Owner, out FTLComponent? ftl))
+            return;
+
+        UpdateUI(ent.Comp.Console, new TradeShuttleConsoleFtlInProgressUIState()
+        {
+            FtlState = ftl.State,
+            FtlTime = ftl.StateTime,
+            ControlledShuttle = Name(ent.Owner),
+            OnTrade = true,
+        });
+
+        // TODO: Fill bough things, like it works with trade station
+    }
+
+    private void UpdateUI(Entity<TradeShuttleConsoleComponent?>? maybeConsole, TradeShuttleConsoleUIState state)
+    {
+        if (maybeConsole is not {} console)
+            return;
+
         if (!Resolve(console.Owner, ref console.Comp))
             return;
 
