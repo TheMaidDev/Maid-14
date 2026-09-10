@@ -244,6 +244,41 @@ public sealed partial class CargoSystem
         return true;
     }
 
+    // MAID BEGIN trade shuttle
+    public bool SellCargo(EntityUid gridUid, EntityUid station)
+    {
+        if (!TryComp<StationBankAccountComponent>(station, out var bankAccount))
+            return false;
+
+        if (!SellPallets(gridUid, station, out var goods))
+            return false;
+
+        var baseDistribution = CreateAccountDistribution((station, bankAccount));
+        foreach (var (_, sellComponent, value) in goods)
+        {
+            Dictionary<ProtoId<CargoAccountPrototype>, double> distribution;
+            if (sellComponent != null)
+            {
+                var cut = _lockboxCutEnabled ? bankAccount.LockboxCut : bankAccount.PrimaryCut;
+                distribution = new Dictionary<ProtoId<CargoAccountPrototype>, double>
+                {
+                    { sellComponent.OverrideAccount, cut },
+                    { bankAccount.PrimaryAccount, 1.0 - cut },
+                };
+            }
+            else
+            {
+                distribution = baseDistribution;
+            }
+
+            UpdateBankAccount((station, bankAccount), (int) Math.Round(value), distribution, false);
+        }
+
+        Dirty(station, bankAccount);
+        return true;
+    }
+    // MAID END trade shuttle
+
     private void OnPalletSale(EntityUid uid, CargoPalletConsoleComponent component, CargoPalletSellMessage args)
     {
         var xform = Transform(uid);
@@ -262,6 +297,8 @@ public sealed partial class CargoSystem
             return;
         }
 
+        // MAID BEGIN trade shuttle
+        /*
         if (!SellPallets(gridUid, station, out var goods))
             return;
 
@@ -287,6 +324,10 @@ public sealed partial class CargoSystem
         }
 
         Dirty(station, bankAccount);
+        */
+        if (!SellCargo(gridUid, station))
+            return;
+        // MAID END trade shuttle
         _audio.PlayPvs(ApproveSound, uid);
         UpdatePalletConsoleInterface(uid);
     }

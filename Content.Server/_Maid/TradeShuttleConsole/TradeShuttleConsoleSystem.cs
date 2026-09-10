@@ -5,13 +5,14 @@ using Content.Server.DeviceLinking.Systems;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Shuttles.Systems;
-using Content.Server.Station.Systems;
 using Content.Server.Station.Events;
+using Content.Server.Station.Systems;
 using Content.Shared._Maid.CVars;
 using Content.Shared._Maid.TradeShuttleConsole;
 using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+
 using Content.Shared.Popups;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.Systems;
@@ -25,6 +26,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+
 namespace Content.Server._Maid.TradeShuttleConsole;
 
 public sealed class TradeShuttleConsoleSystem : EntitySystem
@@ -49,8 +51,6 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-
-
         SubscribeLocalEvent<TradeShuttleComponent, LinkAttemptEvent>(AttemptToLink);
         SubscribeLocalEvent<TradeShuttleConsoleComponent, NewLinkEvent>(OnConsoleLinked);
         SubscribeLocalEvent<TradeShuttleConsoleComponent, PortDisconnectedEvent>(OnConsoleUnlinked);
@@ -396,7 +396,16 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
             OnTrade = true,
         });
 
+        SellSoldThings(ent);
         FillBoughtThings(ent);
+    }
+
+    private void SellSoldThings(Entity<TradeShuttleComponent> ent)
+    {
+        if (!TryComp<TradeMapComponent>(Transform(ent).MapUid, out var tradeMap) || !tradeMap.AttachedStation.IsValid())
+            return;
+
+        _cargoSystem.SellCargo(ent.Owner, tradeMap.AttachedStation);
     }
 
     private void UpdateUI(Entity<TradeShuttleConsoleComponent?>? maybeConsole, TradeShuttleConsoleUIState state)
