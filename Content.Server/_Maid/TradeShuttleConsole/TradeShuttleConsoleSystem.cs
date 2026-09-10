@@ -61,7 +61,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
            subs.Event<TradeShuttleConsoleButtonPressedMessage>(OnButtonPressed);
         });
 
-        SubscribeLocalEvent<TradeShuttleConsoleComponent, ComponentStartup>((uid, component, args) => ResetUIState(uid));
+        SubscribeLocalEvent<TradeShuttleConsoleComponent, ComponentStartup>((uid, component, _) => ResetUIState((uid, component)));
 
         SubscribeLocalEvent<TradeShuttleComponent, FTLCompletedEvent>(OnFTLFinish);
         SubscribeLocalEvent<TradeShuttleComponent, BeforeFTLStartedEvent>(OnBeforeFTLStarted);
@@ -212,13 +212,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
         var pos = _random.NextVector2(FTLTradeRandomMagnitude);
         _shuttleSystem.FTLToCoordinates(shuttle, shuttle.Comp, new EntityCoordinates(_mapSystem.GetMap(tradeMap), pos), 0, startupTime, duration);
-        UpdateUI(console, new TradeShuttleConsoleFtlInProgressUIState
-        {
-            FtlState = FTLState.Starting,
-            ControlledShuttle = Name(shuttle),
-            FtlTime = StartEndTime.FromCurTime(_gameTiming, startupTime),
-            OnTrade = true,
-        });
+        ResetUIState(console);
     }
 
     private void SendToStation(Entity<TradeShuttleConsoleComponent?> console,
@@ -292,13 +286,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
         var targetCoords = new EntityCoordinates(mapUid, spawnPos);
         _shuttleSystem.FTLToCoordinates(shuttle, shuttle.Comp, targetCoords, _random.NextAngle(), startupTime, duration);
 
-        UpdateUI(console, new TradeShuttleConsoleFtlInProgressUIState
-        {
-            FtlState = FTLState.Starting,
-            ControlledShuttle = Name(shuttle),
-            FtlTime = StartEndTime.FromCurTime(_gameTiming, startupTime),
-            OnTrade = false,
-        });
+        ResetUIState(console);
     }
 
     private void OnBeforeFTLStarted(Entity<TradeShuttleComponent> ent, ref BeforeFTLStartedEvent args)
@@ -317,13 +305,9 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
                 _popup.PopupEntity(Loc.GetString("trade-shuttle-alive-entities-aborted"),
                     console,
                     PopupType.MediumCaution);
-            }
 
-            UpdateUI(ent.Comp.Console, new TradeShuttleConsoleIdleUIState
-            {
-                ControlledShuttle = Name(ent),
-                OnTrade = false,
-            });
+                ResetUIState(console);
+            }
         }
     }
 
@@ -349,36 +333,14 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
     private void OnFTLStarted(Entity<TradeShuttleComponent> ent, ref FTLStartedEvent args)
     {
-        if (ent.Comp.Console is not { } console)
-            return;
-
-        if (!TryComp(ent.Owner, out FTLComponent? ftlComponent))
-            return;
-
-        UpdateUI(console, new TradeShuttleConsoleFtlInProgressUIState()
-        {
-            FtlTime = ftlComponent.StateTime,
-            FtlState = ftlComponent.State,
-            ControlledShuttle = Name(ent.Owner),
-            OnTrade = ent.Comp.TradeMap != Transform(ent.Owner).MapID,
-        });
+        if (ent.Comp.Console is { } console)
+            ResetUIState(console);
     }
 
     private void OnFTLArriving(Entity<TradeShuttleComponent> ent, ref FTLArrivingEvent args)
     {
-        if (ent.Comp.Console is not { } console)
-            return;
-
-        if (!TryComp(ent.Owner, out FTLComponent? ftlComponent))
-            return;
-
-        UpdateUI(console, new TradeShuttleConsoleFtlInProgressUIState
-        {
-            FtlTime = ftlComponent.StateTime,
-            FtlState = ftlComponent.State,
-            ControlledShuttle = Name(ent.Owner),
-            OnTrade = ent.Comp.TradeMap != Transform(ent.Owner).MapID,
-        });
+        if (ent.Comp.Console is { } console)
+            ResetUIState(console);
     }
 
     private void OnFTLFinish(Entity<TradeShuttleComponent> ent, ref FTLCompletedEvent args)
@@ -391,66 +353,79 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
     private void OnFTLOntoStation(Entity<TradeShuttleComponent> ent)
     {
-        if (!TryComp(ent.Owner, out FTLComponent? ftl))
-            return;
-
-        UpdateUI(ent.Comp.Console, new TradeShuttleConsoleFtlInProgressUIState
-        {
-            FtlState = ftl.State,
-            FtlTime = ftl.StateTime,
-            ControlledShuttle = Name(ent.Owner),
-            OnTrade = false,
-        });
+        if (ent.Comp.Console is { } console)
+            ResetUIState(console);
     }
 
     private void OnFTLCooldownFinish(Entity<TradeShuttleComponent> ent, ref FTLCooldownFinishEvent args)
     {
         var isTradeMap = ent.Comp.TradeMap == Transform(ent).MapID;
 
+        RemComp<FTLComponent>(ent.Owner); // Ftl component deletes one tick later
         if (ent.Comp.Console is { } console)
-            ResetUIState(console, isTradeMap);
+            ResetUIState(console);
 
         if (!isTradeMap)
             RemComp<TradeShuttleComponent>(ent.Owner);
     }
 
-    private void ResetUIState(Entity<TradeShuttleConsoleComponent?> ent, bool? isTradeMap = null)
+
+    private void ResetUIState(Entity<TradeShuttleConsoleComponent?> ent)
     {
         if (!Resolve(ent.Owner, ref ent.Comp))
             return;
 
-        if (isTradeMap is null)
+        Entity<TradeShuttleConsoleComponent?> targetConsole = ent.Comp.LinkedToConsole ?? ent;
+        if (!Resolve(targetConsole.Owner, ref targetConsole.Comp))
+            return;
+
+        var shuttle = Transform(targetConsole.Owner).GridUid;
+        if (shuttle is null)
         {
-            var station = GetStation(ent);
-            isTradeMap =
-                station is not null
-                && TryComp(station.Value, out AttachedTradeMapComponent? attachedTradeMap)
-                && attachedTradeMap.AttachedMap != MapId.Nullspace
-                && Transform(ent).MapID == attachedTradeMap.AttachedMap;
+            UpdateUI(targetConsole, new TradeShuttleConsoleErrorUIState
+            {
+                OnTrade = false,
+                ControlledShuttle = "???",
+                Error = TradeShuttleConsoleErrorUIState.ErrorType.ShuttleNotFound,
+            });
+            return;
         }
 
-        UpdateUI(ent, new TradeShuttleConsoleIdleUIState
+        var station = GetStation(targetConsole);
+        var isTradeMap =
+            station is not null
+            && TryComp(station.Value, out AttachedTradeMapComponent? attachedTradeMap)
+            && attachedTradeMap.AttachedMap != MapId.Nullspace
+            && Transform(shuttle.Value).MapID == attachedTradeMap.AttachedMap;
+
+        if (TryComp<FTLComponent>(shuttle.Value, out var ftlComponent))
         {
-            ControlledShuttle = Name(ent),
-            OnTrade = isTradeMap.Value,
+            var destinationIsTrade = ftlComponent.State == FTLState.Cooldown ? isTradeMap : !isTradeMap;
+
+            UpdateUI(targetConsole, new TradeShuttleConsoleFtlInProgressUIState
+            {
+                FtlState = ftlComponent.State,
+                FtlTime = ftlComponent.StateTime,
+                ControlledShuttle = Name(shuttle.Value),
+                OnTrade = destinationIsTrade,
+            });
+            return;
+        }
+
+        UpdateUI(targetConsole, new TradeShuttleConsoleIdleUIState
+        {
+            ControlledShuttle = Name(shuttle.Value),
+            OnTrade = isTradeMap,
         });
     }
 
     private void OnFTLOntoTrade(Entity<TradeShuttleComponent> ent)
     {
-        if (!TryComp(ent.Owner, out FTLComponent? ftl))
-            return;
-
-        UpdateUI(ent.Comp.Console, new TradeShuttleConsoleFtlInProgressUIState()
-        {
-            FtlState = ftl.State,
-            FtlTime = ftl.StateTime,
-            ControlledShuttle = Name(ent.Owner),
-            OnTrade = true,
-        });
-
         SellSoldThings(ent);
         FillBoughtThings(ent);
+
+        if (ent.Comp.Console is { } console)
+            ResetUIState(console);
     }
 
 
@@ -491,7 +466,4 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
     {
         Trigger(ent.Comp.LinkedToConsole ?? ent, ent.Owner);
     }
-
-
-
 }
