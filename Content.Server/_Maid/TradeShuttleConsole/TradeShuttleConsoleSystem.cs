@@ -46,7 +46,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
 
     public const float FTLTradeRandomMagnitude = 50;
-    public const float FTLStationDistance = 200f;
+    public const float FTLStationDistance = 100f;
 
     public override void Initialize()
     {
@@ -409,22 +409,25 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
         }
 
         var station = GetStation(targetConsole);
+
+        AttachedTradeMapComponent? attachedTradeMap = null;
+
         var isTradeMap =
             station is not null
-            && TryComp(station.Value, out AttachedTradeMapComponent? attachedTradeMap)
+            && TryComp(station.Value, out attachedTradeMap)
             && attachedTradeMap.AttachedMap != MapId.Nullspace
             && Transform(shuttle.Value).MapID == attachedTradeMap.AttachedMap;
 
         if (TryComp<FTLComponent>(shuttle.Value, out var ftlComponent))
         {
-            var destinationIsTrade = ftlComponent.State == FTLState.Cooldown ? isTradeMap : !isTradeMap;
+            var targetMap = Transform(ftlComponent.TargetCoordinates.EntityId).MapID;
 
             UpdateUI(targetConsole, new TradeShuttleConsoleFtlInProgressUIState
             {
                 FtlState = ftlComponent.State,
                 FtlTime = ftlComponent.StateTime,
                 ControlledShuttle = Name(shuttle.Value),
-                OnTrade = destinationIsTrade,
+                OnTrade = attachedTradeMap?.AttachedMap == targetMap,
             });
             return;
         }
