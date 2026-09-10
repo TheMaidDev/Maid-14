@@ -579,6 +579,11 @@ public sealed partial class ShuttleSystem
         _thruster.EnableLinearThrustDirection(shuttle, DirectionFlag.South);
 
         _console.RefreshShuttleConsoles(entity.Owner);
+
+        // MAID BEGIN trade shuttle
+        var arrivingEvent = new FTLArrivingEvent();
+        RaiseLocalEvent(entity, ref arrivingEvent);
+        // MAID END trade shuttle
     }
 
     /// <summary>
