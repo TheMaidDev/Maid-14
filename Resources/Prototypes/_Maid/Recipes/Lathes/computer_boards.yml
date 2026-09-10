@@ -1,0 +1,5 @@
+- type: latheRecipe
+  parent: [ BaseGoldCircuitboardRecipe, BaseSupplyComputerRecipeCategory ]
+  id: TradeShuttleConsoleCircuitboard
+  icon: _Goobstation/Structures/Machines/Icons/Computers/shuttle.png
+  result: TradeShuttleConsoleCircuitboard

@@ -15,12 +15,18 @@
     - map: ["computerLayerKeys"]
       state: generic_keys
   - type: TradeShuttleConsole
+  - type: Computer
+    board: TradeShuttleConsoleCircuitboard
+#  - type: AccessReader
+#    access: [["Cargo"]]
   - type: ActivatableUI
     key: enum.TradeShuttleConsoleUiKey.Key
   - type: UserInterface
     interfaces:
       enum.TradeShuttleConsoleUiKey.Key:
         type: TradeShuttleConsoleMaidBoundUserInterface
+      enum.WiresUiKey.Key:
+        type: WiresBoundUserInterface
   - type: DeviceLinkSource
     ports:
     - TradeShuttleSource

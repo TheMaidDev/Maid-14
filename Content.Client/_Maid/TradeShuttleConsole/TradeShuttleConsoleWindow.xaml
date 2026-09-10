@@ -1,8 +1,7 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
         xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="Content.Client._Maid.TradeShuttleConsole.TradeShuttleConsoleWindow"
-        Title="Trade Shuttle Console">
+        x:Class="Content.Client._Maid.TradeShuttleConsole.TradeShuttleConsoleWindow">
     <BoxContainer Orientation="Vertical" Margin="10">
         <BoxContainer Orientation="Horizontal" Margin="5 0 5 5">
             <Label Name="StatusLabel" HorizontalAlignment="Left"/>

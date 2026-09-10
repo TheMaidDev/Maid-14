@@ -52,7 +52,7 @@
   parent: BaseCargoPallet
   components:
   - type: CargoPallet # MAID
-    palletType: buy # MAID
+    palletType: all # MAID
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: Metallic

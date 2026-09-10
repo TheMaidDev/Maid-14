@@ -95,6 +95,9 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
     private void OnConsoleLinked(Entity<TradeShuttleConsoleComponent> ent, ref NewLinkEvent args)
     {
+        if (ent.Owner != args.Source)
+            return;
+
         _deviceLink.RemoveAllFromSource(args.Sink); // This will hopefully avoid circular dependency
 
         if (!TryComp(args.Sink, out TradeShuttleConsoleComponent? sinkConsole))
@@ -108,11 +111,18 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
     private void OnConsoleUnlinked(Entity<TradeShuttleConsoleComponent> ent, ref PortDisconnectedEvent args)
     {
-        var linked = ent.Comp.LinkedToConsole;
-        ent.Comp.LinkedToConsole = null;
+        if (args.Port == "TradeShuttleSource")
+        {
+            var linked = ent.Comp.LinkedToConsole;
+            ent.Comp.LinkedToConsole = null;
 
-        if (linked is not null && TryComp(linked, out TradeShuttleConsoleComponent? console))
-            console.LinkedFromConsole.Remove(ent);
+            if (linked is not null && TryComp(linked, out TradeShuttleConsoleComponent? console))
+                console.LinkedFromConsole.Remove(ent);
+        }
+        else if (args.Port == "TradeShuttleSink")
+        {
+            ent.Comp.LinkedFromConsole.Remove(args.RemovedPortUid);
+        }
 
         ResetUIState((ent.Owner, ent.Comp));
     }
@@ -129,7 +139,14 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
             return null;
 
         // kinda scary but we SHOULDNT have circular dependencies
-        return from.Comp.LinkedFromConsole.FirstOrNull(console => GetStation(console, iteration + 1) is not null);
+        foreach (var linkedConsole in from.Comp.LinkedFromConsole)
+        {
+            if (TryComp<TradeShuttleConsoleComponent>(linkedConsole, out var consoleComp) &&
+                GetStation((linkedConsole, consoleComp), iteration + 1) is { } stationEntity)
+                return stationEntity;
+        }
+
+        return null;
     }
 
     private void Trigger(Entity<TradeShuttleConsoleComponent?> console, Entity<TradeShuttleConsoleComponent?> caller)
@@ -203,7 +220,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
         if (!Resolve(map.Owner, ref map.Comp))
             return;
 
-        var comp = AddComp<TradeShuttleComponent>(shuttle);
+        var comp = EnsureComp<TradeShuttleComponent>(shuttle);
         comp.TradeMap = tradeMap;
         comp.Console = console;
 
@@ -250,7 +267,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
         var baseDistance = FTLStationDistance;
 
-        if (TryComp<MapGridComponent>(station, out var gridComp))
+        if (TryComp<MapGridComponent>(stationGrid, out var gridComp))
         {
             var radius = MathF.Max(gridComp.LocalAABB.Width, gridComp.LocalAABB.Height) / 2f;
             baseDistance += radius;
@@ -319,9 +336,9 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
         while (children.MoveNext(out var child))
         {
             if (!HasComp<ActorComponent>(child))
-                return false;
+                return true;
 
-            if (TryComp<MobStateComponent>(child, out var mobState) && _mobStateSystem.IsDead(child, mobState))
+            if (TryComp<MobStateComponent>(child, out var mobState) && !_mobStateSystem.IsDead(child, mobState))
                 return true;
 
             if (HasAliveEntities(child))

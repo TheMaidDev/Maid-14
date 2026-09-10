@@ -22,6 +22,7 @@ public sealed partial class TradeShuttleConsoleWindow : FancyWindow
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
+        Title = Loc.GetString("trade-shuttle-console-menu-title");
         ActionButton.OnPressed += _ => OnActionButtonPressed?.Invoke();
     }
 
@@ -52,6 +53,16 @@ public sealed partial class TradeShuttleConsoleWindow : FancyWindow
                 );
                 ActionButton.Disabled = false;
                 ActionButton.Text = Loc.GetString($"trade-shuttle-console-button-{(idle.OnTrade ? "call" : "recall")}");
+                SetFtlTimer(null);
+                break;
+            case TradeShuttleConsoleErrorUIState error:
+                StatusLabel.Text = error.Error switch
+                {
+                    TradeShuttleConsoleErrorUIState.ErrorType.ShuttleNotFound => Loc.GetString("trade-shuttle-console-error-shuttle-not-found"),
+                    _ => Loc.GetString("trade-shuttle-console-error-shuttle-not-found"),
+                };
+                ActionButton.Disabled = true;
+                ActionButton.Text = Loc.GetString("trade-shuttle-console-error-shuttle-not-found");
                 SetFtlTimer(null);
                 break;
         }

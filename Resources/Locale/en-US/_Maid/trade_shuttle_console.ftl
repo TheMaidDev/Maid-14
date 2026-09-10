@@ -9,9 +9,13 @@ trade-shuttle-console-button-call = Call to Station
 trade-shuttle-console-button-recall = Send to Trade
 trade-shuttle-console-button-ftl-progress = In FTL...
 trade-shuttle-alive-entities-aborted = Alive entities detected on board! FTL aborted.
+trade-shuttle-console-error-shuttle-not-found = Shuttle not found
 
 signal-port-name-trade-shuttle-source = Trade Shuttle Source
 signal-port-description-trade-shuttle-source = Connects to a shuttle console to FTL it.
 
 signal-port-name-trade-shuttle-sink = Trade Shuttle Sink
 signal-port-description-trade-shuttle-sink = Receives FTL commands from a trade shuttle console.
+
+ent-TradeShuttleConsoleCircuitboard = trade shuttle console board
+    .desc = A computer printed circuit board for a trade shuttle console.

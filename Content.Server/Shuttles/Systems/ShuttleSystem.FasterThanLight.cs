@@ -696,8 +696,10 @@ public sealed partial class ShuttleSystem
         RemCompDeferred<FTLComponent>(entity);
         _console.RefreshShuttleConsoles(entity);
 
+        // MAID BEGIN trade shuttle
         var @event = new FTLCooldownFinishEvent();
         RaiseLocalEvent(entity, ref @event);
+        // MAID END trade shuttle
     }
 
     private void UpdateHyperspace()
