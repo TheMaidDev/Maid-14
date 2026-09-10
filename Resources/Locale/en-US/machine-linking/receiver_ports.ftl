@@ -108,7 +108,3 @@ signal-port-description-logic-enable = Only loads the input signal into the memo
 
 signal-port-name-logic-random-input = Input Signal
 signal-port-description-logic-random-input = Receives any signal to trigger a random output.
-
-signal-port-name-trade-shuttle-sink = Trade Shuttle Sink
-signal-port-description-trade-shuttle-sink = Receives FTL commands from a trade shuttle console.
-trade-shuttle-alive-entities-aborted = Alive entities detected on board! FTL aborted.

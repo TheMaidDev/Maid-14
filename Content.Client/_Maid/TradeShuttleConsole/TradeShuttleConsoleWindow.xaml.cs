@@ -42,7 +42,7 @@ public sealed partial class TradeShuttleConsoleWindow : FancyWindow
                     ("destination", location)
                 );
                 ActionButton.Disabled = true;
-                ActionButton.Text = "trade-shuttle-console-button-ftl-progress";
+                ActionButton.Text = Loc.GetString("trade-shuttle-console-button-ftl-progress");
                 SetFtlTimer(ftl.FtlTime);
                 break;
             case TradeShuttleConsoleIdleUIState idle:

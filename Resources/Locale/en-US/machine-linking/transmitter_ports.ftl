@@ -88,6 +88,3 @@ signal-port-description-power-discharging = This port is invoked with HIGH when 
 
 signal-port-name-item-detected = Detected
 signal-port-description-item-detected = This port is invoked whenever the transmitter detects an item.
-
-signal-port-name-trade-shuttle-source = Trade Shuttle Source
-signal-port-description-trade-shuttle-source = Connects to a shuttle console to FTL it.

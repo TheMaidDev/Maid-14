@@ -10,9 +10,9 @@ namespace Content.Shared._Maid.TradeShuttleConsole;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class TradeShuttleComponent : Component
 {
-    [DataField]
+    [ViewVariables]
     public MapId TradeMap;
 
-    [DataField]
+    [ViewVariables]
     public EntityUid? Console;
 }

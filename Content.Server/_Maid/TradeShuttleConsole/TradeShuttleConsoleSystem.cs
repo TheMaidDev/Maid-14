@@ -1,41 +1,35 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Numerics;
 using Content.Server.Cargo.Components;
-using Robust.Server.GameObjects;
-using Robust.Shared.Map;
-using Robust.Shared.Timing;
-using Robust.Shared.Random;
-using Robust.Shared.Audio;
-using Robust.Shared.Audio.Systems;
-using Content.Server.Shuttles.Systems;
+using Content.Server.Cargo.Systems;
+using Content.Server.DeviceLinking.Systems;
 using Content.Server.Shuttles.Components;
+using Content.Server.Shuttles.Events;
+using Content.Server.Shuttles.Systems;
 using Content.Server.Station.Systems;
-using Content.Server.Station.Components;
-using Content.Shared.Shuttles.Systems;
-using Content.Shared.Shuttles.Components;
-using Content.Shared.Timing;
-using Content.Shared.Popups;
+using Content.Server.Station.Events;
+using Content.Shared._Maid.CVars;
+using Content.Shared._Maid.TradeShuttleConsole;
+using Content.Shared.DeviceLinking.Events;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
-using Content.Shared._Maid.TradeShuttleConsole;
-using Content.Shared.DeviceLinking;
-using Content.Shared.Station.Components;
-using Robust.Shared.Map.Components;
-using Content.Server.DeviceLinking.Systems;
-using Content.Server.Shuttles.Events;
-using Content.Shared._Maid.CVars;
-using Content.Shared.DeviceLinking.Events;
+using Content.Shared.Popups;
+using Content.Shared.Shuttles.Components;
+using Content.Shared.Shuttles.Systems;
+using Content.Shared.Timing;
+using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
+using Robust.Shared.Timing;
 using Robust.Shared.Utility;
-
 namespace Content.Server._Maid.TradeShuttleConsole;
 
 public sealed class TradeShuttleConsoleSystem : EntitySystem
 {
     [Dependency] private readonly ShuttleSystem _shuttleSystem = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
@@ -44,15 +38,13 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly CargoSystem _cargoSystem = default!;
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     public const float FTLTradeRandomMagnitude = 50;
-    public const float FTLStationDistance = 400f;
+    public const float FTLStationDistance = 200f;
 
     public override void Initialize()
     {
@@ -73,7 +65,14 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
         SubscribeLocalEvent<TradeShuttleComponent, BeforeFTLStartedEvent>(OnBeforeFTLStarted);
         SubscribeLocalEvent<TradeShuttleComponent, FTLStartedEvent>(OnFTLStarted);
         SubscribeLocalEvent<TradeShuttleComponent, FTLCooldownFinishEvent>(OnFTLCooldownFinish);
+        SubscribeLocalEvent<FulfillCargoOrderEvent>(OnFulfillCargoOrder);
+        SubscribeLocalEvent<AttachedTradeMapComponent, StationPostInitEvent>(OnStationPostInit);
     }
+    private void OnStationPostInit(EntityUid uid, AttachedTradeMapComponent comp, ref StationPostInitEvent args)
+    {
+        EnsureTradeMap(uid);
+    }
+
 
     private void AttemptToLink(Entity<TradeShuttleComponent> ent, ref LinkAttemptEvent args)
     {
@@ -130,7 +129,7 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
         var shuttle = Transform(console.Owner).GridUid;
         if (shuttle is null)
         {
-            // TODO: popup
+            _popup.PopupEntity(Loc.GetString("cargo-no-shuttle"), caller.Owner);
             UpdateUI(console, new TradeShuttleConsoleErrorUIState
             {
                 OnTrade = false,
@@ -289,8 +288,46 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
     {
         if (_configurationManager.GetCVar(MaidCVars.DenyAliveTradeFTL))
         {
-            // TODO: check for sentient entities (+ not dead or invalid if has states) and cancel
+            if (ent.Comp.TradeMap == Transform(ent.Owner).MapID)
+                return;
+
+            if (!HasAliveEntities(ent.Owner))
+                return;
+
+            args.Cancelled = true;
+            if (ent.Comp.Console is { } console)
+            {
+                _popup.PopupEntity(Loc.GetString("trade-shuttle-alive-entities-aborted"),
+                    console,
+                    PopupType.MediumCaution);
+            }
+
+            UpdateUI(ent.Comp.Console, new TradeShuttleConsoleIdleUIState
+            {
+                ControlledShuttle = Name(ent),
+                OnTrade = false,
+            });
         }
+    }
+
+    private bool HasAliveEntities(EntityUid uid)
+    {
+        var transform = Transform(uid);
+        var children = transform.ChildEnumerator;
+
+        while (children.MoveNext(out var child))
+        {
+            if (!HasComp<ActorComponent>(child))
+                return false;
+
+            if (TryComp<MobStateComponent>(child, out var mobState) && _mobStateSystem.IsDead(child, mobState))
+                return true;
+
+            if (HasAliveEntities(child))
+                return true;
+        }
+
+        return false;
     }
 
     private void OnFTLStarted(Entity<TradeShuttleComponent> ent, ref FTLStartedEvent args)
@@ -359,7 +396,7 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
             OnTrade = true,
         });
 
-        // TODO: Fill bough things, like it works with trade station
+        FillBoughtThings(ent);
     }
 
     private void UpdateUI(Entity<TradeShuttleConsoleComponent?>? maybeConsole, TradeShuttleConsoleUIState state)
@@ -398,4 +435,69 @@ public sealed class TradeShuttleConsoleSystem : EntitySystem
     {
         Trigger(ent.Comp.LinkedToConsole ?? ent, ent.Owner);
     }
+
+    private void OnFulfillCargoOrder(ref FulfillCargoOrderEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        if (!TryComp<AttachedTradeMapComponent>(args.Station, out var tradeMapComp))
+            return;
+
+        tradeMapComp.ApprovedOrders.Add(args.Order);
+        args.Handled = true;
+        args.FulfillmentEntity = args.Station;
+    }
+
+    private void FillBoughtThings(Entity<TradeShuttleComponent> ent)
+    {
+        if (!TryComp<TradeMapComponent>(Transform(ent).MapUid, out var tradeMap) || !tradeMap.AttachedStation.IsValid())
+            return;
+
+        var station = tradeMap.AttachedStation;
+        if (!TryComp<AttachedTradeMapComponent>(station, out var attachedTradeMap) || attachedTradeMap.ApprovedOrders.Count == 0)
+            return;
+
+        EntProtoId printerOutput = "PaperCargoInvoice";
+        if (TryComp<StationCargoOrderDatabaseComponent>(station, out var orderDb))
+            printerOutput = orderDb.PrinterOutput;
+
+        var buyPallets = _cargoSystem.GetCargoPallets(ent.Owner, BuySellType.Buy);
+        _random.Shuffle(buyPallets);
+
+        var freePallets = _cargoSystem.GetFreeCargoPallets(ent.Owner, buyPallets);
+
+        if (freePallets.Count == 0)
+            return;
+
+        var palletIndex = 0;
+        var fulfilledCount = 0;
+
+        foreach (var orderData in attachedTradeMap.ApprovedOrders)
+        {
+            if (palletIndex >= freePallets.Count)
+                break;
+
+            while (orderData.NumDispatched < orderData.OrderQuantity && palletIndex < freePallets.Count)
+            {
+                var pad = freePallets[palletIndex++];
+                var coords = new EntityCoordinates(ent.Owner, pad.Transform.LocalPosition);
+                if (_cargoSystem.FulfillOrder(orderData, orderData.Account, coords, printerOutput))
+                {
+                    orderData.NumDispatched++;
+                }
+            }
+
+            if (orderData.NumDispatched < orderData.OrderQuantity)
+                break;
+
+            fulfilledCount++;
+        }
+
+        if (fulfilledCount > 0)
+        {
+            attachedTradeMap.ApprovedOrders.RemoveRange(0, fulfilledCount);
+        }
+    }
+
 }

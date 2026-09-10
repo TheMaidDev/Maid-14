@@ -82,6 +82,7 @@
         Service: [ ]
     - type: StationCargoBountyDatabase
     - type: StationXenobiologyBountyDatabase # Goobstaton
+    - type: AttachedTradeMap # MAID trade shuttle
 
 - type: entity
   id: BaseStationJobsSpawning
