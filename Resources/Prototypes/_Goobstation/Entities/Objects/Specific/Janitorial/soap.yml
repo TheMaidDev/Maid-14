@@ -22,6 +22,7 @@
     fillBaseName: bananasoap-
   - type: Slippery
     slipData:
+      stunTime: 0.5 # Maid-14-Tweak
       knockdownTime: 0.5 # Maid-14-Tweak
       launchForwardsMultiplier: 2
   - type: StepTrigger

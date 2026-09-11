@@ -240,6 +240,20 @@ namespace Content.Client.RoundEnd
                                 ("player", playerInfo.PlayerOOCName));
 
                     playerTitleBox.AddChild(playerRoleText);
+
+                    // Maid-14-Tweak-Start
+                    if (!string.IsNullOrWhiteSpace(playerInfo.Reputation))
+                    {
+                        var playerReputationText = new RichTextLabel
+                        {
+                            VerticalAlignment = VAlignment.Center,
+                            Margin = new Thickness(6, 0, 0, 0),
+                        };
+
+                        playerReputationText.SetMarkup(playerInfo.Reputation);
+                        playerTitleBox.AddChild(playerReputationText);
+                    }
+                    // Maid-14-Tweak-End
                 }
 
                 textVBox.AddChild(playerTitleBox);

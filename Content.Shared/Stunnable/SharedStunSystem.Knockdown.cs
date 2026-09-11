@@ -89,6 +89,14 @@ public abstract partial class SharedStunSystem
                 continue;
 
             TryStanding(uid);
+
+            // Maid-14-Tweak-Start
+            if (knockedDown.DoAfterId.HasValue && !knockedDown.AutoStanding)
+            {
+                knockedDown.AutoStanding = true;
+                DirtyField(uid, knockedDown, nameof(KnockedDownComponent.AutoStanding));
+            }
+            // Maid-14-Tweak-End
         }
     }
 
@@ -153,6 +161,11 @@ public abstract partial class SharedStunSystem
         DoAfter.Cancel(entity.Owner, entity.Comp.DoAfterId.Value);
         entity.Comp.DoAfterId = null;
         DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.DoAfterId));
+
+        // Maid-14-Tweak-Start
+        entity.Comp.AutoStanding = false;
+        DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.AutoStanding));
+        // Maid-14-Tweak-End
     }
 
     /// <summary>
@@ -178,7 +191,9 @@ public abstract partial class SharedStunSystem
     {
         entity.Comp.NextUpdate = time;
         DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.NextUpdate));
-        Alerts.ShowAlert(entity, KnockdownAlert, null, (GameTiming.CurTime, entity.Comp.NextUpdate));
+        // Maid-14-Tweak-Start
+        // Alerts.ShowAlert(entity, KnockdownAlert, null, (GameTiming.CurTime, entity.Comp.NextUpdate));
+        // Maid-14-Tweak-End
     }
 
     /// <summary>
@@ -215,7 +230,9 @@ public abstract partial class SharedStunSystem
 
         entity.Comp.NextUpdate += time;
         DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.NextUpdate));
-        Alerts.ShowAlert(entity, KnockdownAlert, null, (GameTiming.CurTime, entity.Comp.NextUpdate));
+        // Maid-14-Tweak-Start
+        // Alerts.ShowAlert(entity, KnockdownAlert, null, (GameTiming.CurTime, entity.Comp.NextUpdate));
+        // Maid-14-Tweak-End
     }
 
     #endregion
@@ -248,6 +265,9 @@ public abstract partial class SharedStunSystem
             TryKnockdown(entity.Owner, entity.Comp1.DefaultKnockedDuration, true, false, false); // Goob edit
             return;
         }
+
+        if (entity.Comp2.AutoStanding) // Maid-14-Tweak
+            return;
 
         var stand = !entity.Comp2.DoAfterId.HasValue;
         SetAutoStand((entity, entity.Comp2), stand);
@@ -553,6 +573,11 @@ public abstract partial class SharedStunSystem
     private void OnStandDoAfter(Entity<KnockedDownComponent> entity, ref TryStandDoAfterEvent args)
     {
         entity.Comp.DoAfterId = null;
+
+        // Maid-14-Tweak-Start
+        entity.Comp.AutoStanding = false;
+        DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.AutoStanding));
+        // Maid-14-Tweak-End
 
         if (args.Cancelled || StandingBlocked(entity))
         {

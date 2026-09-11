@@ -189,7 +189,10 @@ public sealed class SlipperySystem : EntitySystem
 
             _stamina.TakeStaminaDamage(other, component.StaminaDamage); // Note that this can StamCrit
 
-            _audio.PlayPredicted(component.SlipSound, other, other);
+            // Maid-14-Tweak-Start
+            if (_net.IsServer)
+                _audio.PlayPvs(component.SlipSound, other);
+            // Maid-14-Tweak-End
         }
 
         // Slippery is so tied to knockdown that we really just need to force it here.

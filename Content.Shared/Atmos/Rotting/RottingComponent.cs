@@ -17,7 +17,7 @@ namespace Content.Shared.Atmos.Rotting;
 /// Only the current stage is networked to the client.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentPause]
-[Access(typeof(SharedRottingSystem))]
+//[Access(typeof(SharedRottingSystem))] Maid-14
 public sealed partial class RottingComponent : Component
 {
     /// <summary>

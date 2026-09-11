@@ -305,6 +305,27 @@ namespace Content.Server.Cloning
                 clonerStatus = ClonerStatus.NoClonerDetected;
             }
 
+            // Maid-14-Tweak-Start
+            var cloningChance = 0;
+            var biomassCost = 0;
+
+            if (consoleComponent.GeneticScanner != null
+                && TryComp<MedicalScannerComponent>(consoleComponent.GeneticScanner, out var chanceScanner)
+                && chanceScanner.BodyContainer.ContainedEntity is { } chanceBody
+                && consoleComponent.CloningPod != null
+                && TryComp<CloningPodComponent>(consoleComponent.CloningPod, out var chancePod))
+            {
+                var failChance = Math.Clamp(
+                    (1f - _cloningPodSystem.GetCloningChance(chancePod, _cloningPodSystem.GetCellularDamage(chanceBody)))
+                    * chanceScanner.CloningFailChanceMultiplier,
+                    0f,
+                    1f);
+
+                cloningChance = (int)MathF.Round((1f - failChance) * 100f);
+                biomassCost = _cloningPodSystem.GetCloningCost(chanceBody, chancePod);
+            }
+            // Maid-14-Tweak-End
+
             return new CloningConsoleBoundUserInterfaceState(
                 scanBodyInfo,
                 cloneBodyInfo,
@@ -313,7 +334,9 @@ namespace Content.Server.Cloning
                 scannerConnected,
                 scannerInRange,
                 clonerConnected,
-                clonerInRange
+                clonerInRange,
+                cloningChance, // Maid-14-Tweak
+                biomassCost // Maid-14-Tweak
                 );
         }
 
