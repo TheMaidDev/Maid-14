@@ -83,6 +83,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using Content.Server._Maid.FasterThanLight.Components;
+using Content.Server._Maid.TradeShuttleConsole;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Server.Station.Events;
@@ -462,6 +463,21 @@ public sealed partial class ShuttleSystem
     {
         var uid = entity.Owner;
         var comp = entity.Comp1;
+
+        // MAID BEGIN trade shuttle
+        var beforeEv = new BeforeFTLStartedEvent();
+        beforeEv.Target = entity.Comp1.TargetCoordinates.EntityId;
+        RaiseLocalEvent(uid, ref beforeEv, true);
+        if (beforeEv.Cancelled)
+        {
+            _thruster.DisableLinearThrusters(entity.Comp2);
+            comp.StartupStream = _audio.Stop(comp.StartupStream);
+            RemCompDeferred<FTLComponent>(uid);
+            _console.RefreshShuttleConsoles(uid);
+            return;
+        }
+        // MAID END trade shuttle
+
         var xform = _xformQuery.GetComponent(entity);
         DoTheDinosaur(xform);
 
@@ -561,6 +577,11 @@ public sealed partial class ShuttleSystem
         _thruster.EnableLinearThrustDirection(shuttle, DirectionFlag.South);
 
         _console.RefreshShuttleConsoles(entity.Owner);
+
+        // MAID BEGIN trade shuttle
+        var arrivingEvent = new FTLArrivingEvent();
+        RaiseLocalEvent(entity, ref arrivingEvent);
+        // MAID END trade shuttle
     }
 
     /// <summary>
@@ -672,6 +693,11 @@ public sealed partial class ShuttleSystem
     {
         RemCompDeferred<FTLComponent>(entity);
         _console.RefreshShuttleConsoles(entity);
+
+        // MAID BEGIN trade shuttle
+        var @event = new FTLCooldownFinishEvent();
+        RaiseLocalEvent(entity, ref @event);
+        // MAID END trade shuttle
     }
 
     private void UpdateHyperspace()

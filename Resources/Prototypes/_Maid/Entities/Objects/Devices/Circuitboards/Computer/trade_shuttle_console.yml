@@ -1,0 +1,10 @@
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: TradeShuttleConsoleCircuitboard
+  name: trade shuttle console board
+  description: A computer printed circuit board for a trade shuttle console.
+  components:
+  - type: Sprite
+    state: cpu_supply
+  - type: ComputerBoard
+    prototype: ComputerTradeShuttleConsole

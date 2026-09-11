@@ -88,6 +88,8 @@ public sealed partial class CargoSystem
 
     private void OnTelepadFulfillCargoOrder(ref FulfillCargoOrderEvent args)
     {
+        if (args.Handled) // MAID trade shuttle
+            return; // MAID trade shuttle
         var query = EntityQueryEnumerator<CargoTelepadComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var tele, out var xform))
         {

@@ -79,10 +79,17 @@ public sealed class MaidCVars
         CVarDef.Create("maid.adaptive_statistics", false, CVar.SERVERONLY);
 
     /// <summary>
+    ///     If true doesn't allow to FTL on trade map while anyone alive is on shuttle
+    /// </summary>
+    public static readonly CVarDef<bool> DenyAliveTradeFTL =
+        CVarDef.Create("maid.deny_alive_trade_ftl", false, CVar.SERVERONLY);
+  
     ///     Whether IC messages get their slang words automatically replaced with in-character ones.
     /// </summary>
     public static readonly CVarDef<bool> ChatSlangFilter =
         CVarDef.Create("ic.slang_filter", true, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 
     #endregion
+
+
 }
