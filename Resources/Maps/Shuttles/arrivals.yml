@@ -107,7 +107,7 @@ entities:
         path: /Audio/Effects/Shuttle/Arrivals/hyperspace_progress.ogg
         params:
           volume: -5
-          repeat: true
+          loop: true
     - type: DeviceNetwork
       configurators: []
       deviceLists: []

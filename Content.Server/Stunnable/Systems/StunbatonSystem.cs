@@ -47,6 +47,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using Content.Shared.Damage.Components;
 using Content.Server.Emp;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
@@ -94,11 +96,11 @@ namespace Content.Server.Stunnable.Systems
             if (args.LightAttack)
                 energy *= entity.Comp.LightAttackEnergyMultiplier;
 
-
+            var hasTarget = args.HitEntities.Any(HasComp<StaminaComponent>); // MAID stunbaton
 
             if (!_itemToggle.IsActivated(entity.Owner)
                 || !TryComp<BatteryComponent>(entity.Owner, out var battery)
-                || !_battery.TryUseCharge(entity.Owner, energy, battery)) // Goob edit end
+                || hasTarget && !_battery.TryUseCharge(entity.Owner, energy, battery)) // Goob edit end // MAID stunbaton
             {
                 args.Cancelled = true;
             }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Server.Chat.Managers;
 using Content.Server.GameTicking;
 using Content.Server.Objectives;
 using Content.Server.Roles;
@@ -26,14 +27,7 @@ public sealed class ReputationSystem : EntitySystem
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly RoleSystem _roles = default!;
     [Dependency] private readonly ObjectivesSystem _objectives = default!;
-
-    /// <summary>
-    /// Anti-farm guards: reputation is only handed out on rounds that were actually played out.
-    /// </summary>
-    private const int MinPlayers = 15;
-
-    private const int MinRoundLength = 25;
-    private const int MinTimePlayerConnected = 20;
+    [Dependency] private readonly IChatManager _chat = default!;
 
     /// <summary>
     /// Tries to modify reputation on round end and then returns its new value and delta if successful.
@@ -59,14 +53,25 @@ public sealed class ReputationSystem : EntitySystem
         if (!_repManager.GetCachedPlayerReputation(uid, out var value) || value == null)
             return false;
 
-        var longConnected = _repManager.GetCachedPlayerConnection(uid, out var date)
-                            && DateTime.UtcNow - date >= TimeSpan.FromMinutes(MinTimePlayerConnected);
-        var longRound = _gameTicker.RoundDuration() >= TimeSpan.FromMinutes(MinRoundLength);
-        var enoughPlayers = _playerManager.PlayerCount >= MinPlayers;
-        var earned = longRound && longConnected && enoughPlayers;
+        var minPlayers = _cfg.GetCVar(WhiteCVars.ReputationMinPlayers);
+        var minRoundLength = TimeSpan.FromMinutes(_cfg.GetCVar(WhiteCVars.ReputationMinRoundLength));
+        var minTimePlayed = TimeSpan.FromMinutes(_cfg.GetCVar(WhiteCVars.ReputationMinTimePlayed));
 
-        if (delta != 0 && earned)
+        var hasSpawnTime = _repManager.GetCachedPlayerConnection(uid, out var date);
+        var timePlayed = hasSpawnTime ? DateTime.UtcNow - date : TimeSpan.Zero;
+        var roundLength = _gameTicker.RoundDuration();
+
+        var earned = hasSpawnTime
+                     && timePlayed >= minTimePlayed
+                     && roundLength >= minRoundLength
+                     && _playerManager.PlayerCount >= minPlayers;
+
+        if (earned && delta != 0)
+        {
             _repManager.ModifyPlayerReputation(uid, delta);
+            _chat.DispatchServerMessage(session,
+                Loc.GetString("reputation-round-end-earned", ("value", delta), ("total", value.Value + delta)));
+        }
 
         deltaValue = earned ? delta : 0f;
         newValue = value + deltaValue;

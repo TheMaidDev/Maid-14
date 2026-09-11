@@ -239,7 +239,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
             return;
         // Goobstation
 
-        var ev = new StaminaDamageOnHitAttemptEvent(args.Direction == null, false); // Goob edit
+        var ev = new StaminaDamageOnHitAttemptEvent(args.HitEntities, args.Direction == null, false); // Goob edit // MAID stunbaton fix
         RaiseLocalEvent(uid, ref ev);
         if (ev.Cancelled)
             return;
@@ -312,7 +312,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         if (!TryComp<StaminaComponent>(target, out var stamComp))
             return;
 
-        var ev = new StaminaDamageOnHitAttemptEvent();
+        var ev = new StaminaDamageOnHitAttemptEvent(new[] { target }, false, false); // MAID stunbaton fix
         RaiseLocalEvent(uid, ref ev);
         if (ev.Cancelled)
             return;

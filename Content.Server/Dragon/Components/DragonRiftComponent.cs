@@ -50,7 +50,7 @@ public sealed partial class DragonRiftComponent : SharedDragonRiftComponent
 
     // <Goobstation> - Buff carp rift
     [DataField]
-    public float StrongSpawnChance = 0.15f;
+    public float StrongSpawnChance = 0; // MAID no strong
 
     [DataField("spawnStrong")]
     public EntProtoId SpawnPrototypeStrong = "MobSharkDragon";

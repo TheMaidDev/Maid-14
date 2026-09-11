@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Administration;
+using Content.Shared.Administration.Managers;
 using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Roles;
 using Robust.Shared.Player;
@@ -147,6 +149,54 @@ public sealed partial class PlaytimeDepartmentRestriction : CustomGhostRestricti
                     ("playtimeHours", Math.Round(departmentPlaytime)),
                     ("playtimeMinutes", Math.Round(departmentPlaytime % 1 * 60))
             );
+            return false;
+        }
+
+        return true;
+    }
+}
+
+public sealed partial class AdminFlagsRestriction : CustomGhostRestriction
+{
+    private static ISharedAdminManager? _admin = null;
+
+    [DataField(required: true)]
+    public AdminFlags Flags;
+
+    public override bool HideOnFail => true;
+
+    public override bool CanUse(ICommonSession player, [NotNullWhen(false)] out string? failReason)
+    {
+        failReason = null;
+        _admin ??= IoCManager.Resolve<ISharedAdminManager>();
+
+        if (!_admin.HasAdminFlag(player, Flags, true))
+        {
+            failReason = Loc.GetString("custom-ghost-fail-admin-flags-insufficient", ("requiredFlags", Flags));
+            return false;
+        }
+        return true;
+    }
+}
+
+public sealed partial class AdminTitleRestriction : CustomGhostRestriction
+{
+    private static ISharedAdminManager? _admin = null;
+
+    [DataField(required: true)]
+    public HashSet<string> Titles = [];
+
+    public override bool HideOnFail => true;
+
+    public override bool CanUse(ICommonSession player, [NotNullWhen(false)] out string? failReason)
+    {
+        failReason = null;
+        _admin ??= IoCManager.Resolve<ISharedAdminManager>();
+
+        if (_admin.GetAdminData(player, true)?.Title is not { } title || !Titles.Contains(title))
+        {
+            failReason = Loc.GetString("custom-ghost-fail-admin-flags-insufficient",
+                ("requiredFlags", string.Join(", ", Titles)));
             return false;
         }
 

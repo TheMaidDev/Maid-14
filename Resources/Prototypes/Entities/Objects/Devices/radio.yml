@@ -30,6 +30,15 @@
   id: RadioHandheld
   components:
   - type: TelecomExempt
+  # MAID BEGIN radio sounds
+  - type: RadioAudioPlayer
+    playGlobally: true
+    overrideSound:
+      path: /Audio/_Maid/Radio/handheld.ogg
+      params:
+        volume: -12
+        maxDistance: 3
+  # MAID END radio sounds
   - type: RadioMicrophone
     broadcastChannel: Handheld
   - type: RadioSpeaker

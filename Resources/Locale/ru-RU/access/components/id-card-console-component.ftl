@@ -10,3 +10,5 @@ access-id-card-console-component-no-hands-error = У вас нет рук.
 id-card-console-privileged-id = Основной ID
 id-card-console-target-id = Целевой ID
 id-card-console-damaged = Нарушение структурной целостности, выброс содержимого.
+
+id-card-console-window-current-job-icon = Текущая иконка должности:

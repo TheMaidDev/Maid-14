@@ -150,8 +150,12 @@
     - state: stunbaton_off
       map: [ "enum.ToggleableVisuals.Layer" ]
   - type: Stunbaton
-    energyPerUse: 50
-    lightAttackEnergyMultiplier: 2 # Goob edit
+    # MAID BEGIN stunbaton fix
+    # energyPerUse: 50
+    # lightAttackEnergyMultiplier: 2 # Goob edit
+    energyPerUse: 100
+    lightAttackEnergyMultiplier: 1
+    # MAID END stunbaton fix
   - type: ItemToggle
     predictable: false
     soundActivate:
@@ -181,25 +185,33 @@
     bluntStaminaDamageFactor: 2.0
     angle: 0
     animation: WeaponArcThrust
+    # MAID BEGIN stunbaton fix
+    canHeavyAttack: false
+    canWideSwing: false
+    # MAID END stunbaton fix
   - type: StaminaDamageOnHit # goob edited
     damage: 15
     overtime: 40
     lightAttackDamageMultiplier: 4
     lightAttackOvertimeDamageMultiplier: 0
     sound: /Audio/Weapons/egloves.ogg
-  - type: DelayedKnockdownOnHit # Goobstation
-    useDelay: stunbaton
-  - type: UseDelayBlockMelee # Goobstation
-    delays:
-    - stunbaton
+  # MAID BEGIN stunbaton fix
+  # - type: DelayedKnockdownOnHit # Goobstation
+  #   useDelay: stunbaton
+  # - type: UseDelayBlockMelee # Goobstation
+  #   delays:
+  #   - stunbaton
+  # MAID END stunbaton fix
   - type: LandAtCursor
   - type: Battery
     maxCharge: 1000
     startingCharge: 1000
-  - type: UseDelay
-    delays: # Goobstation
-      stunbaton:
-        length: 2.5
+  # MAID BEGIN stunbaton fix
+  # - type: UseDelay
+  #   delays: # Goobstation
+  #     stunbaton:
+  #       length: 2.5
+  # MAID END stunbaton fix
   - type: Item
     heldPrefix: off
     size: Normal

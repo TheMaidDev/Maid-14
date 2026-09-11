@@ -56,4 +56,22 @@ public sealed class WhiteCVars
     /// </summary>
     public static readonly CVarDef<bool> ReputationShowInOoc =
         CVarDef.Create("reputation.show_in_ooc", true, CVar.SERVERONLY);
+
+    /// <summary>
+    /// How many players have to be connected at round end for reputation to be handed out.
+    /// </summary>
+    public static readonly CVarDef<int> ReputationMinPlayers =
+        CVarDef.Create("reputation.min_players", 15, CVar.SERVERONLY);
+
+    /// <summary>
+    /// How many minutes the round has to have lasted for reputation to be handed out.
+    /// </summary>
+    public static readonly CVarDef<int> ReputationMinRoundLength =
+        CVarDef.Create("reputation.min_round_length", 25, CVar.SERVERONLY);
+
+    /// <summary>
+    /// How many minutes a player has to have been in the round to earn reputation.
+    /// </summary>
+    public static readonly CVarDef<int> ReputationMinTimePlayed =
+        CVarDef.Create("reputation.min_time_played", 20, CVar.SERVERONLY);
 }

@@ -127,6 +127,7 @@
   - type: BlockMovement
   - type: Examiner
   - type: IntrinsicRadioReceiver
+  - type: RadioAudioPlayer # MAID radio sounds
   #- type: IntrinsicRadioTransmitter
   #  channels:
   #  - Binary # Goobstation - replaced with collective mind
@@ -224,6 +225,7 @@
     - type: Examiner
     - type: BorgBrain
     - type: IntrinsicRadioReceiver
+    - type: RadioAudioPlayer # MAID radio sounds
     #- type: IntrinsicRadioTransmitter
     #  channels:
     #  - Binary # Goobstation - replaced with collective mind

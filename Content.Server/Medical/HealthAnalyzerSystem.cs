@@ -408,7 +408,7 @@ public sealed class HealthAnalyzerSystem : EntitySystem
                 if (TryComp<UnrevivableComponent>(target, out var unrevivableComp) && unrevivableComp.Analyzable)
                     unrevivable = true;
 
-                _uiSystem.ServerSendUiMessage(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerBodyMessage(
+                _uiSystem.SetUiState(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerBodyMessage( // MAID health analyzer close fix
                     GetNetEntity(target),
                     bodyTemperature,
                     bloodAmount,
@@ -426,7 +426,7 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             case HealthAnalyzerMode.Organs:
                 bleeding = FetchBleedData(body);
                 var organs = FetchOrganData(target);
-                _uiSystem.ServerSendUiMessage(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerOrgansMessage(
+                _uiSystem.SetUiState(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerOrgansMessage( // MAID health analyzer close fix
                     GetNetEntity(target),
                     bodyTemperature,
                     bloodAmount,
@@ -441,7 +441,7 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             case HealthAnalyzerMode.Chemicals:
                 bleeding = FetchBleedData(body);
                 var chemicals = FetchChemicalData(target);
-                _uiSystem.ServerSendUiMessage(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerChemicalsMessage(
+                _uiSystem.SetUiState(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerChemicalsMessage( // MAID health analyzer close fix
                     GetNetEntity(target),
                     bodyTemperature,
                     bloodAmount,

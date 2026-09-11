@@ -576,6 +576,9 @@ public abstract class SharedDisposalUnitSystem : EntitySystem
     public virtual bool CanInsert(EntityUid uid, DisposalUnitComponent component, EntityUid entity)
     {
         // TODO: All of the below should be using the EXISTING EVENT
+        if (Transform(entity).Anchored) // MAID disposal drag fix
+            return false; // MAID disposal drag fix
+
         if (!Containers.CanInsert(entity, component.Container))
             return false;
 

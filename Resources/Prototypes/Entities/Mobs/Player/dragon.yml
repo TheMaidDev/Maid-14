@@ -307,6 +307,9 @@
       - Item
       tags:
       - Wall
+  # MAID BEGIN dragon digestion
+  - type: AntiRottingContainer
+  # MAID END dragon digestion
   - type: Tag
     tags:
     - CannotSuicide

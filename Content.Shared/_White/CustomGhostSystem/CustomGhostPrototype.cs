@@ -51,9 +51,8 @@ public sealed partial class CustomGhostPrototype : IPrototype, IInheritingProtot
         }
         return result;
     }
-
-    [DataField("proto", required: true)]
-    public EntProtoId<GhostComponent> GhostEntityPrototype { get; private set; } = default!;
+    [DataField]
+    public ComponentRegistry AddComponents { get; private set; } = new();
 
     /// <summary>
     /// If null, the default of "custom-ghost-[id]-name" will be used.

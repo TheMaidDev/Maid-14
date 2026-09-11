@@ -16,6 +16,7 @@ public sealed class SetCustomGhostCommand : IConsoleCommand
     [Dependency] private readonly IServerDbManager _db = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IServerPreferencesManager _prefMan = default!;
+    [Dependency] private readonly IEntityManager _entManager = default!;
 
     public string Command => "setcustomghost";
     public string Description => Loc.GetString("setcustomghost-command-description");

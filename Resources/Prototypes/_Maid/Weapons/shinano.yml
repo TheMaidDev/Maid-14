@@ -154,6 +154,8 @@
       - state: grenade
   - type: TimedDespawn
     lifetime: 10
+  - type: BulletTrail
+    enabled: false
 
 - type: entity
   parent: BaseBulletShinanoGranade

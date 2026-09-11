@@ -84,9 +84,10 @@ namespace Content.Client.HealthAnalyzer.UI
             _window.Title = EntMan.GetComponent<MetaDataComponent>(Owner).EntityName;
         }
 
-
-        protected override void ReceiveMessage(BoundUserInterfaceMessage message)
+        protected override void UpdateState(BoundUserInterfaceState message) // MAID health analyzer close fix
         {
+            base.UpdateState(message); // MAID health analyzer close fix
+
             if (_window == null)
                 return;
 

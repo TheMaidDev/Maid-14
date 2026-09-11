@@ -15,6 +15,7 @@ custom-ghost-fail-department-insufficient-playtime = Play as a member of {$depar
   *[one] hour
   [other] hours
 }. { -playtime(pH: $playtimeHours, pM: $playtimeMinutes) }
+custom-ghost-fail-admin-flags-insufficient = You must have admin flag(s) {$requiredFlags} to use this ghost.
 
 custom-ghosts-window-title = Custom ghost menu
 custom-ghosts-window-show-all-checkbox = Show all

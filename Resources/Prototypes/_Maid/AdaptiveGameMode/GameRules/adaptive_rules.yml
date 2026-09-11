@@ -47,6 +47,8 @@
     scoreDifferenceMultiplierMin: 0.15
 
     midroundRules:
+    - id: ItemArtifacts
+      baseWeight: 10
     - id: ZombieOutbreak
       baseWeight: 10
       conditions:

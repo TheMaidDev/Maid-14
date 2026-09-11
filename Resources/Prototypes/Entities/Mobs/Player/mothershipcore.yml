@@ -138,6 +138,7 @@
       Unsexed: UnisexSiliconXenoborg
     wilhelmProbability: 0
   - type: IntrinsicRadioReceiver
+  - type: RadioAudioPlayer # MAID radio sounds
   - type: IntrinsicRadioTransmitter
     channels:
     - Mothership

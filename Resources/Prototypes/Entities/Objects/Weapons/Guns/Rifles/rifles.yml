@@ -281,6 +281,8 @@
         map: ["enum.GunVisualLayers.Base"]
       - state: mag-0
         map: ["enum.GunVisualLayers.Mag"]
+  - type: Item #Maid
+    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter-inhands.rsi #Maid
   - type: Clothing
 #    sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter.rsi # Maid
     sprite: _Maid/Objects/Weapons/Guns/Rifles/lecter-inhands.rsi # Maid

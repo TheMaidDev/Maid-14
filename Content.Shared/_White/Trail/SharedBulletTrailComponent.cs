@@ -11,6 +11,10 @@ namespace Content.Shared._White.Trail;
 [NetworkedComponent]
 public abstract partial class SharedBulletTrailComponent : Component, ITrailSettings
 {
+    [DataField]
+    [ViewVariables(VVAccess.ReadWrite)]
+    public virtual bool Enabled { get; set; } = true;
+
     [DataField("gravity")]
     [ViewVariables(VVAccess.ReadWrite)]
     public virtual Vector2 Gravity { get; set; }

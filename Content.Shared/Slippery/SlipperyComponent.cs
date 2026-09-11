@@ -75,7 +75,7 @@ namespace Content.Shared.Slippery
         /// How much stamina damage should this component do on slip?
         /// </summary>
         [DataField, AutoNetworkedField]
-        public float StaminaDamage = 25f;
+        public float StaminaDamage = 0f; // Maid-14
 
         /// <summary>
         /// Loads the data needed to determine how slippery something is.
@@ -99,7 +99,7 @@ namespace Content.Shared.Slippery
         /// How many seconds the mob will be knocked down for.
         /// </summary>
         [DataField]
-        public TimeSpan KnockdownTime = TimeSpan.FromSeconds(1.5);
+        public TimeSpan KnockdownTime = TimeSpan.FromSeconds(0.5); // Maid-14
 
         /// <summary>
         /// Should the slipped entity try to stand up when Knockdown ends?

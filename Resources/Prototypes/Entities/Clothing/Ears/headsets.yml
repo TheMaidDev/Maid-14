@@ -137,6 +137,10 @@
         Blunt: 0.95
         Slash: 0.95
         Piercing: 0.95
+  # MAID BEGIN radio sounds
+  - type: RadioAudioPlayer
+    target: Parent
+  # MAID END radio sounds
 
 - type: entity
   parent: ClothingHeadset

@@ -161,6 +161,7 @@
   description: Boo!
   categories: [ HideSpawnMenu ]
   components:
+  - type: CustomGhost # MAID custom ghosts
   - type: Sprite
     sprite: Mobs/Ghosts/ghost_human.rsi
     color: "#fff8"

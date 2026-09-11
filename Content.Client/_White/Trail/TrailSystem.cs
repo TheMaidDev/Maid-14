@@ -66,7 +66,7 @@ public sealed class TrailSystem : EntitySystem
 
     private void TryCreateSegment(BulletTrailComponent comp, TransformComponent xform)
     {
-        if (xform.MapID == MapId.Nullspace)
+        if (!comp.Enabled || xform.MapID == MapId.Nullspace)
             return;
 
         comp.TrailLine ??= _lineManager.CreateTrail(comp, xform.MapID);

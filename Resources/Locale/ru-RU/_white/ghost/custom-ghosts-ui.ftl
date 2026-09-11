@@ -16,6 +16,7 @@ custom-ghost-fail-department-insufficient-playtime = Отыграть {$required
   [few] часа
   [many] часов
 } в отделе «{$department}». У вас наиграно {$playtimeHours} ч. {$playtimeMinutes} мин.
+custom-ghost-fail-admin-flags-insufficient = Вы должны обладать правами администратора ({$requiredFlags}) для использования этого призрака.
 
 custom-ghosts-window-title = Выбор призрака
 custom-ghosts-window-show-all-checkbox = Показать всех

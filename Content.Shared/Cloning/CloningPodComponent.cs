@@ -41,6 +41,11 @@ public sealed partial class CloningPodComponent : Component
     [DataField]
     public ProtoId<MaterialPrototype> RequiredMaterial = "Biomass";
 
+    // Maid-14-Tweak-Start
+    [DataField]
+    public int BiomassCost = 30;
+    // Maid-14-Tweak-End
+
     /// <summary>
     /// The current amount of time it takes to clone a body.
     /// </summary>

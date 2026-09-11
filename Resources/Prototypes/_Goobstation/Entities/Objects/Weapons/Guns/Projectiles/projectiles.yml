@@ -230,6 +230,10 @@
     damage:
       types:
         Heat: 8
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   name: heavy laser bolt
@@ -243,6 +247,10 @@
       types:
         Heat: 12
         Structural: 10
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   name: heavy laser barrage
@@ -290,6 +298,10 @@
     layers:
     - state: omnilaser
       shader: unshaded
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletTemperatureHot
@@ -308,6 +320,10 @@
     energy: 1
   - type: ChangeTemperatureOnCollide # This will probably be tweaked.
     heat: 35000
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 
 - type: entity
@@ -359,6 +375,10 @@
     soundHit:
       collection: WeakHit
     forceSound: true
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   name: disabler bolt
@@ -376,6 +396,10 @@
     soundHit:
       collection: WeakHit
     forceSound: true
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletGrenadeTeargas
@@ -438,6 +462,10 @@
   # Short lifespan
   - type: TimedDespawn
     lifetime: 0.4
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletPistolSilver
@@ -492,6 +520,10 @@
     soundHit:
       collection: WeakHit
     forceSound: true
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: ProjectileMonkeyDart

@@ -13,6 +13,8 @@ public sealed partial class TrailSettings : ITrailSettings
 {
     public static readonly TrailSettings Default = new();
 
+    public bool Enabled { get; set; } = true;
+
     public Vector2 Scale { get; set; } = new(0.5f, 1f);
 
     public float СreationDistanceThresholdSquared { get; set; } = 0.1f;
@@ -43,6 +45,7 @@ public sealed partial class TrailSettings : ITrailSettings
 
     public static void Inject(ITrailSettings into, ITrailSettings from)
     {
+        into.Enabled = from.Enabled;
         into.Scale = from.Scale;
         into.СreationDistanceThresholdSquared = from.СreationDistanceThresholdSquared;
         into.СreationMethod = from.СreationMethod;
@@ -61,6 +64,8 @@ public sealed partial class TrailSettings : ITrailSettings
 
 public interface ITrailSettings
 {
+    bool Enabled { get; set; }
+
     Vector2 Gravity { get; set; }
 
     float Lifetime { get; set; }

@@ -129,6 +129,11 @@ public sealed partial class DepartmentPrototype : IPrototype
     /// </summary>
     [DataField]
     public bool EditorHidden;
+
+    // Maid edit start
+    [DataField]
+    public string ButtonStyle = "ButtonColorSpecificDepartment";
+    // Maid edit end
 }
 
 /// <summary>

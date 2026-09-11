@@ -26,14 +26,17 @@ public sealed class MenuButton : ContainerButton
     public const string StyleClassRedTopButton = "topButtonLabel";
 
     //Maid edit start
-    private static readonly Color ColorNormal = Color.FromHex("#6a6a6a");
+    private static readonly Color ColorNormal = Color.FromHex("#5a5a5a");
     private static readonly Color ColorRedNormal = Color.FromHex("#640000");
     private static readonly Color ColorHovered = Color.FromHex("#646464");
     private static readonly Color ColorRedHovered = Color.FromHex("#960000");
     private static readonly Color ColorPressed = Color.FromHex("#464646");
     //Maid edit end
 
-    private const float VertPad = 8f;
+    //Maid edit start
+    private const float HorPad = 8f;
+    private const float VerPad = 4f;
+    //Maid edit end
     private Color NormalColor => HasStyleClass(StyleClassRedTopButton) ? ColorRedNormal : ColorNormal;
     private Color HoveredColor => HasStyleClass(StyleClassRedTopButton) ? ColorRedHovered : ColorHovered;
 
@@ -62,11 +65,12 @@ public sealed class MenuButton : ContainerButton
         IoCManager.InjectDependencies(this);
         _buttonIcon = new TextureRect()
         {
-            TextureScale = new Vector2(0.5f, 0.5f),
+            // Maid edit
+            TextureScale = new Vector2(1f, 1f),
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
             VerticalExpand = true,
-            Margin = new Thickness(0, VertPad),
+            Margin = new Thickness(HorPad, VerPad), //Maid edit
             ModulateSelfOverride = NormalColor,
             Stretch = TextureRect.StretchMode.KeepCentered
         };
@@ -79,7 +83,7 @@ public sealed class MenuButton : ContainerButton
         };
         _root = new BoxContainer
         {
-            Orientation = BoxContainer.LayoutOrientation.Vertical,
+            Orientation = BoxContainer.LayoutOrientation.Horizontal, //Maid edit
             Children =
             {
                 _buttonIcon,
@@ -107,11 +111,15 @@ public sealed class MenuButton : ContainerButton
 
     private void OnKeyBindingChanged(IKeyBinding obj)
     {
+        if (string.IsNullOrEmpty(_function.FunctionName)) return; //Maid edit
+
         _buttonLabel!.Text = BoundKeyHelper.ShortKeyName(_function);
     }
 
     private void OnKeyBindingChanged()
     {
+        if (string.IsNullOrEmpty(_function.FunctionName)) return; //Maid edit
+
         _buttonLabel!.Text = BoundKeyHelper.ShortKeyName(_function);
     }
 

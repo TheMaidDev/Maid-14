@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Content.Server.Administration;
@@ -22,8 +23,8 @@ public sealed class ReputationManager : EntitySystem
     [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly IPlayerLocator _locator = default!;
 
-    private readonly Dictionary<NetUserId, ReputationInfo> _cacheReputation = new();
-    private readonly Dictionary<NetUserId, DateTime> _playerConnectionTime = new();
+    private readonly ConcurrentDictionary<NetUserId, ReputationInfo> _cacheReputation = new();
+    private readonly ConcurrentDictionary<NetUserId, DateTime> _playerConnectionTime = new();
 
     private ISawmill _sawmill = default!;
     private const string SawmillId = "reputation";
@@ -61,7 +62,13 @@ public sealed class ReputationManager : EntitySystem
 
     private void OnConnected(object? sender, NetChannelArgs e)
     {
-        _cacheReputation.TryGetValue(e.Channel.UserId, out var info);
+        if (!_cacheReputation.TryGetValue(e.Channel.UserId, out var info))
+        {
+            info = new ReputationInfo { Value = 0f };
+            _cacheReputation[e.Channel.UserId] = info;
+            RaiseLocalEvent(new UpdateCachedReputationEvent(e.Channel.UserId));
+        }
+
         var msg = new ReputationNetMsg { Info = info };
         _netMgr.ServerSendMessage(msg, e.Channel);
     }
@@ -79,7 +86,7 @@ public sealed class ReputationManager : EntitySystem
     private async void UpdateCachedReputation(UpdateCachedReputationEvent ev)
     {
         var player = ev.Player;
-        if (!_cacheReputation.ContainsKey(player))
+        if (!_cacheReputation.ContainsKey(player) && _netMgr.Channels.All(channel => channel.UserId != player))
             return;
 
         var value = await GetPlayerReputation(player);
@@ -98,7 +105,7 @@ public sealed class ReputationManager : EntitySystem
         foreach (var userId in _cacheReputation.Keys.ToArray())
         {
             if (!connectedPlayers.Contains(userId))
-                _cacheReputation.Remove(userId);
+                _cacheReputation.TryRemove(userId, out _);
         }
 
         _playerConnectionTime.Clear();

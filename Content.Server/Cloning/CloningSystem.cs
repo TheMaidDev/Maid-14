@@ -62,6 +62,8 @@
 
 using Content.Goobstation.Common.Cloning;
 using Content.Server.Humanoid;
+using Content.Shared._Shitmed.Body.Part;
+using Content.Shared.Body.Systems;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Cloning;
 using Content.Shared.Cloning.Events;
@@ -112,6 +114,7 @@ public sealed partial class CloningSystem : EntitySystem
     [Dependency] private readonly NameModifierSystem _nameMod = default!;
     [Dependency] private readonly ToggleableClothingSystem _toggleable = default!; // Goobstation
     [Dependency] private readonly SharedSealableClothingSystem _sealable = default!; // Goobstation
+    [Dependency] private readonly SharedBodySystem _body = default!;
 
     /// <summary>
     ///     Spawns a clone of the given humanoid mob at the specified location or in nullspace.
@@ -148,6 +151,7 @@ public sealed partial class CloningSystem : EntitySystem
 
         clone = coords == null ? Spawn(proto) : Spawn(proto, coords.Value); // Goob edit
         _humanoidSystem.CloneAppearance(original, clone.Value);
+        SyncBodyPartAppearance(clone.Value); // Maid-14-Tweak
 
         CloneComponents(original, clone.Value, settings);
 
@@ -173,6 +177,20 @@ public sealed partial class CloningSystem : EntitySystem
         return true;
     }
 
+    // Maid-14-Tweak-Start
+    private void SyncBodyPartAppearance(EntityUid clone)
+    {
+        foreach (var part in _body.GetBodyChildren(clone).ToList())
+        {
+            if (!HasComp<BodyPartAppearanceComponent>(part.Id))
+                continue;
+
+            RemComp<BodyPartAppearanceComponent>(part.Id);
+            EnsureComp<BodyPartAppearanceComponent>(part.Id);
+        }
+    }
+    // Maid-14-Tweak-End
+
     /// <summary>
     ///     Copy components from one entity to another based on a CloningSettingsPrototype.
     /// </summary>
@@ -181,8 +199,10 @@ public sealed partial class CloningSystem : EntitySystem
     /// <param name="settings">The clone settings prototype containing the list of components to clone.</param>
     public void CloneComponents(EntityUid original, EntityUid clone, CloningSettingsPrototype settings)
     {
-        var componentsToCopy = settings.Components;
-        var componentsToEvent = settings.EventComponents;
+        // Maid-14-Tweak-Start
+        var componentsToCopy = new HashSet<string>(settings.Components);
+        var componentsToEvent = new HashSet<string>(settings.EventComponents);
+        // Maid-14-Tweak-End
 
         // don't make status effects permanent
         if (TryComp<StatusEffectsComponent>(original, out var statusComp))

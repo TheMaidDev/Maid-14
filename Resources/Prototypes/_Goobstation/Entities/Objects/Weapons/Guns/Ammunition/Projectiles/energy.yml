@@ -49,6 +49,10 @@
         Heat: 17 
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity 
   name: Rifle ion bolt
@@ -89,6 +93,10 @@
         Heat: 5
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity 
   name: Rifle disabler bolt
@@ -129,6 +137,10 @@
         Ion: 0
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity 
   name: ashified energy bolt #oh dear me
@@ -168,6 +180,10 @@
         Heat: 99999 
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity 
   name: overcharge rifle energy bolt #nukie killer projectile part uh i lost count
@@ -207,3 +223,7 @@
         Heat: 25
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End

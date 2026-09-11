@@ -1,0 +1,18 @@
+- type: entity
+  parent: BaseGameRule
+  id: ItemArtifacts
+  components:
+  - type: StationEvent
+    startAnnouncement: station-event-item-artifacts-start-announcement
+    startAnnouncementColor: "#18abf5"
+    startAudio:
+      path: /Audio/_Maid/Announcements/announce.ogg # Maid
+    weight: 8
+    duration: 35
+  - type: GameRule
+    delay:
+      min: 20
+      max: 80
+    chaosScore: 90 # Goob test fails otherwise wtf
+  - type: RandomItemArtifactsRule
+    conversionChance: 0.003

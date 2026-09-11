@@ -272,6 +272,7 @@
     canBeStripped: false
   - type: ComplexInteraction
   - type: IntrinsicRadioReceiver
+  - type: RadioAudioPlayer # MAID Radio sounds
   - type: IntrinsicRadioTransmitter
     channels:
     # - Binary # Goobstation - replaced with collective mind

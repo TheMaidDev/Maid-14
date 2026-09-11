@@ -162,6 +162,7 @@
     keysUnlocked: false
   - type: ActiveRadio
   - type: IntrinsicRadioReceiver
+  - type: RadioAudioPlayer # MAID radio sounds
   - type: IntrinsicRadioTransmitter
   - type: DeadStartupButton
     sound:

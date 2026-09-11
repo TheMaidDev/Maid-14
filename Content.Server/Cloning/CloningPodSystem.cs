@@ -191,10 +191,13 @@ public sealed class CloningPodSystem : EntitySystem
         if (mind.UserId == null || !_playerManager.TryGetSessionById(mind.UserId.Value, out var client))
             return false; // If we can't track down the client, we can't offer transfer. That'd be quite bad.
 
-        if (!TryComp<PhysicsComponent>(bodyToClone, out var physics))
-            return false;
+        // Maid-14-Tweak-Start
+        // if (!TryComp<PhysicsComponent>(bodyToClone, out var physics))
+        //     return false;
 
-        var cloningCost = (int)Math.Round(physics.FixturesMass);
+        // var cloningCost = (int)Math.Round(physics.FixturesMass);
+        var cloningCost = clonePod.BiomassCost;
+        // Maid-14-Tweak-End
 
         if (_configManager.GetCVar(CCVars.BiomassEasyMode))
             cloningCost = (int)Math.Round(cloningCost * EasyModeCloningCost);
@@ -346,7 +349,7 @@ public sealed class CloningPodSystem : EntitySystem
 
         if (!HasComp<EmaggedComponent>(uid))
         {
-            _material.SpawnMultipleFromMaterial(_robustRandom.Next(1, (int)(clonePod.UsedBiomass / 2.5)), clonePod.RequiredMaterial, Transform(uid).Coordinates);
+            _material.SpawnMultipleFromMaterial(_robustRandom.Next(1, Math.Max(2, (int)(clonePod.UsedBiomass / 2.5))), clonePod.RequiredMaterial, Transform(uid).Coordinates); // Maid-14-Tweak
         }
 
         clonePod.UsedBiomass = 0;

@@ -125,7 +125,7 @@
   - Clown
   - HeadOfPersonnel
   - Janitor
-  - Lawyer
+  # - Lawyer #Maid
   - Librarian
   - Mime
   - Musician
@@ -266,3 +266,11 @@
   - Zookeeper
   - Psychologist
   primary: false
+
+- type: department #Maid begin
+  id: Lawyer
+  name: department-lawyer
+  description: department-lawyer-description
+  color: "#fd0101"
+  roles:
+  - Lawyer #Maid end

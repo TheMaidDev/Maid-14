@@ -261,7 +261,7 @@
     - type: StandingState
     - type: MindContainer
       showExamineInfo: true
-#    - type: SSDIndicator # Maid
+    - type: SSDIndicator
     - type: CanEscapeInventory
     - type: HumanoidAppearance
       species: IPC

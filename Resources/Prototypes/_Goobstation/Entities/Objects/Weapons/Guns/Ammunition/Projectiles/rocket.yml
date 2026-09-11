@@ -36,6 +36,10 @@
     radius: 3.5
     color: blue
     energy: 0.5
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   categories: [ HideSpawnMenu ]
@@ -66,3 +70,7 @@
     radius: 3.5
     color: orange
     energy: 0.5
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End

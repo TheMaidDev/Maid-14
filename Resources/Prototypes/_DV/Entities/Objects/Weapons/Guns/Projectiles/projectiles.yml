@@ -50,6 +50,10 @@
         Heat: 15 # Slightly more damage than the 17heat from the Captain's Hitscan lasgun - Goobstation: Nerfed to 15 damage, to keep it less powerful than caps Lasgun
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity #Goobstation, put here so the X-01 stuff isnt spread everywhere.
   name: ion bolt
@@ -89,6 +93,10 @@
         Ion: 25
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity # Goobstation, put here so the X-01 stuff isnt spread everywhere.
   name: magnum bolt
@@ -128,3 +136,7 @@
         Heat: 20
     soundHit:
       collection: MeatLaserImpact
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End

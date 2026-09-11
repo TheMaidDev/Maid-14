@@ -218,12 +218,14 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         targetHumanoid.SkinColor = sourceHumanoid.SkinColor;
         targetHumanoid.EyeColor = sourceHumanoid.EyeColor;
         targetHumanoid.Age = sourceHumanoid.Age;
-        targetHumanoid.BodyType = sourceHumanoid.BodyType; // WD EDIT
-        targetHumanoid.Height = sourceHumanoid.Height; // Goobstation: port EE height/width sliders
-        targetHumanoid.Width = sourceHumanoid.Width; // Goobstation: port EE height/width sliders
-        SetSex(target, sourceHumanoid.Sex, false, targetHumanoid);
         targetHumanoid.CustomBaseLayers = new(sourceHumanoid.CustomBaseLayers);
         targetHumanoid.MarkingSet = new(sourceHumanoid.MarkingSet);
+        // Maid-14-Tweak-Start
+        SetSex(target, sourceHumanoid.Sex, false, targetHumanoid);
+        SetBodyType(target, sourceHumanoid.BodyType, false, targetHumanoid);
+        SetTTSVoice(target, sourceHumanoid.Voice, false, targetHumanoid);
+        SetScale(target, new Vector2(sourceHumanoid.Width, sourceHumanoid.Height), false, targetHumanoid);
+        // Maid-14-Tweak-End
 
         targetHumanoid.Gender = sourceHumanoid.Gender;
 

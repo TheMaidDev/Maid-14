@@ -75,6 +75,7 @@
   - type: Body
     prototype: Drone
   - type: IntrinsicRadioReceiver
+  - type: RadioAudioPlayer # MAID radio sounds
   #- type: IntrinsicRadioTransmitter
   #  channels:
   #  - Binary # Goobstation - replaced with collective mind

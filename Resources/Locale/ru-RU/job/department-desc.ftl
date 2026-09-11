@@ -8,3 +8,4 @@ department-Security-description = Охраняйте порядок на ста�
 department-Science-description = Исследуйте новые технологии и опасные артефакты.
 department-Silicon-description = Соблюдайте свои законы, служите экипажу.
 department-Specific-description = Должности, которые есть не на всех станциях.
+department-lawyer-description = Работа юристом не так проста.

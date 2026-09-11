@@ -1774,6 +1774,8 @@
 - type: loadoutGroup #Maid begin
   id: Underwear
   name: loadout-group-underwear
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomBoxersWhite
   - UnderwearBottomBoxersHeart
@@ -1796,6 +1798,8 @@
 - type: loadoutGroup
   id: Bra
   name: loadout-group-bra
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearTopBraStraplessAlt
   - UnderwearTopBraNeko
@@ -1823,6 +1827,8 @@
 - type: loadoutGroup #Maid begin
   id: CapUnderwear
   name: loadout-group-underwear-cap
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomBoxersCap
   - UnderwearBottomPantiesCap #Maid end
@@ -1830,6 +1836,8 @@
 - type: loadoutGroup #Maid begin
   id: CMOUnderwear
   name: loadout-group-underwear-cmo
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomBoxersCMO
   - UnderwearBottomPantiesCMO #Maid end
@@ -1837,6 +1845,8 @@
 - type: loadoutGroup #Maid begin
   id: HoSUnderwear
   name: loadout-group-underwear-hos
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomBoxersHOS
   - UnderwearBottomPantiesHOS #Maid end
@@ -1844,6 +1854,8 @@
 - type: loadoutGroup #Maid begin
   id: HoPUnderwear
   name: loadout-group-underwear-hop
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomPantiesHOP
   - UnderwearBottomBoxersHOP #Maid end
@@ -1851,6 +1863,8 @@
 - type: loadoutGroup #Maid begin
   id: QMUnderwear
   name: loadout-group-underwear-qm
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomPantiesQM
   - UnderwearBottomBoxersQM #Maid end
@@ -1858,6 +1872,8 @@
 - type: loadoutGroup #Maid begin
   id: RDUnderwear
   name: loadout-group-underwear-rd
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomPantiesRD
   - UnderwearBottomBoxersRD #Maid end
@@ -1865,6 +1881,8 @@
 - type: loadoutGroup #Maid begin
   id: CEUnderwear
   name: loadout-group-underwear-ce
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearBottomPantiesCE
   - UnderwearBottomBoxersCE #Maid end
@@ -1872,29 +1890,39 @@
 - type: loadoutGroup #Maid begin
   id: CEBra
   name: loadout-group-bra-ce
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearTopBraCE #Maid end
 
 - type: loadoutGroup #Maid begin
   id: RDBra
   name: loadout-group-bra-rd
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearTopBraRD #Maid end
 
 - type: loadoutGroup #Maid begin
   id: HoPBra
   name: loadout-group-bra-hop
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearTopBraHOP #Maid end
 
 - type: loadoutGroup #Maid begin
   id: HoSBra
   name: loadout-group-bra-hos
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearTopBraHOS #Maid end
 
 - type: loadoutGroup #Maid begin
   id: CMOBra
   name: loadout-group-bra-cmo
+  minLimit: 0
+  maxLimit: 1
   loadouts:
   - UnderwearTopBraCMO #Maid end

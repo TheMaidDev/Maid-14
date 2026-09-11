@@ -47,6 +47,10 @@
   - type: ProjectileThrowOnHit
     distance: 20
     speed: 50
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletPulse
@@ -84,6 +88,10 @@
   - type: ProjectileThrowOnHit
     distance: 4
     speed: 8
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletDetain
@@ -121,6 +129,10 @@
   - type: StaminaDamageOnCollide
     damage: 25
     overtime: 15
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletExecute
@@ -156,6 +168,10 @@
       types:
         Heat: 17
         Radiation: 2
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletHotshot
@@ -193,6 +209,10 @@
         Heat: 2
   - type: IgniteOnCollide
     fireStacks: 2
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletSleepshot
@@ -243,6 +263,10 @@
         - ReagentId: Haloperidol
           Quantity: 1.5
   - type: BlurOnCollide
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End
 
 - type: entity
   id: BulletBigshot
@@ -271,3 +295,7 @@
         Heat: 2
         Structural: 100
     ignoreResistances: true # This needs ProjectileDamageWhitelistComponent
+  # Maid-14-Start
+  - type: BulletTrail
+    enabled: false
+  # Maid-14-End

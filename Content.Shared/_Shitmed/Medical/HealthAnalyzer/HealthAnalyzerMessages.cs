@@ -15,7 +15,7 @@ namespace Content.Shared._Shitmed.Medical.HealthAnalyzer;
 
 // Base message that contains common data for all Modes
 [Serializable, NetSerializable]
-public abstract class HealthAnalyzerBaseMessage : BoundUserInterfaceMessage
+public abstract class HealthAnalyzerBaseMessage : BoundUserInterfaceState // MAID health analyzer close fix
 {
     public readonly NetEntity? TargetEntity;
     public readonly float Temperature;
