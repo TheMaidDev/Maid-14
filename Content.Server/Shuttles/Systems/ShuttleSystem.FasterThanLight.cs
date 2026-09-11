@@ -470,10 +470,8 @@ public sealed partial class ShuttleSystem
         RaiseLocalEvent(uid, ref beforeEv, true);
         if (beforeEv.Cancelled)
         {
-            if (TryComp(comp.StartupStream, out AudioComponent? startupAudioStream))
-            {
-                _audio.Stop(comp.StartupStream);
-            }
+            _thruster.DisableLinearThrusters(entity.Comp2);
+            comp.StartupStream = _audio.Stop(comp.StartupStream);
             RemCompDeferred<FTLComponent>(uid);
             _console.RefreshShuttleConsoles(uid);
             return;

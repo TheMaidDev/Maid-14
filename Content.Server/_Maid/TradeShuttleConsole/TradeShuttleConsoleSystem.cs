@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Linq;
 using Content.Server.Cargo.Components;
 using Content.Server.Cargo.Systems;
 using Content.Server.DeviceLinking.Systems;
@@ -335,7 +336,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
         while (children.MoveNext(out var child))
         {
-            if (!HasComp<ActorComponent>(child))
+            if (HasComp<ActorComponent>(child))
                 return true;
 
             if (TryComp<MobStateComponent>(child, out var mobState) && !_mobStateSystem.IsDead(child, mobState))
@@ -420,6 +421,9 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
 
         if (TryComp<FTLComponent>(shuttle.Value, out var ftlComponent))
         {
+            if (!Exists(ftlComponent.TargetCoordinates.EntityId))
+                return;
+
             var targetMap = Transform(ftlComponent.TargetCoordinates.EntityId).MapID;
 
             UpdateUI(targetConsole, new TradeShuttleConsoleFtlInProgressUIState
