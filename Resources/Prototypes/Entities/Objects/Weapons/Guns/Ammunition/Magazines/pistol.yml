@@ -46,12 +46,12 @@
   components:
   - type: Tag
     tags:
-      - MagazinePistol
+    - MagazinePistol
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgePistol
+      - CartridgePistol
     capacity: 12 # Goobstation
   - type: Item
     size: Small
@@ -59,8 +59,8 @@
     containers:
       ballistic-ammo: !type:Container
   - type: Sprite
-#    sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
-    sprite: Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
+    sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
+    #    sprite: Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi #Maid
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
@@ -68,7 +68,8 @@
       map: ["enum.GunVisualLayers.Mag"]
   - type: MagazineVisuals
     magState: mag
-    steps: 6
+    #    steps: 6 #Maid
+    steps: 5
     zeroVisible: false
   - type: Appearance
 
@@ -80,12 +81,12 @@
   components:
   - type: Tag
     tags:
-      - MagazinePistolHighCapacity
+    - MagazinePistolHighCapacity
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgePistol
+      - CartridgePistol
     capacity: 16
   - type: Item
     size: Small
@@ -113,12 +114,12 @@
   components:
   - type: Tag
     tags:
-      - MagazinePistolSubMachineGun
+    - MagazinePistolSubMachineGun
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
       tags:
-        - CartridgePistol
+      - CartridgePistol
     capacity: 30
   - type: Item
     size: Small
@@ -146,7 +147,7 @@
   components:
   - type: Tag
     tags:
-      - MagazinePistolSubMachineGunTopMounted
+    - MagazinePistolSubMachineGunTopMounted
   - type: BallisticAmmoProvider
     mayTransfer: true
     proto: CartridgePistol
@@ -156,11 +157,11 @@
   - type: Sprite
     sprite: _Maid/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/smg_mag_top_mounted.rsi #Maid
     layers:
-      - state: base
-        map: ["enum.GunVisualLayers.Base"]
-      - state: mag-unshaded-1
-        map: ["enum.GunVisualLayers.MagUnshaded"]
-        shader: unshaded
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-1
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
   - type: MagazineVisuals
     magState: mag
     steps: 6
@@ -189,16 +190,19 @@
     proto: CartridgePistol
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: red #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      right:
-      - state: inhand-right-mag
+#Maid edit start
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      right:
+#      - state: inhand-right-mag
+#Maid edit end
 
 - type: entity
   id: MagazinePistolEmpty
@@ -213,14 +217,16 @@
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      right:
-      - state: inhand-right-mag
+#Maid edit start
+#    - state: mag-1
+#      map: ["enum.GunVisualLayers.Mag"]
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      right:
+#      - state: inhand-right-mag
+#Maid edit end
 
 - type: entity
   id: MagazinePistolIncendiary
@@ -230,24 +236,26 @@
   components:
   - type: BallisticAmmoProvider
     proto: CartridgePistolIncendiary
-  - type: Sprite
-    layers:
-    - state: base
-      map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#ff6e52"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#ff6e52"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#ff6e52"
+#Maid edit start
+#  - type: Sprite
+#    layers:
+#    - state: base
+#      map: ["enum.GunVisualLayers.Base"]
+#    - state: mag-1
+#      map: ["enum.GunVisualLayers.Mag"]
+#    - state: stripe
+#      color: "#ff6e52"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#ff6e52"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#ff6e52"
+#Maid edit end
 
 - type: entity
   id: MagazinePistolPractice
@@ -259,22 +267,25 @@
     proto: CartridgePistolPractice
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: practice #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#dbdbdb"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#dbdbdb"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#dbdbdb"
+#Maid edit start
+#    - state: stripe
+#      color: "#dbdbdb"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#dbdbdb"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#dbdbdb"
+#Maid edit end
 
 - type: entity
   id: MagazinePistolUranium
@@ -286,22 +297,25 @@
     proto: CartridgePistolUranium
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: uranium
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#00cd42"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#00cd42"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#00cd42"
+#Maid edit start
+#    - state: stripe
+#      color: "#00cd42"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#00cd42"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#00cd42"
+#Maid edit end
 
 - type: entity
   id: MagazinePistolHighCapacityEmpty
@@ -313,16 +327,19 @@
     proto: null
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: base #Maid
       map: ["enum.GunVisualLayers.Base"]
-    - state: mag-1
-      map: ["enum.GunVisualLayers.Mag"]
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      right:
-      - state: inhand-right-mag
+#Maid edit start
+#    - state: mag-1
+#      map: ["enum.GunVisualLayers.Mag"]
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      right:
+#      - state: inhand-right-mag
+#Maid edit end
 
 - type: entity
   id: MagazinePistolHighCapacity
@@ -333,16 +350,19 @@
     proto: CartridgePistol
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base
+    - state: red
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      right:
-      - state: inhand-right-mag
+#Maid edit start
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      right:
+#      - state: inhand-right-mag
+#Maid edit end
 
 - type: entity
   id: MagazinePistolHighCapacityPractice
@@ -353,22 +373,25 @@
     proto: CartridgePistol
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: practice #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
-      color: "#dbdbdb"
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inhand-left-mag
-      - state: inhand-left-stripe
-        color: "#dbdbdb"
-      right:
-      - state: inhand-right-mag
-      - state: inhand-right-stripe
-        color: "#dbdbdb"
+#Maid edit start
+#    - state: stripe
+#      color: "#dbdbdb"
+#  - type: Item
+#    inhandVisuals:
+#      left:
+#      - state: inhand-left-mag
+#      - state: inhand-left-stripe
+#        color: "#dbdbdb"
+#      right:
+#      - state: inhand-right-mag
+#      - state: inhand-right-stripe
+#        color: "#dbdbdb"
+#Maid edit end
 
 - type: entity
   id: MagazinePistolHighCapacityRubber
@@ -379,7 +402,8 @@
     proto: CartridgePistol
   - type: Sprite
     layers:
-    - state: base
+    #    - state: base #Maid
+    - state: rubber #Maid
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
@@ -394,7 +418,7 @@
     proto: CartridgePistol
     whitelist:
       tags:
-        - CartridgePistol
+      - CartridgePistol
     soundInsert:
       path: /Audio/Weapons/Guns/MagIn/bullet_insert.ogg
   - type: Sprite
