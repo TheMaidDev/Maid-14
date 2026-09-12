@@ -774,6 +774,13 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         if (hitEvent.Handled)
             return;
 
+        // Maid-Tweak-start
+        var blockEvent = new MeleeBlockAttemptEvent(user);
+        RaiseLocalEvent(target.Value, ref blockEvent);
+        if (blockEvent.Blocked)
+            return;
+        // Maid-Tweak-end
+
         var targets = new List<EntityUid>(1)
         {
             target.Value
@@ -792,7 +799,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         RaiseLocalEvent(target.Value, attackedEvent);
         var modifiedDamage = DamageSpecifier.ApplyModifierSets(damage + hitEvent.BonusDamage + attackedEvent.BonusDamage, hitEvent.ModifiersList);
         modifiedDamage = DamageSpecifier.ApplyModifierSets(modifiedDamage, attackedEvent.ModifiersList); // Goobstation
-        var damageResult = Damageable.TryChangeDamage(target, modifiedDamage, origin: user, partMultiplier: component.ClickPartDamageMultiplier); // Shitmed Change
+        var damageResult = Damageable.TryChangeDamage(target, modifiedDamage, component.IgnoreResistances, origin: user, partMultiplier: component.ClickPartDamageMultiplier); // Shitmed Change // Maid-Tweak
         var comboEv = new ComboAttackPerformedEvent(user, target.Value, meleeUid, ComboAttackType.Harm);
         RaiseLocalEvent(user, comboEv);
 
@@ -964,6 +971,13 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
                 continue;
             }
 
+            // Maid-Tweak-start
+            var blockEvent = new MeleeBlockAttemptEvent(user);
+            RaiseLocalEvent(entity, ref blockEvent);
+            if (blockEvent.Blocked)
+                continue;
+            // Maid-Tweak-end
+
             var attackedEvent = new AttackedEvent(meleeUid, user, GetCoordinates(ev.Coordinates));
             RaiseLocalEvent(entity, attackedEvent);
             var modifiedDamage = DamageSpecifier.ApplyModifierSets(damage + hitEvent.BonusDamage + attackedEvent.BonusDamage, hitEvent.ModifiersList);
@@ -973,7 +987,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
                 if (!modifiedDamage.WoundSeverityMultipliers.TryAdd(type, component.HeavyAttackWoundMultiplier))
                     modifiedDamage.WoundSeverityMultipliers[type] *= component.HeavyAttackWoundMultiplier;
             }
-            var damageResult = Damageable.TryChangeDamage(entity, modifiedDamage, origin: user, ignoreResistances: resistanceBypass, partMultiplier: component.HeavyPartDamageMultiplier); // Shitmed Change
+            var damageResult = Damageable.TryChangeDamage(entity, modifiedDamage, origin: user, ignoreResistances: resistanceBypass || component.IgnoreResistances, partMultiplier: component.HeavyPartDamageMultiplier); // Shitmed Change // Maid-Tweak
             var comboEv = new ComboAttackPerformedEvent(user, entity, meleeUid, ComboAttackType.HarmLight);
             RaiseLocalEvent(user, comboEv);
 

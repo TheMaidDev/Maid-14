@@ -1,0 +1,339 @@
+- type: entity
+  name: цепной меч
+  parent: HolyClaymore
+  id: Chainsword
+  description: Не позволь еретику жить.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/chainsword.rsi
+  - type: MeleeWeapon
+    soundHit:
+      path: /Audio/Weapons/chainsaw.ogg
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/chainsword.rsi
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/chainsword.rsi
+  - type: Tool
+    qualities:
+      - Sawing
+    speedModifier: 0.5
+
+- type: entity
+  name: силовой меч
+  parent: HolyClaymore
+  id: SwordGlowing
+  description: Клинок светится силой веры. Или, возможно, благодаря аккумулятору.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/forceweapon.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/forceweapon.rsi
+  - type: PointLight
+    radius: 4
+    energy: 2
+    color: lightblue
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/forceweapon.rsi
+
+
+- type: entity
+  name: лезвие ханзо
+  parent: Katana
+  id: HolyKatana
+  description: Способен прорезать святой клеймор.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/katana.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/katana.rsi
+    slots:
+    - back
+    - belt
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/katana.rsi
+
+- type: entity
+  name: внепространственный клинок
+  parent: HolyKatana
+  id: MultiverseBlade
+  description: Будучи когда-то предвестником межпространственной войны, его острота сильно колеблется. Наносит от 1 до 50 урона.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/multiverse.rsi
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 1
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/multiverse.rsi
+    slots:
+    - back
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/multiverse.rsi
+  - type: RandomDamage
+
+- type: entity
+  name: коса жнеца
+  parent: HolyClaymore
+  id: VorpalScythe
+  description: И жрец, и жнец, и на дуде игрец! Коса способна пробить броню противника.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/scythe.rsi
+  - type: MeleeWeapon
+    ignoreResistances: true
+    damage:
+      types:
+        Slash: 27
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/scythe.rsi
+    slots:
+    - back
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/scythe-inhands.rsi
+
+
+- type: entity
+  name: клинок заклинаний
+  parent: HolyKatana
+  id: SpellBlade
+  description: Клинок, с шансом 20% наносящий критический удар.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/spellblade.rsi
+  - type: MeleeWeapon
+    wideAnimationRotation: 135
+    damage:
+      types:
+        Slash: 18
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/spellblade.rsi
+    slots:
+    - back
+  - type: MaidCrit
+    critChance: 20
+    critMultiplier: 2.5
+    critType: Slash
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/spellblade.rsi
+
+- type: entity
+  name: одержимый клинок
+  parent: HolyKatana
+  id: PossessedBlade
+  description: Когда на станции царит хаос, приятно иметь рядом друга.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/possessed.rsi
+  - type: MeleeWeapon
+    wideAnimationRotation: -45
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/possessed.rsi
+    slots:
+    - back
+  - type: GhostRole
+    allowSpeech: true
+    name: Одержимый Клинок
+    description: Вы - одержимый клинок. Подчиняйтесь своему владельцу.
+  - type: GhostTakeoverAvailable
+  - type: Examiner
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/possessed.rsi
+
+- type: entity
+  name: рука-бензопила
+  parent: BaseItem
+  id: ChainsawHand
+  description: Добро? Зло? Ты парень с бензопилой в руке.
+  components:
+  - type: Sharp
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/chainsaw.rsi
+    state: icon
+  - type: MeleeWeapon
+    autoAttack: true
+    angle: 0
+    wideAnimationRotation: 90
+    attackRate: 4
+    damage:
+      types:
+        Slash: 6
+    soundHit:
+      path: /Audio/Weapons/chainsaw.ogg
+      params:
+        volume: -3
+  - type: Item
+    size: Huge
+    sprite: _Maid/Objects/Weapons/Chaplain/chainsaw.rsi
+  - type: Unremoveable
+    deleteOnDrop: true
+  - type: Tool
+    qualities:
+      - Sawing
+    speedModifier: 0.5
+
+- type: entity
+  name: священная плеть
+  parent: BaseItem
+  id: HolyWhip
+  description: Какая ужасная ночь на космической станции 14.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/whip.rsi
+    state: icon
+  - type: MeleeWeapon
+    soundHit:
+      path: /Audio/_Maid/Items/hit/chainhit.ogg
+    range: 2.5
+    damage:
+      types:
+        Blunt: 15
+  - type: Item
+    size: Normal
+    sprite: _Maid/Objects/Weapons/Chaplain/whip.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/whip.rsi
+    slots:
+    - belt
+  - type: DisarmMalus
+
+- type: entity
+  name: посох монаха
+  parent: BaseItem
+  id: HolyStaff
+  description: Длинный высокий посох из полированного дерева. Традиционно используемый в боевых искусствах древней Земли, теперь он используется для преследования клоуна.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/staff.rsi
+    state: icon
+  - type: MeleeWeapon
+    wideAnimationRotation: 135
+    damage:
+      types:
+        Blunt: 10
+  - type: Item
+    size: Huge
+    sprite: _Maid/Objects/Weapons/Chaplain/staff.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/staff.rsi
+    slots:
+    - back
+  - type: Wieldable
+  - type: IncreaseDamageOnWield
+    damage:
+      types:
+        Blunt: 10
+  - type: UseDelay
+  - type: DisarmMalus
+  - type: MeleeBlock
+
+- type: entity
+  name: нечестивые вилы
+  parent: BaseItem
+  id: UnholyPitchfork
+  description: Держа это, ты выглядишь абсолютно по дьявольски.
+  components:
+  - type: EmbeddableProjectile
+    offset: 0.15,0.15
+  - type: ThrowingAngle
+    angle: 225
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape: !type:PolygonShape
+          vertices:
+            - -0.20,-0.10
+            - -0.10,-0.20
+            - 0.40,0.30
+            - 0.30,0.40
+        density: 20
+        mask:
+        - ItemMask
+        restitution: 0.3
+        friction: 0.2
+  - type: Sharp
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/pitchfork.rsi
+    state: icon
+  - type: MeleeWeapon
+    wideAnimationRotation: -135
+    damage:
+      types:
+        Piercing: 15
+    angle: 0
+    animation: WeaponArcThrust
+    soundHit:
+      path: /Audio/Weapons/bladeslice.ogg
+    range: 2
+  - type: DamageOtherOnHit
+    damage:
+      types:
+        Piercing: 25
+  - type: Item
+    sprite: _Maid/Objects/Weapons/Chaplain/pitchfork.rsi
+    size: Huge
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/pitchfork.rsi
+    slots:
+    - back
+  - type: Wieldable
+  - type: IncreaseDamageOnWield
+    damage:
+      types:
+        Piercing: 10
+  - type: UseDelay
+  - type: DisarmMalus
+
+- type: entity
+  name: реликтовый боевой молот
+  parent: BaseItem
+  id: WarHammer
+  description: Этот боевой молот обошелся священнику в сорок тысяч кредитов.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/hammer.rsi
+    state: icon
+  - type: MeleeWeapon
+    wideAnimationRotation: -135
+    attackRate: 0.75
+    damage:
+      types:
+        Blunt: 24
+        Structural: 80
+  - type: Item
+    size: Huge
+    sprite: _Maid/Objects/Weapons/Chaplain/hammer.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/hammer.rsi
+    slots:
+    - belt
+  - type: DisarmMalus
+
+- type: entity
+  name: гиперинструмент
+  parent: BaseItem
+  id: HyperTool
+  description: Инструмент настолько мощный, что даже вы не можете им идеально пользоваться.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Chaplain/hypertool.rsi
+    state: icon
+  - type: MeleeWeapon
+    wideAnimationRotation: -135
+    attackRate: 0.75
+    canHeavyAttack: false
+    damage:
+      types:
+        Blunt: 0
+  - type: StaminaDamageOnHit
+    damage: 60
+  - type: Item
+    size: Normal
+    sprite: _Maid/Objects/Weapons/Chaplain/hypertool.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Chaplain/hypertool.rsi
+    slots:
+    - belt
+  - type: DisarmMalus
+
+

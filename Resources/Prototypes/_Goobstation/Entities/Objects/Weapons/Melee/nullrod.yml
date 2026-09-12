@@ -53,6 +53,35 @@
   - type: Tag
     tags:
     - Nullrod
+  # Maid-Tweak-Start
+  - type: ActivatableUI
+    key: enum.SelectWeaponUi.Key
+    inHandsOnly: true
+    # closeOnHandDeselect: true
+  - type: UserInterface
+    interfaces:
+      enum.SelectWeaponUi.Key:
+        type: NullRodBui
+  - type: HolyNullRod
+    weapons:
+    - GodHand
+    - HolyClaymore
+    - Chainsword
+    - SwordGlowing
+    - HolyKatana
+    - MultiverseBlade
+    - VorpalScythe
+    - HighFrequencyBlade
+    - SpellBlade
+    - PossessedBlade
+    - ChainsawHand
+    - HolyWhip
+    - HolyStaff
+    - UnholyPitchfork
+    - WarHammer
+    - HyperTool
+  - type: HolyWeapon
+  # Maid-Tweak-End
 
 - type: entity
   name: holy claymore

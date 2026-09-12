@@ -1038,7 +1038,8 @@
     pocket2: FoodSnackEnergy
   inhand:                 #goobstation
   - Nullrod               #goobstation
-  - ArmamentsBeacon       #goobstation
+  # - ArmamentsBeacon       #goobstation
+  - MaidArmamentsBeacon   # Maid-Tweak
 
 - type: startingGear
   id: VisitorChaplainAlt
@@ -1054,7 +1055,8 @@
     pocket2: DrinkCoconutWaterCarton
   inhand:                 #goobstation
   - Nullrod               #goobstation
-  - ArmamentsBeacon       #goobstation
+  # - ArmamentsBeacon       #goobstation
+  - MaidArmamentsBeacon   # Maid-Tweak
 
 - type: startingGear
   id: VisitorChef

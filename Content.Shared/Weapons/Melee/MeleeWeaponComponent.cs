@@ -66,6 +66,11 @@ public sealed partial class MeleeWeaponComponent : Component
     [AutoPausedField]
     public TimeSpan NextAttack;
 
+    // Maid-Tweak-start
+    [ViewVariables(VVAccess.ReadWrite), DataField]
+    public bool IgnoreResistances;
+    // Maid-Tweak-end
+
     /// <summary>
     /// Starts attack cooldown when equipped if true.
     /// </summary>
