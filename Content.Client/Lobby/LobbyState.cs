@@ -353,11 +353,20 @@ namespace Content.Client.Lobby
             if (Lobby == null)
                 return;
 
-            // "Join" state while the round is running, or simply not ready -> default color.
-            if (_gameTicker.IsGameStarted || !Lobby.ReadyButton.Pressed)
+            if (_gameTicker.IsGameStarted)
+            {
                 Lobby.ReadyButton.Label.FontColorOverride = null;
-            else
+                return;
+            }
+
+            if (Lobby.ReadyButton.Pressed)
+            {
                 Lobby.ReadyButton.Label.FontColorOverride = Color.FromHex("#6ED18D");
+            }
+            else
+            {
+                Lobby.ReadyButton.Label.FontColorOverride = Color.FromHex("#D16E6E");
+            }
         }
 
         public override void FrameUpdate(FrameEventArgs e)
