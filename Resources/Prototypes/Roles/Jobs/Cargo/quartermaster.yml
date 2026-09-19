@@ -181,6 +181,7 @@
     ears: ClothingHeadsetAltCargo # Goobstation
     belt: BoxFolderClipboard
     pocket1: AppraisalTool
+    shoes: ClothingShoesColorBrown
   storage:
     back:
     - Flash

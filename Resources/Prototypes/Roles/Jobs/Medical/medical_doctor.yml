@@ -109,6 +109,7 @@
   equipment:
     ears: ClothingHeadsetMedical
     belt: ClothingBeltMedicalFilled
+    shoes: ClothingShoesColorWhite #Maid
   #storage:
     #back:
     #- Stuff
