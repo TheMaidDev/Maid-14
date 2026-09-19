@@ -551,10 +551,14 @@ namespace Content.Shared.Preferences
                 count += otherProto.Cost;
             }
 
+            // MAID BEGIN old character features
+            /*
             if (count > traitCategory.MaxTraitPoints && traitProto.Cost != 0)
             {
                 return new(this);
             }
+            */
+            // MAID END
 
             return new(this)
             {
@@ -828,8 +832,12 @@ namespace Content.Shared.Preferences
                 existing += traitProto.Cost;
 
                 // Too expensive.
+                // MAID BEGIN old character features
+                /*
                 if (existing > category.MaxTraitPoints)
                     continue;
+                */
+                // MAID END
 
                 groups[category.ID] = existing;
                 result.Add(trait);
