@@ -160,3 +160,15 @@ JobTechnicalAssistant = Technical Assistant
 JobVisitor = Visitor
 JobWarden = Warden
 JobZookeeper = Zookeeper
+
+job-name-senior-engineer = Senior Engineer
+job-name-senior-researcher = Senior Researcher
+job-name-senior-physician = Senior Physician
+job-name-senior-officer = Senior Officer
+job-name-senior-salvage-specialist = Senior Salvage Specialist
+
+JobSeniorEngineer = Senior Engineer
+JobSeniorResearcher = Senior Researcher
+JobSeniorPhysician = Senior Physician
+JobSeniorOfficer = Senior Officer
+JobSeniorSalvageSpecialist = Senior Salvage Specialist

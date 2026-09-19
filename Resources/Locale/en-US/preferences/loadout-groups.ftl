@@ -228,3 +228,14 @@ loadout-group-psychologist-jumpsuit = Psychologist jumpsuit
 
 loadout-group-boxer-jumpsuit = Boxer jumpsuit
 loadout-group-boxer-gloves = Boxer gloves
+
+loadout-group-senior-engineer-jumpsuit = Senior Engineer jumpsuit
+loadout-group-senior-engineer-id = Senior Engineer PDA
+loadout-group-senior-physician-jumpsuit = Senior Physician jumpsuit
+loadout-group-senior-physician-id = Senior Physician PDA
+loadout-group-senior-researcher-jumpsuit = Senior Researcher jumpsuit
+loadout-group-senior-researcher-id = Senior Researcher PDA
+loadout-group-senior-officer-jumpsuit = Senior Officer jumpsuit
+loadout-group-senior-officer-id = Senior Officer PDA
+loadout-group-senior-salvage-specialist-jumpsuit = Senior Salvage Specialist jumpsuit
+loadout-group-senior-salvage-specialist-id = Senior Salvage Specialist PDA

@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "copyright": "Danza",
+  "license": "CC-BY-SA-3.0",
+  "states": [
+    {
+      "name": "generic"
+    },
+    {
+      "name": "generic_door"
+    },
+    {
+      "name": "welded"
+    },
+    {
+      "name": "unlocked"
+    },
+    {
+      "name": "locked"
+    },
+    {
+      "name": "vet_locker"
+    },
+    {
+      "name": "vet_door"
+    },
+    {
+      "name": "vet_open"
+    },
+    {
+      "name": "brigadier_locker"
+    },
+    {
+      "name": "brigadier_door"
+    },
+    {
+      "name": "brigadier_open"
+    },
+    {
+      "name": "mofficer_locker"
+    },
+    {
+      "name": "mofficer_door"
+    },
+    {
+      "name": "mofficer_open"
+    },
+    {
+      "name": "lead_res_locker"
+    },
+    {
+      "name": "lead_res_door"
+    },
+    {
+      "name": "lead_res_open"
+    },
+    {
+      "name": "cargo_hunt_locker"
+    },
+    {
+      "name": "cargo_hunt_door"
+    },
+    {
+      "name": "cargo_hunt_open"
+    },
+    {
+      "name": "head_cleaner_locker"
+    },
+    {
+      "name": "head_cleaner_door"
+    },
+    {
+      "name": "head_cleaner_open"
+    }
+  ]
+}

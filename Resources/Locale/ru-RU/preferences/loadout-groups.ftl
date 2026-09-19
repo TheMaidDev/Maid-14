@@ -168,3 +168,14 @@ loadout-group-medical-glasses = медицинские очки
 loadout-group-psychologist-jumpsuit = Психолог, комбинезон
 loadout-group-boxer-jumpsuit = Боксёр, комбинезон
 loadout-group-boxer-gloves = Боксёр, перчатки
+
+loadout-group-senior-engineer-jumpsuit = Бригадир, комбинезон
+loadout-group-senior-engineer-id = Бригадир, КПК
+loadout-group-senior-physician-jumpsuit = Медицинский офицер, комбинезон
+loadout-group-senior-physician-id = Медицинский офицер, КПК
+loadout-group-senior-researcher-jumpsuit = Ведущий исследователь, комбинезон
+loadout-group-senior-researcher-id = Ведущий исследователь, КПК
+loadout-group-senior-officer-jumpsuit = Ветеран СБ, комбинезон
+loadout-group-senior-officer-id = Ветеран СБ, КПК
+loadout-group-senior-salvage-specialist-jumpsuit = Охотник карго, комбинезон
+loadout-group-senior-salvage-specialist-id = Охотник карго, КПК

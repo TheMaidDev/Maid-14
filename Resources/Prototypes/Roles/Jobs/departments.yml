@@ -104,10 +104,12 @@
   name: department-Cargo
   description: department-Cargo-description
   color: "#A46106"
+  buttonStyle: ButtonColorCargoDepartment #Maid
   roles:
   - CargoTechnician
   - Quartermaster
   - SalvageSpecialist
+  - SeniorSalvageSpecialist #Maid
   - ShaftMiner # Lavaland Change
 
 - type: department
@@ -115,6 +117,7 @@
   name: department-Civilian
   description: department-Civilian-description
   color: "#9FED58"
+  buttonStyle: ButtonColorCivilianDepartment #Maid
   weight: -10
   roles:
   - Bartender
@@ -141,6 +144,7 @@
   name: department-CentralCommand
   description: department-CentralCommand-description
   color: "#0c344d"
+  buttonStyle: ButtonColorCommandDepartment #Maid
   roles:
   - CentralCommandOfficial
   - CBURN
@@ -169,6 +173,7 @@
   name: department-Command
   description: department-Command-description
   color: "#334E6D"
+  buttonStyle: ButtonColorCommandDepartment #Maid
   roles:
   - Captain
   - ChiefEngineer
@@ -199,9 +204,11 @@
   name: department-Engineering
   description: department-Engineering-description
   color: "#EFB341"
+  buttonStyle: ButtonColorEngineeringDepartment #Maid
   roles:
   - AtmosphericTechnician
   - ChiefEngineer
+  - SeniorEngineer #Maid
   - StationEngineer
   - TechnicalAssistant
 
@@ -210,9 +217,11 @@
   name: department-Medical
   description: department-Medical-description
   color: "#52B4E9"
+  buttonStyle: ButtonColorMedicalDepartment #Maid
   roles:
   - Chemist
   - ChiefMedicalOfficer
+  - SeniorPhysician #Maid - senior roles
   - MedicalDoctor
   - MedicalIntern
   - Psychologist
@@ -224,9 +233,11 @@
   name: department-Security
   description: department-Security-description
   color: "#DE3A3A"
+  buttonStyle: ButtonColorSecurityDepartment #Maid
   weight: 20
   roles:
   - HeadOfSecurity
+  - SeniorOfficer #Maid - senior roles
   - SecurityCadet
   - SecurityOfficer
   - Detective
@@ -239,8 +250,10 @@
   name: department-Science
   description: department-Science-description
   color: "#D381C9"
+  buttonStyle: ButtonColorScienceDepartment #Maid
   roles:
   - ResearchDirector
+  - SeniorResearcher #Maid - senior roles
   - Scientist
   - ResearchAssistant
   - Roboticist #Goob
@@ -250,6 +263,7 @@
   name: department-Silicon
   description: department-Silicon-description
   color: "#D381C9"
+  buttonStyle: ButtonColorScienceDepartment #Maid
   roles:
   - Borg
   - StationAi
@@ -259,6 +273,7 @@
   name: department-Specific
   description: department-Specific-description
   color: "#9FED58"
+  buttonStyle: ButtonColorSpecificDepartment #Maid
   weight: 10
   roles:
   - Boxer

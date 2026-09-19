@@ -1,0 +1,68 @@
+# Ветеран СБ
+- type: entity
+  parent: Stunbaton
+  id: ExperimentalStunbaton
+  name: experimental stun baton
+  description: Meowk!
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Weapons/Melee/experimental_stunbaton.rsi
+  - type: Clothing
+    sprite: _Maid/Objects/Weapons/Melee/experimental_stunbaton.rsi
+  - type: Battery
+    maxCharge: 2000
+    startingCharge: 2000
+  - type: StaticPrice
+    price: 1000
+
+# Медицинский офицер
+- type: entity
+  parent: Medkit
+  id: ExpandedMedkit
+  name: expanded medkit
+  description: A bigger first aid kit for those who deal with more than scraped knees.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Specific/Medical/expmedkit.rsi
+  - type: Item
+    sprite: _Maid/Objects/Specific/Medical/expmedkit.rsi
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,5,1
+
+- type: entity
+  parent: ExpandedMedkit
+  id: ExpandedMedkitFilled
+  suffix: Filled
+  components:
+  - type: StorageFill
+    contents:
+    - id: MedicatedSuture
+      amount: 2
+    - id: RegenerativeMesh
+      amount: 2
+    - id: PillCanisterDylovene
+    - id: PillCanisterKelotane
+
+# Охотник карго
+- type: entity
+  parent: ClothingOuterHardsuitSpatio
+  id: ClothingOuterHardsuitImprovedSpatio
+  name: improved spationaut hardsuit
+  components:
+  - type: Sprite
+    sprite: _Maid/Clothing/OuterClothing/Hardsuits/impspatio.rsi
+  - type: Clothing
+    sprite: _Maid/Clothing/OuterClothing/Hardsuits/impspatio.rsi
+  - type: Armor
+    modifiers:
+      coefficients:
+        Blunt: 0.85
+        Slash: 0.85
+        Piercing: 0.85
+        Radiation: 0.45
+        Caustic: 0.85
+  - type: ClothingSpeedModifier
+    walkModifier: 0.95
+    sprintModifier: 0.95

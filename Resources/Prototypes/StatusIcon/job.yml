@@ -506,7 +506,7 @@
   icon:
     sprite: /Textures/_Maid/Interface/Misc/job_icons.rsi #Maid
     state: SeniorPhysician
-  allowSelection: false
+  jobName: job-name-senior-physician #Maid
 
 - type: jobIcon
   parent: JobIcon
@@ -514,7 +514,7 @@
   icon:
     sprite: /Textures/_Maid/Interface/Misc/job_icons.rsi #Maid
     state: SeniorOfficer
-  allowSelection: false
+  jobName: job-name-senior-officer #Maid
 
 - type: jobIcon
   parent: JobIcon
@@ -522,7 +522,7 @@
   icon:
     sprite: /Textures/_Maid/Interface/Misc/job_icons.rsi #Maid
     state: SeniorEngineer
-  allowSelection: false
+  jobName: job-name-senior-engineer #Maid
 
 - type: jobIcon
   parent: JobIcon
@@ -530,7 +530,7 @@
   icon:
     sprite: /Textures/_Maid/Interface/Misc/job_icons.rsi #Maid
     state: SeniorResearcher
-  allowSelection: false
+  jobName: job-name-senior-researcher #Maid
 
 - type: jobIcon
   parent: JobIcon

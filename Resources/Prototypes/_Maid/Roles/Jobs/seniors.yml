@@ -1,0 +1,257 @@
+# Бригадир
+- type: job
+  id: SeniorEngineer
+  name: job-name-senior-engineer
+  description: job-description-senior-engineer
+  playTimeTracker: JobSeniorEngineer
+  requirements:
+  - !type:RoleTimeRequirement
+    role: JobAtmosphericTechnician
+    time: 21600 #6 hrs
+  - !type:RoleTimeRequirement
+    role: JobStationEngineer
+    time: 21600 #6 hrs
+  - !type:DepartmentTimeRequirement
+    department: Engineering
+    time: 216000 # 60 hrs
+  weight: 5
+  startingGear: SeniorEngineerGear
+  icon: "JobIconSeniorEngineer"
+  supervisors: job-supervisors-ce
+  canBeAntag: false
+  guides: [ Engineering ]
+  access:
+  - Maintenance
+  - Engineering
+  - External
+  - Atmospherics
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant ]
+  - !type:AddComponentSpecial
+    components:
+    - type: EngineeringStaff
+
+- type: startingGear
+  id: SeniorEngineerGear
+  equipment:
+    eyes: ClothingEyesGlassesMeson
+    belt: ClothingBeltUtilitySeniorEngineerFilled
+    ears: ClothingHeadsetEngineering
+
+- type: chameleonOutfit
+  id: SeniorEngineerChameleonOutfit
+  job: SeniorEngineer
+  equipment:
+    head: ClothingHeadHatBeretEngineering
+    jumpsuit: ClothingUniformJumpsuitSeniorEngineer
+    mask: ClothingMaskBreath
+    gloves: ClothingHandsGlovesColorYellow
+    shoes: ClothingShoesBootsMag
+
+# Медицинский офицер
+- type: job
+  id: SeniorPhysician
+  name: job-name-senior-physician
+  description: job-description-senior-physician
+  playTimeTracker: JobSeniorPhysician
+  requirements:
+  - !type:RoleTimeRequirement
+    role: JobChemist
+    time: 21600 #6 hrs
+  - !type:RoleTimeRequirement
+    role: JobMedicalDoctor
+    time: 21600 #6 hrs
+  - !type:DepartmentTimeRequirement
+    department: Medical
+    time: 216000 # 60 hrs
+  weight: 5
+  startingGear: SeniorPhysicianGear
+  icon: "JobIconSeniorPhysician"
+  supervisors: job-supervisors-cmo
+  canBeAntag: false
+  guides:
+  - MedicalDoctor
+  - Medical
+  - Medicine
+  access:
+  - Medical
+  - Maintenance
+  - Chemistry
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant ]
+  - !type:AddComponentSpecial
+    components:
+    - type: SurgerySpeedModifier
+      speedModifier: 1.5
+
+- type: startingGear
+  id: SeniorPhysicianGear
+  equipment:
+    ears: ClothingHeadsetMedical
+    belt: ClothingBeltSeniorPhysicianFilled
+
+- type: chameleonOutfit
+  id: SeniorPhysicianChameleonOutfit
+  job: SeniorPhysician
+  equipment:
+    head: ClothingHeadHatBeretSeniorPhysician
+    jumpsuit: ClothingUniformJumpsuitSeniorPhysician
+    eyes: ClothingEyesHudMedical
+    mask: ClothingMaskSterile
+    neck: ClothingNeckStethoscope
+    outerClothing: ClothingOuterCoatLabSeniorPhysician
+    gloves: ClothingHandsGlovesLatex
+
+# Ведущий исследователь
+- type: job
+  id: SeniorResearcher
+  name: job-name-senior-researcher
+  description: job-description-senior-researcher
+  playTimeTracker: JobSeniorResearcher
+  requirements:
+  - !type:DepartmentTimeRequirement
+    department: Science
+    time: 216000 #60 hrs
+  weight: 5
+  startingGear: SeniorResearcherGear
+  icon: "JobIconSeniorResearcher"
+  supervisors: job-supervisors-rd
+  canBeAntag: false
+  guides: [ Science ]
+  access:
+  - Research
+  - Maintenance
+
+- type: startingGear
+  id: SeniorResearcherGear
+  equipment:
+    ears: ClothingHeadsetScience
+
+- type: chameleonOutfit
+  id: SeniorResearcherChameleonOutfit
+  job: SeniorResearcher
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSeniorResearcher
+    neck: ClothingNeckTieSci
+    outerClothing: ClothingOuterCoatLabSeniorResearcher
+    gloves: ClothingHandsGlovesLatex
+
+# Ветеран СБ
+- type: job
+  id: SeniorOfficer
+  name: job-name-senior-officer
+  description: job-description-senior-officer
+  playTimeTracker: JobSeniorOfficer
+  requirements:
+  - !type:RoleTimeRequirement
+    role: JobWarden
+    time: 21600 #6 hrs
+  - !type:RoleTimeRequirement
+    role: JobDetective
+    time: 7200 #2 hrs
+  - !type:RoleTimeRequirement
+    role: JobSecurityOfficer
+    time: 21600 #6 hrs
+  - !type:DepartmentTimeRequirement
+    department: Security
+    time: 216000 # 60 hrs
+  - !type:SpeciesRequirement # Maid
+    inverted: false
+    species:
+    - Human
+    - Dwarf
+  weight: 5
+  startingGear: SeniorOfficerGear
+  icon: "JobIconSeniorOfficer"
+  supervisors: job-supervisors-hos
+  canBeAntag: false
+  guides:
+  - Security
+  - CorporateJudo
+  access:
+  - Security
+  - Brig
+  - Maintenance
+  - Service
+  - External
+  - Cryogenics
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant ]
+  - !type:AddComponentSpecial
+    components:
+    - type: SecurityStaff
+
+- type: startingGear
+  id: SeniorOfficerGear
+  equipment:
+    eyes: ClothingEyesGlassesSecurity
+    ears: ClothingHeadsetAltSecurity
+    belt: ClothingBeltSeniorSecurityFilled
+    pocket1: WeaponPistolMk58
+  storage:
+    back:
+    - Flash
+    - MagazinePistol
+
+- type: chameleonOutfit
+  id: SeniorOfficerChameleonOutfit
+  job: SeniorOfficer
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatBeretSecurity
+    jumpsuit: ClothingUniformJumpsuitSeniorOfficer
+    mask: ClothingMaskGasSecurity
+    neck: Dinkystar
+    gloves: ClothingHandsGlovesColorBlack
+    shoes: ClothingShoesBootsJack
+
+# Охотник карго
+- type: job
+  id: SeniorSalvageSpecialist
+  name: job-name-senior-salvage-specialist
+  description: job-description-senior-salvage-specialist
+  playTimeTracker: JobSeniorSalvageSpecialist
+  requirements:
+  - !type:RoleTimeRequirement
+    role: JobCargoTechnician
+    time: 21600 #6 hrs
+  - !type:RoleTimeRequirement
+    role: JobSalvageSpecialist
+    time: 21600 #6 hrs
+  - !type:DepartmentTimeRequirement
+    department: Cargo
+    time: 216000 # 60 hrs
+  weight: 5
+  startingGear: SeniorSalvageSpecialistGear
+  icon: "JobIconSeniorSalvageSpecialist"
+  supervisors: job-supervisors-qm
+  canBeAntag: false
+  guides:
+  - Salvage
+  - Cargo
+  access:
+  - Cargo
+  - Salvage
+  - Maintenance
+  - External
+
+- type: startingGear
+  id: SeniorSalvageSpecialistGear
+  equipment:
+    ears: ClothingHeadsetCargo
+  storage:
+    back:
+    - MiningVoucher
+
+- type: chameleonOutfit
+  id: SeniorSalvageSpecialistChameleonOutfit
+  job: SeniorSalvageSpecialist
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSeniorSalvageSpecialist
+    eyes: ClothingEyesGlassesCheapSunglasses
+    mask: ClothingMaskGasExplorer
+    outerClothing: ClothingOuterWinterMiner
+    gloves: ClothingHandsGlovesColorBlack

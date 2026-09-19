@@ -1,0 +1,43 @@
+# Ветеран СБ
+- type: entity
+  id: ClothingBeltSeniorSecurityFilled
+  parent: ClothingBeltSecurity
+  suffix: Filled, Senior
+  components:
+  - type: StorageFill
+    contents:
+    - id: GrenadeFlashBang
+    - id: TearGasGrenade
+    - id: ExperimentalStunbaton
+    - id: Handcuffs
+    - id: Handcuffs
+
+# Медицинский офицер
+- type: entity
+  id: ClothingBeltSeniorPhysicianFilled
+  parent: ClothingBeltMedical
+  suffix: Filled, Senior
+  components:
+  - type: StorageFill
+    contents:
+    - id: Scalpel
+    - id: Retractor
+    - id: Cautery
+    - id: Drill
+    - id: Saw
+    - id: Hemostat
+
+# Бригадир
+- type: entity
+  id: ClothingBeltUtilitySeniorEngineerFilled
+  parent: ClothingBeltUtility
+  suffix: Filled, Senior
+  components:
+  - type: StorageFill
+    contents:
+    - id: ImprovedCrowbar
+    - id: ImprovedWrench
+    - id: ImprovedScrewdriver
+    - id: ImprovedWirecutter
+    - id: ImprovedWelder
+    - id: Multitool
