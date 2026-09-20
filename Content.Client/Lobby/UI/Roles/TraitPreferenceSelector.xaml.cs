@@ -29,7 +29,10 @@ public sealed partial class TraitPreferenceSelector : Control
     {
         RobustXamlLoader.Load(this);
 
-        var text = trait.Cost != 0 ? $"[{trait.Cost}] " : "";
+        // MAID BEGIN old character features
+        // var text = trait.Cost != 0 ? $"[{trait.Cost}] " : "";
+        var text = "";
+        // MAID END
         text += Loc.GetString(trait.Name);
 
         Cost = trait.Cost;

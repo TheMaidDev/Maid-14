@@ -724,7 +724,8 @@ namespace Content.Client.Lobby.UI
                 });
                 return;
             }
-
+            // MAID BEGIN old character features
+            /*
             // Setup model
             Dictionary<string, List<string>> traitGroups = new();
             List<string> defaultTraits = new();
@@ -824,11 +825,43 @@ namespace Content.Client.Lobby.UI
                     TraitsList.AddChild(selector);
                 }
             }
+            */
+
+            foreach (var trait in traits)
+            {
+                // Begin Goobstation: ported from DeltaV - Species trait exclusion
+                if (Profile?.Species is { } selectedSpecies && (trait.ExcludedSpecies.Contains(selectedSpecies) ||
+                    trait.IncludedSpecies.Count > 0 && !trait.IncludedSpecies.Contains(selectedSpecies)))
+                {
+                    Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
+                    continue;
+                }
+                // End Goobstation: ported from DeltaV - Species trait exclusion
+
+                var selector = new TraitPreferenceSelector(trait);
+                selector.Preference = Profile?.TraitPreferences.Contains(trait.ID) == true;
+
+                selector.PreferenceChanged += preference =>
+                {
+                    if (preference)
+                    {
+                        Profile = Profile?.WithTraitPreference(trait.ID, _prototypeManager);
+                    }
+                    else
+                    {
+                        Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
+                    }
+
+                    SetDirty();
+                    RefreshTraits();
+                };
+                TraitsList.AddChild(selector);
+            }
+            // MAID END old character features
         }
 
         /// <summary>
         /// Refreshes the species selector.
-        /// </summary>
         public void RefreshSpecies()
         {
             SpeciesButton.Clear();
