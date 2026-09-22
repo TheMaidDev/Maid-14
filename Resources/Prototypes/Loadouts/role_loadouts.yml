@@ -119,9 +119,9 @@
 - type: roleLoadout
   id: JobCaptain
   groups:
-  - CaptainHead
+ #- CaptainHead #Maid
   - CaptainEnvirohelm # MAID plasmaman loadouts
-  - CaptainNeck
+  # - CaptainNeck #Maid
   - CaptainJumpsuit
   - CaptainEnvirosuit
 #  - CaptainMask # Goobstation - Lollypops! # MAID
@@ -133,7 +133,7 @@
   - GroupSpeciesBreathTool
   # Goobstation - EE Plasmeme Change.
   # - CaptainEnvirohelm # MAID plasmaman loadouts
-  - CaptainGloves
+ # - CaptainGloves #Maid
   - CaptainEnvirogloves
   - CaptainUnderwear # Maid changes
   - SocksUnderwear # Maid changes - socks
@@ -145,9 +145,9 @@
   id: JobHeadOfPersonnel
   groups:
   - GroupTankHarness
-  - HoPHead
+ #- HoPHead #Maid
   - HoPEnvirohelm
-  - HoPNeck
+  # - HoPNeck #Maid
   - HoPJumpsuit
   - HoPEnvirosuit
   - HoPBackpack
@@ -158,7 +158,7 @@
 #  - Animals #Maid
   - GroupSpeciesBreathTool
   # Goobstation - EE Plasmeme Change.
-  - HoPGloves
+  # - HoPGloves #Maid
   - HoPEnvirogloves
   - HeadOfPersonnelUnderwear # Maid changes
   - SocksUnderwear # Maid changes - socks
@@ -187,12 +187,12 @@
   - PassengerJumpsuit
   - AssistantEnvirosuit
   - CommonBackpack
-  - PassengerNeck
-  - PassengerFace
-  - PassengerGloves
+  # - PassengerNeck #Maid
+ #- PassengerFace #Maid 
+ # - PassengerGloves #Maid
   - AssistantEnvirogloves
   - PassengerOuterClothing
-  - PassengerShoes
+ #- PassengerShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -208,7 +208,7 @@
   id: JobBartender
   groups:
   - GroupTankHarness
-  - BartenderHead
+ #- BartenderHead #Maid
   - BartenderEnvirohelm
   - BartenderJumpsuit
   - BartenderEnvirosuit
@@ -230,7 +230,7 @@
   id: JobServiceWorker
   groups:
   - BartenderOuterClothing #Maid
-  - BartenderHead #Maid
+ #- BartenderHead #Maid
   - ServiceWorkerEnvirohelm
   - GroupTankHarness
   - BartenderJumpsuit
@@ -252,7 +252,7 @@
   id: JobChef
   groups:
   - GroupTankHarness
-  - ChefHead
+ #- ChefHead #Maid
   - ChefEnvirohelm
   - ChefMask
   - ChefJumpsuit
@@ -275,7 +275,7 @@
   id: JobLibrarian
   groups:
   - BartenderOuterClothing #Maid
-  - BartenderHead #Maid
+ #- BartenderHead #Maid 
   - LibrarianEnvirohelm
   - GroupTankHarness
   - LibrarianJumpsuit
@@ -299,7 +299,7 @@
   - BartenderHead #Maid
   - LawyerEnvirohelm
   - GroupTankHarness
-  - LawyerNeck
+  # - LawyerNeck #Maid
   - LawyerJumpsuit
   - LawyerEnvirosuit
   - LawyerEnvirogloves
@@ -319,10 +319,10 @@
   id: JobChaplain
   groups:
   - GroupTankHarness
-  - ChaplainHead
+ #- ChaplainHead #Maid
   - ChaplainEnvirohelm
   - ChaplainMask
-  - ChaplainNeck
+  # - ChaplainNeck #Maid
   - ChaplainJumpsuit
   - ChaplainEnvirosuit
   - ChaplainEnvirogloves
@@ -343,18 +343,18 @@
   id: JobJanitor
   groups:
   - GroupTankHarness
-  - JanitorHead
+ #- JanitorHead #Maid
   - JanitorEnvirohelm
   - JanitorJumpsuit
   - JanitorEnvirosuit
-  - JanitorGloves
+ #- JanitorGloves #Maid
   - JanitorEnvirogloves
   - CommonBackpack
   - JanitorOuterClothing
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
-  - JanitorPlunger
+ #- JanitorPlunger #Maid
 #  - Animals #Maid
   - GroupSpeciesBreathTool
   # Goobstation - EE Plasmeme Change.
@@ -367,7 +367,7 @@
   id: JobBotanist
   groups:
   - GroupTankHarness
-  - BotanistHead
+ #- BotanistHead #Maid
   - BotanistEnvirohelm
   - BotanistJumpsuit
   - BotanistEnvirosuit
@@ -390,14 +390,14 @@
   canCustomizeName: true
   groups:
   - GroupTankHarness
-  - ClownHead
+ #- ClownHead #Maid
   - ClownEnvirohelm
   - ClownJumpsuit
   - ClownEnvirosuit
   - ClownEnvirogloves
   - ClownBackpack
   - ClownOuterClothing
-  - ClownShoes
+# - ClownShoes #Maid
 #  - Glasses #Maid
   - SurvivalClown
 #  - Trinkets #Maid
@@ -413,7 +413,7 @@
   canCustomizeName: true
   groups:
   - GroupTankHarness
-  - MimeHead
+ #- MimeHead #Maid
   - MimeEnvirohelm
   - MimeMask
   - MimeJumpsuit
@@ -426,7 +426,7 @@
 #  - Trinkets #Maid
 #  - Animals #Maid
   # Goobstation - EE Plasmeme Change.
-  - MimeGloves
+ # - MimeGloves #Maid
   - MimeEnvirogloves
   - DefaultUnderwearWhite # Maid changes
   - SocksUnderwear # Maid changes - socks
@@ -436,7 +436,7 @@
 - type: roleLoadout
   id: JobMusician
   groups:
-  - BartenderHead #Maid
+ #- BartenderHead #Maid
   - MusicianEnvirohelm
   - GroupTankHarness
   - MusicianJumpsuit
@@ -461,15 +461,15 @@
   id: JobQuartermaster
   groups:
   - GroupTankHarness
-  - QuartermasterHead
+ #- QuartermasterHead #Maid
   - QuartermasterEnvirohelm
-  - QuartermasterNeck
+  # - QuartermasterNeck #Maid
   - QuartermasterJumpsuit
   - QuartermasterEnvirosuit
   - QuartermasterEnvirogloves
   - CargoTechnicianBackpack
   - QuartermasterOuterClothing
-  - QuartermasterShoes
+ #- QuartermasterShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -486,14 +486,14 @@
   id: JobCargoTechnician
   groups:
   - GroupTankHarness
-  - CargoTechnicianHead
+ #- CargoTechnicianHead #Maid
   - CargoTechnicianEnvirohelm
   - CargoTechnicianJumpsuit
   - CargoTechnicianEnvirosuit
   - CargoTechnicianEnvirogloves
   - CargoTechnicianBackpack
   - CargoTechnicianOuterClothing
-  - CargoTechnicianShoes
+ #- CargoTechnicianShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -509,16 +509,16 @@
   id: JobSalvageSpecialist
   groups:
   - CargoTechnicianOuterClothing #Maid
-  - CargoTechnicianHead #Maid
+ #- CargoTechnicianHead #Maid
   - SalvageEnvirohelm
-  - CargoTechnicianJumpsuit #Maid
+ # - CargoTechnicianJumpsuit #Maid
   - SalvageEnvirosuit
   - SalvageEnvirogloves
   - GroupTankHarness
-  - SalvageSpecialistNeck # Goobstation
+  # - SalvageSpecialistNeck #Maid # Goobstation
   - SalvageSpecialistBackpack
   - SalvageSpecialistOuterClothing
-  - SalvageSpecialistShoes
+ #- SalvageSpecialistShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -535,15 +535,15 @@
   id: JobChiefEngineer
   groups:
   - GroupTankHarness
-  - ChiefEngineerHead
+ #- ChiefEngineerHead #Maid
   - ChiefEngineerEnvirohelm
   - ChiefEngineerJumpsuit
   - ChiefEngineerEnvirosuit
   - ChiefEngineerEnvirogloves
   - StationEngineerBackpack
-  - ChiefEngineerNeck
+  # - ChiefEngineerNeck #Maid
   - ChiefEngineerOuterClothing
-  - ChiefEngineerShoes
+ #- ChiefEngineerShoes #Maid
   - SurvivalExtended
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -560,7 +560,7 @@
   id: JobTechnicalAssistant
   groups:
   - StationEngineerOuterClothing #Maid
-  - StationEngineerHead #Maid
+ #- StationEngineerHead #Maid
   - TechnicalAssistantEnvirohelm
   - GroupTankHarness
   - TechnicalAssistantJumpsuit
@@ -581,15 +581,15 @@
   id: JobStationEngineer
   groups:
   - GroupTankHarness
-  - StationEngineerHead
+ #- StationEngineerHead #Maid
   - StationEngineerEnvirohelm
   - StationEngineerJumpsuit
   - StationEngineerEnvirosuit
   - StationEngineerEnvirogloves
   - StationEngineerBackpack
   - StationEngineerOuterClothing
-  - StationEngineerShoes
-  - StationEngineerID
+ #- StationEngineerShoes #Maid
+# - StationEngineerID #Maid
   - SurvivalExtended
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -604,14 +604,14 @@
   id: JobAtmosphericTechnician
   groups:
   - GroupTankHarness
-  - AtmosphericTechnicianHead # Goobstation
+ #- AtmosphericTechnicianHead # Goobstation #Maid Вырезано
   - AtmosEnvirohelm
   - AtmosphericTechnicianJumpsuit
   - AtmosEnvirosuit
   - AtmosEnvirogloves
   - AtmosphericTechnicianBackpack
   - AtmosphericTechnicianOuterClothing
-  - AtmosphericTechnicianShoes
+ #- AtmosphericTechnicianShoes #Maid
   - SurvivalExtended
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -627,16 +627,16 @@
   id: JobResearchDirector
   groups:
   - GroupTankHarness
-  - ResearchDirectorHead
+ #- ResearchDirectorHead #Maid
   - ResearchDirectorEnvirohelm
-  - ResearchDirectorNeck
+  # - ResearchDirectorNeck #Maid  
   - ResearchDirectorJumpsuit
   - ResearchDirectorEnvirosuit
   - ScientistBackpack
   - ResearchDirectorOuterClothing
-  - ScientistGloves
+ # - ScientistGloves #Maid
   - ResearchDirectorEnvirogloves
-  - ResearchDirectorShoes
+ #- ResearchDirectorShoes #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -654,17 +654,17 @@
   id: JobScientist
   groups:
   - GroupTankHarness
-  - ScientistHead
+ #- ScientistHead #Maid
   - ScientistEnvirohelm
-  - ScientistNeck
+  # - ScientistNeck #Maid
   - ScientistJumpsuit
   - ScientistEnvirosuit
   - ScientistBackpack
   - ScientistOuterClothing
-  - ScientistGloves
+ # - ScientistGloves #Maid
   - ScientistEnvirogloves
-  - ScientistShoes
-  - ScientistPDA
+ #- ScientistShoes #Maid
+ #- ScientistPDA #Maid
 #  - Glasses #Maid
   - Survival
 #  - Trinkets #Maid
@@ -679,9 +679,9 @@
 - type: roleLoadout
   id: JobResearchAssistant
   groups:
-  - ScientistGloves #Maid
+ # - ScientistGloves #Maid
   - ResearchAssistantEnvirogloves
-  - ScientistHead #Maid
+ #- ScientistHead #Maid
   - ResearchAssistantEnvirohelm
   - GroupTankHarness
   - ResearchAssistantJumpsuit
@@ -702,23 +702,23 @@
 - type: roleLoadout
   id: JobHeadOfSecurity
   groups:
-  - HeadofSecurityHead
+ #- HeadofSecurityHead #Maid
   - HeadofSecurityEnvirohelm
-  - HeadofSecurityNeck
+  # - HeadofSecurityNeck #Maid
   - HeadofSecurityJumpsuit
   - HeadofSecurityEnvirosuit
   - SecurityBackpack
-  - SecurityMelee # Goobstation
-  - SecurityBelt
+  # - SecurityMelee # Goobstation #Maid Вырезано
+ # - SecurityBelt #Maid
   - HeadofSecurityOuterClothing
-  - HeadofSecurityShoes # Goobstation edit
+ #- HeadofSecurityShoes # Goobstation edit #Maid Вырезано
   - SurvivalSecurity
 #  - Trinkets #Maid
 #  - SecurityStar #Maid
 #  - Animals #Maid
   - GroupSpeciesBreathToolSecurity
   # Goobstation - EE Plasmeme Change.
-  - HeadofSecurityGloves
+ # - HeadofSecurityGloves #Maid
   - HeadofSecurityEnvirogloves
   - HeadOfSecurityUnderwear # Maid changes
   - SocksUnderwear # Maid changes - socks
@@ -730,17 +730,17 @@
 - type: roleLoadout
   id: JobWarden
   groups:
-  - WardenHead
+ #- WardenHead #Maid
   - WardenEnvirohelm
   - WardenJumpsuit
   - WardenEnvirosuit
   - WardenEnvirogloves
   - SecurityBackpack
-  - SecurityMelee # Goobstation
-  - SecurityNeck
-  - SecurityBelt
+ #  - SecurityMelee # Goobstation #Maid Вырезано
+  # - SecurityNeck #Maid
+ # - SecurityBelt #Maid
   - WardenOuterClothing
-  - SecurityShoes
+ #- SecurityShoes #Maid
   - SurvivalSecurity
 #  - Trinkets #Maid
 #  - SecurityStar #Maid
@@ -755,18 +755,18 @@
 - type: roleLoadout
   id: JobSecurityOfficer
   groups:
-  - SecurityHead
+  #- SecurityHead #Maid
   - SecurityOfficerEnvirohelm
   - SecurityJumpsuit
   - SecurityOfficerEnvirosuit
   - SecurityOfficerEnvirogloves
   - SecurityBackpack
-  - SecurityMelee # Goobstation
+ # - SecurityMelee # Goobstation #Maid Вырезано
   - SecurityOuterClothing
-  - SecurityShoes
-  - SecurityNeck
-  - SecurityPDA
-  - SecurityBelt
+ #- SecurityShoes #Maid
+  # - SecurityNeck #Maid
+ # - SecurityPDA #Maid
+ # - SecurityBelt #Maid
   - SurvivalSecurity
 #  - Trinkets #Maid
 #  - SecurityStar #Maid
@@ -781,39 +781,40 @@
 - type: roleLoadout
   id: JobDetective
   groups:
-  - DetectiveHead
+ #- DetectiveHead #Maid
   - DetectiveEnvirohelm
-  - DetectiveNeck
+  # - DetectiveNeck #Maid
   - DetectiveJumpsuit
   - DetectiveEnvirosuit
   - SecurityBackpack
   - DetectiveOuterClothing
-  - SecurityShoes
+ #- SecurityShoes 
   - SurvivalSecurity
 #  - Trinkets #Maid
 #  - SecurityStar #Maid
 #  - Animals #Maid
   - GroupSpeciesBreathToolSecurity
   # Goobstation - EE Plasmeme Change.
-  - DetectiveGloves
+ # - DetectiveGloves #Maid
   - DetectiveEnvirogloves
   - DefaultUnderwearWhite # Maid changes
   - SocksUnderwear # Maid changes - socks
   - Underwear #Maid
   - Bra #Maid
+  - SocksUnderwear # Maid
 
 - type: roleLoadout
   id: JobSecurityCadet
   groups:
-  - SecurityHead #Maid
+ #- SecurityHead #Maid
   - SecurityCadetEnvirohelm
   - SecurityCadetJumpsuit
   - SecurityCadetEnvirosuit
   - SecurityCadetEnvirogloves
   - SecurityBackpack
-  - SecurityMelee # Goobstation
+ #  - SecurityMelee # Goobstation #Maid Вырезано
   - SurvivalSecurity
-  - SecurityNeck
+  # - SecurityNeck #Maid
   - SecurityOuterClothing # Goobstation - Why not.
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -829,18 +830,18 @@
   id: JobChiefMedicalOfficer
   groups:
   - GroupTankHarness
-  - ChiefMedicalOfficerHead
+ #- ChiefMedicalOfficerHead #Maid
   - ChiefMedicalOfficerEnvirohelm
-  - MedicalMask
+ # - MedicalMask #Maid
   - ChiefMedicalOfficerJumpsuit
   - ChiefMedicalOfficerEnvirosuit
-  - MedicalGloves
+ # - MedicalGloves #Maid
   - ChiefMedicalOfficerEnvirogloves
   - MedicalBackpack
   - ChiefMedicalOfficerOuterClothing
-  - ChiefMedicalOfficerNeck
-  - ChiefMedicalOfficerShoes
-  - MedicalEyewear
+  # - ChiefMedicalOfficerNeck #Maid
+ #- ChiefMedicalOfficerShoes #Maid
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -857,18 +858,18 @@
   id: JobMedicalDoctor
   groups:
   - GroupTankHarness
-  - MedicalDoctorHead
+ #- MedicalDoctorHead #Maid
   - MedicalDoctorEnvirohelm
-  - MedicalMask
+  #- MedicalMask #Maid
   - MedicalDoctorJumpsuit
   - MedicalDoctorEnvirosuit
-  - MedicalGloves
+ # - MedicalGloves #Maid
   - MedicalDoctorEnvirogloves
   - MedicalBackpack
   - MedicalDoctorOuterClothing
-  - MedicalShoes
-  - MedicalDoctorPDA
-  - MedicalEyewear
+ #- MedicalShoes #Maid
+ #- MedicalDoctorPDA #Maid
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -882,7 +883,7 @@
 - type: roleLoadout
   id: JobMedicalIntern
   groups:
-  - MedicalGloves #Maid
+ # - MedicalGloves #Maid
   - MedicalInternEnvirogloves
   - MedicalDoctorHead #Maid
   - MedicalInternEnvirohelm
@@ -890,7 +891,7 @@
   - MedicalInternJumpsuit
   - MedicalInternEnvirosuit
   - MedicalBackpack
-  - MedicalEyewear
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -905,16 +906,16 @@
   id: JobChemist
   groups:
   - GroupTankHarness
-  - ChemistHead # Goobstation
+ #- ChemistHead # Goobstation #Maid вырезано
   - ChemistEnvirohelm
-  - MedicalMask
+ # - MedicalMask #Maid
   - ChemistJumpsuit
   - ChemistEnvirosuit
-  - MedicalGloves
+ # - MedicalGloves #Maid
   - ChemistEnvirogloves
   - ChemistBackpack
   - ChemistOuterClothing
-  - MedicalShoes
+ #- MedicalShoes #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -929,17 +930,17 @@
   id: JobParamedic
   groups:
   - GroupTankHarness
-  - ParamedicHead
+ #- ParamedicHead #Maid
   - ParamedicEnvirohelm
-  - MedicalMask
+ # - MedicalMask #Maid
   - ParamedicJumpsuit
   - ParamedicEnvirosuit
-  - MedicalGloves
+ # - MedicalGloves #Maid
   - ParamedicEnvirogloves
   - MedicalBackpack
   - ParamedicOuterClothing
-  - ParamedicShoes
-  - MedicalEyewear
+# - ParamedicShoes #Maid
+ # - MedicalEyewear #Maid
   - SurvivalMedical
 #  - Trinkets #Maid
 #  - Animals #Maid
@@ -954,7 +955,7 @@
 - type: roleLoadout
   id: JobZookeeper
   groups:
-  - ZookeeperHead
+ #- ZookeeperHead #Maid
   - ZookeeperEnvirohelm
   - ZookeeperJumpsuit
   - ZookeeperEnvirosuit
@@ -981,7 +982,7 @@
   - ReporterJumpsuit
   - ReporterEnvirosuit
   - ReporterEnvirogloves
-  - ReporterOuterClothing # Goobstation - Bodycams
+ #- ReporterOuterClothing # Goobstation - Bodycams #Maid Вырезано
   - CommonBackpack
 #  - Glasses #Maid
   - Survival
@@ -997,9 +998,9 @@
 - type: roleLoadout
   id: JobPsychologist
   groups:
-  - MedicalDoctorHead #Maid
+ #- MedicalDoctorHead #Maid
   - PsychologistEnvirohelm
-  - MedicalGloves #Maid
+ # - MedicalGloves #Maid
   - PsychologistEnvirogloves
   - GroupTankHarness
   - PsychologistJumpsuit
@@ -1024,7 +1025,7 @@
   - BoxerEnvirohelm
   - BoxerJumpsuit
   - BoxerEnvirosuit
-  - BoxerGloves
+ # - BoxerGloves
   - CommonBackpack
 #  - Glasses #Maid
   - Survival

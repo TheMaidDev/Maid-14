@@ -190,6 +190,7 @@
     ears: ClothingHeadsetAltMedical # Goobstation
     eyes: ClothingEyesGlassesMed # Goobstation
     belt: ClothingBeltMedicalFilled
+    shoes: ClothingShoesColorBrown #Maid
   storage:
     back:
     - Flash

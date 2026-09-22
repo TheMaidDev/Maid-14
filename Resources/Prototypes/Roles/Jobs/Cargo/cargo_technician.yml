@@ -98,6 +98,8 @@
     id: CargoPDA
     ears: ClothingHeadsetCargo
     pocket1: AppraisalTool
+    shoes: ClothingShoesColorBrown #Maid
+
   #storage:
     #back:
     #- Stuff

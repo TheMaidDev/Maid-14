@@ -1,140 +1,224 @@
 - type: loadout
   id: UnderwearTopBraStraplessAlt
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraStraplessAlt
 
 - type: loadout
   id: UnderwearTopBraRD
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraRD
 
 - type: loadout
   id: UnderwearTopBraNeko
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraNeko
 
 - type: loadout
   id: UnderwearTopFishnetBodySleeves
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopFishnetBodySleeves
 
 - type: loadout
   id: UnderwearTopBraCMO
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraCMO
 
 - type: loadout
   id: UnderwearTopBraStriped
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraStriped
 
 - type: loadout
   id: UnderwearTopBraCap
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraCap
 
 - type: loadout
   id: UnderwearTopBraBeeKini
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraBeeKini 
 
 - type: loadout
   id: UnderwearTopBraTubetop
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraTubetop                 
 
 - type: loadout
   id: UnderwearTopBraCE
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraCE
 
 - type: loadout
   id: UnderwearTopBraHOP
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraHOP
 
 - type: loadout
   id: UnderwearTopBraHalterneck
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraHalterneck
 
 - type: loadout
   id: UnderwearTopBraSwimming
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraSwimming
 
 - type: loadout
   id: UnderwearTopBraShibari
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraShibari
 
 - type: loadout
   id: UnderwearTopBraShibariSleeves
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraShibariSleeves
 
 - type: loadout
   id: UnderwearTopBraHOS
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraHOS
 
 - type: loadout
   id: UnderwearTopBraSports
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraSports
 
 - type: loadout
   id: UnderwearTopBraKinky
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraKinky
 
 - type: loadout
   id: UnderwearTopBraStrapless
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraStrapless
 
 - type: loadout
   id: UnderwearTopFishnetBodyGloves
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopFishnetBodyGloves
 
 - type: loadout
   id: UnderwearTopBraSwimmingAlt
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraSwimmingAlt
 
 - type: loadout
   id: UnderwearTopCow
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopCow
 
 - type: loadout
   id: UnderwearTopBraThin
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraThin
 
 - type: loadout
   id: UnderwearTopBraQM
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraQM
 
 - type: loadout
   id: UnderwearTopBraBinder
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraBinder
 
 - type: loadout
   id: UnderwearTopFishnetBody
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopFishnetBody
 
 - type: loadout
   id: UnderwearTopBraBinderStrapless
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraBinderStrapless
 
 - type: loadout
   id: UnderwearTopBraSportsAlternative
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: FemaleUnderwear
   equipment:
    bra: ClothingUnderwearTopBraSportsAlternative
                                                          
