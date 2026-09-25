@@ -15,7 +15,7 @@
   description: uplink-experimental-syndicate-teleporter-desc
   productEntity: ExperimentalSyndicateTeleporter
   cost:
-    Telecrystal: 50 # Goob
+    Telecrystal: 11 # Goob - MAID uplink price rebalance
   categories:
     - UplinkDisruption
   conditions:
@@ -31,7 +31,7 @@
   icon: { sprite: /Textures/_White/Objects/Weapons/Melee/Daggers/betrayal_knife.rsi, state: icon }
   productEntity: BetrayalKnife
   cost:
-    Telecrystal: 30 # goob
+    Telecrystal: 7 # goob - MAID uplink price rebalance
   categories:
   - UplinkWeaponry
   conditions:
@@ -48,7 +48,7 @@
   description: uplink-night-vision-desc
   productEntity: ClothingEyesNightVisionGogglesSyndie
   cost:
-    Telecrystal: 10 # goob
+    Telecrystal: 2 # goob - MAID uplink price rebalance
   categories:
   - UplinkWearables
   conditions:
@@ -63,7 +63,7 @@
   description: uplink-night-vision-desc
   productEntity: ClothingEyesNightVisionGogglesNukie
   cost:
-    Telecrystal: 15 # goob
+    Telecrystal: 3 # goob - MAID uplink price rebalance
   categories:
   - UplinkWearables
   conditions:
@@ -80,7 +80,7 @@
   description: uplink-thermal-vision-desc
   productEntity: ClothingEyesThermalVisionGogglesSyndie
   cost:
-    Telecrystal: 25 # Maid
+    Telecrystal: 6 # Maid - MAID uplink price rebalance
   categories:
   - UplinkWearables
   conditions:
@@ -95,7 +95,7 @@
   description: uplink-thermal-vision-desc
   productEntity: ClothingEyesThermalVisionGogglesNukie
   cost:
-    Telecrystal: 20 # goob
+    Telecrystal: 4 # goob - MAID uplink price rebalance
   categories:
   - UplinkWearables
   conditions:

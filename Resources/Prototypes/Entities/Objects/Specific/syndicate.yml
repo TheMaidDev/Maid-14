@@ -37,8 +37,8 @@
   name: telecrystal
   parent: [BaseItem, BaseSyndicateContraband]
   id: Telecrystal
-  # Goobstation - Telecrystal rework
-  suffix: 100 TC
+  # MAID uplink price rebalance
+  suffix: 20 TC # MAID uplink price rebalance
   description: It seems to be pulsing with suspiciously enticing energies.
   components:
   - type: Sprite
@@ -48,12 +48,12 @@
     sprite: Objects/Specific/Syndicate/telecrystal.rsi
     size: Tiny
   - type: Stack
-    count: 100
+    count: 20 # MAID uplink price rebalance
     stackType: Telecrystal
   - type: StaticPrice
     price: 0
   - type: StackPrice
-    price: 1000
+    price: 200 # MAID uplink price rebalance
   - type: Currency
     price:
       Telecrystal: 1
@@ -115,20 +115,20 @@
 - type: entity
   parent: BaseUplinkRadio
   id: BaseUplinkRadio50TC
-  suffix: 50 TC
+  suffix: 10 TC # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 50
+      Telecrystal: 10 # MAID uplink price rebalance
 
 - type: entity
   parent: BaseUplinkRadio
   id: BaseUplinkRadio50TCNukeOps
-  suffix: 50 TC, NukeOps reinforcement
+  suffix: 10 TC, NukeOps reinforcement # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 50
+      Telecrystal: 10 # MAID uplink price rebalance
   - type: Tag
     tags:
     - NukeOpsUplink
@@ -136,43 +136,43 @@
 
 - type: entity
   parent: BaseUplinkRadio
-  # Goobstation - Telecrystal rework
+  # MAID uplink price rebalance
   id: BaseUplinkRadio100TC
-  suffix: 100 TC
+  suffix: 20 TC # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 100
+      Telecrystal: 20 # MAID uplink price rebalance
 
 - type: entity
   parent: BaseUplinkRadio
-  # Goobstation - Telecrystal rework
+  # MAID uplink price rebalance
   id: BaseUplinkRadio125TC
-  suffix: 125 TC
+  suffix: 25 TC # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 125
+      Telecrystal: 25 # MAID uplink price rebalance
 
 - type: entity
   parent: BaseUplinkRadio
-  # Goobstation - Telecrystal rework
+  # MAID uplink price rebalance
   id: BaseUplinkRadio200TC
-  suffix: 200 TC
+  suffix: 40 TC # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 200
+      Telecrystal: 40 # MAID uplink price rebalance
 
 - type: entity
   parent: BaseUplinkRadio
-  # Goobstation - Telecrystal rework
+  # MAID uplink price rebalance
   id: BaseUplinkRadio350TC
-  suffix: 350 TC, Commander #(LoneOps suffix Removed) Commander is goob only
+  suffix: 70 TC, Commander #(LoneOps suffix Removed) Commander is goob only # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 350
+      Telecrystal: 70 # MAID uplink price rebalance
   - type: Tag
     tags:
     - NukeOpsUplink

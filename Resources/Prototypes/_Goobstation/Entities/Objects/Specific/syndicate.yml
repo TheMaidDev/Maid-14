@@ -13,84 +13,83 @@
 - type: entity
   parent: Telecrystal
   id: Telecrystal15
-  suffix: 15 TC
+  suffix: 3 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 15
+    count: 3 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal20
-  suffix: 20 TC
+  suffix: 4 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 20
+    count: 4 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal25
-  suffix: 25 TC
+  suffix: 5 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 25
+    count: 5 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal30
-  suffix: 30 TC
+  suffix: 7 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 30
+    count: 7 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal35
-  suffix: 35 TC
+  suffix: 8 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 35
+    count: 8 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal40
-  suffix: 40 TC
+  suffix: 9 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 40
+    count: 9 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal50
-  suffix: 50 TC
+  suffix: 10 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 50
+    count: 10 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal250
-  suffix: 250 TC
+  suffix: 50 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 250
+    count: 50 # MAID uplink price rebalance
 
 - type: entity
   parent: Telecrystal
   id: Telecrystal500
-  suffix: 500 TC
+  suffix: 100 TC # MAID uplink price rebalance
   components:
   - type: Stack
-    count: 500
-
+    count: 100 # MAID uplink price rebalance
 #this uplink MUST be used for nukeops, as it has the tag for filtering the listing.
 - type: entity
   parent: BaseUplinkRadio
   id: BaseUplinkRadio225TC
-  suffix: 225 TC, NukeOps
+  suffix: 50 TC, NukeOps # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 225
+      Telecrystal: 50 # MAID uplink price rebalance
   - type: Tag
     tags:
     - NukeOpsUplink
@@ -98,11 +97,11 @@
 - type: entity
   parent: BaseUplinkRadio
   id: BaseUplinkRadio225TCMedic
-  suffix: 225 TC, NukeOps medic
+  suffix: 50 TC, NukeOps medic # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 225
+      Telecrystal: 50 # MAID uplink price rebalance
   - type: Tag
     tags:
     - NukeOpsUplink

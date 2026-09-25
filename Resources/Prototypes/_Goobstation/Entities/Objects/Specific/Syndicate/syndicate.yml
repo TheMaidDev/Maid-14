@@ -6,13 +6,13 @@
 
 - type: entity
   parent: BaseUplinkRadio
-  # Goobstation - Telecrystal rework
+  # MAID uplink price rebalance
   id: LoneOpsUplink350TC
-  suffix: 350 TC, LoneOps
+  suffix: 70 TC, LoneOps # MAID uplink price rebalance
   components:
   - type: Store
     balance:
-      Telecrystal: 350
+      Telecrystal: 70 # MAID uplink price rebalance
   - type: Tag
     tags:
     - NukeOpsUplink

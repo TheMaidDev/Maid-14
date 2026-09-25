@@ -150,7 +150,7 @@
   icon: "JobIconQuarterMaster"
   supervisors: job-supervisors-captain
   canBeAntag: true
-  antagAdvantage: 75 # Goobstation
+  antagAdvantage: 15 # MAID uplink price rebalance
   guides: # goobstation
   - Cargo
 #  - QuartermasterSOP # Maid

@@ -15,7 +15,7 @@
     - Debug
   cost:
     DebugDollar: 10
-    Telecrystal: 50  # Goobstation - Telecrystal rework
+    Telecrystal: 11 # Goobstation - Telecrystal rework - MAID uplink price rebalance
 
 - type: listing
   id: DebugListing3

@@ -1,4 +1,4 @@
-﻿- type: entity
+- type: entity
   parent: BaseImplantOnlyImplanterSyndi
   id: HardlightSpearImplanter
   suffix: hardlight spear
@@ -128,7 +128,7 @@
   icon: { sprite: _Maid/Weapons/hardlight_spear.rsi, state: spear }
   productEntity: HardlightSpearImplanter
   cost:
-    Telecrystal: 20
+    Telecrystal: 4
   categories:
   - UplinkImplants
   conditions:

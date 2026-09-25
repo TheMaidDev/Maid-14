@@ -154,7 +154,7 @@
   icon: "JobIconChiefEngineer"
   supervisors: job-supervisors-captain
   #canBeAntag: false
-  antagAdvantage: 75 # Goobstation
+  antagAdvantage: 15 # MAID uplink price rebalance
   guides: # goobstation
   - Engineering
 #  - ChiefEngineerSOP # Maid

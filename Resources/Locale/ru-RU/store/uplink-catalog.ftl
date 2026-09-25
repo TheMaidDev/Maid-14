@@ -178,9 +178,9 @@ uplink-l6-saw-bundle-name = Набор L6 Saw
 uplink-l6-saw-bundle-desc = Еще имба: культовый ручной пулемет L6 в комплекте с 2 коробчатыми магазинами.
 uplink-zombie-bundle-name = Набор зомби синдиката
 uplink-zombie-bundle-desc = Универсальный набор для натравливания нежити на станцию.
-uplink-surplus-bundle-name = Ящик припасов синдиката
+uplink-surplus-bundle-name = Ящик припасов Синдиката
 uplink-surplus-bundle-desc = Содержит случайное снаряжение Синдиката, общей стоимостью в 50 телекристаллов. Оно может быть как бесполезным хламом, так и реально крутым.
-uplink-super-surplus-bundle-name = Ящик суперприпасов синдиката
+uplink-super-surplus-bundle-name = Ящик суперприпасов Синдиката
 uplink-super-surplus-bundle-desc = Содержит случайное снаряжение Синдиката, общей стоимостью в 125 телекристаллов.
 # Tools
 uplink-toolbox-name = Ящик инструментов

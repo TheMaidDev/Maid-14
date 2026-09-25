@@ -44,7 +44,7 @@
     key: enum.StoreUiKey.Key
   - type: Store
     balance:
-      Telecrystal: 100
+      Telecrystal: 20 # MAID uplink price rebalance
   - type: Tag
     tags:
       - ContravendUplink

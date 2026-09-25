@@ -154,7 +154,7 @@
   icon: "JobIconResearchDirector"
   supervisors: job-supervisors-captain
   canBeAntag: true # Maid
-  antagAdvantage: 75 # Goobstation
+  antagAdvantage: 15 # MAID uplink price rebalance
   guides: # goobstation
   - Science
   - Command
