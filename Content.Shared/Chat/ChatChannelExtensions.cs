@@ -18,8 +18,8 @@ public static class ChatChannelExtensions
     {
         return channel switch
         {
-            ChatChannel.Server => Color.Orange,
-            ChatChannel.Radio => Color.LimeGreen,
+            ChatChannel.Server => Color.FromHex("#C4A0DC"),
+            ChatChannel.Radio => Color.FromHex("#5CFF6A"),
             ChatChannel.LOOC => Color.MediumTurquoise,
             ChatChannel.OOC => Color.LightSkyBlue,
             ChatChannel.Dead => Color.MediumPurple,

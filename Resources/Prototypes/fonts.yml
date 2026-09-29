@@ -8,19 +8,19 @@
 
 - type: font
   id: Default
-  path: /Fonts/_Maid/IBMPlexSans/IBMPlexSans-Regular.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf
 
 - type: font
   id: DefaultItalic
-  path: /Fonts/NotoSans/NotoSans-Italic.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Italic.ttf
 
 - type: font
   id: DefaultBold
-  path: /Fonts/_Maid/IBMPlexSans/IBMPlexSans-Bold.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf
 
 - type: font
   id: DefaultBoldItalic
-  path: /Fonts/NotoSans/NotoSans-BoldItalic.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-BoldItalic.ttf
 
 - type: font
   id: NotoSansDisplay

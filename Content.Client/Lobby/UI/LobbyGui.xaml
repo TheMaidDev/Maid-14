@@ -58,12 +58,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
                     <!-- COLUMN 1: left menu -->
                     <neon:NeonFlickerControl MinSize="180 0" MaxSize="250 Infinity"
-                                             Margin="36 16 0 0" VerticalExpand="True">
+                                             Margin="16 16 0 0" VerticalExpand="True">
                         <BoxContainer Orientation="Vertical" MinSize="180 0" VerticalExpand="True"
-                                      SeparationOverride="10">
-                            <Control VerticalExpand="True" />
+                                      SeparationOverride="13">
+                            <!-- The menu block sits above the vertical centre, like the reference. -->
+                            <Control VerticalExpand="True" SizeFlagsStretchRatio="0.62" />
                             <neon:NeonFlickerControl Intensity="1.45">
-                                <Label Text="Maid Cafe" StyleClasses="LobbyTitle" Margin="0 0 0 2" />
+                                <Label Text="Maid Cafe" StyleClasses="LobbyTitle" Margin="0 0 0 4" />
                             </neon:NeonFlickerControl>
 
                             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
@@ -99,7 +100,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                 <TextureRect Name="DiscordIcon" Access="Public"
                                              TexturePath="/Textures/Interface/VerbIcons/open.svg.192dpi.png"
                                              SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
-                                <Button Name="MenuDiscordButton" Access="Public" Text="{Loc 'rmc-ui-link-discord-account'}"
+                                <Button Name="MenuDiscordButton" Access="Public" Text="{Loc 'ui-lobby-discord-button'}"
                                         StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
                             </BoxContainer>
 
@@ -116,7 +117,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
                             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
                                 <TextureRect Name="AHelpIcon" Access="Public"
-                                             TexturePath="/Textures/Interface/VerbIcons/light.svg.192dpi.png"
+                                             TexturePath="/Textures/Interface/VerbIcons/information.svg.192dpi.png"
                                              SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
                                 <Button Name="AHelpButton" Access="Public" Text="{Loc 'ui-lobby-ahelp-button'}"
                                         HorizontalAlignment="Left" StyleClasses="MenuTextButton" />
@@ -142,11 +143,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                     <!-- COLUMN 2: changelog -->
                     <neon:NeonFlickerControl Name="ChangelogColumn" Access="Public" Intensity="0.85" VerticalExpand="True">
                         <PanelContainer Name="ChangelogPanel" Access="Public"
-                                        StyleClasses="TransparentBorderedWindowPanel"
-                                        SetWidth="414" Margin="0 0 0 0" VerticalExpand="True">
+                                        StyleClasses="LobbyColumnPanel"
+                                        SetWidth="380" Margin="0 0 0 0" VerticalExpand="True">
                             <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
-                                          Margin="6 4 6 6" SeparationOverride="0">
-                                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 0 0 4">
+                                          Margin="8 6 8 8" SeparationOverride="0">
+                                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 0 0 6">
                                     <Label Text="{Loc 'ui-lobby-changelog-heading'}" StyleClasses="LobbyHeading"
                                            HorizontalExpand="True" HorizontalAlignment="Center" />
                                     <TextureButton Name="ToggleChangelogButton" Access="Public"
@@ -169,29 +170,36 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
                     <!-- COLUMN 3: server info + chat -->
                     <neon:NeonFlickerControl Intensity="0.85" MinSize="414 0" MaxSize="414 Infinity" VerticalExpand="True">
-                        <PanelContainer StyleClasses="TransparentBorderedWindowPanel"
+                        <PanelContainer StyleClasses="LobbyPanel"
                                         SetWidth="414" VerticalExpand="True">
                             <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
-                                          SeparationOverride="4">
-                                <BoxContainer Orientation="Vertical" HorizontalExpand="True"
-                                              Margin="10 8 10 4" SeparationOverride="2">
+                                          SeparationOverride="0">
+                                <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="False"
+                                              Margin="10 14 10 4" SeparationOverride="0">
+                                    <!-- Stretch + Align: with ClipText a centred label measures as
+                                         zero-width and clips its own text away entirely. -->
+                                    <Label Name="ServerName" Access="Public" StyleClasses="LobbyServerName"
+                                           HorizontalAlignment="Stretch" HorizontalExpand="True"
+                                           Align="Center" ClipText="True" />
+                                    <PanelContainer Name="ServerNameRule" Access="Public" StyleClasses="LobbyRule"
+                                                    MinSize="0 2" Margin="0 5 0 12" />
                                     <maidControls:LobbyBracketHeading Text="{Loc 'ui-lobby-server-info-block'}"
-                                                                      HorizontalAlignment="Left" />
-                                    <Label Name="ServerName" Access="Public" StyleClasses="LobbyText"
-                                           HorizontalAlignment="Left" ClipText="True" Margin="0 2 0 0" />
+                                                                      HorizontalAlignment="Left" VerticalExpand="False" />
                                     <info:ServerInfo Name="ServerInfo" Access="Public" StyleClasses="LobbyText"
-                                                     MinSize="0 20" VerticalExpand="false"
-                                                     HorizontalAlignment="Left" Margin="0 2 0 2" />
+                                                     VerticalExpand="False"
+                                                     HorizontalAlignment="Left" Margin="0 11 0 2" />
                                     <Label Name="StationTime" Access="Public" StyleClasses="LobbyText"
-                                           FontColorOverride="#E090C0"
-                                           HorizontalAlignment="Left" />
+                                           FontColorOverride="#E255B0"
+                                           HorizontalAlignment="Left" Margin="0 15 0 0" />
                                     <Label Name="StartTime" Access="Public" StyleClasses="LobbyText"
-                                           FontColorOverride="#E090C0"
-                                           HorizontalAlignment="Left" Margin="0 0 0 2" />
+                                           FontColorOverride="#E255B0"
+                                           HorizontalAlignment="Left" />
                                 </BoxContainer>
+                                <PanelContainer Name="ChatRule" Access="Public" StyleClasses="LobbyRule"
+                                                MinSize="0 2" Margin="10 14 10 0" />
                                 <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True"
                                                  HorizontalExpand="True"
-                                                 MinSize="0 180" Margin="0 0 0 0" />
+                                                 MinSize="0 180" Margin="0 4 0 0" />
                             </BoxContainer>
                         </PanelContainer>
                     </neon:NeonFlickerControl>

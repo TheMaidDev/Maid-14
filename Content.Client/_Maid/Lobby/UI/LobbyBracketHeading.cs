@@ -13,8 +13,8 @@ namespace Content.Client._Maid.Lobby.UI;
 /// </summary>
 public sealed class LobbyBracketHeading : Control
 {
-    private static readonly Color TitleColor = Color.FromHex("#C9A0D8");
-    private static readonly Color BracketColor = Color.FromHex("#C6A15A");
+    private static readonly Color TitleColor = StyleNano.LobbyLavender;
+    private static readonly Color BracketColor = StyleNano.LobbyGold;
 
     private readonly Label _label;
 
@@ -32,13 +32,14 @@ public sealed class LobbyBracketHeading : Control
             FontColorOverride = TitleColor,
             HorizontalAlignment = HAlignment.Left,
         };
+        VerticalExpand = false;
         AddChild(_label);
     }
 
     protected override Vector2 MeasureOverride(Vector2 availableSize)
     {
         _label.Measure(availableSize);
-        return _label.DesiredSize + new Vector2(10, 8);
+        return _label.DesiredSize + new Vector2(10, 4);
     }
 
     protected override Vector2 ArrangeOverride(Vector2 finalSize)

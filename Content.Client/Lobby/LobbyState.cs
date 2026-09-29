@@ -113,6 +113,27 @@ namespace Content.Client.Lobby
 {
     public sealed class LobbyState : Robust.Client.State.State
     {
+        private const string MaidServerName = "Maid Cafe";
+
+        // Plain array + case-insensitive Equals: the sandbox whitelist has no System.StringComparer,
+        // so a comparer-backed HashSet fails the client type check at startup.
+        private static readonly string[] PlaceholderServerNames =
+        {
+            "MyServer",
+            "Space Station 14",
+            "unnamed server",
+        };
+
+        private static readonly string[] AuthorTints =
+        {
+            "#9FD6C0",
+            "#7FC8D6",
+            "#C9A0DC",
+            "#D6B98C",
+            "#A8C98A",
+            "#D69FC4",
+        };
+
         [Dependency] private readonly IBaseClient _baseClient = default!;
         [Dependency] private readonly IConfigurationManager _cfg = default!;
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
@@ -154,12 +175,9 @@ namespace Content.Client.Lobby
             _voteManager.SetPopupContainer(Lobby.VoteContainer);
             LayoutContainer.SetAnchorPreset(Lobby, LayoutContainer.LayoutPreset.Wide);
 
-            var lobbyNameCvar = _cfg.GetCVar(CCVars.ServerLobbyName);
-            var serverName = _baseClient.GameInfo?.ServerName ?? string.Empty;
-
-            Lobby.ServerName.Text = string.IsNullOrEmpty(lobbyNameCvar)
-                ? Loc.GetString("ui-lobby-title", ("serverName", serverName))
-                : lobbyNameCvar;
+            Lobby.ServerName.Text = PickServerName(
+                _cfg.GetCVar(CCVars.ServerLobbyName),
+                _baseClient.GameInfo?.ServerName);
 
             var width = _cfg.GetCVar(CCVars.ServerLobbyRightPanelWidth);
             //Lobby.RightSide.SetWidth = width;
@@ -199,6 +217,33 @@ namespace Content.Client.Lobby
             Lobby = null;
         }
 
+        /// <summary>
+        /// Maid: the right panel is crowned with the server name. Prefer whatever the server
+        /// advertises, but never show an engine placeholder — fall back to our own brand.
+        /// </summary>
+        private static string PickServerName(string? lobbyName, string? serverName)
+        {
+            if (IsRealName(lobbyName))
+                return lobbyName!;
+
+            return IsRealName(serverName) ? serverName! : MaidServerName;
+        }
+
+        private static bool IsRealName(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            var trimmed = value.Trim();
+            foreach (var placeholder in PlaceholderServerNames)
+            {
+                if (string.Equals(trimmed, placeholder, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            return true;
+        }
+
         public void SwitchState(LobbyGui.LobbyGuiState state)
         {
             // Yeah I hate this but LobbyState contains all the badness for now.
@@ -229,7 +274,6 @@ namespace Content.Client.Lobby
                 body.Children.Clear();
                 Lobby.ChangelogScrollContainer.SetScrollValue(default);
 
-                DateTime? lastDay = null;
                 var firstEntry = true;
 
                 foreach (var entry in entries)
@@ -237,34 +281,12 @@ namespace Content.Client.Lobby
                     if (entry.Changes.Count == 0)
                         continue;
 
-                    var day = entry.Time.ToLocalTime().Date;
-
-                    // Day header (only when the day changes).
-                    if (lastDay != day)
-                    {
-                        if (!firstEntry)
-                            body.AddChild(new Control { MinSize = new Vector2(0, 6) });
-
-                        string dayNice;
-                        var today = DateTime.Today;
-                        if (day == today)
-                            dayNice = Loc.GetString("changelog-today");
-                        else if (day == today.AddDays(-1))
-                            dayNice = Loc.GetString("changelog-yesterday");
-                        else
-                            dayNice = day.ToShortDateString();
-
-                        body.AddChild(new Label
-                        {
-                            Text = dayNice,
-                            StyleClasses = { "LabelHeading", StyleNano.StyleClassLobbyFont },
-                            Margin = new Thickness(0, 4, 0, 2)
-                        });
-                        lastDay = day;
-                    }
+                    if (!firstEntry)
+                        body.AddChild(new Control { MinSize = new Vector2(0, 8) });
 
                     firstEntry = false;
 
+                    // One header line per entry: tinted author, plain date, like the reference lobby.
                     var author = FormattedMessage.EscapeText(entry.Author);
                     var authorLabel = new RichTextLabel
                     {
@@ -272,7 +294,7 @@ namespace Content.Client.Lobby
                         StyleClasses = { StyleNano.StyleClassLobbyFont }
                     };
                     authorLabel.SetMessage(FormattedMessage.FromMarkupOrThrow(
-                        Loc.GetString("changelog-author-changed", ("author", author))));
+                        $"[color={AuthorTint(entry.Author)}]{author}[/color] [color=#C8C8CC]{FormatChangelogDay(entry.Time.ToLocalTime().Date)}[/color]"));
                     body.AddChild(authorLabel);
 
                     foreach (var change in entry.Changes)
@@ -300,6 +322,30 @@ namespace Content.Client.Lobby
             {
                 _sawmill.Error($"Failed to load lobby changelog: {e}");
             }
+        }
+
+        private static string FormatChangelogDay(DateTime day)
+        {
+            var today = DateTime.Today;
+            if (day == today)
+                return Loc.GetString("changelog-today");
+
+            return day == today.AddDays(-1)
+                ? Loc.GetString("changelog-yesterday")
+                : day.ToShortDateString();
+        }
+
+        /// <summary>
+        /// Stable pastel tint per author, so the changelog reads like the reference lobby
+        /// where every contributor has their own colour.
+        /// </summary>
+        private static string AuthorTint(string author)
+        {
+            var hash = 0;
+            foreach (var c in author)
+                hash = hash * 31 + char.ToLowerInvariant(c);
+
+            return AuthorTints[(int) ((uint) hash % (uint) AuthorTints.Length)];
         }
 
         private TextureRect GetChangelogIcon(ChangelogManager.ChangelogLineType type)

@@ -42,7 +42,7 @@
 # Monospace (Silicon)
 - type: font
   id: MonospaceBold
-  path: /Fonts/_Goobstation/NotoSansMono/NotoSansMono-Bold.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf
 
 # Valyrian Standard (Harpies/Squackroaches)
 - type: font

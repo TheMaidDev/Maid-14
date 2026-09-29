@@ -157,26 +157,32 @@ namespace Content.Client.Stylesheets
     public static class ResCacheExtension
     {
         // Goobstation - ZH text support start
+        // Maid: IBM Plex Mono is the interface face for the whole game. Noto stays in the stack
+        // as a fallback for glyphs IBM Plex does not ship (symbols, CJK).
         public static Font NotoStack(this IResourceCache resCache, string variation = "Regular", int size = 10, bool display = false)
         {
-            var ds = "";
-            var sv = variation.StartsWith("Bold", StringComparison.Ordinal) ? "Bold" : "Regular";
+            var bold = variation.StartsWith("Bold", StringComparison.Ordinal);
+            var italic = variation.EndsWith("Italic", StringComparison.Ordinal);
+            var sv = bold ? "Bold" : "Regular";
+            var ds = display ? "Display" : "";
 
-            if (variation == "Mono-Regular")
+            // IBM Plex Mono ships all four faces, so italics keep the interface font too.
+            var ibmVariation = (bold, italic) switch
             {
-                ds = "Mono";
-                sv = "Regular";
-            }
-            else
-            {
-                ds = display ? "Display" : "";
-            }
+                (true, true) => "BoldItalic",
+                (true, false) => "Bold",
+                (false, true) => "Italic",
+                _ => "Regular",
+            };
+
+            var primary = $"/Fonts/_Maid/IBMPlexMono/IBMPlexMono-{ibmVariation}.ttf";
 
             return resCache.GetFont
             (
                 // Ew, but ok
                 new[]
                 {
+                    primary,
                     $"/Fonts/NotoSans{ds}/NotoSans{ds}-{sv}.ttf",
                     $"/Fonts/NotoSans/NotoSansSymbols-{sv}.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
@@ -260,6 +266,18 @@ namespace Content.Client.Stylesheets
         public const string StyleClassLobbyMeta = "LobbyMeta";
         public const string StyleClassLobbyCountdown = "LobbyCountdown";
         public const string StyleClassLobbyInfoPanel = "LobbyInfoPanel";
+        public const string StyleClassLobbyMenuText = "LobbyMenuText";
+        public const string StyleClassLobbyServerName = "LobbyServerName";
+        public const string StyleClassLobbyPanel = "LobbyPanel";
+        public const string StyleClassLobbyColumnPanel = "LobbyColumnPanel";
+        public const string StyleClassLobbyRule = "LobbyRule";
+
+        // Maid lobby palette, sampled off the reference lobby screenshot.
+        public static readonly Color LobbyLavender = Color.FromHex("#C9A0DC");
+        public static readonly Color LobbyViolet = Color.FromHex("#B48EDC");
+        public static readonly Color LobbyMagenta = Color.FromHex("#E255B0");
+        public static readonly Color LobbyGold = Color.FromHex("#D4B56A");
+        public static readonly Color LobbyTextWhite = Color.FromHex("#E6E6EC");
 
         public const string StyleClassButtonHelp = "HelpButton";
 
@@ -366,29 +384,24 @@ namespace Content.Client.Stylesheets
             var robotoMonoBold12 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 12);
             var robotoMonoBold14 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 14);
 
-            // Maid lobby: IBM Plex (Sans for titles/UI, Mono for compact labels) + Noto fallbacks.
-            Font MaidSans(int size, string weight = "Regular") => resCache.GetFont(new[]
-            {
-                $"/Fonts/_Maid/IBMPlexSans/IBMPlexSans-{weight}.ttf",
-                "/Fonts/NotoSans/NotoSans-Regular.ttf",
-                "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-                "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
-                "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
-            }, size);
+            // Maid: IBM Plex Mono is the interface face; Noto only fills glyphs it lacks.
             Font MaidMono(int size, string weight = "Regular") => resCache.GetFont(new[]
             {
                 $"/Fonts/_Maid/IBMPlexMono/IBMPlexMono-{weight}.ttf",
                 "/Fonts/NotoSans/NotoSans-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
+                "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
             }, size);
-            var jbmMenu = MaidSans(13, "Medium");
-            var jbmText = MaidSans(12);
-            var jbmHeading = MaidSans(15, "SemiBold");
-            var jbmTitle = MaidSans(22, "Bold");
+            // Reference lobby uses IBM Plex Mono Regular throughout — Bold looks too heavy.
+            var jbmMenu = MaidMono(13);
+            var jbmText = MaidMono(12);
+            var jbmHeading = MaidMono(14);
+            var jbmTitle = MaidMono(18);
+            var jbmServerName = MaidMono(16);
             var jbmVersion = MaidMono(10);
-            var lobbyMeta = MaidMono(12, "Bold");
-            var lobbyCountdown = MaidSans(14, "SemiBold");
+            var lobbyMeta = MaidMono(12);
+            var lobbyCountdown = MaidMono(13);
             var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
             var windowHeader = new StyleBoxTexture
             {
@@ -490,7 +503,7 @@ namespace Content.Client.Stylesheets
             {
                 BackgroundColor = Color.Transparent,
             };
-            var menuTextButtonNormal = Color.FromHex("#C9C9C9");
+            var menuTextButtonNormal = Color.FromHex("#FFFFFF");
             var menuTextButtonHover = Color.FromHex("#F0C96A");
             var menuTextButtonPressed = Color.FromHex("#FFFFFF");
 
@@ -2276,13 +2289,45 @@ namespace Content.Client.Stylesheets
                     }),
 
                 // Maid lobby: IBM Plex headings and body text.
+                // Reference lobby keeps the left-hand title and the column headings near-white;
+                // violet/gold are reserved for the right panel accents.
                 Element<Label>().Class(StyleClassLobbyTitle)
                     .Prop(Label.StylePropertyFont, jbmTitle)
-                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#FFD34D")),
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#F2F2F4")),
 
                 Element<Label>().Class(StyleClassLobbyHeading)
                     .Prop(Label.StylePropertyFont, jbmHeading)
-                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#F0C96A")),
+                    .Prop(Label.StylePropertyFontColor, LobbyTextWhite),
+
+                // Server name crowning the right panel: bigger than the body text, lavender.
+                Element<Label>().Class(StyleClassLobbyServerName)
+                    .Prop(Label.StylePropertyFont, jbmServerName)
+                    .Prop(Label.StylePropertyFontColor, LobbyLavender),
+
+                // Right lobby panel: dark plate with a thin violet border.
+                Element<PanelContainer>().Class(StyleClassLobbyPanel)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#12131AE6"),
+                        BorderColor = Color.FromHex("#7A5C93"),
+                        BorderThickness = new Thickness(1),
+                    }),
+
+                // Changelog column: no frame in the reference, just enough scrim to stay readable
+                // over the animated background.
+                Element<PanelContainer>().Class(StyleClassLobbyColumnPanel)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#0A0B1099"),
+                    }),
+
+                // Horizontal violet separator (under the server name, above the chat).
+                Element<PanelContainer>().Class(StyleClassLobbyRule)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        // The reference rules are muted, not neon: violet at roughly half strength.
+                        BackgroundColor = LobbyViolet.WithAlpha(0.6f),
+                    }),
 
                 Element<Label>().Class(StyleClassLobbyText)
                     .Prop(Label.StylePropertyFont, jbmText)
@@ -2294,6 +2339,10 @@ namespace Content.Client.Stylesheets
                 Element<Label>().Class(StyleClassLobbyVersion)
                     .Prop(Label.StylePropertyFont, jbmVersion)
                     .Prop(Label.StylePropertyFontColor, Color.DarkGray),
+
+                // Same face as the left menu buttons, for labels that are not the button's own.
+                Element<Label>().Class(StyleClassLobbyMenuText)
+                    .Prop(Label.StylePropertyFont, jbmMenu),
 
                 Element<Label>().Class(StyleClassLobbyMeta)
                     .Prop(Label.StylePropertyFont, lobbyMeta)
