@@ -347,26 +347,13 @@ namespace Content.Client.Lobby
             UpdateReadyButtonColor();
         }
 
-        // Maid: tint the ready button text green while the player is ready.
+        // Maid: tint the ready button green/red and swap its check/cross icon.
         private void UpdateReadyButtonColor()
         {
             if (Lobby == null)
                 return;
 
-            if (_gameTicker.IsGameStarted)
-            {
-                Lobby.ReadyButton.Label.FontColorOverride = null;
-                return;
-            }
-
-            if (Lobby.ReadyButton.Pressed)
-            {
-                Lobby.ReadyButton.Label.FontColorOverride = Color.FromHex("#6ED18D");
-            }
-            else
-            {
-                Lobby.ReadyButton.Label.FontColorOverride = Color.FromHex("#D16E6E");
-            }
+            Lobby.UpdateReadyVisuals(_gameTicker.IsGameStarted, Lobby.ReadyButton.Pressed);
         }
 
         public override void FrameUpdate(FrameEventArgs e)
@@ -433,6 +420,7 @@ namespace Content.Client.Lobby
                 Lobby!.ReadyButton.ToggleMode = false;
                 Lobby!.ReadyButton.Pressed = false;
                 Lobby!.ObserveButton.Disabled = false;
+                Lobby.UpdateObserveIcon(true);
             }
             else
             {
@@ -442,6 +430,7 @@ namespace Content.Client.Lobby
                 Lobby!.ReadyButton.Disabled = false;
                 Lobby!.ReadyButton.Pressed = _gameTicker.AreWeReady;
                 Lobby!.ObserveButton.Disabled = true;
+                Lobby.UpdateObserveIcon(false);
             }
 
             UpdateReadyButtonColor();
@@ -476,31 +465,35 @@ namespace Content.Client.Lobby
 
         private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent ev)
         {
+            if (Lobby == null)
+                return;
+
             if (ev.SoundtrackFilename == null)
             {
-                //Lobby!.LobbySong.SetMarkup(Loc.GetString("lobby-state-song-no-song-text"));
+                Lobby.LobbySong.Visible = false;
+                return;
             }
-            else if (
-                ev.SoundtrackFilename != null
-                && _resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource)
-                )
+
+            if (!_resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource))
             {
-                var lobbyStream = lobbySongResource.AudioStream;
-
-                var title = string.IsNullOrEmpty(lobbyStream.Title)
-                    ? Loc.GetString("lobby-state-song-unknown-title")
-                    : lobbyStream.Title;
-
-                var artist = string.IsNullOrEmpty(lobbyStream.Artist)
-                    ? Loc.GetString("lobby-state-song-unknown-artist")
-                    : lobbyStream.Artist;
-
-                var markup = Loc.GetString("lobby-state-song-text",
-                    ("songTitle", title),
-                    ("songArtist", artist));
-
-                //Lobby!.LobbySong.SetMarkup(markup);
+                Lobby.LobbySong.Visible = false;
+                return;
             }
+
+            var lobbyStream = lobbySongResource.AudioStream;
+
+            var title = string.IsNullOrEmpty(lobbyStream.Title)
+                ? Loc.GetString("lobby-state-song-unknown-title")
+                : lobbyStream.Title;
+
+            var artist = string.IsNullOrEmpty(lobbyStream.Artist)
+                ? Loc.GetString("lobby-state-song-unknown-artist")
+                : lobbyStream.Artist;
+
+            Lobby.LobbySong.SetMarkup(Loc.GetString("lobby-state-song-text",
+                ("songTitle", title),
+                ("songArtist", artist)));
+            Lobby.LobbySong.Visible = true;
         }
 
         // Goobstation - heavily modified to add credits for lobby backgrounds

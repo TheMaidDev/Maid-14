@@ -146,6 +146,7 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         if (LobbyAHelpButton != null)
         {
             LobbyAHelpButton.Pressed = pressed;
+            (UIManager.ActiveScreen as LobbyGui)?.UpdateAHelpVisuals(_hasUnreadAHelp, pressed);
         }
 
         UIManager.ClickSound();
@@ -278,6 +279,7 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         // The lobby button is a plain-text MenuTextButton, so recolor its label directly.
         if (LobbyAHelpButton is { Label: { } label })
             label.FontColorOverride = Color.FromHex("#E5534B");
+        (UIManager.ActiveScreen as LobbyGui)?.UpdateAHelpVisuals(true, UIHelper?.IsOpen ?? false);
         _hasUnreadAHelp = true;
     }
 
@@ -287,6 +289,7 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         LobbyAHelpButton?.StyleClasses.Remove(StyleNano.StyleClassButtonColorRed);
         if (LobbyAHelpButton is { Label: { } label })
             label.FontColorOverride = null;
+        (UIManager.ActiveScreen as LobbyGui)?.UpdateAHelpVisuals(false, UIHelper?.IsOpen ?? false);
         _hasUnreadAHelp = false;
     }
 
