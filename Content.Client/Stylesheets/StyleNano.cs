@@ -143,6 +143,7 @@ using Content.Client.Silicons.Laws.SiliconLawEditUi;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Controls.FancyTree;
 using Content.Client.Verbs.UI;
+using Content.Goobstation.UIKit.UserInterface.Controls;
 using Content.Shared.Verbs;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -250,12 +251,15 @@ namespace Content.Client.Stylesheets
         public const string StyleClassButtonBig = "ButtonBig";
         public const string StyleClassMenuTextButton = "MenuTextButton";
 
-        // Maid: lobby font style classes (JetBrains Mono).
+        // Maid: lobby font style classes (IBM Plex).
         public const string StyleClassLobbyTitle = "LobbyTitle";
         public const string StyleClassLobbyHeading = "LobbyHeading";
         public const string StyleClassLobbyText = "LobbyText";
         public const string StyleClassLobbyVersion = "LobbyVersion";
         public const string StyleClassLobbyFont = "LobbyFontVT";
+        public const string StyleClassLobbyMeta = "LobbyMeta";
+        public const string StyleClassLobbyCountdown = "LobbyCountdown";
+        public const string StyleClassLobbyInfoPanel = "LobbyInfoPanel";
 
         public const string StyleClassButtonHelp = "HelpButton";
 
@@ -362,20 +366,29 @@ namespace Content.Client.Stylesheets
             var robotoMonoBold12 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 12);
             var robotoMonoBold14 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 14);
 
-            // Maid: JetBrains Mono (full Cyrillic support) with NotoSans fallback for symbols/emoji.
-            Font MaidStack(int size) => resCache.GetFont(new[]
+            // Maid lobby: IBM Plex (Sans for titles/UI, Mono for compact labels) + Noto fallbacks.
+            Font MaidSans(int size, string weight = "Regular") => resCache.GetFont(new[]
             {
-                "/Fonts/_Maid/JetBrainsMono/JetBrainsMono-Regular.ttf",
+                $"/Fonts/_Maid/IBMPlexSans/IBMPlexSans-{weight}.ttf",
                 "/Fonts/NotoSans/NotoSans-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
             }, size);
-            var jbmMenu = MaidStack(12);
-            var jbmText = MaidStack(12);
-            var jbmHeading = MaidStack(16);
-            var jbmTitle = MaidStack(20);
-            var jbmVersion = MaidStack(10);
+            Font MaidMono(int size, string weight = "Regular") => resCache.GetFont(new[]
+            {
+                $"/Fonts/_Maid/IBMPlexMono/IBMPlexMono-{weight}.ttf",
+                "/Fonts/NotoSans/NotoSans-Regular.ttf",
+                "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
+                "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
+            }, size);
+            var jbmMenu = MaidSans(13, "Medium");
+            var jbmText = MaidSans(12);
+            var jbmHeading = MaidSans(15, "SemiBold");
+            var jbmTitle = MaidSans(22, "Bold");
+            var jbmVersion = MaidMono(10);
+            var lobbyMeta = MaidMono(12, "Bold");
+            var lobbyCountdown = MaidSans(14, "SemiBold");
             var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
             var windowHeader = new StyleBoxTexture
             {
@@ -2253,7 +2266,16 @@ namespace Content.Client.Stylesheets
                         new StyleProperty("font-color", menuTextButtonPressed),
                     }),
 
-                // Maid lobby: JetBrains Mono headings and body text.
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassMenuTextButton}, null, new[] {Button.StylePseudoClassDisabled}),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
+                        new StyleProperty("font-color", Color.FromHex("#5A5A5A")),
+                    }),
+
+                // Maid lobby: IBM Plex headings and body text.
                 Element<Label>().Class(StyleClassLobbyTitle)
                     .Prop(Label.StylePropertyFont, jbmTitle)
                     .Prop(Label.StylePropertyFontColor, Color.FromHex("#FFD34D")),
@@ -2273,6 +2295,26 @@ namespace Content.Client.Stylesheets
                     .Prop(Label.StylePropertyFont, jbmVersion)
                     .Prop(Label.StylePropertyFontColor, Color.DarkGray),
 
+                Element<Label>().Class(StyleClassLobbyMeta)
+                    .Prop(Label.StylePropertyFont, lobbyMeta)
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#B8C4D4")),
+
+                Element<Label>().Class(StyleClassLobbyCountdown)
+                    .Prop(Label.StylePropertyFont, lobbyCountdown)
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#FFD34D")),
+
+                Element<PanelContainer>().Class(StyleClassLobbyInfoPanel)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#0A0E14AA"),
+                        BorderColor = Color.FromHex("#F0C96A55"),
+                        BorderThickness = new Thickness(2, 0, 0, 0),
+                        ContentMarginLeftOverride = 10,
+                        ContentMarginRightOverride = 8,
+                        ContentMarginTopOverride = 6,
+                        ContentMarginBottomOverride = 6,
+                    }),
+
                 // Only swaps the font (keeps whatever color the other style class set).
                 Element<Label>().Class(StyleClassLobbyFont)
                     .Prop(Label.StylePropertyFont, jbmText),
@@ -2287,6 +2329,25 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty("font", jbmText),
+                    }),
+
+                // Maid: chat output + input use IBM Plex (overrides the global Noto default).
+                Element<CustomOutputPanel>()
+                    .Prop("font", jbmText),
+
+                Element<OutputPanel>()
+                    .Prop("font", jbmText),
+
+                Element<LineEdit>()
+                    .Class(StyleClassChatLineEdit)
+                    .Prop("font", jbmText),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassChatChannelSelectorButton}, null, null),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
                     }),
             }).ToList());
         }

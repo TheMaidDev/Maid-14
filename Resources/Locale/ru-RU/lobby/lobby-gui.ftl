@@ -13,4 +13,5 @@ ui-lobby-hide-ui-button = Скрыть интерфейс
 ui-lobby-show-ui-button = Показать интерфейс
 ui-lobby-toggle-changelog-button = Скрыть список изменений
 ui-lobby-show-changelog-button = Показать список изменений
+ui-lobby-discord-already-linked = Discord уже привязан
 ui-options-custom-ghosts-button = Кастомизация призрака

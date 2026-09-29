@@ -172,6 +172,8 @@ namespace Content.Client.Lobby
             Lobby.ReadyButton.OnPressed += OnReadyPressed;
             Lobby.ReadyButton.OnToggled += OnReadyToggled;
 
+            _linkAccount.Updated += OnLinkAccountUpdated;
+
             _gameTicker.InfoBlobUpdated += UpdateLobbyUi;
             _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
             _gameTicker.LobbyLateJoinStatusUpdated += LobbyLateJoinStatusUpdated;
@@ -185,6 +187,7 @@ namespace Content.Client.Lobby
             _gameTicker.LobbyStatusUpdated -= LobbyStatusUpdated;
             _gameTicker.LobbyLateJoinStatusUpdated -= LobbyLateJoinStatusUpdated;
             _contentAudioSystem.LobbySoundtrackChanged -= UpdateLobbySoundtrackInfo;
+            _linkAccount.Updated -= OnLinkAccountUpdated;
 
             _voteManager.ClearPopupContainer();
 
@@ -320,6 +323,11 @@ namespace Content.Client.Lobby
             };
         }
 
+        private void OnLinkAccountUpdated()
+        {
+            Lobby?.UpdateDiscordLinked(_linkAccount.Linked);
+        }
+
         private void OnSetupPressed(BaseButton.ButtonEventArgs args)
         {
             SetReady(false);
@@ -434,6 +442,7 @@ namespace Content.Client.Lobby
             }
 
             UpdateReadyButtonColor();
+            Lobby.UpdateDiscordLinked(_linkAccount.Linked);
 
             if (_gameTicker.ServerInfoBlob != null)
             {
@@ -465,35 +474,36 @@ namespace Content.Client.Lobby
 
         private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent ev)
         {
-            if (Lobby == null)
-                return;
-
-            if (ev.SoundtrackFilename == null)
-            {
-                Lobby.LobbySong.Visible = false;
-                return;
-            }
-
-            if (!_resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource))
-            {
-                Lobby.LobbySong.Visible = false;
-                return;
-            }
-
-            var lobbyStream = lobbySongResource.AudioStream;
-
-            var title = string.IsNullOrEmpty(lobbyStream.Title)
-                ? Loc.GetString("lobby-state-song-unknown-title")
-                : lobbyStream.Title;
-
-            var artist = string.IsNullOrEmpty(lobbyStream.Artist)
-                ? Loc.GetString("lobby-state-song-unknown-artist")
-                : lobbyStream.Artist;
-
-            Lobby.LobbySong.SetMarkup(Loc.GetString("lobby-state-song-text",
-                ("songTitle", title),
-                ("songArtist", artist)));
-            Lobby.LobbySong.Visible = true;
+            // On-screen track credits were removed: title and artist stay in the audio files.
+            // if (Lobby == null)
+            //     return;
+            //
+            // if (ev.SoundtrackFilename == null)
+            // {
+            //     Lobby.LobbySong.Visible = false;
+            //     return;
+            // }
+            //
+            // if (!_resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource))
+            // {
+            //     Lobby.LobbySong.Visible = false;
+            //     return;
+            // }
+            //
+            // var lobbyStream = lobbySongResource.AudioStream;
+            //
+            // var title = string.IsNullOrEmpty(lobbyStream.Title)
+            //     ? Loc.GetString("lobby-state-song-unknown-title")
+            //     : lobbyStream.Title;
+            //
+            // var artist = string.IsNullOrEmpty(lobbyStream.Artist)
+            //     ? Loc.GetString("lobby-state-song-unknown-artist")
+            //     : lobbyStream.Artist;
+            //
+            // Lobby.LobbySong.SetMarkup(Loc.GetString("lobby-state-song-text",
+            //     ("songTitle", title),
+            //     ("songArtist", artist)));
+            // Lobby.LobbySong.Visible = true;
         }
 
         // Goobstation - heavily modified to add credits for lobby backgrounds

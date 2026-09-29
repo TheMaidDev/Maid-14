@@ -8,7 +8,7 @@
 
 - type: font
   id: Default
-  path: /Fonts/NotoSans/NotoSans-Regular.ttf
+  path: /Fonts/_Maid/IBMPlexSans/IBMPlexSans-Regular.ttf
 
 - type: font
   id: DefaultItalic
@@ -16,7 +16,7 @@
 
 - type: font
   id: DefaultBold
-  path: /Fonts/NotoSans/NotoSans-Bold.ttf
+  path: /Fonts/_Maid/IBMPlexSans/IBMPlexSans-Bold.ttf
 
 - type: font
   id: DefaultBoldItalic
@@ -48,7 +48,7 @@
 
 - type: font
   id: Monospace
-  path: /EngineFonts/NotoSans/NotoSansMono-Regular.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf
 
 - type: font
   id: Emoji

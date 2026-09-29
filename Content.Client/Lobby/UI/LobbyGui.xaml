@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <!-- Background -->
     <animated:AnimatedBackgroundControl Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background" /> <!-- Tweak-Maid: Animated Lobby -->
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Vertical"
-                  Margin="10 10 10 10" SeparationOverride="2">
+                  Margin="8 8 8 8" SeparationOverride="2">
         <LayoutContainer Name="DefaultState" VerticalExpand="True" HorizontalExpand="True">
             <!-- Voting popups: overlaid on top-left, must NOT push the layout around -->
             <BoxContainer Orientation="Vertical" SeparationOverride="4" Name="VoteContainer"
@@ -51,26 +51,23 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <TextureButton Name="HideUiButton" Access="Public"
                            TexturePath="/Textures/Interface/hamburger.svg.192dpi.png"
                            SetSize="24 24" ToolTip="{Loc 'ui-lobby-hide-ui-button'}" />
-            <!-- Main 3-column "White Dream" layout -->
+            <!-- Main 3-column layout, sized to survive 1280x720 -->
             <BoxContainer Name="BottomSide" Orientation="Horizontal" VerticalAlignment="Stretch"
                           HorizontalExpand="True" VerticalExpand="True"
-                          SeparationOverride="8" Margin="0 10 0 10">
+                          SeparationOverride="6" Margin="0 6 0 6">
 
-                    <!-- COLUMN 1: left menu (plain text items, no boxes) -->
-                    <neon:NeonFlickerControl MinSize="200 0" MaxSize="280 Infinity"
-                                             Margin="16 24 0 0" VerticalExpand="True">
-                        <BoxContainer Orientation="Vertical" MinSize="200 0" VerticalExpand="True"
-                                      SeparationOverride="14">
-                            <!-- Push the menu block to the vertical center of the column -->
+                    <!-- COLUMN 1: left menu -->
+                    <neon:NeonFlickerControl MinSize="180 0" MaxSize="250 Infinity"
+                                             Margin="36 16 0 0" VerticalExpand="True">
+                        <BoxContainer Orientation="Vertical" MinSize="180 0" VerticalExpand="True"
+                                      SeparationOverride="10">
                             <Control VerticalExpand="True" />
                             <neon:NeonFlickerControl Intensity="1.45">
-                                <Label Text="Maid Cafe" StyleClasses="LobbyTitle" Margin="0 0 0 0" />
+                                <Label Text="Maid Cafe" StyleClasses="LobbyTitle" Margin="0 0 0 2" />
                             </neon:NeonFlickerControl>
 
                             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
-                                <TextureRect Name="ReadyIcon" Access="Public"
-                                             TexturePath="/Textures/Interface/Nano/cross.svg.png"
-                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <maidControls:ReadyStatusIcon Name="ReadyIcon" Access="Public" />
                                 <Button Name="ReadyButton" Access="Public" ToggleMode="True"
                                         HorizontalAlignment="Left"
                                         Text="{Loc 'lobby-state-player-status-not-ready'}"
@@ -84,7 +81,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                 <Button Name="MenuCharacterSetupButton" Text="{Loc 'ui-lobby-character-setup-button'}"
                                         StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
                             </BoxContainer>
-                            <!-- Tweak-Maid: rules and guidebook merged into one entry -->
                             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
                                 <TextureRect Name="RulesIcon" Access="Public"
                                              TexturePath="/Textures/Interface/students-cap.svg.192dpi.png"
@@ -120,7 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
                             <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
                                 <TextureRect Name="AHelpIcon" Access="Public"
-                                             TexturePath="/Textures/Interface/VerbIcons/examine.svg.192dpi.png"
+                                             TexturePath="/Textures/Interface/VerbIcons/light.svg.192dpi.png"
                                              SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
                                 <Button Name="AHelpButton" Access="Public" Text="{Loc 'ui-lobby-ahelp-button'}"
                                         HorizontalAlignment="Left" StyleClasses="MenuTextButton" />
@@ -134,7 +130,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             </BoxContainer>
 
                             <Control VerticalExpand="True" />
-                            <!-- Character preview & preferences: kept hidden for code wiring (not shown on this screen) -->
                             <BoxContainer Name="HiddenCharacterArea" Visible="False" Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
                                 <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" HorizontalExpand="True" VerticalExpand="True" />
                                 <maidControls:CharacterPreferencesWidget Name="PreferencesWidget" Access="Public" HorizontalExpand="True" Margin="0 0 0 0"/>
@@ -142,15 +137,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         </BoxContainer>
                     </neon:NeonFlickerControl>
 
-                    <!-- Spacer pushing the changelog panel toward the right -->
                     <Control HorizontalExpand="True" />
 
-                    <!-- COLUMN 2: changelog (always expanded, boxed, narrow, right-aligned) -->
+                    <!-- COLUMN 2: changelog -->
                     <neon:NeonFlickerControl Name="ChangelogColumn" Access="Public" Intensity="0.85" VerticalExpand="True">
                         <PanelContainer Name="ChangelogPanel" Access="Public"
                                         StyleClasses="TransparentBorderedWindowPanel"
-                                        SetWidth="380" Margin="0 0 0 0" VerticalExpand="True">
-                            <!-- Shared semi-transparent frame: header + body inside it -->
+                                        SetWidth="414" Margin="0 0 0 0" VerticalExpand="True">
                             <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
                                           Margin="6 4 6 6" SeparationOverride="0">
                                 <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 0 0 4">
@@ -174,46 +167,43 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         </PanelContainer>
                     </neon:NeonFlickerControl>
 
-                    <!-- COLUMN 3: server info + chat (single panel, announcement is part of chat) -->
-                    <neon:NeonFlickerControl Intensity="0.85" MinSize="360 0" MaxSize="470 Infinity" VerticalExpand="True">
+                    <!-- COLUMN 3: server info + chat -->
+                    <neon:NeonFlickerControl Intensity="0.85" MinSize="414 0" MaxSize="414 Infinity" VerticalExpand="True">
                         <PanelContainer StyleClasses="TransparentBorderedWindowPanel"
-                                        HorizontalExpand="True" VerticalExpand="True">
-                            <!-- Outer box has no insets so the chat can reach the panel edges -->
+                                        SetWidth="414" VerticalExpand="True">
                             <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
-                                          SeparationOverride="6">
-                                <!-- Compact header: name, countdown, then round clock + info blob -->
+                                          SeparationOverride="4">
                                 <BoxContainer Orientation="Vertical" HorizontalExpand="True"
-                                              Margin="10 10 10 0" SeparationOverride="4">
-                                    <Label Name="ServerName" Access="Public" StyleClasses="LobbyTitle"
-                                           VAlign="Center" HorizontalExpand="True" HorizontalAlignment="Center"
-                                           ClipText="True" />
-                                    <Label Name="StartTime" Access="Public" Align="Center"
-                                           FontColorOverride="{x:Static maths:Color.Gold}"
-                                           StyleClasses="LobbyText" HorizontalExpand="True" />
-                                    <Label Name="StationTime" Access="Public" StyleClasses="LobbyText"
-                                           FontColorOverride="{x:Static maths:Color.LightGray}"
-                                           HorizontalAlignment="Center" />
+                                              Margin="10 8 10 4" SeparationOverride="2">
+                                    <maidControls:LobbyBracketHeading Text="{Loc 'ui-lobby-server-info-block'}"
+                                                                      HorizontalAlignment="Left" />
+                                    <Label Name="ServerName" Access="Public" StyleClasses="LobbyText"
+                                           HorizontalAlignment="Left" ClipText="True" Margin="0 2 0 0" />
                                     <info:ServerInfo Name="ServerInfo" Access="Public" StyleClasses="LobbyText"
-                                                     MinSize="0 24" VerticalExpand="false" Margin="0 4 0 4"
-                                                     HorizontalAlignment="Left" />
+                                                     MinSize="0 20" VerticalExpand="false"
+                                                     HorizontalAlignment="Left" Margin="0 2 0 2" />
+                                    <Label Name="StationTime" Access="Public" StyleClasses="LobbyText"
+                                           FontColorOverride="#E090C0"
+                                           HorizontalAlignment="Left" />
+                                    <Label Name="StartTime" Access="Public" StyleClasses="LobbyText"
+                                           FontColorOverride="#E090C0"
+                                           HorizontalAlignment="Left" Margin="0 0 0 2" />
                                 </BoxContainer>
-                                <!-- Chat: stretches to the full width of the panel and down to its bottom edge -->
                                 <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True"
                                                  HorizontalExpand="True"
-                                                 MinSize="0 225" Margin="0 0 0 0" />
+                                                 MinSize="0 180" Margin="0 0 0 0" />
                             </BoxContainer>
                         </PanelContainer>
                     </neon:NeonFlickerControl>
                 </BoxContainer>
-            <!-- Bottom-left corner of the lobby, drawn above the columns. -->
-            <RichTextLabel Name="LobbySong" Access="Public" StyleClasses="LobbyText"
-                           HorizontalAlignment="Left" MaxWidth="420" Visible="False" />
+            <!-- Track title/artist caption removed: credits already live in the audio files.
+            <RichTextLabel Name="LobbySong" Access="Public" StyleClasses="LobbyVersion"
+                           HorizontalAlignment="Left" MaxWidth="380" Visible="False" />
+            -->
             <TextureButton Name="ShowChangelogButton" Access="Public" Visible="False"
                            TexturePath="/Textures/Interface/Changelog/plus.svg.192dpi.png"
                            SetSize="20 20" ToolTip="{Loc 'ui-lobby-show-changelog-button'}" />
         </LayoutContainer>
-        <!-- Character setup state -->
-        <!-- This is injected on startup. Funky! -->
         <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" />
     </BoxContainer>
 </lobbyUi:LobbyGui>

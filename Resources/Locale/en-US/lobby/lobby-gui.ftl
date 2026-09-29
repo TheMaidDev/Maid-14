@@ -22,4 +22,5 @@ ui-lobby-hide-ui-button = Hide interface
 ui-lobby-show-ui-button = Show interface
 ui-lobby-toggle-changelog-button = Hide changelog
 ui-lobby-show-changelog-button = Show changelog
+ui-lobby-discord-already-linked = Discord already linked
 ui-options-custom-ghosts-button = Custom ghost

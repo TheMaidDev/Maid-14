@@ -51,6 +51,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Lobby.UI;
 using Content.Client._RMC14.LinkAccount;
 using Content.Client.Info;
 using Content.Client.Resources;
@@ -71,20 +72,21 @@ namespace Content.Client.Lobby.UI
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
         [Dependency] private readonly IResourceCache _resourceCache = default!;
 
-        public const string IconReady = "/Textures/Interface/Nano/checkbox_checked.svg.96dpi.png";
-        public const string IconNotReady = "/Textures/Interface/Nano/cross.svg.png";
-        public const string IconJoin = "/Textures/Interface/VerbIcons/in.svg.192dpi.png";
-        public const string IconAHelp = "/Textures/Interface/VerbIcons/examine.svg.192dpi.png";
+        public const string IconAHelp = "/Textures/Interface/VerbIcons/light.svg.192dpi.png";
         public const string IconHideUi = "/Textures/Interface/hamburger.svg.192dpi.png";
         public const string IconShowUi = "/Textures/Interface/VerbIcons/examine.svg.192dpi.png";
 
         public static readonly Color MenuIconNormal = Color.FromHex("#C9C9C9");
         public static readonly Color MenuIconHover = Color.FromHex("#F0C96A");
+        public static readonly Color MenuIconDisabled = Color.FromHex("#555555");
         public static readonly Color ReadyGreen = Color.FromHex("#6ED18D");
         public static readonly Color ReadyRed = Color.FromHex("#D16E6E");
         public static readonly Color AHelpUnread = Color.FromHex("#E5534B");
 
         public bool UiHidden { get; private set; }
+
+        private Label? _aHelpRest;
+        private bool _aHelpUnread;
 
         public LobbyGui()
         {
@@ -93,28 +95,27 @@ namespace Content.Client.Lobby.UI
             SetAnchorPreset(MainContainer, LayoutPreset.Wide);
             SetAnchorPreset(Background, LayoutPreset.Wide);
 
-            // DefaultState is a LayoutContainer: BottomSide fills it (with the 10px top/bottom inset),
-            // and the vote popups float at the top-left instead of pushing the layout down.
             LayoutContainer.SetAnchorPreset(BottomSide, LayoutPreset.Wide);
-            LayoutContainer.SetMarginTop(BottomSide, 10);
-            LayoutContainer.SetMarginBottom(BottomSide, 10);
+            LayoutContainer.SetMarginTop(BottomSide, 8);
+            LayoutContainer.SetMarginBottom(BottomSide, 8);
 
             LayoutContainer.SetAnchorPreset(VoteContainer, LayoutPreset.TopLeft);
             LayoutContainer.SetMarginLeft(VoteContainer, 20);
-            LayoutContainer.SetMarginTop(VoteContainer, 60);
+            LayoutContainer.SetMarginTop(VoteContainer, 56);
 
             LayoutContainer.SetAnchorPreset(HideUiButton, LayoutPreset.TopLeft);
-            LayoutContainer.SetMarginLeft(HideUiButton, 16);
-            LayoutContainer.SetMarginTop(HideUiButton, 12);
+            LayoutContainer.SetMarginLeft(HideUiButton, 14);
+            LayoutContainer.SetMarginTop(HideUiButton, 10);
 
-            LayoutContainer.SetAnchorAndMarginPreset(LobbySong, LayoutContainer.LayoutPreset.BottomLeft, margin: 56);
-            LayoutContainer.SetGrowVertical(LobbySong, LayoutContainer.GrowDirection.Begin);
+            // Track caption is commented out in LobbyGui.xaml.
+            // LayoutContainer.SetAnchorAndMarginPreset(LobbySong, LayoutContainer.LayoutPreset.BottomLeft, margin: 48);
+            // LayoutContainer.SetGrowVertical(LobbySong, LayoutContainer.GrowDirection.Begin);
 
             LayoutContainer.SetAnchorPreset(ShowChangelogButton, LayoutPreset.BottomLeft);
             LayoutContainer.SetGrowVertical(ShowChangelogButton, LayoutContainer.GrowDirection.Begin);
-            LayoutContainer.SetMarginLeft(ShowChangelogButton, 20);
-            LayoutContainer.SetMarginTop(ShowChangelogButton, -56);
-            LayoutContainer.SetMarginBottom(ShowChangelogButton, -56);
+            LayoutContainer.SetMarginLeft(ShowChangelogButton, 18);
+            LayoutContainer.SetMarginTop(ShowChangelogButton, -48);
+            LayoutContainer.SetMarginBottom(ShowChangelogButton, -48);
 
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
@@ -134,9 +135,10 @@ namespace Content.Client.Lobby.UI
             BindMenuIcon(LeaveButton, LeaveIcon);
 
             AHelpIcon.ModulateSelfOverride = MenuIconNormal;
-            ReadyIcon.ModulateSelfOverride = ReadyRed;
+            ReadyIcon.IconColor = ReadyRed;
+            ReadyIcon.Mode = ReadyStatusIcon.ReadyIconMode.NotReady;
+            SetupAHelpCaption();
 
-            // Keep wheel scrolling but make the changelog scroll bars invisible.
             foreach (var child in ChangelogScrollContainer.Children)
             {
                 if (child is ScrollBar scrollBar)
@@ -162,36 +164,105 @@ namespace Content.Client.Lobby.UI
         {
             if (gameStarted)
             {
-                SetIcon(ReadyIcon, IconJoin);
-                ReadyIcon.ModulateSelfOverride = MenuIconNormal;
+                ReadyIcon.Mode = ReadyStatusIcon.ReadyIconMode.Join;
+                ReadyIcon.IconColor = MenuIconNormal;
                 ReadyButton.Label.FontColorOverride = null;
                 return;
             }
 
-            SetIcon(ReadyIcon, ready ? IconReady : IconNotReady);
+            ReadyIcon.Mode = ready
+                ? ReadyStatusIcon.ReadyIconMode.Ready
+                : ReadyStatusIcon.ReadyIconMode.NotReady;
             var color = ready ? ReadyGreen : ReadyRed;
-            ReadyIcon.ModulateSelfOverride = color;
+            ReadyIcon.IconColor = color;
             ReadyButton.Label.FontColorOverride = color;
         }
 
         public void UpdateAHelpVisuals(bool unread, bool open)
         {
+            _aHelpUnread = unread;
             SetIcon(AHelpIcon, IconAHelp);
+            RefreshAHelpCaption(false);
             if (unread)
             {
                 AHelpIcon.ModulateSelfOverride = AHelpUnread;
                 return;
             }
 
-            // Open eye when the ahelp window is up, dimmer "closed" eye otherwise.
             AHelpIcon.ModulateSelfOverride = open
                 ? Color.White
                 : Color.FromHex("#6A6A6A");
         }
 
+        private void SetupAHelpCaption()
+        {
+            // The stock button label is one color. Draw "A" separately so it stays red.
+            AHelpButton.Label.Visible = false;
+            var text = Loc.GetString("ui-lobby-ahelp-button");
+            var letter = text.Length > 0 ? text[..1] : "A";
+            var rest = text.Length > 1 ? text[1..] : "Help";
+            var font = _resourceCache.GetFont(
+            [
+                "/Fonts/_Maid/IBMPlexSans/IBMPlexSans-Medium.ttf",
+                "/Fonts/NotoSans/NotoSans-Regular.ttf",
+            ], 13);
+
+            _aHelpRest = new Label
+            {
+                Text = rest,
+                FontOverride = font,
+                FontColorOverride = MenuIconNormal,
+                VerticalAlignment = VAlignment.Center,
+            };
+
+            AHelpButton.AddChild(new BoxContainer
+            {
+                Orientation = BoxContainer.LayoutOrientation.Horizontal,
+                SeparationOverride = 0,
+                MouseFilter = MouseFilterMode.Ignore,
+                Children =
+                {
+                    new Label
+                    {
+                        Text = letter,
+                        FontOverride = font,
+                        FontColorOverride = AHelpUnread,
+                        VerticalAlignment = VAlignment.Center,
+                    },
+                    _aHelpRest,
+                },
+            });
+
+            AHelpButton.OnMouseEntered += _ => RefreshAHelpCaption(true);
+            AHelpButton.OnMouseExited += _ => RefreshAHelpCaption(false);
+        }
+
+        private void RefreshAHelpCaption(bool hover)
+        {
+            if (_aHelpRest == null)
+                return;
+
+            _aHelpRest.FontColorOverride = _aHelpUnread
+                ? AHelpUnread
+                : hover ? MenuIconHover : MenuIconNormal;
+        }
+
         public void UpdateObserveIcon(bool enabled)
         {
-            ObserveIcon.ModulateSelfOverride = enabled ? MenuIconNormal : Color.FromHex("#555555");
+            ObserveIcon.ModulateSelfOverride = enabled ? MenuIconNormal : MenuIconDisabled;
+            if (ObserveButton.Label != null)
+                ObserveButton.Label.FontColorOverride = enabled ? null : MenuIconDisabled;
+        }
+
+        public void UpdateDiscordLinked(bool linked)
+        {
+            MenuDiscordButton.Disabled = linked;
+            DiscordIcon.ModulateSelfOverride = linked ? MenuIconDisabled : MenuIconNormal;
+            if (MenuDiscordButton.Label != null)
+                MenuDiscordButton.Label.FontColorOverride = linked ? MenuIconDisabled : null;
+            MenuDiscordButton.ToolTip = linked
+                ? Loc.GetString("ui-lobby-discord-already-linked")
+                : null;
         }
 
         private void BindMenuIcon(Button button, TextureRect icon)
@@ -204,7 +275,7 @@ namespace Content.Client.Lobby.UI
             };
             button.OnMouseExited += _ =>
             {
-                icon.ModulateSelfOverride = button.Disabled ? Color.FromHex("#555555") : MenuIconNormal;
+                icon.ModulateSelfOverride = button.Disabled ? MenuIconDisabled : MenuIconNormal;
             };
         }
 
@@ -243,13 +314,7 @@ namespace Content.Client.Lobby.UI
 
         public enum LobbyGuiState : byte
         {
-            /// <summary>
-            ///  The default state, i.e., what's seen on launch.
-            /// </summary>
             Default,
-            /// <summary>
-            ///  The character setup state.
-            /// </summary>
             CharacterSetup
         }
     }
