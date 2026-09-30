@@ -393,15 +393,15 @@ namespace Content.Client.Stylesheets
                 "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
             }, size);
-            // Reference lobby uses IBM Plex Mono Regular throughout — Bold looks too heavy.
-            var jbmMenu = MaidMono(13);
-            var jbmText = MaidMono(12);
-            var jbmHeading = MaidMono(14);
-            var jbmTitle = MaidMono(18);
-            var jbmServerName = MaidMono(16);
-            var jbmVersion = MaidMono(10);
-            var lobbyMeta = MaidMono(12);
-            var lobbyCountdown = MaidMono(13);
+            // White Dream reference is IBM Plex Mono at the Light cut: upright, thinner than Regular.
+            var jbmMenu = MaidMono(13, "Light");
+            var jbmText = MaidMono(12, "Light");
+            var jbmHeading = MaidMono(14, "Light");
+            var jbmTitle = MaidMono(18, "Light");
+            var jbmServerName = MaidMono(16, "Light");
+            var jbmVersion = MaidMono(10, "Light");
+            var lobbyMeta = MaidMono(12, "Light");
+            var lobbyCountdown = MaidMono(13, "Light");
             var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
             var windowHeader = new StyleBoxTexture
             {
@@ -2304,21 +2304,18 @@ namespace Content.Client.Stylesheets
                     .Prop(Label.StylePropertyFont, jbmServerName)
                     .Prop(Label.StylePropertyFontColor, LobbyLavender),
 
-                // Right lobby panel: dark plate with a thin violet border.
+                // Right lobby panel: gray plate, no outline (violet border removed).
                 Element<PanelContainer>().Class(StyleClassLobbyPanel)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
                         BackgroundColor = Color.FromHex("#12131AE6"),
-                        BorderColor = Color.FromHex("#7A5C93"),
-                        BorderThickness = new Thickness(1),
                     }),
 
-                // Changelog column: no frame in the reference, just enough scrim to stay readable
-                // over the animated background.
+                // Changelog column: same gray fill and alpha as the right panel, no frame.
                 Element<PanelContainer>().Class(StyleClassLobbyColumnPanel)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
-                        BackgroundColor = Color.FromHex("#0A0B1099"),
+                        BackgroundColor = Color.FromHex("#12131AE6"),
                     }),
 
                 // Horizontal violet separator (under the server name, above the chat).

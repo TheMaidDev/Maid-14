@@ -49,7 +49,10 @@ chat-manager-no-radio-key = No radio key specified!
 chat-manager-no-such-channel = There is no channel with key '{$key}'!
 chat-manager-whisper-headset-on-message = You can't whisper on the radio!
 
-chat-manager-server-wrap-message = [bold]{$message}[/bold]
+# Maid: ordinary server/lobby lines use the base chat face (IBM Plex Mono Light).
+# Do not wrap these in [bold] — that forces DefaultBold and makes lobby chat look heavy.
+# Real announcements keep [bold] via chat-manager-sender-announcement-wrap-message.
+chat-manager-server-wrap-message = {$message}
 chat-manager-sender-announcement = Central Command
 chat-manager-sender-announcement-wrap-message = [font size=14][bold]{$sender} Announcement:[/font][font size=12]
                                                 {$message}[/bold][/font]

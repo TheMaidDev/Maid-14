@@ -140,6 +140,14 @@ namespace Content.Client.Lobby.UI
             ReadyIcon.Mode = ReadyStatusIcon.ReadyIconMode.NotReady;
             SetupAHelpCaption();
 
+            // Lobby chat keeps the shared ChatBox widget, but drops its framed
+            // MaidTransparentBackground plate so the right column matches the
+            // frameless White Dream reference.
+            Chat.ChatWindowPanel.PanelOverride = new StyleBoxFlat
+            {
+                BackgroundColor = Color.Transparent,
+            };
+
             foreach (var child in ChangelogScrollContainer.Children)
             {
                 if (child is ScrollBar scrollBar)

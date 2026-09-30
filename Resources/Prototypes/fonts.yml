@@ -8,11 +8,12 @@
 
 - type: font
   id: Default
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf
+  # Maid: match lobby/chat base face (IBM Plex Mono Light). [bold] still uses DefaultBold.
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Light.ttf
 
 - type: font
   id: DefaultItalic
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Italic.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-LightItalic.ttf
 
 - type: font
   id: DefaultBold
