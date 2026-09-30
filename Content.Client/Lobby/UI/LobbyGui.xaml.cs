@@ -313,7 +313,13 @@ namespace Content.Client.Lobby.UI
 
         public enum LobbyGuiState : byte
         {
+            /// <summary>
+            ///  The default state, i.e., what's seen on launch.
+            /// </summary>
             Default,
+            /// <summary>
+            ///  The character setup state.
+            /// </summary>
             CharacterSetup
         }
     }

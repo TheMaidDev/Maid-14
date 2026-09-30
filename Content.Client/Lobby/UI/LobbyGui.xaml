@@ -45,11 +45,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                   Margin="8 8 8 8" SeparationOverride="2">
         <LayoutContainer Name="DefaultState" VerticalExpand="True" HorizontalExpand="True">
             <!-- Maid-Tweak-start -->
+            <!-- Voting Popups -->
             <BoxContainer Orientation="Vertical" SeparationOverride="4" Name="VoteContainer"
                           Access="Public" HorizontalAlignment="Left" VerticalAlignment="Top" />
             <TextureButton Name="HideUiButton" Access="Public"
                            TexturePath="/Textures/Interface/hamburger.svg.192dpi.png"
                            SetSize="24 24" ToolTip="{Loc 'ui-lobby-hide-ui-button'}" />
+            <!-- Bottom Panel -->
             <BoxContainer Name="BottomSide" Orientation="Horizontal" VerticalAlignment="Stretch"
                           HorizontalExpand="True" VerticalExpand="True"
                           SeparationOverride="6" Margin="0 6 0 6">
@@ -127,6 +129,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             </BoxContainer>
 
                             <Control VerticalExpand="True" />
+                            <!-- Character Preview & Preferences -->
                             <BoxContainer Name="HiddenCharacterArea" Visible="False" Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
                                 <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" HorizontalExpand="True" VerticalExpand="True" />
                                 <maidControls:CharacterPreferencesWidget Name="PreferencesWidget" Access="Public" HorizontalExpand="True" Margin="0 0 0 0"/>
@@ -177,6 +180,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                                     MinSize="0 2" Margin="0 5 0 12" />
                                     <maidControls:LobbyBracketHeading Text="{Loc 'ui-lobby-server-info-block'}"
                                                                       HorizontalAlignment="Left" VerticalExpand="False" />
+                                    <!-- Server info -->
                                     <info:ServerInfo Name="ServerInfo" Access="Public" StyleClasses="LobbyText"
                                                      VerticalExpand="False"
                                                      HorizontalAlignment="Left" Margin="0 11 0 2" />
@@ -189,6 +193,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                 </BoxContainer>
                                 <PanelContainer Name="ChatRule" Access="Public" StyleClasses="LobbyRule"
                                                 MinSize="0 2" Margin="10 14 10 0" />
+                                <!-- Chat -->
                                 <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True"
                                                  HorizontalExpand="True"
                                                  MinSize="0 180" Margin="0 4 0 0" />
@@ -201,6 +206,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                            SetSize="20 20" ToolTip="{Loc 'ui-lobby-show-changelog-button'}" />
             <!-- Maid-Tweak-end -->
         </LayoutContainer>
+        <!-- Character setup state -->
+        <!-- This is injected on startup. Funky! -->
         <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" />
     </BoxContainer>
 </lobbyUi:LobbyGui>
