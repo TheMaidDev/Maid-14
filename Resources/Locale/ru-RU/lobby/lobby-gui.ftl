@@ -1,4 +1,5 @@
 ui-lobby-title = Лобби: { $serverName }
+# Maid-Tweak
 ui-lobby-character-setup-button = Персонаж
 ui-lobby-ahelp-button = AHelp
 ui-lobby-options-button = Настройки
@@ -7,6 +8,7 @@ ui-lobby-observe-button = Наблюдать
 ui-lobby-ready-up-button = Готовность
 ui-lobby-online-players-block = Текущие игроки
 ui-lobby-server-info-block = Серверная информация
+# Maid-Tweak
 ui-lobby-rules-guidebook-button = Правила и руководство
 ui-lobby-changelog-heading = Список изменений:
 ui-lobby-hide-ui-button = Скрыть интерфейс

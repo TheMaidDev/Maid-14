@@ -64,8 +64,7 @@ namespace Content.Client.Stylesheets
         // Goobstation - ZH text support
         protected StyleBase(IResourceCache resCache)
         {
-            // Maid: IBM Plex Mono Light is the default interface face (same cut as lobby headings);
-            // Noto only covers missing glyphs. Regular looked too heavy next to Light headers.
+            // Maid-Tweak-start
             var notoSans12 = resCache.GetFont
             (
                 new []
@@ -82,7 +81,7 @@ namespace Content.Client.Stylesheets
             (
                 new []
                 {
-                    "/Fonts/_Maid/IBMPlexMono/IBMPlexMono-LightItalic.ttf",
+                    "/Fonts/_Maid/IBMPlexMono/IBMPlexMono-LightItalic.ttf", // Maid-Tweak-end
                     "/Fonts/NotoSans/NotoSans-Italic.ttf",
                     "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",

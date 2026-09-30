@@ -32,8 +32,8 @@ namespace Content.Client.Info
 
             _richTextLabel = new RichTextLabel
             {
-                VerticalExpand = false,
-                StyleClasses = { StyleNano.StyleClassLobbyText }
+                VerticalExpand = false, // Maid-Tweak
+                StyleClasses = { StyleNano.StyleClassLobbyText } // Maid-Tweak
             };
             AddChild(_richTextLabel);
         }

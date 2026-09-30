@@ -30,8 +30,8 @@ public sealed partial class LoadingScreenControl : Control
 
         LayoutContainer.SetAnchorPreset(this, LayoutContainer.LayoutPreset.Wide);
         // Goobstation - ZH text support start
-        Header.FontOverride = resCache.NotoStack2ElectricBoogaloo("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf", 24);
-        Subtext.FontOverride = resCache.NotoStack2ElectricBoogaloo("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf", 12);
+        Header.FontOverride = resCache.NotoStack2ElectricBoogaloo("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf", 24); // Maid-Tweak
+        Subtext.FontOverride = resCache.NotoStack2ElectricBoogaloo("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf", 12); // Maid-Tweak
         // Goobstation - ZH text support end
 
         SpriteLeft.SetFromSpriteSpecifier(Sprite);

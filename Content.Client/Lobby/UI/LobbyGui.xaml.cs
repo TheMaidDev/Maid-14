@@ -51,7 +51,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Content.Client._Maid.Lobby.UI;
+using Content.Client._Maid.Lobby.UI; // Maid-Tweak
 using Content.Client._RMC14.LinkAccount;
 using Content.Client.Info;
 using Content.Client.Resources;
@@ -71,8 +71,9 @@ namespace Content.Client.Lobby.UI
     public sealed partial class LobbyGui : UIScreen
     {
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
-        [Dependency] private readonly IResourceCache _resourceCache = default!;
+        [Dependency] private readonly IResourceCache _resourceCache = default!; // Maid-Tweak
 
+        // Maid-Tweak-start
         public const string IconAHelp = "/Textures/Interface/VerbIcons/information.svg.192dpi.png";
         public const string IconHideUi = "/Textures/Interface/hamburger.svg.192dpi.png";
         public const string IconShowUi = "/Textures/Interface/VerbIcons/examine.svg.192dpi.png";
@@ -108,10 +109,6 @@ namespace Content.Client.Lobby.UI
             LayoutContainer.SetMarginLeft(HideUiButton, 14);
             LayoutContainer.SetMarginTop(HideUiButton, 10);
 
-            // Track caption is commented out in LobbyGui.xaml.
-            // LayoutContainer.SetAnchorAndMarginPreset(LobbySong, LayoutContainer.LayoutPreset.BottomLeft, margin: 48);
-            // LayoutContainer.SetGrowVertical(LobbySong, LayoutContainer.GrowDirection.Begin);
-
             LayoutContainer.SetAnchorPreset(ShowChangelogButton, LayoutPreset.BottomLeft);
             LayoutContainer.SetGrowVertical(ShowChangelogButton, LayoutContainer.GrowDirection.Begin);
             LayoutContainer.SetMarginLeft(ShowChangelogButton, 18);
@@ -140,9 +137,7 @@ namespace Content.Client.Lobby.UI
             ReadyIcon.Mode = ReadyStatusIcon.ReadyIconMode.NotReady;
             SetupAHelpCaption();
 
-            // Lobby chat keeps the shared ChatBox widget, but drops its framed
-            // MaidTransparentBackground plate so the right column matches the
-            // frameless White Dream reference.
+            // Maid-Tweak
             Chat.ChatWindowPanel.PanelOverride = new StyleBoxFlat
             {
                 BackgroundColor = Color.Transparent,
@@ -205,7 +200,6 @@ namespace Content.Client.Lobby.UI
 
         private void SetupAHelpCaption()
         {
-            // The stock button label is one color. Draw "A" separately so it stays red.
             AHelpButton.Label.Visible = false;
             var text = Loc.GetString("ui-lobby-ahelp-button");
             var letter = text.Length > 0 ? text[..1] : "A";
@@ -287,6 +281,7 @@ namespace Content.Client.Lobby.UI
         {
             icon.Texture = _resourceCache.GetTexture(path);
         }
+        // Maid-Tweak-end
 
         public void SwitchState(LobbyGuiState state)
         {
@@ -297,13 +292,13 @@ namespace Content.Client.Lobby.UI
             {
                 case LobbyGuiState.Default:
                     DefaultState.Visible = true;
-                    BottomSide.Visible = !UiHidden;
+                    BottomSide.Visible = !UiHidden; // Maid-Tweak
                     break;
                 case LobbyGuiState.CharacterSetup:
                     CharacterSetupState.Visible = true;
 
                     var actualWidth = (float) UserInterfaceManager.RootControl.PixelWidth;
-                    var setupWidth = (float) MainContainer.PixelWidth;
+                    var setupWidth = (float) MainContainer.PixelWidth; // Maid-Tweak
 
                     if (1 - (setupWidth / actualWidth) > 0.30)
                     {

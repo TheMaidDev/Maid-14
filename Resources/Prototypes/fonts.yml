@@ -8,20 +8,19 @@
 
 - type: font
   id: Default
-  # Maid: match lobby/chat base face (IBM Plex Mono Light). [bold] still uses DefaultBold.
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Light.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Light.ttf # Maid-Tweak
 
 - type: font
   id: DefaultItalic
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-LightItalic.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-LightItalic.ttf # Maid-Tweak
 
 - type: font
   id: DefaultBold
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf # Maid-Tweak
 
 - type: font
   id: DefaultBoldItalic
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-BoldItalic.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-BoldItalic.ttf # Maid-Tweak
 
 - type: font
   id: NotoSansDisplay
@@ -49,7 +48,7 @@
 
 - type: font
   id: Monospace
-  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf
+  path: /Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf # Maid-Tweak
 
 - type: font
   id: Emoji

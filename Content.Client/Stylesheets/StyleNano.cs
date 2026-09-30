@@ -157,8 +157,7 @@ namespace Content.Client.Stylesheets
     public static class ResCacheExtension
     {
         // Goobstation - ZH text support start
-        // Maid: IBM Plex Mono is the interface face for the whole game. Noto stays in the stack
-        // as a fallback for glyphs IBM Plex does not ship (symbols, CJK).
+        // Maid-Tweak
         public static Font NotoStack(this IResourceCache resCache, string variation = "Regular", int size = 10, bool display = false)
         {
             var bold = variation.StartsWith("Bold", StringComparison.Ordinal);
@@ -166,7 +165,6 @@ namespace Content.Client.Stylesheets
             var sv = bold ? "Bold" : "Regular";
             var ds = display ? "Display" : "";
 
-            // IBM Plex Mono ships all four faces, so italics keep the interface font too.
             var ibmVariation = (bold, italic) switch
             {
                 (true, true) => "BoldItalic",
@@ -216,7 +214,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassHandSlotHighlight = "HandSlotHighlight";
         public const string StyleClassChatPanel = "ChatPanel";
         public const string StyleClassChatSubPanel = "ChatSubPanel";
-        public const string StyleClassHiddenScrollbar = "HiddenScrollbar";
+        public const string StyleClassHiddenScrollbar = "HiddenScrollbar"; // Maid-Tweak
         public const string StyleClassTransparentBorderedWindowPanel = "TransparentBorderedWindowPanel";
         public const string StyleClassHotbarPanel = "HotbarPanel";
         public const string StyleClassTooltipPanel = "tooltipBox";
@@ -257,7 +255,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassButtonBig = "ButtonBig";
         public const string StyleClassMenuTextButton = "MenuTextButton";
 
-        // Maid: lobby font style classes (IBM Plex).
+        // Maid-Tweak-start
         public const string StyleClassLobbyTitle = "LobbyTitle";
         public const string StyleClassLobbyHeading = "LobbyHeading";
         public const string StyleClassLobbyText = "LobbyText";
@@ -272,12 +270,12 @@ namespace Content.Client.Stylesheets
         public const string StyleClassLobbyColumnPanel = "LobbyColumnPanel";
         public const string StyleClassLobbyRule = "LobbyRule";
 
-        // Maid lobby palette, sampled off the reference lobby screenshot.
         public static readonly Color LobbyLavender = Color.FromHex("#C9A0DC");
         public static readonly Color LobbyViolet = Color.FromHex("#B48EDC");
         public static readonly Color LobbyMagenta = Color.FromHex("#E255B0");
         public static readonly Color LobbyGold = Color.FromHex("#D4B56A");
         public static readonly Color LobbyTextWhite = Color.FromHex("#E6E6EC");
+        // Maid-Tweak-end
 
         public const string StyleClassButtonHelp = "HelpButton";
 
@@ -384,7 +382,7 @@ namespace Content.Client.Stylesheets
             var robotoMonoBold12 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 12);
             var robotoMonoBold14 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 14);
 
-            // Maid: IBM Plex Mono is the interface face; Noto only fills glyphs it lacks.
+            // Maid-Tweak-start
             Font MaidMono(int size, string weight = "Regular") => resCache.GetFont(new[]
             {
                 $"/Fonts/_Maid/IBMPlexMono/IBMPlexMono-{weight}.ttf",
@@ -393,7 +391,6 @@ namespace Content.Client.Stylesheets
                 "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
                 "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
             }, size);
-            // White Dream reference is IBM Plex Mono at the Light cut: upright, thinner than Regular.
             var jbmMenu = MaidMono(13, "Light");
             var jbmText = MaidMono(12, "Light");
             var jbmHeading = MaidMono(14, "Light");
@@ -402,6 +399,7 @@ namespace Content.Client.Stylesheets
             var jbmVersion = MaidMono(10, "Light");
             var lobbyMeta = MaidMono(12, "Light");
             var lobbyCountdown = MaidMono(13, "Light");
+            // Maid-Tweak-end
             var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
             var windowHeader = new StyleBoxTexture
             {
@@ -487,8 +485,7 @@ namespace Content.Client.Stylesheets
             };
             borderedTransparentWindowBackground.SetPatchMargin(StyleBox.Margin.All, 3);
 
-            // Invisible scroll bar grabber (used by StyleClassHiddenScrollbar) - scrolling keeps working,
-            // but no bar is drawn.
+            // Maid-Tweak
             var invisibleGrabber = new StyleBoxFlat
             {
                 BackgroundColor = Color.Transparent,
@@ -498,7 +495,7 @@ namespace Content.Client.Stylesheets
                 ContentMarginBottomOverride = 1,
             };
 
-            // Plain text menu buttons (lobby left menu): no box/background, just text.
+            // Maid-Tweak
             var menuTextButtonStyle = new StyleBoxFlat
             {
                 BackgroundColor = Color.Transparent,
@@ -926,7 +923,7 @@ namespace Content.Client.Stylesheets
                     {
                         new StyleProperty(PanelContainer.StylePropertyPanel, borderedTransparentWindowBackground),
                     }),
-                // Hidden (invisible) scroll bars: keep scrolling working but draw no bar.
+                // Maid-Tweak
                 new StyleRule(
                     new SelectorElement(typeof(VScrollBar), new[] {StyleClassHiddenScrollbar}, null, null),
                     new[]
@@ -2222,15 +2219,10 @@ namespace Content.Client.Stylesheets
                     .Class(StyleClassInset)
                     .Prop(PanelContainer.StylePropertyPanel, insetBack),
 
-                // Lobby left menu: plain text buttons. No box, hover recolors the label.
-                // Only Button subclasses are used (Button restyles its inner Label on pseudo-class
-                // changes; plain ContainerButton would not recolor on hover).
+                // Maid-Tweak-start
                 Element<Button>()
                     .Class(StyleClassMenuTextButton)
                     .Prop(ContainerButton.StylePropertyStyleBox, menuTextButtonStyle),
-
-                // Button is deeper in the class hierarchy than plain ContainerButton, so the rules above
-                // must use typeof(Button) to out-specificity the default "button" class rules.
 
                 Element<Button>()
                     .Class(StyleClassMenuTextButton)
@@ -2288,9 +2280,6 @@ namespace Content.Client.Stylesheets
                         new StyleProperty("font-color", Color.FromHex("#5A5A5A")),
                     }),
 
-                // Maid lobby: IBM Plex headings and body text.
-                // Reference lobby keeps the left-hand title and the column headings near-white;
-                // violet/gold are reserved for the right panel accents.
                 Element<Label>().Class(StyleClassLobbyTitle)
                     .Prop(Label.StylePropertyFont, jbmTitle)
                     .Prop(Label.StylePropertyFontColor, Color.FromHex("#F2F2F4")),
@@ -2299,30 +2288,25 @@ namespace Content.Client.Stylesheets
                     .Prop(Label.StylePropertyFont, jbmHeading)
                     .Prop(Label.StylePropertyFontColor, LobbyTextWhite),
 
-                // Server name crowning the right panel: bigger than the body text, lavender.
                 Element<Label>().Class(StyleClassLobbyServerName)
                     .Prop(Label.StylePropertyFont, jbmServerName)
                     .Prop(Label.StylePropertyFontColor, LobbyLavender),
 
-                // Right lobby panel: gray plate, no outline (violet border removed).
                 Element<PanelContainer>().Class(StyleClassLobbyPanel)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
                         BackgroundColor = Color.FromHex("#12131AE6"),
                     }),
 
-                // Changelog column: same gray fill and alpha as the right panel, no frame.
                 Element<PanelContainer>().Class(StyleClassLobbyColumnPanel)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
                         BackgroundColor = Color.FromHex("#12131AE6"),
                     }),
 
-                // Horizontal violet separator (under the server name, above the chat).
                 Element<PanelContainer>().Class(StyleClassLobbyRule)
                     .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
                     {
-                        // The reference rules are muted, not neon: violet at roughly half strength.
                         BackgroundColor = LobbyViolet.WithAlpha(0.6f),
                     }),
 
@@ -2337,7 +2321,6 @@ namespace Content.Client.Stylesheets
                     .Prop(Label.StylePropertyFont, jbmVersion)
                     .Prop(Label.StylePropertyFontColor, Color.DarkGray),
 
-                // Same face as the left menu buttons, for labels that are not the button's own.
                 Element<Label>().Class(StyleClassLobbyMenuText)
                     .Prop(Label.StylePropertyFont, jbmMenu),
 
@@ -2361,14 +2344,12 @@ namespace Content.Client.Stylesheets
                         ContentMarginBottomOverride = 6,
                     }),
 
-                // Only swaps the font (keeps whatever color the other style class set).
                 Element<Label>().Class(StyleClassLobbyFont)
                     .Prop(Label.StylePropertyFont, jbmText),
 
                 Element<RichTextLabel>().Class(StyleClassLobbyFont)
                     .Prop(Label.StylePropertyFont, jbmText),
 
-                // ServerInfo is a BoxContainer whose child RichTextLabel shows the info blob.
                 new StyleRule(new SelectorChild(
                     new SelectorElement(typeof(ServerInfo), new[] {StyleClassLobbyText}, null, null),
                     new SelectorElement(typeof(RichTextLabel), null, null, null)),
@@ -2377,7 +2358,6 @@ namespace Content.Client.Stylesheets
                         new StyleProperty("font", jbmText),
                     }),
 
-                // Maid: chat output + input use IBM Plex (overrides the global Noto default).
                 Element<CustomOutputPanel>()
                     .Prop("font", jbmText),
 
@@ -2395,6 +2375,7 @@ namespace Content.Client.Stylesheets
                     {
                         new StyleProperty("font", jbmMenu),
                     }),
+                // Maid-Tweak-end
             }).ToList());
         }
     }

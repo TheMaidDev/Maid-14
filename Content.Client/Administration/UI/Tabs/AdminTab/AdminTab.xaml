@@ -36,6 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             <cc:CommandButton Command="faxui" Text="{Loc admin-player-actions-window-admin-fax}"/>
             <cc:CommandButton Command="timetransferpanel" Text="{Loc admin-player-actions-window-time-transfer}"/>
             <cc:CommandButton Command="achatwindow" Text="{Loc admin-player-actions-window-admin-chat}"/>
+            <!-- Maid-Tweak -->
             <whiteButtons:CustomGhostsMenuOpenButton Text="{Loc 'ui-options-custom-ghosts-button'}" />
         </GridContainer>
     </BoxContainer>

@@ -6,9 +6,6 @@ using Robust.Shared.Timing;
 
 namespace Content.Client._Maid.UserInterface.Neon;
 
-/// <summary>
-/// Soft neon-sign flicker: slow brightness pulse with rare short dropouts.
-/// </summary>
 public sealed class NeonFlickerControl : BoxContainer
 {
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -16,9 +13,6 @@ public sealed class NeonFlickerControl : BoxContainer
     private float _phase;
     private float _flickerRemaining;
 
-    /// <summary>
-    /// How strong the pulse and dropouts are. 1 is the default lobby intensity.
-    /// </summary>
     public float Intensity { get; set; } = 1f;
 
     public NeonFlickerControl()

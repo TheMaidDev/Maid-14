@@ -79,8 +79,8 @@
 
 using System.Linq;
 using Content.Client._RMC14.LinkAccount;
-using Content.Client._White.CustomGhosts.UI;
-using Content.Client._White.UserInterface;
+using Content.Client._White.CustomGhosts.UI; // Maid-Tweak
+using Content.Client._White.UserInterface; // Maid-Tweak
 using Content.Client.UserInterface.Screens;
 using Content.Shared._White;
 using Content.Shared._White.UserInterface;
@@ -104,7 +104,7 @@ public sealed partial class MiscTab : Control
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly LinkAccountManager _linkAccount = default!;
-    private readonly WindowTracker<CustomGhostsWindow> _customGhostsWindow = new();
+    private readonly WindowTracker<CustomGhostsWindow> _customGhostsWindow = new(); // Maid-Tweak
 
     public MiscTab()
     {
@@ -166,7 +166,7 @@ public sealed partial class MiscTab : Control
         Control.AddOptionCheckBox(CCVars.ChatFancyNameBackground, FancyNameBackgroundsCheckBox);
         Control.AddOptionCheckBox(CCVars.StaticStorageUI, StaticStorageUI);
 
-        CustomGhostsButton.OnPressed += _ => _customGhostsWindow.TryOpenCenteredLeft();
+        CustomGhostsButton.OnPressed += _ => _customGhostsWindow.TryOpenCenteredLeft(); // Maid-Tweak
 
         Control.Initialize();
     }

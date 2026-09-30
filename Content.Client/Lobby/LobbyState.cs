@@ -113,10 +113,10 @@ namespace Content.Client.Lobby
 {
     public sealed class LobbyState : Robust.Client.State.State
     {
+        // Maid-Tweak
         private const string MaidServerName = "Maid Cafe";
 
-        // Plain array + case-insensitive Equals: the sandbox whitelist has no System.StringComparer,
-        // so a comparer-backed HashSet fails the client type check at startup.
+        // Maid-Tweak
         private static readonly string[] PlaceholderServerNames =
         {
             "MyServer",
@@ -217,10 +217,7 @@ namespace Content.Client.Lobby
             Lobby = null;
         }
 
-        /// <summary>
-        /// Maid: the right panel is crowned with the server name. Prefer whatever the server
-        /// advertises, but never show an engine placeholder — fall back to our own brand.
-        /// </summary>
+        // Maid-Tweak
         private static string PickServerName(string? lobbyName, string? serverName)
         {
             if (IsRealName(lobbyName))
@@ -254,22 +251,18 @@ namespace Content.Client.Lobby
         {
             try
             {
-                // Load all changelog yml files (runs on a background thread).
+                // Maid-Tweak
                 var changelogs = await _changelog.LoadChangelog();
 
-                // We only want the Maid changelog (Resources/Changelog/MaidChangelog.yml -> Name: Maidlog).
                 var maidChangelog = changelogs.FirstOrDefault(c => c.Name == "Maidlog");
                 if (maidChangelog == null || Lobby == null)
                     return;
 
-                // Newest entries first (only the latest ones, full list is in the changelog window).
                 var entries = maidChangelog.Entries
                     .OrderByDescending(e => e.Time)
                     .Take(15)
                     .ToList();
 
-                // Fill the container with controls (same pattern as the ChangelogTab window,
-                // so long texts wrap and the ScrollContainer can scroll).
                 var body = Lobby.ChangelogBodyContainer;
                 body.Children.Clear();
                 Lobby.ChangelogScrollContainer.SetScrollValue(default);
@@ -286,7 +279,6 @@ namespace Content.Client.Lobby
 
                     firstEntry = false;
 
-                    // One header line per entry: tinted author, plain date, like the reference lobby.
                     var author = FormattedMessage.EscapeText(entry.Author);
                     var authorLabel = new RichTextLabel
                     {
@@ -335,10 +327,7 @@ namespace Content.Client.Lobby
                 : day.ToShortDateString();
         }
 
-        /// <summary>
-        /// Stable pastel tint per author, so the changelog reads like the reference lobby
-        /// where every contributor has their own colour.
-        /// </summary>
+        // Maid-Tweak
         private static string AuthorTint(string author)
         {
             var hash = 0;
@@ -401,7 +390,7 @@ namespace Content.Client.Lobby
             UpdateReadyButtonColor();
         }
 
-        // Maid: tint the ready button green/red and swap its check/cross icon.
+        // Maid-Tweak
         private void UpdateReadyButtonColor()
         {
             if (Lobby == null)
@@ -495,7 +484,7 @@ namespace Content.Client.Lobby
                 Lobby!.ServerInfo.SetInfoBlob(_gameTicker.ServerInfoBlob);
             }
 
-            //Maid edit start
+            // Maid-Tweak-start
             /*var minutesToday = _playtimeTracking.PlaytimeMinutesToday;
             if (minutesToday > 60)
             {
@@ -515,45 +504,16 @@ namespace Content.Client.Lobby
             }
             else
                 Lobby!.PlaytimeComment.Visible = false;*/
-            //Maid edit end
+            // Maid-Tweak-end
         }
 
-        private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent ev)
+        // Maid-Tweak
+        private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent _)
         {
-            // On-screen track credits were removed: title and artist stay in the audio files.
-            // if (Lobby == null)
-            //     return;
-            //
-            // if (ev.SoundtrackFilename == null)
-            // {
-            //     Lobby.LobbySong.Visible = false;
-            //     return;
-            // }
-            //
-            // if (!_resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource))
-            // {
-            //     Lobby.LobbySong.Visible = false;
-            //     return;
-            // }
-            //
-            // var lobbyStream = lobbySongResource.AudioStream;
-            //
-            // var title = string.IsNullOrEmpty(lobbyStream.Title)
-            //     ? Loc.GetString("lobby-state-song-unknown-title")
-            //     : lobbyStream.Title;
-            //
-            // var artist = string.IsNullOrEmpty(lobbyStream.Artist)
-            //     ? Loc.GetString("lobby-state-song-unknown-artist")
-            //     : lobbyStream.Artist;
-            //
-            // Lobby.LobbySong.SetMarkup(Loc.GetString("lobby-state-song-text",
-            //     ("songTitle", title),
-            //     ("songArtist", artist)));
-            // Lobby.LobbySong.Visible = true;
         }
 
         // Goobstation - heavily modified to add credits for lobby backgrounds
-        private void UpdateLobbyBackground() // Tweak-Maid: Animated Lobby
+        private void UpdateLobbyBackground() // Maid-Tweak
         {
             if (_gameTicker.AnimatedLobbyScreen != null)
             {

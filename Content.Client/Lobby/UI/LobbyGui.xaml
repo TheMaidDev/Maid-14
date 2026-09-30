@@ -40,28 +40,24 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     xmlns:maidControls="clr-namespace:Content.Client._Maid.Lobby.UI"
     xmlns:neon="clr-namespace:Content.Client._Maid.UserInterface.Neon">
     <!-- Background -->
-    <animated:AnimatedBackgroundControl Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background" /> <!-- Tweak-Maid: Animated Lobby -->
+    <animated:AnimatedBackgroundControl Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background" /> <!-- Maid-Tweak -->
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Vertical"
                   Margin="8 8 8 8" SeparationOverride="2">
         <LayoutContainer Name="DefaultState" VerticalExpand="True" HorizontalExpand="True">
-            <!-- Voting popups: overlaid on top-left, must NOT push the layout around -->
+            <!-- Maid-Tweak-start -->
             <BoxContainer Orientation="Vertical" SeparationOverride="4" Name="VoteContainer"
                           Access="Public" HorizontalAlignment="Left" VerticalAlignment="Top" />
-            <!-- Always-visible HUD toggle (stays when the rest of the lobby UI is hidden). -->
             <TextureButton Name="HideUiButton" Access="Public"
                            TexturePath="/Textures/Interface/hamburger.svg.192dpi.png"
                            SetSize="24 24" ToolTip="{Loc 'ui-lobby-hide-ui-button'}" />
-            <!-- Main 3-column layout, sized to survive 1280x720 -->
             <BoxContainer Name="BottomSide" Orientation="Horizontal" VerticalAlignment="Stretch"
                           HorizontalExpand="True" VerticalExpand="True"
                           SeparationOverride="6" Margin="0 6 0 6">
 
-                    <!-- COLUMN 1: left menu -->
                     <neon:NeonFlickerControl MinSize="180 0" MaxSize="250 Infinity"
                                              Margin="16 16 0 0" VerticalExpand="True">
                         <BoxContainer Orientation="Vertical" MinSize="180 0" VerticalExpand="True"
                                       SeparationOverride="13">
-                            <!-- The menu block sits above the vertical centre, like the reference. -->
                             <Control VerticalExpand="True" SizeFlagsStretchRatio="0.62" />
                             <neon:NeonFlickerControl Intensity="1.45">
                                 <Label Text="Maid Cafe" StyleClasses="LobbyTitle" Margin="0 0 0 4" />
@@ -140,7 +136,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
                     <Control HorizontalExpand="True" />
 
-                    <!-- COLUMN 2: changelog -->
                     <neon:NeonFlickerControl Name="ChangelogColumn" Access="Public" Intensity="0.85" VerticalExpand="True">
                         <PanelContainer Name="ChangelogPanel" Access="Public"
                                         StyleClasses="LobbyColumnPanel"
@@ -168,7 +163,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         </PanelContainer>
                     </neon:NeonFlickerControl>
 
-                    <!-- COLUMN 3: server info + chat -->
                     <neon:NeonFlickerControl Intensity="0.85" MinSize="414 0" MaxSize="414 Infinity" VerticalExpand="True">
                         <PanelContainer StyleClasses="LobbyPanel"
                                         SetWidth="414" VerticalExpand="True">
@@ -176,8 +170,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                                           SeparationOverride="0">
                                 <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="False"
                                               Margin="10 14 10 4" SeparationOverride="0">
-                                    <!-- Stretch + Align: with ClipText a centred label measures as
-                                         zero-width and clips its own text away entirely. -->
                                     <Label Name="ServerName" Access="Public" StyleClasses="LobbyServerName"
                                            HorizontalAlignment="Stretch" HorizontalExpand="True"
                                            Align="Center" ClipText="True" />
@@ -204,13 +196,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         </PanelContainer>
                     </neon:NeonFlickerControl>
                 </BoxContainer>
-            <!-- Track title/artist caption removed: credits already live in the audio files.
-            <RichTextLabel Name="LobbySong" Access="Public" StyleClasses="LobbyVersion"
-                           HorizontalAlignment="Left" MaxWidth="380" Visible="False" />
-            -->
             <TextureButton Name="ShowChangelogButton" Access="Public" Visible="False"
                            TexturePath="/Textures/Interface/Changelog/plus.svg.192dpi.png"
                            SetSize="20 20" ToolTip="{Loc 'ui-lobby-show-changelog-button'}" />
+            <!-- Maid-Tweak-end -->
         </LayoutContainer>
         <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" />
     </BoxContainer>
