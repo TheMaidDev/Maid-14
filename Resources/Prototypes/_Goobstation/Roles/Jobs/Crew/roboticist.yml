@@ -21,6 +21,7 @@
   equipment:
     ears: ClothingHeadsetRobotics
     eyes: ClothingEyesHudDiagnostic
+    shoes: ClothingShoesColorBrown #Maid
 
 - type: chameleonOutfit
   id: RoboticistChameleonOutfit

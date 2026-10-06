@@ -180,6 +180,7 @@
   equipment:
     id: RnDPDA
     ears: ClothingHeadsetAltScience # Goobstation
+    shoes: ClothingShoesColorBrown #Maid
   storage:
     back:
     - Flash

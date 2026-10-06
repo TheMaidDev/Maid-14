@@ -89,6 +89,7 @@
   id: ScientistGear
   equipment:
     ears: ClothingHeadsetScience
+    shoes: ClothingShoesColorBrown #Maid
   #storage:
     #back:
     #- Stuff

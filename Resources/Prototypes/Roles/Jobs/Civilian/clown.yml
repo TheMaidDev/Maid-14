@@ -157,6 +157,7 @@
     pocket2: ClownRecorder
     id: ClownPDA
     ears: ClothingHeadsetService
+    shoes: ClothingShoesClown
   storage:
     back:
     - RubberStampClown

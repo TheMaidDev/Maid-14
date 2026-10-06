@@ -126,6 +126,7 @@
   equipment:
     eyes: ClothingEyesGlassesSecurity
     ears: ClothingHeadsetAltSecurityRegular # Goobstation
+    shoes: ClothingShoesBootsJack #Maid
     pocket1: WeaponPistolMk58
   storage:
     back:
