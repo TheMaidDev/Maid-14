@@ -16,6 +16,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client.Stylesheets;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Utility;
 
@@ -31,7 +32,8 @@ namespace Content.Client.Info
 
             _richTextLabel = new RichTextLabel
             {
-                VerticalExpand = true
+                VerticalExpand = false, // Maid-Tweak
+                StyleClasses = { StyleNano.StyleClassLobbyText } // Maid-Tweak
             };
             AddChild(_richTextLabel);
         }

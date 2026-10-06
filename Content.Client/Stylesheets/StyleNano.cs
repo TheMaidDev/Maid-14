@@ -136,12 +136,14 @@ using System.Linq;
 using System.Numerics;
 using Content.Client.ContextMenu.UI;
 using Content.Client.Examine;
+using Content.Client.Info;
 using Content.Client.PDA;
 using Content.Client.Resources;
 using Content.Client.Silicons.Laws.SiliconLawEditUi;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Controls.FancyTree;
 using Content.Client.Verbs.UI;
+using Content.Goobstation.UIKit.UserInterface.Controls;
 using Content.Shared.Verbs;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -155,26 +157,30 @@ namespace Content.Client.Stylesheets
     public static class ResCacheExtension
     {
         // Goobstation - ZH text support start
+        // Maid-Tweak
         public static Font NotoStack(this IResourceCache resCache, string variation = "Regular", int size = 10, bool display = false)
         {
-            var ds = "";
-            var sv = variation.StartsWith("Bold", StringComparison.Ordinal) ? "Bold" : "Regular";
+            var bold = variation.StartsWith("Bold", StringComparison.Ordinal);
+            var italic = variation.EndsWith("Italic", StringComparison.Ordinal);
+            var sv = bold ? "Bold" : "Regular";
+            var ds = display ? "Display" : "";
 
-            if (variation == "Mono-Regular")
+            var ibmVariation = (bold, italic) switch
             {
-                ds = "Mono";
-                sv = "Regular";
-            }
-            else
-            {
-                ds = display ? "Display" : "";
-            }
+                (true, true) => "BoldItalic",
+                (true, false) => "Bold",
+                (false, true) => "Italic",
+                _ => "Regular",
+            };
+
+            var primary = $"/Fonts/_Maid/IBMPlexMono/IBMPlexMono-{ibmVariation}.ttf";
 
             return resCache.GetFont
             (
                 // Ew, but ok
                 new[]
                 {
+                    primary,
                     $"/Fonts/NotoSans{ds}/NotoSans{ds}-{sv}.ttf",
                     $"/Fonts/NotoSans/NotoSansSymbols-{sv}.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
@@ -208,6 +214,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassHandSlotHighlight = "HandSlotHighlight";
         public const string StyleClassChatPanel = "ChatPanel";
         public const string StyleClassChatSubPanel = "ChatSubPanel";
+        public const string StyleClassHiddenScrollbar = "HiddenScrollbar"; // Maid-Tweak
         public const string StyleClassTransparentBorderedWindowPanel = "TransparentBorderedWindowPanel";
         public const string StyleClassHotbarPanel = "HotbarPanel";
         public const string StyleClassTooltipPanel = "tooltipBox";
@@ -246,6 +253,29 @@ namespace Content.Client.Stylesheets
         public const string StyleClassLabelBig = "LabelBig";
         public const string StyleClassLabelSmall = "LabelSmall";
         public const string StyleClassButtonBig = "ButtonBig";
+        public const string StyleClassMenuTextButton = "MenuTextButton";
+
+        // Maid-Tweak-start
+        public const string StyleClassLobbyTitle = "LobbyTitle";
+        public const string StyleClassLobbyHeading = "LobbyHeading";
+        public const string StyleClassLobbyText = "LobbyText";
+        public const string StyleClassLobbyVersion = "LobbyVersion";
+        public const string StyleClassLobbyFont = "LobbyFontVT";
+        public const string StyleClassLobbyMeta = "LobbyMeta";
+        public const string StyleClassLobbyCountdown = "LobbyCountdown";
+        public const string StyleClassLobbyInfoPanel = "LobbyInfoPanel";
+        public const string StyleClassLobbyMenuText = "LobbyMenuText";
+        public const string StyleClassLobbyServerName = "LobbyServerName";
+        public const string StyleClassLobbyPanel = "LobbyPanel";
+        public const string StyleClassLobbyColumnPanel = "LobbyColumnPanel";
+        public const string StyleClassLobbyRule = "LobbyRule";
+
+        public static readonly Color LobbyLavender = Color.FromHex("#C9A0DC");
+        public static readonly Color LobbyViolet = Color.FromHex("#B48EDC");
+        public static readonly Color LobbyMagenta = Color.FromHex("#E255B0");
+        public static readonly Color LobbyGold = Color.FromHex("#D4B56A");
+        public static readonly Color LobbyTextWhite = Color.FromHex("#E6E6EC");
+        // Maid-Tweak-end
 
         public const string StyleClassButtonHelp = "HelpButton";
 
@@ -363,6 +393,25 @@ namespace Content.Client.Stylesheets
             var robotoMonoBold11 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 11);
             var robotoMonoBold12 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 12);
             var robotoMonoBold14 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 14);
+
+            // Maid-Tweak-start
+            Font MaidMono(int size, string weight = "Regular") => resCache.GetFont(new[]
+            {
+                $"/Fonts/_Maid/IBMPlexMono/IBMPlexMono-{weight}.ttf",
+                "/Fonts/NotoSans/NotoSans-Regular.ttf",
+                "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
+                "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
+                "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
+            }, size);
+            var jbmMenu = MaidMono(13, "Light");
+            var jbmText = MaidMono(12, "Light");
+            var jbmHeading = MaidMono(14, "Light");
+            var jbmTitle = MaidMono(18, "Light");
+            var jbmServerName = MaidMono(16, "Light");
+            var jbmVersion = MaidMono(10, "Light");
+            var lobbyMeta = MaidMono(12, "Light");
+            var lobbyCountdown = MaidMono(13, "Light");
+            // Maid-Tweak-end
             var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
             var windowHeader = new StyleBoxTexture
             {
@@ -447,6 +496,25 @@ namespace Content.Client.Stylesheets
                 Texture = borderedTransparentWindowBackgroundTex,
             };
             borderedTransparentWindowBackground.SetPatchMargin(StyleBox.Margin.All, 3);
+
+            // Maid-Tweak
+            var invisibleGrabber = new StyleBoxFlat
+            {
+                BackgroundColor = Color.Transparent,
+                ContentMarginLeftOverride = 1,
+                ContentMarginRightOverride = 1,
+                ContentMarginTopOverride = 1,
+                ContentMarginBottomOverride = 1,
+            };
+
+            // Maid-Tweak
+            var menuTextButtonStyle = new StyleBoxFlat
+            {
+                BackgroundColor = Color.Transparent,
+            };
+            var menuTextButtonNormal = Color.FromHex("#FFFFFF");
+            var menuTextButtonHover = Color.FromHex("#F0C96A");
+            var menuTextButtonPressed = Color.FromHex("#FFFFFF");
 
             var hotbarBackground = new StyleBoxTexture
             {
@@ -866,6 +934,43 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty(PanelContainer.StylePropertyPanel, borderedTransparentWindowBackground),
+                    }),
+                // Maid-Tweak
+                new StyleRule(
+                    new SelectorElement(typeof(VScrollBar), new[] {StyleClassHiddenScrollbar}, null, null),
+                    new[]
+                    {
+                        new StyleProperty(ScrollBar.StylePropertyGrabber, invisibleGrabber),
+                    }),
+                new StyleRule(
+                    new SelectorElement(typeof(VScrollBar), new[] {StyleClassHiddenScrollbar}, null, new[] {ScrollBar.StylePseudoClassHover}),
+                    new[]
+                    {
+                        new StyleProperty(ScrollBar.StylePropertyGrabber, invisibleGrabber),
+                    }),
+                new StyleRule(
+                    new SelectorElement(typeof(VScrollBar), new[] {StyleClassHiddenScrollbar}, null, new[] {ScrollBar.StylePseudoClassGrabbed}),
+                    new[]
+                    {
+                        new StyleProperty(ScrollBar.StylePropertyGrabber, invisibleGrabber),
+                    }),
+                new StyleRule(
+                    new SelectorElement(typeof(HScrollBar), new[] {StyleClassHiddenScrollbar}, null, null),
+                    new[]
+                    {
+                        new StyleProperty(ScrollBar.StylePropertyGrabber, invisibleGrabber),
+                    }),
+                new StyleRule(
+                    new SelectorElement(typeof(HScrollBar), new[] {StyleClassHiddenScrollbar}, null, new[] {ScrollBar.StylePseudoClassHover}),
+                    new[]
+                    {
+                        new StyleProperty(ScrollBar.StylePropertyGrabber, invisibleGrabber),
+                    }),
+                new StyleRule(
+                    new SelectorElement(typeof(HScrollBar), new[] {StyleClassHiddenScrollbar}, null, new[] {ScrollBar.StylePseudoClassGrabbed}),
+                    new[]
+                    {
+                        new StyleProperty(ScrollBar.StylePropertyGrabber, invisibleGrabber),
                     }),
                 // inventory slot background
                 new StyleRule(
@@ -2165,6 +2270,164 @@ namespace Content.Client.Stylesheets
                 Element<PanelContainer>()
                     .Class(StyleClassInset)
                     .Prop(PanelContainer.StylePropertyPanel, insetBack),
+
+                // Maid-Tweak-start
+                Element<Button>()
+                    .Class(StyleClassMenuTextButton)
+                    .Prop(ContainerButton.StylePropertyStyleBox, menuTextButtonStyle),
+
+                Element<Button>()
+                    .Class(StyleClassMenuTextButton)
+                    .Pseudo(Button.StylePseudoClassNormal)
+                    .Prop(Control.StylePropertyModulateSelf, Color.White),
+
+                Element<Button>()
+                    .Class(StyleClassMenuTextButton)
+                    .Pseudo(Button.StylePseudoClassHover)
+                    .Prop(Control.StylePropertyModulateSelf, Color.White),
+
+                Element<Button>()
+                    .Class(StyleClassMenuTextButton)
+                    .Pseudo(Button.StylePseudoClassPressed)
+                    .Prop(Control.StylePropertyModulateSelf, Color.White),
+
+                Element<Button>()
+                    .Class(StyleClassMenuTextButton)
+                    .Pseudo(Button.StylePseudoClassDisabled)
+                    .Prop(Control.StylePropertyModulateSelf, Color.White),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassMenuTextButton}, null, new[] {Button.StylePseudoClassNormal}),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
+                        new StyleProperty("font-color", menuTextButtonNormal),
+                    }),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassMenuTextButton}, null, new[] {Button.StylePseudoClassHover}),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
+                        new StyleProperty("font-color", menuTextButtonHover),
+                    }),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassMenuTextButton}, null, new[] {Button.StylePseudoClassPressed}),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
+                        new StyleProperty("font-color", menuTextButtonPressed),
+                    }),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassMenuTextButton}, null, new[] {Button.StylePseudoClassDisabled}),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
+                        new StyleProperty("font-color", Color.FromHex("#5A5A5A")),
+                    }),
+
+                Element<Label>().Class(StyleClassLobbyTitle)
+                    .Prop(Label.StylePropertyFont, jbmTitle)
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#F2F2F4")),
+
+                Element<Label>().Class(StyleClassLobbyHeading)
+                    .Prop(Label.StylePropertyFont, jbmHeading)
+                    .Prop(Label.StylePropertyFontColor, LobbyTextWhite),
+
+                Element<Label>().Class(StyleClassLobbyServerName)
+                    .Prop(Label.StylePropertyFont, jbmServerName)
+                    .Prop(Label.StylePropertyFontColor, LobbyLavender),
+
+                Element<PanelContainer>().Class(StyleClassLobbyPanel)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#12131AE6"),
+                    }),
+
+                Element<PanelContainer>().Class(StyleClassLobbyColumnPanel)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#12131AE6"),
+                    }),
+
+                Element<PanelContainer>().Class(StyleClassLobbyRule)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = LobbyViolet.WithAlpha(0.6f),
+                    }),
+
+                Element<Label>().Class(StyleClassLobbyText)
+                    .Prop(Label.StylePropertyFont, jbmText)
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#DCDCDC")),
+
+                Element<RichTextLabel>().Class(StyleClassLobbyText)
+                    .Prop(Label.StylePropertyFont, jbmText),
+
+                Element<Label>().Class(StyleClassLobbyVersion)
+                    .Prop(Label.StylePropertyFont, jbmVersion)
+                    .Prop(Label.StylePropertyFontColor, Color.DarkGray),
+
+                Element<Label>().Class(StyleClassLobbyMenuText)
+                    .Prop(Label.StylePropertyFont, jbmMenu),
+
+                Element<Label>().Class(StyleClassLobbyMeta)
+                    .Prop(Label.StylePropertyFont, lobbyMeta)
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#B8C4D4")),
+
+                Element<Label>().Class(StyleClassLobbyCountdown)
+                    .Prop(Label.StylePropertyFont, lobbyCountdown)
+                    .Prop(Label.StylePropertyFontColor, Color.FromHex("#FFD34D")),
+
+                Element<PanelContainer>().Class(StyleClassLobbyInfoPanel)
+                    .Prop(PanelContainer.StylePropertyPanel, new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#0A0E14AA"),
+                        BorderColor = Color.FromHex("#F0C96A55"),
+                        BorderThickness = new Thickness(2, 0, 0, 0),
+                        ContentMarginLeftOverride = 10,
+                        ContentMarginRightOverride = 8,
+                        ContentMarginTopOverride = 6,
+                        ContentMarginBottomOverride = 6,
+                    }),
+
+                Element<Label>().Class(StyleClassLobbyFont)
+                    .Prop(Label.StylePropertyFont, jbmText),
+
+                Element<RichTextLabel>().Class(StyleClassLobbyFont)
+                    .Prop(Label.StylePropertyFont, jbmText),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(ServerInfo), new[] {StyleClassLobbyText}, null, null),
+                    new SelectorElement(typeof(RichTextLabel), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmText),
+                    }),
+
+                Element<CustomOutputPanel>()
+                    .Prop("font", jbmText),
+
+                Element<OutputPanel>()
+                    .Prop("font", jbmText),
+
+                Element<LineEdit>()
+                    .Class(StyleClassChatLineEdit)
+                    .Prop("font", jbmText),
+
+                new StyleRule(new SelectorChild(
+                    new SelectorElement(typeof(Button), new[] {StyleClassChatChannelSelectorButton}, null, null),
+                    new SelectorElement(typeof(Label), null, null, null)),
+                    new[]
+                    {
+                        new StyleProperty("font", jbmMenu),
+                    }),
+                // Maid-Tweak-end
             }).ToList());
         }
     }

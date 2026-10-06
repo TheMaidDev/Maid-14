@@ -80,8 +80,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
+using System.Numerics;
 using Content.Client._RMC14.LinkAccount;
 using Content.Client.Audio;
+using Content.Client.Changelog;
+using Content.Client.Resources;
+using Content.Client.Stylesheets;
 using Content.Client.GameTicking.Managers;
 using Content.Client.LateJoin;
 using Content.Client.Lobby.UI;
@@ -95,15 +100,40 @@ using Robust.Client.Console;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using static Robust.Client.UserInterface.Control;
+using static Robust.Client.UserInterface.Controls.BoxContainer;
 using Robust.Shared.Configuration;
+using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 using Content.Shared._Maid.GameTicking.Prototypes;
 
 namespace Content.Client.Lobby
 {
     public sealed class LobbyState : Robust.Client.State.State
     {
+        // Maid-Tweak
+        private const string MaidServerName = "Maid Cafe";
+
+        // Maid-Tweak
+        private static readonly string[] PlaceholderServerNames =
+        {
+            "MyServer",
+            "Space Station 14",
+            "unnamed server",
+        };
+
+        private static readonly string[] AuthorTints =
+        {
+            "#9FD6C0",
+            "#7FC8D6",
+            "#C9A0DC",
+            "#D6B98C",
+            "#A8C98A",
+            "#D69FC4",
+        };
+
         [Dependency] private readonly IBaseClient _baseClient = default!;
         [Dependency] private readonly IConfigurationManager _cfg = default!;
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
@@ -115,6 +145,7 @@ namespace Content.Client.Lobby
         [Dependency] private readonly IPrototypeManager _protoMan = default!; // Goobstation - credits
         [Dependency] private readonly LinkAccountManager _linkAccount = default!; // RMC - Patreon
         [Dependency] private readonly ClientsidePlaytimeTrackingManager _playtimeTracking = default!;
+        [Dependency] private readonly ChangelogManager _changelog = default!;
         private ProtoId<AnimatedLobbyScreenPrototype>? _lastAnimatedScreen;
 
         private ISawmill _sawmill = default!; // Goobstation
@@ -144,22 +175,22 @@ namespace Content.Client.Lobby
             _voteManager.SetPopupContainer(Lobby.VoteContainer);
             LayoutContainer.SetAnchorPreset(Lobby, LayoutContainer.LayoutPreset.Wide);
 
-            var lobbyNameCvar = _cfg.GetCVar(CCVars.ServerLobbyName);
-            var serverName = _baseClient.GameInfo?.ServerName ?? string.Empty;
-
-            Lobby.ServerName.Text = string.IsNullOrEmpty(lobbyNameCvar)
-                ? Loc.GetString("ui-lobby-title", ("serverName", serverName))
-                : lobbyNameCvar;
+            Lobby.ServerName.Text = PickServerName(
+                _cfg.GetCVar(CCVars.ServerLobbyName),
+                _baseClient.GameInfo?.ServerName);
 
             var width = _cfg.GetCVar(CCVars.ServerLobbyRightPanelWidth);
             //Lobby.RightSide.SetWidth = width;
 
             UpdateLobbyUi();
+            LoadLobbyChangelog();
 
             Lobby.CharacterPreview.CharacterSetupButton.OnPressed += OnSetupPressed;
             Lobby.CharacterPreview.PatronPerks.OnPressed += OnPatronPerksPressed;
             Lobby.ReadyButton.OnPressed += OnReadyPressed;
             Lobby.ReadyButton.OnToggled += OnReadyToggled;
+
+            _linkAccount.Updated += OnLinkAccountUpdated;
 
             _gameTicker.InfoBlobUpdated += UpdateLobbyUi;
             _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
@@ -174,6 +205,7 @@ namespace Content.Client.Lobby
             _gameTicker.LobbyStatusUpdated -= LobbyStatusUpdated;
             _gameTicker.LobbyLateJoinStatusUpdated -= LobbyLateJoinStatusUpdated;
             _contentAudioSystem.LobbySoundtrackChanged -= UpdateLobbySoundtrackInfo;
+            _linkAccount.Updated -= OnLinkAccountUpdated;
 
             _voteManager.ClearPopupContainer();
 
@@ -185,10 +217,150 @@ namespace Content.Client.Lobby
             Lobby = null;
         }
 
+        // Maid-Tweak
+        private static string PickServerName(string? lobbyName, string? serverName)
+        {
+            if (IsRealName(lobbyName))
+                return lobbyName!;
+
+            return IsRealName(serverName) ? serverName! : MaidServerName;
+        }
+
+        private static bool IsRealName(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            var trimmed = value.Trim();
+            foreach (var placeholder in PlaceholderServerNames)
+            {
+                if (string.Equals(trimmed, placeholder, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            return true;
+        }
+
         public void SwitchState(LobbyGui.LobbyGuiState state)
         {
             // Yeah I hate this but LobbyState contains all the badness for now.
             Lobby?.SwitchState(state);
+        }
+
+        private async void LoadLobbyChangelog()
+        {
+            try
+            {
+                // Maid-Tweak
+                var changelogs = await _changelog.LoadChangelog();
+
+                var maidChangelog = changelogs.FirstOrDefault(c => c.Name == "Maidlog");
+                if (maidChangelog == null || Lobby == null)
+                    return;
+
+                var entries = maidChangelog.Entries
+                    .OrderByDescending(e => e.Time)
+                    .Take(15)
+                    .ToList();
+
+                var body = Lobby.ChangelogBodyContainer;
+                body.Children.Clear();
+                Lobby.ChangelogScrollContainer.SetScrollValue(default);
+
+                var firstEntry = true;
+
+                foreach (var entry in entries)
+                {
+                    if (entry.Changes.Count == 0)
+                        continue;
+
+                    if (!firstEntry)
+                        body.AddChild(new Control { MinSize = new Vector2(0, 8) });
+
+                    firstEntry = false;
+
+                    var author = FormattedMessage.EscapeText(entry.Author);
+                    var authorLabel = new RichTextLabel
+                    {
+                        Margin = new Thickness(2, 2, 0, 0),
+                        StyleClasses = { StyleNano.StyleClassLobbyFont }
+                    };
+                    authorLabel.SetMessage(FormattedMessage.FromMarkupOrThrow(
+                        $"[color={AuthorTint(entry.Author)}]{author}[/color] [color=#C8C8CC]{FormatChangelogDay(entry.Time.ToLocalTime().Date)}[/color]"));
+                    body.AddChild(authorLabel);
+
+                    foreach (var change in entry.Changes)
+                    {
+                        var text = new RichTextLabel
+                        {
+                            StyleClasses = { StyleNano.StyleClassLobbyFont }
+                        };
+                        text.SetMessage(FormattedMessage.FromUnformatted(change.Message));
+
+                        body.AddChild(new BoxContainer
+                        {
+                            Orientation = LayoutOrientation.Horizontal,
+                            Margin = new Thickness(14, 1, 0, 2),
+                            Children =
+                            {
+                                GetChangelogIcon(change.Type),
+                                text
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _sawmill.Error($"Failed to load lobby changelog: {e}");
+            }
+        }
+
+        private static string FormatChangelogDay(DateTime day)
+        {
+            var today = DateTime.Today;
+            if (day == today)
+                return Loc.GetString("changelog-today");
+
+            return day == today.AddDays(-1)
+                ? Loc.GetString("changelog-yesterday")
+                : day.ToShortDateString();
+        }
+
+        // Maid-Tweak
+        private static string AuthorTint(string author)
+        {
+            var hash = 0;
+            foreach (var c in author)
+                hash = hash * 31 + char.ToLowerInvariant(c);
+
+            return AuthorTints[(int) ((uint) hash % (uint) AuthorTints.Length)];
+        }
+
+        private TextureRect GetChangelogIcon(ChangelogManager.ChangelogLineType type)
+        {
+            var (file, color) = type switch
+            {
+                ChangelogManager.ChangelogLineType.Add => ("plus.svg.192dpi.png", "#6ED18D"),
+                ChangelogManager.ChangelogLineType.Remove => ("minus.svg.192dpi.png", "#D16E6E"),
+                ChangelogManager.ChangelogLineType.Fix => ("bug.svg.192dpi.png", "#D1BA6E"),
+                ChangelogManager.ChangelogLineType.Tweak => ("wrench.svg.192dpi.png", "#6E96D1"),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+
+            return new TextureRect
+            {
+                Texture = _resourceCache.GetTexture($"/Textures/Interface/Changelog/{file}"),
+                VerticalAlignment = VAlignment.Top,
+                TextureScale = new Vector2(0.5f, 0.5f),
+                Margin = new Thickness(2, 4, 6, 2),
+                ModulateSelfOverride = Color.FromHex(color)
+            };
+        }
+
+        private void OnLinkAccountUpdated()
+        {
+            Lobby?.UpdateDiscordLinked(_linkAccount.Linked);
         }
 
         private void OnSetupPressed(BaseButton.ButtonEventArgs args)
@@ -215,6 +387,16 @@ namespace Content.Client.Lobby
         private void OnReadyToggled(BaseButton.ButtonToggledEventArgs args)
         {
             SetReady(args.Pressed);
+            UpdateReadyButtonColor();
+        }
+
+        // Maid-Tweak
+        private void UpdateReadyButtonColor()
+        {
+            if (Lobby == null)
+                return;
+
+            Lobby.UpdateReadyVisuals(_gameTicker.IsGameStarted, Lobby.ReadyButton.Pressed);
         }
 
         public override void FrameUpdate(FrameEventArgs e)
@@ -281,6 +463,7 @@ namespace Content.Client.Lobby
                 Lobby!.ReadyButton.ToggleMode = false;
                 Lobby!.ReadyButton.Pressed = false;
                 Lobby!.ObserveButton.Disabled = false;
+                Lobby.UpdateObserveIcon(true);
             }
             else
             {
@@ -290,14 +473,18 @@ namespace Content.Client.Lobby
                 Lobby!.ReadyButton.Disabled = false;
                 Lobby!.ReadyButton.Pressed = _gameTicker.AreWeReady;
                 Lobby!.ObserveButton.Disabled = true;
+                Lobby.UpdateObserveIcon(false);
             }
+
+            UpdateReadyButtonColor();
+            Lobby.UpdateDiscordLinked(_linkAccount.Linked);
 
             if (_gameTicker.ServerInfoBlob != null)
             {
                 Lobby!.ServerInfo.SetInfoBlob(_gameTicker.ServerInfoBlob);
             }
 
-            //Maid edit start
+            // Maid-Tweak-start
             /*var minutesToday = _playtimeTracking.PlaytimeMinutesToday;
             if (minutesToday > 60)
             {
@@ -317,40 +504,16 @@ namespace Content.Client.Lobby
             }
             else
                 Lobby!.PlaytimeComment.Visible = false;*/
-            //Maid edit end
+            // Maid-Tweak-end
         }
 
-        private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent ev)
+        // Maid-Tweak
+        private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent _)
         {
-            if (ev.SoundtrackFilename == null)
-            {
-                //Lobby!.LobbySong.SetMarkup(Loc.GetString("lobby-state-song-no-song-text"));
-            }
-            else if (
-                ev.SoundtrackFilename != null
-                && _resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource)
-                )
-            {
-                var lobbyStream = lobbySongResource.AudioStream;
-
-                var title = string.IsNullOrEmpty(lobbyStream.Title)
-                    ? Loc.GetString("lobby-state-song-unknown-title")
-                    : lobbyStream.Title;
-
-                var artist = string.IsNullOrEmpty(lobbyStream.Artist)
-                    ? Loc.GetString("lobby-state-song-unknown-artist")
-                    : lobbyStream.Artist;
-
-                var markup = Loc.GetString("lobby-state-song-text",
-                    ("songTitle", title),
-                    ("songArtist", artist));
-
-                //Lobby!.LobbySong.SetMarkup(markup);
-            }
         }
 
         // Goobstation - heavily modified to add credits for lobby backgrounds
-        private void UpdateLobbyBackground() // Tweak-Maid: Animated Lobby
+        private void UpdateLobbyBackground() // Maid-Tweak
         {
             if (_gameTicker.AnimatedLobbyScreen != null)
             {
