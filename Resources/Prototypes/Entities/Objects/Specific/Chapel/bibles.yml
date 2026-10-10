@@ -92,18 +92,34 @@
   id: ChaplainUndeterminedBible
   name: bluespace scripture beacon
   description: Though I walk through the valley of the shadow of death I will fear no evil, for you are with me.
-  parent: [ BaseItem, BaseSetSelector ]
+  parent: BaseItem # , BaseSetSelector # Maid edit
   components:
   - type: Sprite
     sprite: _ShitChap/Objects/scripturebeacon.rsi
     state: icon
-  - type: SetSelector
-    possibleSets:
-    - BibleSet
-    - QuaranSet
-    - TanakhSet
-    - ClockworkSet
-    maxSelectedSets: 1
+  # Maid-Edit-Start
+  # - type: SetSelector
+  #   possibleSets:
+  #   - BibleSet
+  #   - QuaranSet
+  #   - TanakhSet
+  #   - ClockworkSet
+  #   maxSelectedSets: 1
+  - type: ActivatableUI
+    key: enum.SelectWeaponUi.Key
+    inHandsOnly: true
+    # closeOnHandDeselect: true
+  - type: UserInterface
+    interfaces:
+      enum.SelectWeaponUi.Key:
+        type: NullRodBui
+  - type: HolyNullRod
+    weapons:
+      - Bible
+      - BibleQuaran
+      - BibleTanakh
+      - BibleSlabClockwork
+    # Maid-Edit-End
 
 - type: selectableSet
   id: BibleSet
