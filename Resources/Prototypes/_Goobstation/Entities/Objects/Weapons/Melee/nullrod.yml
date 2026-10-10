@@ -71,8 +71,8 @@
     - HolyKatana
     - MultiverseBlade
     - VorpalScythe
-    - HighFrequencyBlade
-    - SpellBlade
+    # - HighFrequencyBlade # this shouldn't be here
+    # - SpellBlade # this shouldn't be here
     - PossessedBlade
     - ChainsawHand
     - HolyWhip
