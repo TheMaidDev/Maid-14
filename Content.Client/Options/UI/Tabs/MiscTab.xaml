@@ -48,6 +48,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <!-- Goobstation Edit Start -->
                 <Label Text="{Loc 'ui-options-preferences'}"
                        StyleClasses="LabelKeyText"/>
+                <!-- Maid-Tweak -->
+                <Button Name="CustomGhostsButton" Text="{Loc 'ui-options-custom-ghosts-button'}"
+                        HorizontalAlignment="Left" />
                 <CheckBox Name="AutoFocusSearchOnBuildMenuCheckBox" Text="{Loc 'ui-options-auto-focus-search-on-build-menu'}" />
                 <CheckBox Name="LockActionBarDragCheckBox" Text="{Loc 'ui-options-lock-action-bar-drag'}" />
                 <!-- Goobstation Edit End -->
