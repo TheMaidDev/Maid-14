@@ -1200,6 +1200,20 @@
   conditions:
     - !type:TileNotBlocked
 
+#Maid start
+- type: construction
+  id: PlasmaWindoor
+  graph: Windoor
+  startNode: start
+  targetNode: pwindoor
+  category: construction-category-structures
+  objectType: Structure
+  placementMode: SnapgridCenter
+  canBuildInImpassable: false
+  conditions:
+  - !type:TileNotBlocked
+#Maid end
+
 #lighting
 - type: construction
   id: LightTubeFixture
