@@ -3,39 +3,34 @@
   layers:
   - texture:
       !type:ImageParallaxTextureSource
-      path: "/Textures/_Maid/Parallaxes/wonderbox2.png"
+      path: "/Textures/Parallaxes/KettleParallaxBG.png"
     slowness: 0.998046875
-    scale: "0.5, 0.5"
-    scrolling: "0, 0"
-  - texture:
-      !type:ImageParallaxTextureSource
-      path: "/Textures/_Maid/Parallaxes/XenoParallaxNebBlue.png"
-    slowness: 0.998046875
-    scale: "0.33, 0.33"
-    scrolling: "0, 0"
-  - texture:
-      !type:ImageParallaxTextureSource
-      path: "/Textures/_Maid/Parallaxes/XenoParallaxNebPurple.png"
-    slowness: 0.997046875
-    scale: "0.25, 0.25"
-    scrolling: "0, 0"
-  - texture:
-      !type:ImageParallaxTextureSource
-      path: "/Textures/_Maid/Parallaxes/planet2.png"
-    slowness: 0.999046875
-    scale: "0.25, 0.25"
-    scrolling: "0, 0"
-    tiled: false
-  - texture:
-      !type:ImageParallaxTextureSource
-      path: "/Textures/_Maid/Parallaxes/Asteroids.png"
-    slowness: 0.988046875
-    scale: "0.5, 0.5"
+    scale: "1, 1"
   - texture:
       !type:GeneratedParallaxTextureSource
       id: "hq_wizard_stars"
       configPath: "/Prototypes/Parallaxes/parallax_config_stars.toml"
-    slowness: 0.9999
+    slowness: 0.986625
+  - texture:
+      !type:GeneratedParallaxTextureSource
+      id: "hq_wizard_stars_dim"
+      configPath: "/Prototypes/Parallaxes/parallax_config_stars_dim.toml"
+    slowness: 0.979375
+  - texture:
+      !type:ImageParallaxTextureSource
+      path: "/Textures/Parallaxes/KettleParallaxNeb.png"
+    slowness: 0.968046875
+    scale: "1, 1"
+  - texture:
+      !type:GeneratedParallaxTextureSource
+      id: "hq_wizard_stars_faster"
+      configPath: "/Prototypes/Parallaxes/parallax_config_stars-2.toml"
+    slowness: 0.957265625
+  - texture:
+      !type:GeneratedParallaxTextureSource
+      id: "hq_wizard_stars_dim_faster"
+      configPath: "/Prototypes/Parallaxes/parallax_config_stars_dim-2.toml"
+    slowness: 0.954352
   layersLQ:
   - texture:
       !type:GeneratedParallaxTextureSource
