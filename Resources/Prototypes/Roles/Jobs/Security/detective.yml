@@ -74,10 +74,12 @@
     time: 18000 #5 hrs
   - !type:SpeciesRequirement # Maid
     inverted: false
-    species:
+    species: 
     - Human
     - Felinid
     - Dwarf
+    - SlimePerson
+    - IPC
   startingGear: DetectiveGear
   icon: "JobIconDetective"
   supervisors: job-supervisors-hos

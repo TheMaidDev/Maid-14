@@ -15,10 +15,18 @@
   - !type:DepartmentTimeRequirement
     department: Security
     time: 36000 # 10 hrs
+  - !type:SpeciesRequirement # Maid
+    inverted: false
+    species: 
+    - Human
+    - Felinid
+    - Dwarf
+    - SlimePerson
+    - IPC
   startingGear: BrigmedicGear
   icon: "JobIconBrigmedic"
   supervisors: job-supervisors-hos
-  canBeAntag: true # Maid
+  canBeAntag: false #Maid
   guides:
   - MedicalDoctor
 #  - BrigmedicSOP # Maid
