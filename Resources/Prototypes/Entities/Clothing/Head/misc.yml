@@ -157,9 +157,9 @@
   description: A jack o' lantern! Believed to ward off evil spirits.
   components:
   - type: Sprite
-    sprite: Clothing/Head/Misc/pumpkin.rsi
+    sprite: _Maid/Clothing/Head/Misc/pumpkin.rsi #Maid
   - type: Clothing
-    sprite: Clothing/Head/Misc/pumpkin.rsi
+    sprite: _Maid/Clothing/Head/Misc/pumpkin.rsi #Maid
   - type: IngestionBlocker
   - type: IdentityBlocker
   - type: PointLight

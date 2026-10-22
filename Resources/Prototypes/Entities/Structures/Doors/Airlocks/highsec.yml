@@ -75,7 +75,7 @@
   - type: StationAiWhitelist
   - type: InteractionOutline
   - type: Sprite
-    sprite: _Maid/Structures/Doors/Airlocks/highsec/highsec.rsi # Maid
+    sprite: _Maid/Structures/Doors/Airlocks/highsec/highsec1.rsi # Maid
     layers:
     - state: closed
       map: ["enum.DoorVisualLayers.Base"]
