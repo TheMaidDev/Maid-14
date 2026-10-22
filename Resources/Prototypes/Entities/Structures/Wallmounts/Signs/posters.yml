@@ -113,6 +113,10 @@
     sprite: _Maid/Structures/Wallmounts/posters.rsi
 #    sprite: Structures/Wallmounts/posters.rsi
 # MAID END old poster rotation
+# MAID BEGIN poster damage modifier
+  - type: Damageable
+    damageModifierSet: Poster
+# MAID END poster damage modifier
   - type: Destructible
     thresholds:
     - trigger: # Excess damage, don't spawn entities
@@ -153,6 +157,10 @@
 #    sprite: Structures/Wallmounts/posters.rsi
 # MAID END old poster rotation
     state: poster_broken
+# MAID BEGIN poster damage modifier
+  - type: Damageable
+    damageModifierSet: Poster
+# MAID END poster damage modifier
   - type: Destructible
     thresholds:
     - trigger:

@@ -163,7 +163,7 @@
       collection: MetalThud
     activatedDamage:
         types:
-            Heat: 8
+            Heat: 7 # Maid (same as crowbar)
   - type: ItemToggleSize
     activatedSize: Large
   - type: ItemToggleHot

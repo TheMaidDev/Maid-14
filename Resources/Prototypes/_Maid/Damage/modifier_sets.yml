@@ -23,3 +23,15 @@
     Caustic: 0.0
     Poison: 0.0
     Cellular: 0.0
+
+- type: damageModifierSet
+  id: Poster
+  coefficients:
+    Slash: 3
+    Piercing: 1
+  flatReductions:
+    Blunt: 15
+    Structural: 15
+    Shock: 15
+    Caustic: 15
+    Cold: 15

@@ -256,10 +256,10 @@
   - type: MeleeWeapon
     animationRotation: -90 # WWDP
     wideAnimationRotation: -90
-    attackRate: 1
+    attackRate: 2.5 # Maid
     damage:
       types:
-        Piercing: 6
+        Piercing: 2.4 # Maid
     soundHit:
       path: "/Audio/Weapons/bladeslice.ogg"
   - type: Tool
