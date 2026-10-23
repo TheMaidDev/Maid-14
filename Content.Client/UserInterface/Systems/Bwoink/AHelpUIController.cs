@@ -46,6 +46,7 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Configuration;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Network;
+using Robust.Shared.Maths; // Maid-Tweak
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
 
@@ -145,6 +146,7 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         if (LobbyAHelpButton != null)
         {
             LobbyAHelpButton.Pressed = pressed;
+            (UIManager.ActiveScreen as LobbyGui)?.UpdateAHelpVisuals(_hasUnreadAHelp, pressed); // Maid-Tweak
         }
 
         UIManager.ClickSound();
@@ -274,6 +276,10 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
     {
         GameAHelpButton?.StyleClasses.Add(MenuButton.StyleClassRedTopButton);
         LobbyAHelpButton?.StyleClasses.Add(StyleNano.StyleClassButtonColorRed);
+        // Maid-Tweak
+        if (LobbyAHelpButton is { Label: { } label })
+            label.FontColorOverride = Color.FromHex("#E5534B");
+        (UIManager.ActiveScreen as LobbyGui)?.UpdateAHelpVisuals(true, UIHelper?.IsOpen ?? false);
         _hasUnreadAHelp = true;
     }
 
@@ -281,6 +287,10 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
     {
         GameAHelpButton?.StyleClasses.Remove(MenuButton.StyleClassRedTopButton);
         LobbyAHelpButton?.StyleClasses.Remove(StyleNano.StyleClassButtonColorRed);
+        // Maid-Tweak
+        if (LobbyAHelpButton is { Label: { } label })
+            label.FontColorOverride = null;
+        (UIManager.ActiveScreen as LobbyGui)?.UpdateAHelpVisuals(false, UIHelper?.IsOpen ?? false);
         _hasUnreadAHelp = false;
     }
 
