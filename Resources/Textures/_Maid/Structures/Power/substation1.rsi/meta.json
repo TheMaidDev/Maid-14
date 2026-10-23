@@ -11,6 +11,12 @@
       "name": "substation"
     },
     {
+      "name": "substation_wall_static"
+    },
+    {
+      "name": "substation_static"
+    },
+    {
       "name": "substation_wall"
     },
     {
