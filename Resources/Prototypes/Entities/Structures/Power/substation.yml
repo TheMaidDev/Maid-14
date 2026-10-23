@@ -192,7 +192,7 @@
     castShadows: false
   - type: PowerMonitoringDevice
     sprite: _Maid/Structures/Power/substation1.rsi # Maid
-    state: substation_static
+    # state: substation_static #Maid
   - type: Destructible
     thresholds:
     - trigger:
@@ -287,7 +287,7 @@
     startingCharge: 0
   - type: PowerMonitoringDevice
     sprite: _Maid/Structures/Power/substation1.rsi # Maid
-    state: substation_wall_static
+    # state: substation_wall_static #Maid
   - type: Destructible
     thresholds:
     - trigger:
