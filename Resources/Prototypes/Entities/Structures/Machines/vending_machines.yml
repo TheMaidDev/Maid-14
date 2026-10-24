@@ -1243,7 +1243,7 @@
   - type: SpeakOnUIClosed
     pack: GenericVendGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/medivend.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/medical.rsi #Maid
     noRot: true
     layers:
     - state: "off"
@@ -1715,7 +1715,7 @@
     pack: GenericVendGoodbyes
   - type: Sprite
     noRot: true
-    sprite: Structures/Machines/VendingMachines/robotics.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/robotics.rsi #Maid
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
