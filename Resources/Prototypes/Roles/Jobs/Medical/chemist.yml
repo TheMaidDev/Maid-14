@@ -94,6 +94,7 @@
     belt: ChemBagFilled
     pocket1: HandLabeler
     eyes: ClothingEyesGlassesChemical
+    shoes: ClothingShoesColorWhite #Maid
   #storage:
     #back:
     #- Stuff

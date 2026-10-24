@@ -31,7 +31,7 @@
   - Medicine
   access:  # EE parity, make corpsman able function.
   - Security
-  - Brig
+  - Brig 
   - Medical
   - Maintenance 
   - Service
