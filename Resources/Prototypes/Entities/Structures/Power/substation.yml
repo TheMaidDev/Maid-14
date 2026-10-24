@@ -174,7 +174,7 @@
     mode: SnapgridCenter
   components:
   - type: Sprite # TODO: add sprite for maintenance panel open
-    sprite: _Maid/Structures/Power/substation1.rsi # Maid
+    sprite: _Maid/Structures/Power/substation.rsi # Maid
     snapCardinals: true
     layers:
     - state: substation
@@ -191,7 +191,7 @@
     color: "#ff6900"
     castShadows: false
   - type: PowerMonitoringDevice
-    sprite: _Maid/Structures/Power/substation1.rsi # Maid
+    sprite: _Maid/Structures/Power/substation.rsi # Maid
     state: substation_static
   - type: Destructible
     thresholds:
@@ -277,7 +277,7 @@
     anchored: true
   - type: Sprite # TODO: add sprite for maintenance panel open
     drawdepth: WallMountedItems
-    sprite: _Maid/Structures/Power/substation1.rsi # Maid
+    sprite: _Maid/Structures/Power/substation.rsi # Maid
     layers:
     - state: substation_wall
     - state: screen # MAID fix wallmount substation shading
@@ -286,7 +286,7 @@
     maxCharge: 2000000
     startingCharge: 0
   - type: PowerMonitoringDevice
-    sprite: _Maid/Structures/Power/substation1.rsi # Maid
+    sprite: _Maid/Structures/Power/substation.rsi # Maid
     state: substation_wall_static
   - type: Destructible
     thresholds:
@@ -373,7 +373,7 @@
     anchored: true
   - type: Sprite
     drawdepth: WallMountedItems
-    sprite: _Maid/Structures/Power/substation1.rsi # Maid
+    sprite: _Maid/Structures/Power/substation.rsi # Maid
     layers:
     - state: substation_wall
   - type: Construction
