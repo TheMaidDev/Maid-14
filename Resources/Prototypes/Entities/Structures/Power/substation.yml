@@ -178,7 +178,7 @@
     snapCardinals: true
     layers:
     - state: substation
-    - state: screen
+    - state: screen_wall
       shader: unshaded
     - state: full
       shader: unshaded
