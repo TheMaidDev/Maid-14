@@ -17,11 +17,11 @@
       "name": "icon-flash"
     },
     {
-      "name": "off-equipped-HEAD",
+      "name": "off-equipped-HELMET",
       "directions": 4
     },
     {
-      "name": "on-equipped-HEAD",
+      "name": "on-equipped-HELMET",
       "directions": 4
     },
     {
@@ -49,7 +49,7 @@
       "directions": 4
     },
     {
-      "name": "equipped-HEAD",
+      "name": "equipped-HELMET",
       "directions": 4
     }
   
