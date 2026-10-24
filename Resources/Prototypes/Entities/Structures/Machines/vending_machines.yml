@@ -868,6 +868,40 @@
     rotateWhilePulling: true
 
 - type: entity
+  parent: VendingMachineCola
+  id: VendingMachineSodaRed
+  suffix: Soda
+  components:
+  - type: VendingMachine
+    pack: SodaInventory
+    offState: off
+    normalState: normal-unshaded
+    denyState: deny-unshaded
+    ejectState: eject-unshaded
+  - type: Sprite
+    noRot: true
+    sprite: _Maid/Structures/Machines/VendingMachines/cola-red.rsi
+    layers:
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.Base"]
+    - state: "off"
+      map: ["enum.VendingMachineVisualLayers.BaseUnshaded"]
+      shader: unshaded
+    - state: panel
+      map: ["enum.WiresVisualLayers.MaintenancePanel"]
+  - type: PointLight
+    radius: 2
+    energy: 1.6
+    color: "#CBC6BE"
+    mask: /Textures/Effects/LightMasks/cone.png
+    autoRot: true
+  - type: Transform
+    noRot: false
+  - type: Rotatable
+    rotateWhileAnchored: false
+    rotateWhilePulling: true
+
+- type: entity
   parent: VendingMachine
   id: VendingMachineStarkist
   name: Star-kist Vendor
@@ -1064,7 +1098,7 @@
     pack: GenericVendGoodbyes
   - type: Sprite
     noRot: true
-    sprite: Structures/Machines/VendingMachines/dinnerware.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/dinnerware.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -1289,7 +1323,7 @@
   - type: SpeakOnUIClosed
     pack: NutriMaxGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/nutri_green.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/nutri.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -1459,7 +1493,7 @@
     denyState: deny-unshaded
     priceMultiplier: 0 #Maid
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/sustenance.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/sustenance.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -1584,7 +1618,7 @@
   - type: SpeakOnUIClosed
     pack: BodaGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/sodasoviet.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/sovietsoda.rsi
     noRot: true
     layers:
     - state: "off"
@@ -1801,7 +1835,7 @@
     pack: GoodCleanFunGoodbyes
   - type: Sprite
     noRot: true
-    sprite: Structures/Machines/VendingMachines/games.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/games.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -1843,7 +1877,7 @@
   - type: SpeakOnUIClosed
     pack: ChangGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/snix.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/changs.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]
@@ -1941,7 +1975,7 @@
   - type: SpeakOnUIClosed
     pack: DonutGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/donut.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/donut.rsi
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]

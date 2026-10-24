@@ -200,9 +200,9 @@
   description: A gentle coat for a gentle man, or woman.
   components:
   - type: Sprite
-    sprite: Clothing/OuterClothing/Coats/gentlecoat.rsi
+    sprite: _Maid/Clothing/OuterClothing/Coats/gentlecoat.rsi
   - type: Clothing
-    sprite: Clothing/OuterClothing/Coats/gentlecoat.rsi
+    sprite: _Maid/Clothing/OuterClothing/Coats/gentlecoat.rsi
 
 - type: entity
   abstract: true
@@ -270,15 +270,27 @@
     sprite: Clothing/OuterClothing/Coats/hos_trenchcoat.rsi
 
 - type: entity
+  parent: ClothingOuterStorageBase
+  id: ClothingOuterCoatInspector
+  name: inspectors coat
+  description: A strict inspector coat for being intimidating during inspections.
+  components:
+  - type: Sprite
+    sprite: _Maid/Clothing/OuterClothing/Coats/insp_coat.rsi
+  - type: Clothing
+    sprite: _Maid/Clothing/OuterClothing/Coats/insp_coat.rsi
+
+
+- type: entity
   parent: ClothingOuterStorageToggleableBase
   id: ClothingOuterCoatJensen
   name: jensen coat
   description: A jensen coat.
   components:
   - type: Sprite
-    sprite: Clothing/OuterClothing/Coats/jensencoat.rsi
+    sprite: _Maid/Clothing/OuterClothing/Coats/jensencoat.rsi
   - type: Clothing
-    sprite: Clothing/OuterClothing/Coats/jensencoat.rsi
+    sprite: _Maid/Clothing/OuterClothing/Coats/jensencoat.rsi
   - type: ToggleableClothing # Goobstation - Modsuits change
     clothingPrototypes:
       head: ClothingHeadHatHoodChaplainHood
