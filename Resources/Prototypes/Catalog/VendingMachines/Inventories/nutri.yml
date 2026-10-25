@@ -44,11 +44,11 @@
     Bucket: 3
     BoxMouthSwab: 1
     Eftpos: 4 # Maid edit - economy
-#    BoxAgrichem: 1 #Maid
+    BoxAgrichem: 1 #Maid
     #TO DO:
     #plant analyzer
   contrabandInventory:
     ChemistryBottleUnstableMutagen: 1
-    Chainsaw: 1 #Goob
+    # Chainsaw: 1 #Goob #Maid вырезано
     Joint: 1
     ChemistryBottleLeft4Zed: 1

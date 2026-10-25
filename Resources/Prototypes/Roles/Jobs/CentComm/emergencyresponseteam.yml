@@ -150,6 +150,9 @@
     belt: ClothingBeltSecurityFilled
     pocket1: WeaponPistolN1984
     pocket2: FlashlightSeclite
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - WeaponDisabler
@@ -175,6 +178,9 @@
     belt: ClothingBeltSecurityFilled
     pocket1: WeaponPistolN1984
     pocket2: FlashlightSeclite
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - WeaponDisabler
@@ -235,6 +241,9 @@
     belt: ClothingBeltStorageWaistbag
     pocket1: Flare
     pocket2: DrinkWaterBottleFull
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - BoxCandle
@@ -268,6 +277,9 @@
     belt: ClothingBeltStorageWaistbag
     pocket1: Flare
     pocket2: DrinkWaterBottleFull
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - BoxCandle
@@ -332,6 +344,9 @@
     belt: ClothingBeltChiefEngineerFilled
     pocket1: Flare
     pocket2: GasAnalyzer
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - trayScanner
@@ -361,6 +376,9 @@
     belt: ClothingBeltChiefEngineerFilled
     pocket1: Flare
     pocket2: GasAnalyzer
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - trayScanner
@@ -419,6 +437,9 @@
     belt: ClothingBeltSecurityFilled
     pocket1: WeaponPistolMk58
     pocket2: FlashlightSeclite
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - WeaponDisabler
@@ -444,6 +465,9 @@
     belt: ClothingBeltSecurityFilled
     pocket1: WeaponPistolMk58
     pocket2: FlashlightSeclite
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - WeaponDisabler
@@ -524,6 +548,9 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltMedicalFilled
     pocket1: Flare
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - BoxSurvivalMedical
@@ -549,6 +576,9 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltMedicalFilled
     pocket1: Flare
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - BoxSurvivalMedical
@@ -602,6 +632,9 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltJanitorFilled
     pocket1: Flare
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - LightReplacer
@@ -625,6 +658,9 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltJanitorFilled
     pocket1: Flare
+    underweart: ClothingUnderwearTopBraSportsAlternative
+    underwearb: ClothingUnderwearBottomBoxersWhite
+    socks: ClothingUnderwearSocksNormal
   storage:
     back:
     - LightReplacer

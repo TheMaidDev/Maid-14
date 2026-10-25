@@ -44,5 +44,6 @@
   contrabandInventory:
     BalloonNT: 2
     LuxuryPen: 1
+    BalloonCorgi: 1 #Maid
   emaggedInventory: # Goobstation
     AgentIDCard: 1

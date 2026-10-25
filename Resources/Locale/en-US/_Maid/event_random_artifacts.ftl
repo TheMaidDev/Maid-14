@@ -1,1 +1,2 @@
 station-event-item-artifacts-start-announcement = Alert! Strange energy spikes detected aboard the station. It appears some random items have spontaneously turned into artifacts. Exercise extreme caution when interacting with objects.
+random-artifacts-spawn-popup = {CAPITALIZE($item)} suddenly hums with strange alien energy!

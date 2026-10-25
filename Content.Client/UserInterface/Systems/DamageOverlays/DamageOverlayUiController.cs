@@ -166,7 +166,7 @@ public sealed class DamageOverlayUiController : UIController
         else if (body != null)
         {
             if (!EntityManager.TryGetComponent<ConsciousnessComponent>(entity, out var consciousness))
-                return;
+                /*return;*/ { } // MAID crit overlay vital damage
 
             switch (mobState.CurrentState)
             {
@@ -176,15 +176,29 @@ public sealed class DamageOverlayUiController : UIController
                         _overlay.CritLevel = 0;
                         _overlay.DeadLevel = 0;
 
+                        if (consciousness is null)
+                            return; // MAID crit overlay vital damage
+
+                        /* // MAID pain overlay
                         if (consciousness.Consciousness <= 0 || consciousness.Consciousness >= consciousness.Cap)
                         {
                             _overlay.PainLevel = 0;
                             return;
                         }
+                        */
 
+                        // MAID BEGIN pain overlay
+                        /*
                         _overlay.PainLevel = FixedPoint2.Min(1f,
                             (consciousness.Cap - consciousness.Consciousness) / (consciousness.Cap - consciousness.Threshold))
+                        */
+
+                        _overlay.PainLevel = FixedPoint2.Clamp(
+                                (consciousness.Cap - consciousness.Consciousness) / (consciousness.Cap - consciousness.Threshold),
+                                0f,
+                                1f)
                             .Float();
+                        // MAID END pain overlay
 
                         if (_consciousness.TryGetNerveSystem(_playerManager.LocalEntity!.Value, out var nerveSys) &&
                             _consciousness.TryGetConsciousnessModifier(_playerManager.LocalEntity!.Value, nerveSys.Value, out var modifier, "Suffocation"))
@@ -201,9 +215,23 @@ public sealed class DamageOverlayUiController : UIController
                     }
                 case MobState.Critical:
                     {
+                        // MAID BEGIN crit overlay vital damage
+                        /*
                         _overlay.CritLevel = FixedPoint2.Min(1f,
                             (consciousness.Threshold - consciousness.Consciousness) / consciousness.Threshold)
                             .Float();
+                        */
+                        if (damageable is not null || EntityManager.TryGetComponent(entity, out damageable))
+                        {
+                            if (!_mobThresholdSystem.TryGetDeadPercentage(
+                                    entity,
+                                    FixedPoint2.Max(0.0, _mobThresholdSystem.CheckVitalDamage(entity, damageable)),
+                                    out var critLevel))
+                                return;
+
+                            _overlay.CritLevel = critLevel.Value.Float();
+                        }
+                        // MAID END crit overlay vital damage
 
                         _overlay.PainLevel = 0;
                         _overlay.DeadLevel = 0;

@@ -72,12 +72,16 @@
 #    ClothingHeadHelmetBasic: 2 #Maid
     ClothingHeadHelmetBasicAlt: 2
   contrabandInventory:
-    ClothingMaskClownSecurity: 1
-    ClothingMaskMimeSecurity: 1
+    # ClothingMaskClownSecurity: 1 #Maid
+    # ClothingMaskMimeSecurity: 1 #Maid
     ToyFigurineSecurity: 1
     ToyFigurineBrigmedic: 1 # Goobstation
     ToyFigurineWarden: 1
     ToyFigurineHeadOfSecurity: 1
+    ClothingUniformMNKOfficeSkirt: 1 #Maid
+    ClothingUniformMNKBlackOveralls: 1 #Maid
+    CigarCase: 1 #Maid
+    Matchbox: 1 #Maid
   emaggedInventory: # Goobstation
     ClothingOuterCoatSyndieCapArmored: 1
     ClothingOuterWinterSyndieCapArmored: 1

@@ -29,4 +29,5 @@
     DrinkHotCoco: 5
   contrabandInventory:
     DrinkTeapot: 2
-    DrinkNothing: 2
+    # DrinkNothing: 2 #Maid
+    CocoaSeeds: 1 #Maid

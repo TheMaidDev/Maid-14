@@ -15,4 +15,3 @@
       max: 80
     chaosScore: 90 # Goob test fails otherwise wtf
   - type: RandomItemArtifactsRule
-    conversionChance: 0.003

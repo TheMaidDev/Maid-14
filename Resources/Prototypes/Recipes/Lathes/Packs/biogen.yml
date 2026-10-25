@@ -24,6 +24,49 @@
   - BioGenLeft4Zed
   - BioGenEZNutrient
   - BioGenRobustHarvest
+  - BioGenRadium #Maid begin
+  - BioGenPhosphorus
+  - BioGenChlorine
+  - BioGenNitrogen
+  - BioGenPotassium
+  - BioGenSilicon
+  - BioGenEthanol
+  - BioGenOxygen
+  - BioGenDurathread
+  - BioGenAppleSeeds
+  - BioGenBananaSeeds
+  - BioGenBerrySeeds
+  - BioGenBungoSeeds
+  - BioGenCarrotSeeds
+  - BioGenCabbageSeeds
+  - BioGenChanterelleSeeds
+  - BioGenCherrySeeds
+  - BioGenChiliSeeds
+  - BioGenCocoaSeeds
+  - BioGenCornSeeds
+  - BioGenCottonSeeds
+  - BioGenEggySeeds
+  - BioGenGarlicSeeds
+  - BioGenGrapeSeeds
+  - BioGenLemonSeeds
+  - BioGenLimeSeeds
+  - BioGenPineappleSeeds
+  - BioGenOatSeeds
+  - BioGenOnionSeeds
+  - BioGenOnionRedSeeds
+  - BioGenOrangeSeeds
+  - BioGenPeaSeeds
+  - BioGenPotatoSeeds
+  - BioGenPumpkinSeeds
+  - BioGenRiceSeeds
+  - BioGenSoybeanSeeds
+  - BioGenSugarcaneSeeds
+  - BioGenTeaPlantSeeds
+  - BioGenTomatoSeeds
+  - BioGenTowercapSeeds
+  - BioGenWheatSeeds
+  - BioGenWatermelonSeeds
+  - BioGenHydrogen #Maid end
 
 - type: latheRecipePack
   id: BioGenMaterialsStatic

@@ -63,12 +63,10 @@
   id: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming
-    startAudio:
-      path: /Audio/_Maid/Announcements/attention.ogg # Maid
+    startAnnouncement: null
     weight: 2 #More down # Maid
     reoccurrenceDelay: 30
-    earliestStart: 20 # Goobstation
+    earliestStart: 30 # Goobstation
     duration: 1
     maxOccurrences: 1 # should be the same as [copies] in shuttle_incoming_event.yml
     chaos: # Goobstation
@@ -95,7 +93,7 @@
   id: UnknownShuttleTravelingCuisine
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming
+    startAnnouncement: null
     maxOccurrences: 2 # should be the same as [copies] in shuttle_incoming_event.yml
   - type: LoadMapRule
     preloadedGrid: TravelingCuisine
@@ -105,7 +103,7 @@
   id: UnknownShuttleDisasterEvacPod
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming
+    startAnnouncement: null
     maxOccurrences: 3 # should be the same as [copies] in shuttle_incoming_event.yml
   - type: LoadMapRule
     preloadedGrid: DisasterEvacPod
@@ -116,7 +114,7 @@
   id: UnknownShuttleHonki
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
     weight: 2
     chaos: # Goobstation
       Friend: -10
@@ -156,7 +154,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
     weight: 1 # Its just a big ship, so it needs to be rarer to be interesting. # Maid 2 -> 1
     chaos: # Goobstation
       Friend: -60
@@ -172,7 +170,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
   - type: LoadMapRule
     preloadedGrid: Cryptid
 
@@ -181,7 +179,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
   - type: LoadMapRule
     preloadedGrid: Eternal
 
@@ -190,7 +188,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
     chaos: # Goobstation
       Friend: -20
       Medical: -20
@@ -206,7 +204,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
     weight: 1 # Its just a big ship, so it needs to be rarer to be interesting. # Maid 3 -> 1
   - type: LoadMapRule
     preloadedGrid: Gym
@@ -216,7 +214,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
     weight: 0.5 # Its just a big ship, so it needs to be rarer to be interesting. # Maid 2 -> 0.5
     earliestStart: 45 # late to hopefully have enough ghosts to fill all roles quickly. (5-6)
     chaos: # Goobstation
@@ -262,7 +260,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
   - type: LoadMapRule
     preloadedGrid: Joe
 
@@ -271,7 +269,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
   - type: LoadMapRule
     preloadedGrid: Lambordeere
 
@@ -297,7 +295,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
   - type: LoadMapRule
     preloadedGrid: Meatzone
 
@@ -306,7 +304,7 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
     weight: 2 # Maid 4 -> 2
     maxOccurrences: 4
   - type: LoadMapRule
@@ -317,6 +315,6 @@
   parent: BaseUnknownShuttleRule
   components:
   - type: StationEvent
-    startAnnouncement: station-event-unknown-shuttle-incoming #!!
+    startAnnouncement: null
   - type: LoadMapRule
     preloadedGrid: Spacebus

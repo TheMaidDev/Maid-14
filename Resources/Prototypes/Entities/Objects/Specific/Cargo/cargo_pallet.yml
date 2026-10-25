@@ -51,6 +51,9 @@
   id: CargoPallet
   parent: BaseCargoPallet
   components:
+  - type: Construction #Maid
+    graph: CargoPallet #Maid
+    node: CargoPallet #Maid
   - type: CargoPallet # MAID
     palletType: all # MAID
   - type: Damageable
@@ -82,6 +85,9 @@
   description: Designates valid items to sell. Made of plastitanium to discourage pesky vandals.
   parent: BaseCargoPallet
   components:
+  - type: Construction #Maid
+    graph: CargoPalletSell #Maid
+    node: CargoPalletSell #Maid
   - type: CargoPallet
     palletType: sell
   - type: Sprite
