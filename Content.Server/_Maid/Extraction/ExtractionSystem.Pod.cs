@@ -405,7 +405,7 @@ public sealed partial class ExtractionSystem
         SetGlow((container.Owner, pod), DropPodGlow.Sealed);
 
         if (pod.EngineSound != null)
-            pod.EngineSoundStream = _audio.PlayPvs(pod.EngineSound, container.Owner, pod.EngineSound.Params.WithLoop(true))?.Entity;
+            pod.EngineSoundStream = _audio.PlayPvs(pod.EngineSound, container.Owner)?.Entity;
 
         _popup.PopupEntity(Loc.GetString(pod.LaunchingMessage, ("seconds", (int) pod.LaunchDelay.TotalSeconds)), user, user, PopupType.Medium);
         _adminLog.Add(LogType.Action, LogImpact.Medium, $"{ToPrettyString(user):player} started the launch of extraction drop pod {ToPrettyString(container.Owner)}");

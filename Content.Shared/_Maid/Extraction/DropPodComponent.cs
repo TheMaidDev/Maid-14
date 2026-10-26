@@ -144,7 +144,8 @@ public sealed partial class DropPodComponent : Component
     public SoundSpecifier? CountdownSound;
 
     /// <summary>
-    /// Looped engine sound while the pod counts down. None yet, the sound is picked later.
+    /// Engine sound started with the launch countdown and stopped if the launch is cancelled.
+    /// Loops only if its params say so.
     /// </summary>
     [DataField]
     public SoundSpecifier? EngineSound;

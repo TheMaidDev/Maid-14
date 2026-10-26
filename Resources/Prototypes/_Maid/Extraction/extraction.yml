@@ -111,6 +111,10 @@
       path: /Audio/_Maid/Machines/DropPod/success_sound.ogg
     wrongCodeSound:
       path: /Audio/_Maid/Machines/DropPod/failure_sound.ogg
+    engineSound:
+      path: /Audio/_Maid/Machines/DropPod/engine_pod_startup.ogg
+    launchSound:
+      path: /Audio/_Maid/Machines/DropPod/engine_pod_launch.ogg
   - type: UserInterface
     interfaces:
       enum.DropPodUiKey.Key:

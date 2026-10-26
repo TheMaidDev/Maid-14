@@ -1,4 +1,4 @@
-- files: ["button_beep.ogg", "success_sound.ogg", "failure_sound.ogg"]
+- files: ["button_beep.ogg", "success_sound.ogg", "failure_sound.ogg", "engine_pod_startup.ogg", "engine_pod_launch.ogg"]
   license: "CC-BY-SA-3.0"
   copyright: "Provided by Warete for Maid-14"
   source: "https://github.com/TheMaidDev/Maid-14"
