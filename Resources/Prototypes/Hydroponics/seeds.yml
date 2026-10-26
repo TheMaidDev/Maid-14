@@ -2200,7 +2200,7 @@
 - type: seed
   id: Galaxyarrow
   name: seeds-galaxyarrow-name
-  noun: seeds-noun-spores
+  noun: seeds-noun-seeds
   displayName: seeds-galaxyarrow-display-name
   plantRsi: _Maid/Objects/Specific/Hydroponics/galaxyarrow.rsi
   packetPrototype: GalaxyarrowSeeds
@@ -2208,7 +2208,6 @@
   - FoodGalaxyarrow
   lifespan: 80
   maturation: 15
-  ligneous: true
   production: 3
   yield: 3
   potency: 1
@@ -2217,6 +2216,15 @@
   nutrientConsumption: 0.80
   lightTolerance: 6
   idealHeat: 288
+  chemicals:
+    Nutriment:
+      Min: 5
+      Max: 10
+      PotencyDivisor: 1
+    Razorium:
+      Min: 5
+      Max: 10
+      PotencyDivisor: 1
 
 - type: seed
   id: DragonFruit
@@ -2241,11 +2249,11 @@
     Nutriment:
       Min: 5
       Max: 10
-      PotencyDivisor: 20
+      PotencyDivisor: 10
     Enzyme:
       Min: 5
       Max: 10
-      PotencyDivisor: 20
+      PotencyDivisor: 10
 
 - type: seed
   id: RadioactiveBerries

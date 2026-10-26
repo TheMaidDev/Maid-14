@@ -66,7 +66,7 @@
       - medicine
   - type: SolutionContainerManager
     solutions:
-      melee:
+      food:
         maxVol: 25
         reagents:
         - ReagentId: Razorium
@@ -86,7 +86,7 @@
   - type: SolutionInjectOnEmbed
     transferAmount: 100
     blockSlots: NONE
-    solution: melee
+    solution: food
   - type: SolutionTransfer
     maxTransferAmount: 100
   - type: EmbeddableProjectile
@@ -109,26 +109,26 @@
     angle: 0
     animation: WeaponArcThrust
   - type: MeleeChemicalInjector
-    solution: melee
+    solution: food
   - type: RefillableSolution
-    solution: melee
+    solution: food
   - type: InjectableSolution
-    solution: melee
+    solution: food
   - type: Fixtures
     fixtures:
       fix1:
         shape: !type:PolygonShape
           vertices:
             - -0.20,0.10
-            - -0.10,0.20
-            - 0.20,-0.10
             - 0.10,-0.20
+            - 0.20,-0.10
+            - -0.10,0.20
         density: 20
         mask:
         - ItemMask
         restitution: 0.3
         friction: 0.2
-
+  
 - type: entity
   name: dragon fruit
   parent: FoodProduceBase
