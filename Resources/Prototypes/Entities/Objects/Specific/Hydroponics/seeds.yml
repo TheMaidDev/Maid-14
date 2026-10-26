@@ -916,6 +916,6 @@
   id: RadioactiveBerriesSeeds
   components:
     - type: Seed
-      seedId: radioactiveBerries
+      seedId: RadioactiveBerries
     - type: Sprite
       sprite: _Maid/Objects/Specific/Hydroponics/radioactive_berry.rsi

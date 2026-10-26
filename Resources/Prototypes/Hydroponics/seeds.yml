@@ -1846,7 +1846,7 @@
   productPrototypes:
     - FoodBungo
   mutationPrototypes:
-    - FoodDragonfruit
+    - DragonFruit
   harvestRepeat: Repeat
   lifespan: 50
   maturation: 8
@@ -2224,7 +2224,7 @@
   noun: seeds-noun-seeds
   displayName: seeds-dragonfruit-display-name
   plantRsi: Objects/Specific/Hydroponics/dragon_fruit.rsi
-  packetPrototype: DragonFruit
+  packetPrototype: DragonFruitSeeds
   productPrototypes:
     - FoodDragonFruit
   harvestRepeat: Repeat
@@ -2248,7 +2248,7 @@
       PotencyDivisor: 20
 
 - type: seed
-  id: radioactiveBerries
+  id: RadioactiveBerries
   name: seeds-glowingberries-name
   noun: seeds-noun-seeds
   displayName: seeds-glowingberries-display-name

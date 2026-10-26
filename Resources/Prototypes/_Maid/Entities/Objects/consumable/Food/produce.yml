@@ -152,7 +152,7 @@
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/dragon_fruit.rsi
   - type: Produce
-    seedId: bungo
+    seedId: dragonfruit
   - type: Tag
     tags:
     - Fruit
@@ -190,7 +190,6 @@
     - Fruit
   - type: RadiationSource
     intensity: 0.3
-    slope: 0.1
   - type: PointLight
     color: "#19FF19FF"
     energy: 2.5
