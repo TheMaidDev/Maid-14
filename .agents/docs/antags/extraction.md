@@ -1,6 +1,6 @@
 # Antag extraction (drop pod)
 
-Generic way for an antagonist with objectives to leave the round early. SpaceNinja is the first user, the system itself knows nothing about ninjas. Everything lives in `_Maid/Extraction` (Shared, Server, Client) plus prototypes/locale/textures under the matching `_Maid` folders. Branch: `ninja-extraction` on `creas` (CREAsTIVE/Maid-14).
+Generic way for an antagonist with objectives to leave the round early. SpaceNinja is the first user, the system itself knows nothing about ninjas. Everything lives in `_Maid/Extraction` (Shared, Server, Client) plus prototypes/locale/textures under the matching `_Maid` folders. Branch: `ninja-extraction` on `origin` (TheMaidDev/Maid-14).
 
 ## Player flow
 
