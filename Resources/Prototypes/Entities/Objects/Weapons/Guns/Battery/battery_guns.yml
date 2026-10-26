@@ -368,8 +368,8 @@
     - oni-cannot-shoot-guns-1
     - oni-cannot-shoot-guns-2
     - oni-cannot-shoot-guns-3
-  - type: HitscanBatteryAmmoProvider
-    proto: RedMediumLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   - type: MagazineVisuals
     magState: mag
@@ -405,8 +405,8 @@
   - type: Appearance
   - type: Clothing
     sprite: Objects/Weapons/Guns/Battery/makeshift.rsi
-  - type: HitscanBatteryAmmoProvider
-    proto: RedLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   - type: Battery
     maxCharge: 500
@@ -466,8 +466,8 @@
     selectedMode: SemiAuto
     availableModes:
     - SemiAuto
-  - type: HitscanBatteryAmmoProvider
-    proto: RedLaserPractice
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   - type: StaticPrice
     price: 300
@@ -504,8 +504,8 @@
     selectedMode: SemiAuto
     availableModes:
     - SemiAuto
-  - type: HitscanBatteryAmmoProvider
-    proto: RedLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   # Goobstation
   - type: Item
@@ -539,8 +539,8 @@
     - SemiAuto
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser3.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: LightPulse # Goobstation
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 200
   - type: Battery
     maxCharge: 2000
@@ -685,8 +685,8 @@
     fireRate: 1.5
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: RedHeavyLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 100
   - type: Tag
     tags:
@@ -755,8 +755,8 @@
   - type: Gun
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser3.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: XrayLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 100
   - type: MagazineVisuals
     magState: mag
@@ -1021,8 +1021,8 @@
   - type: Gun
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: RedMediumLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser
     fireCost: 100
   - type: BatterySelfRecharger
     autoRecharge: true
@@ -1128,8 +1128,8 @@
     fireRate: 0.5
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser_clown.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: RedMediumLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 100
   - type: BatterySelfRecharger
     autoRecharge: true
