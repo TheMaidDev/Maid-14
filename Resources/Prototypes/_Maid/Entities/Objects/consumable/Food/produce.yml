@@ -76,7 +76,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: galaxyarrow
+    seedId: Galaxyarrow
   - type: Extractable
     grindableSolutionName: food
   - type: Tag
@@ -152,7 +152,7 @@
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/dragon_fruit.rsi
   - type: Produce
-    seedId: dragonfruit
+    seedId: DragonFruitSeeds
   - type: Tag
     tags:
     - Fruit
@@ -179,7 +179,7 @@
   - type: Sprite
     sprite: _Maid/Objects/Specific/Hydroponics/radioactive_berry.rsi
   - type: Produce
-    seedId: radioactiveBerries
+    seedId: RadioactiveBerries
   - type: Extractable
     juiceSolution:
       reagents:
