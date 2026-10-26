@@ -1819,7 +1819,7 @@
     - FoodBerries
   mutationPrototypes:
     - strangeBerries #goobstation
-    - RadioactiveBerries
+    - RadioactiveBerries #Maid
   harvestRepeat: Repeat
   lifespan: 50
   maturation: 6
