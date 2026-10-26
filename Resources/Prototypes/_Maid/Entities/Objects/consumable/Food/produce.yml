@@ -152,7 +152,7 @@
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/dragon_fruit.rsi
   - type: Produce
-    seedId: DragonFruitSeeds
+    seedId: DragonFruit
   - type: Tag
     tags:
     - Fruit
