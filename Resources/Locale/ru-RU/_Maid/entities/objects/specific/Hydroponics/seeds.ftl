@@ -1,0 +1,12 @@
+ent-FoodDragonFruit = драконий фрукт
+    .desc = выглядит экзотически
+ent-GlassLog = бревно стеклошляпника
+    .desc = выглядит хрупким
+ent-PlastSteelLog = бревно пласталешляпника
+    .desc = ну очень тяжёлое
+ent-PlasticLog = бревно пластикошляпника
+    .desc = довольно лёгкое
+ent-FoodGalaxyarrow = стрелополох
+    .desc = кончик довольн острый
+ent-FoodRadioactiveBerries = радиоктивные ягоды
+    .desc = вам лучше держаться подальше от них

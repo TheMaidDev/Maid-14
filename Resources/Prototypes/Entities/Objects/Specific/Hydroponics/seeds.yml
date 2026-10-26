@@ -858,3 +858,64 @@
     seedId: bloonion
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/bloonion.rsi
+
+#Maid begin
+- type: entity
+  parent: SeedBase
+  name: packet of glasscap
+  id: GlasscapSeeds
+  components:
+  - type: Seed
+    seedId: glasscap
+  - type: Sprite
+    sprite: _Maid/Objects/Specific/Hydroponics/glasscap.rsi
+
+- type: entity
+  parent: SeedBase
+  name: packet of plaststeelcap
+  id: PlastSteelcapSeeds
+  components:
+  - type: Seed
+    seedId: plaststeelcap
+  - type: Sprite
+    sprite: _Maid/Objects/Specific/Hydroponics/plaststeelcap.rsi
+
+- type: entity
+  parent: SeedBase
+  name: packet of plasticcap
+  id: PlasticcapSeeds
+  components:
+  - type: Seed
+    seedId: plasticcap
+  - type: Sprite
+    sprite: _Maid/Objects/Specific/Hydroponics/plasticcap.rsi
+
+- type: entity
+  parent: SeedBase
+  name: packet of GalaxyArrow
+  id: GalaxyarrowSeeds
+  components:
+  - type: Seed
+    seedId: Galaxyarrow
+  - type: Sprite
+    sprite: _Maid/Objects/Specific/Hydroponics/galaxyarrow.rsi
+
+- type: entity
+  parent: SeedBase
+  name: packet of DragonFruit
+  id: DragonFruitSeeds
+  components:
+    - type: Seed
+      seedId: DragonFruit
+    - type: Sprite
+      sprite: Objects/Specific/Hydroponics/dragon_fruit.rsi
+
+- type: entity
+  parent: SeedBase
+  name: packet of glowing berries seeds
+  id: RadioactiveBerriesSeeds
+  components:
+    - type: Seed
+      seedId: radioactiveBerries
+    - type: Sprite
+      sprite: _Maid/Objects/Specific/Hydroponics/radioactive_berry.rsi
