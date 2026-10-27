@@ -79,6 +79,7 @@ public sealed class FlammableParticleSystem : EntitySystem
         {
             StopState(state);
             state.OnFire = false;
+            _active.Remove(ent); // MAID particle lifecycle fix
         }
     }
 
