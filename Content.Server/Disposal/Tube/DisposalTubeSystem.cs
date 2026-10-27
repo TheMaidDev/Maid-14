@@ -71,6 +71,7 @@ namespace Content.Server.Disposal.Tube
             SubscribeLocalEvent<DisposalTubeComponent, BreakageEventArgs>(OnBreak);
             SubscribeLocalEvent<DisposalTubeComponent, ComponentStartup>(OnStartup);
             SubscribeLocalEvent<DisposalTubeComponent, ConstructionBeforeDeleteEvent>(OnDeconstruct);
+            SubscribeLocalEvent<DisposalTubeComponent, EntityTerminatingEvent>(OnTerminating); // MAID eject on tube delete
 
             SubscribeLocalEvent<DisposalBendComponent, GetDisposalsConnectableDirectionsEvent>(OnGetBendConnectableDirections);
             SubscribeLocalEvent<DisposalBendComponent, GetDisposalsNextDirectionEvent>(OnGetBendNextDirection);
@@ -291,6 +292,15 @@ namespace Content.Server.Disposal.Tube
         {
             DisconnectTube(uid, component);
         }
+
+        // MAID BEGIN eject on tube delete
+        // Raised before the tube's children (holders and their contents) get deleted with it.
+        // Covers deletions that bypass ConstructionBeforeDeleteEvent, e.g. welding via DestroyEntity.
+        private void OnTerminating(EntityUid uid, DisposalTubeComponent component, ref EntityTerminatingEvent args)
+        {
+            DisconnectTube(uid, component);
+        }
+        // MAID END eject on tube delete
 
         private void OnStartup(EntityUid uid, DisposalTubeComponent component, ComponentStartup args)
         {
