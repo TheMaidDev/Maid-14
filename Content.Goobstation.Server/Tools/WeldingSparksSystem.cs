@@ -8,21 +8,12 @@ using Content.Shared.Tools.Components;
 using Content.Shared.Tools.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.Map;
-using Robust.Shared.Timing; // MAID welding sparks cleanup
 
 namespace Content.Goobstation.Server.Tools;
 
 public sealed class WeldingSparksSystem : EntitySystem
 {
     [Dependency] private readonly ToolSystem _toolSystem = default!;
-    // MAID BEGIN welding sparks cleanup
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-
-    private static readonly TimeSpan CleanupInterval = TimeSpan.FromSeconds(1);
-    private TimeSpan _nextCleanup;
-    private readonly List<DoAfterId> _toRemove = new();
-    // MAID END welding sparks cleanup
 
     public override void Initialize()
     {
@@ -31,49 +22,48 @@ public sealed class WeldingSparksSystem : EntitySystem
         SubscribeLocalEvent<WeldingSparksComponent, UseToolEvent>(OnUseTool);
         SubscribeLocalEvent<WeldingSparksComponent, SharedToolSystem.ToolDoAfterEvent>(OnAfterUseTool);
         SubscribeLocalEvent<WeldingSparksComponent, BeforeRangedInteractEvent>(OnBeforeInteract);
-        SubscribeLocalEvent<WeldingSparksComponent, ComponentShutdown>(OnShutdown); // MAID welding sparks cleanup
+        // MAID BEGIN welding sparks cleanup
+        SubscribeLocalEvent<WeldingSparksComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<WeldingSparksUserComponent, ComponentShutdown>(OnUserShutdown);
+        // MAID END welding sparks cleanup
     }
 
     // MAID BEGIN welding sparks cleanup
-    // DoAfter end events can be missed (tool deleted mid-weld, user deleted mid-weld), so periodically
-    // drop any sparks whose DoAfter is no longer running.
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        if (_timing.CurTime < _nextCleanup)
-            return;
-
-        _nextCleanup = _timing.CurTime + CleanupInterval;
-
-        var query = EntityQueryEnumerator<WeldingSparksComponent>();
-        while (query.MoveNext(out var comp))
-        {
-            if (comp.SpawnedEffects.Count == 0)
-                continue;
-
-            foreach (var id in comp.SpawnedEffects.Keys)
-            {
-                if (!_doAfter.IsRunning(id))
-                    _toRemove.Add(id);
-            }
-
-            foreach (var id in _toRemove)
-            {
-                if (comp.SpawnedEffects.Remove(id, out var effect))
-                    QueueDel(effect);
-            }
-
-            _toRemove.Clear();
-        }
-    }
-
+    // DoAfter end events are raised on the tool, so they are lost if the tool or the user is deleted mid-weld.
+    // Sparks are tracked on both the tool and the user, and deleted when either goes away.
     private void OnShutdown(Entity<WeldingSparksComponent> ent, ref ComponentShutdown args)
     {
-        foreach (var effect in ent.Comp.SpawnedEffects.Values)
+        foreach (var (id, effect) in ent.Comp.SpawnedEffects)
+        {
             QueueDel(effect);
+            UntrackUserEffect(id.Uid, effect);
+        }
 
         ent.Comp.SpawnedEffects.Clear();
+    }
+
+    private void OnUserShutdown(Entity<WeldingSparksUserComponent> ent, ref ComponentShutdown args)
+    {
+        foreach (var (effect, (tool, id)) in ent.Comp.Effects)
+        {
+            QueueDel(effect);
+
+            if (TryComp<WeldingSparksComponent>(tool, out var sparks))
+                sparks.SpawnedEffects.Remove(id);
+        }
+
+        ent.Comp.Effects.Clear();
+    }
+
+    private void UntrackUserEffect(EntityUid user, EntityUid effect)
+    {
+        if (!TryComp<WeldingSparksUserComponent>(user, out var userComp)
+            || !userComp.Effects.Remove(effect)
+            || userComp.Effects.Count > 0
+            || TerminatingOrDeleted(user))
+            return;
+
+        RemComp<WeldingSparksUserComponent>(user);
     }
     // MAID END welding sparks cleanup
 
@@ -98,6 +88,7 @@ public sealed class WeldingSparksSystem : EntitySystem
     {
         var effect = Spawn(ent.Comp.EffectProto, spawnLoc);
         ent.Comp.SpawnedEffects.Add(id, effect);
+        EnsureComp<WeldingSparksUserComponent>(id.Uid).Effects[effect] = (ent.Owner, id); // MAID welding sparks cleanup
 
         if (args.Target is { } target)
         {
@@ -127,6 +118,7 @@ public sealed class WeldingSparksSystem : EntitySystem
 
         QueueDel(effect);
         ent.Comp.SpawnedEffects.Remove(args.DoAfter.Id);
+        UntrackUserEffect(args.DoAfter.Id.Uid, effect); // MAID welding sparks cleanup
     }
 
     // This is a pretty hacky way of putting the spark effect in the right spot when welding a floor tile, since that doesn't pass a `target` arg.
