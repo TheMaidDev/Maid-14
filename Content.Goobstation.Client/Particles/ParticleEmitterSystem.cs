@@ -4,10 +4,18 @@ using Content.Goobstation.Shared.Particles;
 
 namespace Content.Goobstation.Client.Particles;
 
+// MAID BEGIN particle lifecycle fix
+/*
+/// <summary>
+/// Spawns a particle effect on this client when an entity with
+/// <see cref="ParticleEmitterComponent"/> enters the local view (MapInitEvent).
+/// </summary>
+*/
 /// <summary>
 /// Spawns a particle effect on this client when an entity with
 /// <see cref="ParticleEmitterComponent"/> starts up, and stops it when the component shuts down.
 /// </summary>
+// MAID END particle lifecycle fix
 public sealed class ParticleEmitterSystem : EntitySystem
 {
     [Dependency] private readonly ParticleSystem _particles = default!;
