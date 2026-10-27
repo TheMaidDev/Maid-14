@@ -23,8 +23,11 @@ public sealed class SpawnParticlesEffectSystem : SharedSpawnParticlesEffectSyste
         if (!_timing.IsFirstTimePredicted)
             return;
 
-        // A detached infinite emitter has nothing that would ever stop it.
-        if (!attached && _proto.Resolve(particleProto, out var proto) && proto.Duration <= TimeSpan.Zero)
+        // A detached infinite emitter has nothing that would ever stop it. One-shot bursts exhaust themselves.
+        if (!attached
+            && _proto.Resolve(particleProto, out var proto)
+            && proto.Duration <= TimeSpan.Zero
+            && !proto.Burst)
         {
             Log.Warning($"Refusing to spawn infinite particle effect {particleProto} without attaching it to an entity.");
             return;
