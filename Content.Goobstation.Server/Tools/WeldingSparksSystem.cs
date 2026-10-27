@@ -9,7 +9,6 @@ using Content.Shared.Tools.Components;
 using Content.Shared.Tools.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.Map;
-using System.Linq; // MAID welding sparks cleanup
 
 namespace Content.Goobstation.Server.Tools;
 
@@ -39,17 +38,14 @@ public sealed class WeldingSparksSystem : EntitySystem
         if (ent.Comp.SpawnedEffects.Count == 0)
             return;
 
-        var users = new HashSet<EntityUid>();
-        foreach (var (id, effect) in ent.Comp.SpawnedEffects)
-        {
+        var ids = new List<DoAfterId>(ent.Comp.SpawnedEffects.Keys);
+        foreach (var effect in ent.Comp.SpawnedEffects.Values)
             QueueDel(effect);
-            users.Add(id.Uid);
-        }
 
         ent.Comp.SpawnedEffects.Clear();
 
-        foreach (var user in users)
-            UntrackUser(user, ent.Owner);
+        foreach (var id in ids)
+            UntrackUser(id.Uid, ent.Owner);
     }
 
     private void OnUserShutdown(Entity<WeldingSparksUserComponent> ent, ref ComponentShutdown args)
@@ -59,7 +55,14 @@ public sealed class WeldingSparksSystem : EntitySystem
             if (!TryComp<WeldingSparksComponent>(tool, out var sparks))
                 continue;
 
-            foreach (var id in sparks.SpawnedEffects.Keys.Where(id => id.Uid == ent.Owner).ToList())
+            var ids = new List<DoAfterId>();
+            foreach (var id in sparks.SpawnedEffects.Keys)
+            {
+                if (id.Uid == ent.Owner)
+                    ids.Add(id);
+            }
+
+            foreach (var id in ids)
             {
                 if (sparks.SpawnedEffects.Remove(id, out var effect))
                     QueueDel(effect);
@@ -81,9 +84,14 @@ public sealed class WeldingSparksSystem : EntitySystem
         if (!TryComp<WeldingSparksUserComponent>(user, out var userComp))
             return;
 
-        if (TryComp<WeldingSparksComponent>(tool, out var sparks)
-            && sparks.SpawnedEffects.Keys.Any(id => id.Uid == user))
-            return;
+        if (TryComp<WeldingSparksComponent>(tool, out var sparks))
+        {
+            foreach (var id in sparks.SpawnedEffects.Keys)
+            {
+                if (id.Uid == user)
+                    return;
+            }
+        }
 
         userComp.Tools.Remove(tool);
         if (userComp.Tools.Count == 0 && !TerminatingOrDeleted(user))
