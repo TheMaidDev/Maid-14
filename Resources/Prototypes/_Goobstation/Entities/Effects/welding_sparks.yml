@@ -21,6 +21,8 @@
   - type: Tag
     tags:
     - HideContextMenu
+  - type: TimedDespawn # MAID instant doafter sparks
+    lifetime: 30 # MAID instant doafter sparks
 
 - type: entity
   parent: EffectWeldingSparks

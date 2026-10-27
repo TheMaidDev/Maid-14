@@ -268,7 +268,8 @@ public abstract partial class SharedToolSystem : EntitySystem
         };
 
         // Goobstation - Moved `TryStartDoAfter` into a check and added `UseToolEvent`.
-        if (_doAfterSystem.TryStartDoAfter(doAfterArgs, out id))
+        if (_doAfterSystem.TryStartDoAfter(doAfterArgs, out id)
+            && _doAfterSystem.IsRunning(id)) // MAID instant doafter sparks - instant DoAfters already finished, so don't spawn effects that nothing would clean up
         {
             RaiseLocalEvent(tool, new UseToolEvent(user, target, id.Value.Index, doAfterLength));
         }
