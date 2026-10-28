@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #nullable enable
+using Robust.UnitTesting.Pool; // MAID rt-update
+using System.IO; // MAID rt-update
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,7 +57,7 @@ public class PvsBenchmark
 #endif
         PoolManager.Startup();
 
-        _pair = PoolManager.GetServerClient().GetAwaiter().GetResult();
+        _pair = PoolManager.GetServerClient(testContext: new ExternalTestContext("Benchmark", StreamWriter.Null)).GetAwaiter().GetResult(); // MAID rt-update RT 274 test context
         _entMan = _pair.Server.ResolveDependency<IEntityManager>();
         _pair.Server.CfgMan.SetCVar(CVars.NetPVS, true);
         _pair.Server.CfgMan.SetCVar(CVars.ThreadParallelCount, 0);

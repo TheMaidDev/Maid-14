@@ -8,6 +8,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.UnitTesting.Pool; // MAID rt-update
+using System.IO; // MAID rt-update
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -70,7 +72,7 @@ public class DeviceNetworkingBenchmark
     {
         ProgramShared.PathOffset = "../../../../";
         PoolManager.Startup(typeof(DeviceNetworkingBenchmark).Assembly);
-        _pair = await PoolManager.GetServerClient();
+        _pair = await PoolManager.GetServerClient(testContext: new ExternalTestContext("Benchmark", StreamWriter.Null)); // MAID rt-update RT 274 test context
         var server = _pair.Server;
 
         await server.WaitPost(() =>

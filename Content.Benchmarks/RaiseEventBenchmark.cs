@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using Robust.UnitTesting.Pool; // MAID rt-update
+using System.IO; // MAID rt-update
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
@@ -21,7 +23,7 @@ public class RaiseEventBenchmark
     {
         ProgramShared.PathOffset = "../../../../";
         PoolManager.Startup(typeof(BenchSystem).Assembly);
-        _pair = PoolManager.GetServerClient().GetAwaiter().GetResult();
+        _pair = PoolManager.GetServerClient(testContext: new ExternalTestContext("Benchmark", StreamWriter.Null)).GetAwaiter().GetResult(); // MAID rt-update RT 274 test context
         var entMan = _pair.Server.EntMan;
         _sys = entMan.System<BenchSystem>();
 

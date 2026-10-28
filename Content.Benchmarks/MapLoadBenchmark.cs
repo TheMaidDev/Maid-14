@@ -28,6 +28,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.UnitTesting.Pool; // MAID rt-update
+using System.IO; // MAID rt-update
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +61,7 @@ public class MapLoadBenchmark
         ProgramShared.PathOffset = "../../../../";
         PoolManager.Startup();
 
-        _pair = PoolManager.GetServerClient().GetAwaiter().GetResult();
+        _pair = PoolManager.GetServerClient(testContext: new ExternalTestContext("Benchmark", StreamWriter.Null)).GetAwaiter().GetResult(); // MAID rt-update RT 274 test context
         var server = _pair.Server;
 
         Paths = server.ResolveDependency<IPrototypeManager>()

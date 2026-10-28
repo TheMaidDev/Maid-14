@@ -13,10 +13,12 @@ SPDX-License-Identifier: MIT
 -->
 
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\RobustToolbox\Imports\Lidgren.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\Imports\Shared.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\Imports\Client.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\Imports\Server.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\Imports\Benchmarks.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Testing.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
   <PropertyGroup>
     <!-- Work around https://github.com/dotnet/project-system/issues/4314 -->
@@ -31,6 +33,9 @@ SPDX-License-Identifier: MIT
   <Import Project="..\MSBuild\Content.props" /> <!-- MAID rt-update -->
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
+    <!-- MAID rt-update: pin transitive deps for the generated BenchmarkDotNet project (as Goob) -->
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <PackageReference Include="Moq" /> <!-- MAID rt-update -->
   </ItemGroup>
   <ItemGroup>
