@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #nullable enable
-using Robust.UnitTesting.Pool; // MAID rt-update
 using System.IO; // MAID rt-update
 using System;
 using System.Linq;

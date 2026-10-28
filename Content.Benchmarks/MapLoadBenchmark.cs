@@ -28,7 +28,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.UnitTesting.Pool; // MAID rt-update
 using System.IO; // MAID rt-update
 using System;
 using System.Collections.Generic;
