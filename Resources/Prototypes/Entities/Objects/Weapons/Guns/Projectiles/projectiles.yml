@@ -224,10 +224,10 @@
     gravity: 0.001, 0.005
     gradientIteratorType: Bezier
     gradient:
-    - 1, 0, 1, 1 # MAID rt-update inverted Box2i fixed
+    - 1, 1, 1, 0
     - 1, 1, 1, 2
-    - 1, 0, 1, 1 # MAID rt-update inverted Box2i fixed
-    - 1, 0, 1, 1 # MAID rt-update inverted Box2i fixed
+    - 1, 1, 1, 0
+    - 1, 1, 1, 0
     optionsConcealable: true
     # WD-Tweak-End
 
