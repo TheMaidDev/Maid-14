@@ -30,5 +30,7 @@
     ClothingHeadsetService: 2
   contrabandInventory:
     ToyFigurineLibrarian: 1
+    BeachBall: 1 #Maid
+    PlushieLamp: 1 #Maid
   emaggedInventory: # Goobstation
     SyndicatePersonalAI: 1

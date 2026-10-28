@@ -76,7 +76,7 @@
     distance: 1
     speed: 5
   - type: Item
-    size: Large # Goob edit
+    size: Normal #Maid edit
     storedRotation: 90 # Goob
     shape:
     - 0,0,0,3

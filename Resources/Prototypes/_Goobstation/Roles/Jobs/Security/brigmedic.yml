@@ -15,6 +15,12 @@
   - !type:DepartmentTimeRequirement
     department: Security
     time: 36000 # 10 hrs
+  - !type:SpeciesRequirement # Maid
+    inverted: false
+    species:
+    - Human
+    - Felinid
+    - Dwarf 
   startingGear: BrigmedicGear
   icon: "JobIconBrigmedic"
   supervisors: job-supervisors-hos
@@ -27,7 +33,7 @@
   - Security
   - Brig
   - Medical
-  - Maintenance
+  - Maintenance 
   - Service
   - External
   - Cryogenics

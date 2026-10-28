@@ -109,7 +109,7 @@
   - type: StationAiWhitelist
   - type: Sprite
     drawdepth: SmallObjects
-    sprite: Structures/Wallmounts/switch.rsi
+    sprite: _Maid/Structures/Wallmounts/switch.rsi #Maid
     # CorvaxGoob-ButtonsVisuals-Start
     layers:
     - state: dead
@@ -181,7 +181,7 @@
   - type: StationAiWhitelist
   - type: Sprite
     drawdepth: SmallObjects
-    sprite: Structures/Wallmounts/switch.rsi
+    sprite: _Maid/Structures/Wallmounts/switch.rsi #Maid
     state: dead
   - type: UseDelay
     delay: 0.5 # prevent light-toggling auto-clickers.
@@ -238,7 +238,7 @@
       anchored: true
     - type: Sprite
       drawdepth: SmallObjects
-      sprite: Structures/Wallmounts/switch.rsi
+      sprite: _Maid/Structures/Wallmounts/switch.rsi #Maid
       # CorvaxGoob-ButtonsVisuals-End
       layers:
       - state: dead

@@ -215,6 +215,7 @@
   - type: Tag # Goobstation - Prevent RCD from making lights in one tile
     tags:
     - WallLight
+  - type: LightGlow # MAID settings port
   placement:
     mode: SnapgridCenter
     snap:

@@ -1631,6 +1631,7 @@
   - type: VentCrawler # goobstation - Ventcrawl
     allowInventory: false
   - type: CombatMode
+  - type: OfferItem # MAID settings port
   # Shitmed Change Start
   - type: Targeting
   - type: HumanoidAppearance

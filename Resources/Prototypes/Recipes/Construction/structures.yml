@@ -1200,6 +1200,20 @@
   conditions:
     - !type:TileNotBlocked
 
+#Maid start
+- type: construction
+  id: PlasmaWindoor
+  graph: Windoor
+  startNode: start
+  targetNode: pwindoor
+  category: construction-category-structures
+  objectType: Structure
+  placementMode: SnapgridCenter
+  canBuildInImpassable: false
+  conditions:
+  - !type:TileNotBlocked
+#Maid end
+
 #lighting
 - type: construction
   id: LightTubeFixture
@@ -1485,32 +1499,6 @@
   graph: CargoPalletBuy
   startNode: start
   targetNode: CargoPalletBuy
-  category: construction-category-structures
-  conditions:
-    - !type:TileNotBlocked
-      failIfSpace: false
-  objectType: Structure
-  placementMode: SnapgridCenter
-  canBuildInImpassable: false #Maid end
-
-- type: construction #Maid begin
-  id: CargoPallet
-  graph: CargoPallet
-  startNode: start
-  targetNode: CargoPallet
-  category: construction-category-structures
-  conditions:
-    - !type:TileNotBlocked
-      failIfSpace: false
-  objectType: Structure
-  placementMode: SnapgridCenter
-  canBuildInImpassable: false #Maid end
-
-- type: construction #Maid begin
-  id: CargoPalletSell
-  graph: CargoPalletSell
-  startNode: start
-  targetNode: CargoPalletSell
   category: construction-category-structures
   conditions:
     - !type:TileNotBlocked

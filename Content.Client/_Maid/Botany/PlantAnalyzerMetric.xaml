@@ -1,0 +1,13 @@
+<PanelContainer xmlns="https://spacestation14.io"
+                xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+                HorizontalExpand="True">
+    <PanelContainer.PanelOverride>
+        <gfx:StyleBoxFlat BorderThickness="3 0 0 0" BackgroundColor="#2f2f35" />
+    </PanelContainer.PanelOverride>
+    <BoxContainer Orientation="Vertical" Margin="8 4">
+        <Label Name="TitleLabel" StyleClasses="LabelSecondaryColor" />
+        <Label Name="ValueLabel" />
+        <Label Name="TargetLabel" StyleClasses="LabelSubText" Visible="False" />
+        <ProgressBar Name="Progress" MinValue="0" MaxValue="1" MinHeight="8" Visible="False" />
+    </BoxContainer>
+</PanelContainer>

@@ -218,7 +218,7 @@ public abstract class SharedInternalsSystem : EntitySystem
             return false;
 
         if (TryComp(ent.Comp.GasTankEntity, out GasTankComponent? tank))
-            _gasTank.DisconnectFromInternals((ent.Comp.GasTankEntity.Value, tank));
+            _gasTank.DisconnectFromInternals((ent.Comp.GasTankEntity.Value, tank), forced: true); // MAID tank drop disconnect
 
         ent.Comp.GasTankEntity = tankEntity;
         Dirty(ent);

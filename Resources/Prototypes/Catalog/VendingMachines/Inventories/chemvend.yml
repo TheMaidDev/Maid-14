@@ -73,7 +73,7 @@
     JugSulfur: 2
     JugWeldingFuel: 1 #Maid edit end
   contrabandInventory:
-    DrinkLithiumFlask: 1
+    # DrinkLithiumFlask: 1 #Maid 
     StrangePill: 3
     ChemistryBottlePax: 3
     ChemistryBottleMuteToxin: 3

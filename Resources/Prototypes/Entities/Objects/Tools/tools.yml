@@ -179,7 +179,7 @@
   - type: Sprite
     sprite: Objects/Tools/wirecutters.rsi
     layers:
-    - state: cutters
+    - state: cutters-map #Maid
       map: [ "enum.DamageStateVisualLayers.Base" ]
     - state: cutters-cutty-thingy
   - type: MeleeWeapon
@@ -247,7 +247,7 @@
   - type: Sprite
     sprite: Objects/Tools/screwdriver.rsi
     layers:
-      - state: screwdriver
+      - state: screwdriver-map #Maid
         map: [ "enum.DamageStateVisualLayers.Base" ]
       - state: screwdriver-screwybits
   - type: Item

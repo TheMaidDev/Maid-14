@@ -66,7 +66,7 @@ public sealed class LungSystem : EntitySystem
 
     private void OnGotUnequipped(Entity<BreathToolComponent> ent, ref GotUnequippedEvent args)
     {
-        _atmos.DisconnectInternals(ent);
+        _atmos.DisconnectInternals(ent, forced: true); // MAID tank drop disconnect
     }
 
     private void OnGotEquipped(Entity<BreathToolComponent> ent, ref GotEquippedEvent args)

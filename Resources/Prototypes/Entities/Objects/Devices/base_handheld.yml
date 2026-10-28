@@ -47,6 +47,7 @@
   - type: ActivatableUIRequiresPowerCell
   - type: ItemToggle
     onUse: false # above component does the toggling
+    onActivate: false
   - type: PowerCellDraw
     drawRate: 0
     useRate: 20

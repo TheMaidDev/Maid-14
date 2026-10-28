@@ -636,6 +636,7 @@
     # - Shovel # Goobstation
     - MineralScannerUnpowered
     - BorgOreBag
+    - WeaponProtoKineticAccelerator #Maid
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: mining-module }
 
@@ -657,13 +658,13 @@
     - AdvancedMineralScannerUnpowered
     - OreBagOfHolding
   # Goob start
-  - type: DroppableBorgModule
-    moduleId: AdvancedMining
-    items:
-    - id: WeaponProtoKineticAccelerator
-      whitelist:
-        components:
-        - UpgradeableGun #Maid
+  # - type: DroppableBorgModule #Maid begin
+  #   moduleId: AdvancedMining
+  #   items:
+  #   - id: WeaponProtoKineticAccelerator
+  #     whitelist:
+  #       components: 
+  #       - UpgradeableGun #Maid end
   # Goob end
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: adv-mining-module }
@@ -729,9 +730,8 @@
     - SheetRPGlassLingering0
     - SheetPlasteelLingering0
     - PartRodMetalLingering0
-    - FloorTileItemSteelLingering0
-    - FloorTileItemWhiteLingering0
-    - FloorTileItemDarkLingering0
+    # - FloorTileItemWhiteLingering0 #Maid вырезано
+    # - FloorTileItemDarkLingering0 #Maid вырезано
     # Frontier: droppable borg items
   - type: DroppableBorgModule
     moduleId: Construction
@@ -745,6 +745,19 @@
       whitelist:
         components:
         - StockPart
+    - id: FloorTileItemWhite #Maid begin
+      whitelist:
+        components:
+        - FloorTile #Maid end
+    - id: Beaker #Maid begin
+      whitelist:
+        tags:
+        - GlassBeaker #Maid end
+    - id: PowerCellSmall #Maid begin
+      whitelist:
+        tags:
+        - PowerCellSmall
+        - PowerCell #Maid end
     # End Frontier: droppable borg items
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: construction-module }

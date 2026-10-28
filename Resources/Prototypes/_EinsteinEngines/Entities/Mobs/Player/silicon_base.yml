@@ -24,6 +24,7 @@
   components:
     - type: ContentEye
     - type: CameraRecoil
+    - type: OfferItem # MAID settings port
     - type: Reactive
       groups:
         Flammable: [Touch]

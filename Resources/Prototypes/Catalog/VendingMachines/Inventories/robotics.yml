@@ -51,5 +51,6 @@
     Crowbar: 2
   contrabandInventory:
     FoodBurgerRobot: 1
+    StasisBedMachineCircuitboard: 1 #Maid
   emaggedInventory: # goob
     JawsOfLife: 1

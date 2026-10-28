@@ -409,6 +409,7 @@
     state: icon
   - type: AnimationPlayer
   - type: Buckle
+  - type: OfferItem # MAID settings port
   - type: CombatMode
     canDisarm: true
   - type: MeleeWeapon
@@ -421,6 +422,7 @@
       types:
         Blunt: 5
   - type: SleepEmitSound
+    popUp: null
   - type: SSDIndicator
   - type: StandingState
   - type: Crawler

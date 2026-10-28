@@ -302,7 +302,7 @@
     implantAction: ActionActivateScramImplant
   - type: TriggerOnActivateImplant
   - type: ScramOnTrigger
-    targetUser: true
+    targetUser: true 
 
 - type: entity
   parent: BaseSubdermalImplant

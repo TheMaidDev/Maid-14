@@ -35,7 +35,7 @@
     ClothingUniformJumpskirtTacticalMaid: 5
     ClothingHeadHatTacticalMaidHeadband: 5
     ClothingHandsTacticalMaidGloves: 5
-    ClothingShoesRealJordans: 1 # Goobstation
+    # ClothingShoesRealJordans: 1 # Goobstation #Maid вырезано
   emaggedInventory:
     ClothingOuterCoatSyndieCapArmored: 1
     ClothingOuterWinterSyndieCapArmored: 1

@@ -48,6 +48,18 @@
     Biomass: 5
 
 - type: latheRecipe
+  id: BioGenDurathread
+  result: MaterialDurathread1
+  categories:
+  - Materials
+  icon:
+    sprite: Objects/Materials/materials.rsi
+    state: durathread
+  completetime: 1
+  materials:
+    Biomass: 20
+
+- type: latheRecipe
   id: BioGenPaper
   result: Paper
   categories:
@@ -152,6 +164,124 @@
   materials:
     Biomass: 15
 
+
+- type: latheRecipe #Maid begin
+  id: BioGenChlorine
+  resultReagents:
+    Chlorine: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenRadium
+  resultReagents:
+    Radium: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenPhosphorus
+  resultReagents:
+    Phosphorus: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenNitrogen
+  resultReagents:
+    Nitrogen: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenPotassium
+  resultReagents:
+    Potassium: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenSilicon
+  resultReagents:
+    Silicon: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenEthanol
+  resultReagents:
+    Ethanol: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenOxygen
+  resultReagents:
+    Oxygen: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15
+
+- type: latheRecipe
+  id: BioGenHydrogen
+  resultReagents:
+    Hydrogen: 10
+  categories:
+  - Chemicals
+  icon:
+    sprite: Objects/Specific/Chemistry/bottle.rsi
+    state: bottle-1
+  completetime: 1
+  materials:
+    Biomass: 15 #Maid end
+
 - type: latheRecipe
   id: BioGenMilk
   resultReagents:
@@ -177,19 +307,6 @@
   completetime: 1
   materials:
     Biomass: 12
-
-- type: latheRecipe
-  id: BioGenEthanol
-  resultReagents:
-    Ethanol: 10
-  categories:
-  - Food
-  icon:
-    sprite: Objects/Consumable/Drinks/glass_clear.rsi
-    state: icon
-  completetime: 1
-  materials:
-    Biomass: 18
 
 - type: latheRecipe
   id: BioGenCream
@@ -256,4 +373,398 @@
   materials:
     Biomass: 18
 
+#Maid begin
+#Seeds 
 
+- type: latheRecipe
+  id: BioGenAppleSeeds
+  result: AppleSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/apple.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenBananaSeeds
+  result: BananaSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/banana.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenBerrySeeds
+  result: BerrySeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/berries.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenBungoSeeds
+  result: BungoSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/bungo.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenCarrotSeeds
+  result: CarrotSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/carrot.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenCabbageSeeds
+  result: CabbageSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/cabbage.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenChanterelleSeeds
+  result: ChanterelleSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/chanterelle.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenCherrySeeds
+  result: CherrySeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/cherry.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenChiliSeeds
+  result: ChiliSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/chili.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenCocoaSeeds
+  result: CocoaSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/cocoa.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenCornSeeds
+  result: CornSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/corn.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenCottonSeeds
+  result: CottonSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/cotton.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenEggplantSeeds
+  result: EggplantSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/eggplant.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenEggySeeds
+  result: EggySeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/eggy.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenGarlicSeeds
+  result: GarlicSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/garlic.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenGrapeSeeds
+  result: GrapeSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/grape.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenLemonSeeds
+  result: LemonSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/lemon.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenLimeSeeds
+  result: LimeSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/lime.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenPineappleSeeds
+  result: PineappleSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/pineapple.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenOatSeeds
+  result: OatSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/oat.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenOnionSeeds
+  result: OnionSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/onion.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenOnionRedSeeds
+  result: OnionRedSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/onion_red.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenOrangeSeeds
+  result: OrangeSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/orange.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenPeaSeeds
+  result: PeaSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/pea.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenPotatoSeeds
+  result: PotatoSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/potato.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenPumpkinSeeds
+  result: PumpkinSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/pumpkin.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenRiceSeeds
+  result: RiceSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/rice.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenSoybeanSeeds
+  result: SoybeanSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/soybeans.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenSugarcaneSeeds
+  result: SugarcaneSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/sugarcane.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenTeaPlantSeeds
+  result: TeaPlantSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/tea_plant.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenTomatoSeeds
+  result: TomatoSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/tomato.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenTowercapSeeds
+  result: TowercapSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/towercap.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenWheatSeeds
+  result: WheatSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/wheat.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenWatermelonSeeds
+  result: WatermelonSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/watermelon.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+# region Medical Seeds
+
+- type: latheRecipe
+  id: BioGenAloeSeeds
+  result: AloeSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/aloe.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenAmbrosiaVulgarisSeeds
+  result: AmbrosiaVulgarisSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/ambrosia_vulgaris.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenGalaxythistleSeeds
+  result: GalaxythistleSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/galaxythistle.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenLingzhiSeeds
+  result: LingzhiSeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/lingzhi.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+
+- type: latheRecipe
+  id: BioGenPoppySeeds
+  result: PoppySeeds
+  icon:
+    sprite: Objects/Specific/Hydroponics/poppy.rsi
+    state: seed
+  completetime: 1
+  materials:
+    Biomass: 5
+#Maid end

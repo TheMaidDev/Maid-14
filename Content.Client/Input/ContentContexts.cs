@@ -155,6 +155,8 @@ namespace Content.Client.Input
             human.AddFunction(ContentKeyFunctions.RotateObjectClockwise);
             human.AddFunction(ContentKeyFunctions.RotateObjectCounterclockwise);
             human.AddFunction(ContentKeyFunctions.FlipObject);
+            human.AddFunction(ContentKeyFunctions.OfferItem); // MAID settings port
+            human.AddFunction(ContentKeyFunctions.LookUp); // MAID settings port
             human.AddFunction(ContentKeyFunctions.ArcadeUp);
             human.AddFunction(ContentKeyFunctions.ArcadeDown);
             human.AddFunction(ContentKeyFunctions.ArcadeLeft);

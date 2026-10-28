@@ -83,7 +83,7 @@ public sealed class MaidCVars
     /// </summary>
     public static readonly CVarDef<bool> DenyAliveTradeFTL =
         CVarDef.Create("maid.deny_alive_trade_ftl", false, CVar.SERVERONLY);
-  
+
     ///     Whether IC messages get their slang words automatically replaced with in-character ones.
     /// </summary>
     public static readonly CVarDef<bool> ChatSlangFilter =
@@ -116,6 +116,59 @@ public sealed class MaidCVars
     /// </summary>
     public static readonly CVarDef<int> EconomyVendingDefaultPrice =
         CVarDef.Create("maid.economy.vending_default_price", 67676767, CVar.SERVERONLY);
+
+    #endregion
+
+    #region Client preferences
+
+    /// <summary>
+    ///     Show the give item indicator next to the cursor while offering an item.
+    /// </summary>
+    public static readonly CVarDef<bool> OfferModeIndicatorsPointShow =
+        CVarDef.Create("maid.offer_mode_indicators_point_show", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Draw the glow around light fixtures.
+    /// </summary>
+    public static readonly CVarDef<bool> EnableLightsGlowing =
+        CVarDef.Create("maid.enable_lights_glowing", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Draw a film grain effect over the screen.
+    /// </summary>
+    public static readonly CVarDef<bool> GrainEnabled =
+        CVarDef.Create("maid.grain_enabled", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Film grain strength multiplier, 1 is the default look.
+    /// </summary>
+    public static readonly CVarDef<float> GrainStrength =
+        CVarDef.Create("maid.grain_strength", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Automatically get up when the knockdown ends.
+    /// </summary>
+    public static readonly CVarDef<bool> AutoGetUp =
+        CVarDef.Create("maid.auto_get_up", true, CVar.CLIENT | CVar.ARCHIVE | CVar.REPLICATED);
+
+    /// <summary>
+    ///     If true, the look up key has to be held to aim through a telescope; otherwise it toggles.
+    /// </summary>
+    public static readonly CVarDef<bool> HoldLookUp =
+        CVarDef.Create("maid.hold_look_up", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     If true, an admin's dead chat messages are sent as admin messages with their username;
+    ///     otherwise they are sent like a regular player's, with the current character name.
+    /// </summary>
+    public static readonly CVarDef<bool> DeadChatAdmin =
+        CVarDef.Create("maid.admin.dead_chat_admin", true, CVar.CLIENT | CVar.REPLICATED | CVar.ARCHIVE);
+
+    /// <summary>
+    ///     Volume of the ahelp sound for admins, as a gain from 0 to 1.
+    /// </summary>
+    public static readonly CVarDef<float> AhelpVolume =
+        CVarDef.Create("maid.admin.ahelp_volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     #endregion
 }

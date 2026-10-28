@@ -256,6 +256,7 @@
   - type: Loadout
     prototypes: [ MobAghostGear ]
   - type: BypassInteractionChecks
+  - type: AdminInvisibility # MAID admin invisibility
   - type: SupermatterImmune # Goobstation
   - type: Eye
     visMask: # Goob edit

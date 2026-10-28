@@ -32,6 +32,7 @@ using Content.Client.Lobby.UI;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Systems.MenuBar.Widgets;
+using Content.Shared._Maid.CVars;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.Input;
@@ -43,6 +44,8 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Network;
@@ -162,7 +165,15 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         if (message.PlaySound && localPlayer.UserId != message.TrueSender)
         {
             if (_aHelpSound != null && (_bwoinkSoundEnabled || !_adminManager.IsActive()))
-                _audio.PlayGlobal(_aHelpSound, Filter.Local(), false);
+            {
+                // MAID BEGIN admin ahelp volume
+                /* _audio.PlayGlobal(_aHelpSound, Filter.Local(), false); */
+                var audioParams = _adminManager.IsActive()
+                    ? AudioParams.Default.WithVolume(SharedAudioSystem.GainToVolume(_config.GetCVar(MaidCVars.AhelpVolume)))
+                    : AudioParams.Default;
+                _audio.PlayGlobal(_aHelpSound, Filter.Local(), false, audioParams);
+                // MAID END admin ahelp volume
+            }
             _clyde.RequestWindowAttention();
         }
 

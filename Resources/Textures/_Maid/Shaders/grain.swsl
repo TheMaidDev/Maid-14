@@ -1,0 +1,21 @@
+// Film grain, taken from wwdpublic (_White/Shaders/grain.swsl, based on https://www.shadertoy.com/view/4sXSWs).
+// Differences from the original:
+// - no "light_mode unshaded": in maid the overlay draws before lighting, so an unshaded copy of the screen wipes out
+//   lighting and FOV shadows. Like drunk.swsl, the output is lit normally;
+// - "time" comes from the client wrapped to a short period instead of the ever-growing TIME, so the mod() math
+//   doesn't lose float precision late in a round.
+
+uniform sampler2D SCREEN_TEXTURE;
+uniform highp float strength;
+uniform highp float time;
+
+void fragment()
+{
+    highp vec2 uv = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
+    highp vec4 color = zTextureSpec(SCREEN_TEXTURE, uv);
+
+    highp float x = (uv.x + 4.0) * (uv.y + 4.0) * (time * 10.0);
+    highp vec4 grain = vec4(mod((mod(x, 13.0) + 1.0) * (mod(x, 123.0) + 1.0), 0.01) - 0.005) * strength;
+
+    COLOR = color * (1.0 - grain);
+}

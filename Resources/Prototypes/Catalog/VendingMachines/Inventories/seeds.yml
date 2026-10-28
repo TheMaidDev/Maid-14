@@ -75,7 +75,7 @@
     WatermelonSeeds: 5
   contrabandInventory:
     TobaccoSeeds: 2
-    FoodSnackSemki: 2
+    # FoodSnackSemki: 2 #Maid
     FlyAmanitaSeeds: 1
   emaggedInventory: # goob
     RealCapfruitSeeds: 1

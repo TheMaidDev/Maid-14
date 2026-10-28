@@ -138,7 +138,7 @@
   - pausemap
   - unpausemap
   - restart
-  - shutdown
+#  - shutdown # MAID host only shutdown
 
 - Flags: SPAWN
   Commands:
@@ -153,6 +153,7 @@
 
 - Flags: HOST
   Commands:
+  - shutdown # MAID host only shutdown
   - gc_mode
   - gc
   - saveconfig
