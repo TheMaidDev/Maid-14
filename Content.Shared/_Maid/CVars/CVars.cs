@@ -89,6 +89,12 @@ public sealed class MaidCVars
     public static readonly CVarDef<bool> ChatSlangFilter =
         CVarDef.Create("ic.slang_filter", true, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
 
+    public static readonly CVarDef<bool> AhelpHistory =
+        CVarDef.Create("ahelp.history", true, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> AhelpMaxMessageLength =
+        CVarDef.Create("ahelp.max_message_length", 2000, CVar.SERVER | CVar.REPLICATED);
+
     #endregion
 
     #region Economy

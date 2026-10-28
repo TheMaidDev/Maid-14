@@ -190,6 +190,7 @@ namespace Content.Server.Database
         public DbSet<RMCPatronLobbyMessage> RMCPatronLobbyMessages { get; set; } = default!;
         public DbSet<RMCPatronRoundEndNTShoutout> RMCPatronRoundEndNTShoutouts { get; set; } = default!;
         public DbSet<PlayerReputation> PlayerReputations { get; set; } = default!; // WD edit
+        public DbSet<AhelpMessage> AhelpMessages { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -242,6 +243,12 @@ namespace Content.Server.Database
             modelBuilder.Entity<AssignedUserId>()
                 .HasIndex(p => p.UserName)
                 .IsUnique();
+
+            modelBuilder.Entity<AhelpMessage>()
+                .HasOne(m => m.Round)
+                .WithMany()
+                .HasForeignKey(m => m.RoundId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Can't have two usernames with the same user ID.
             modelBuilder.Entity<AssignedUserId>()
@@ -587,6 +594,40 @@ namespace Content.Server.Database
         public float Reputation { get; set; }
     }
     // WD-Tweak-End
+
+    [Table("ahelp_messages")]
+    [Index(nameof(PlayerUserId), nameof(Id))]
+    public class AhelpMessage
+    {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [ForeignKey("Round")]
+        public int? RoundId { get; set; }
+        public Round? Round { get; set; }
+
+        public Guid PlayerUserId { get; set; }
+        public Guid SenderUserId { get; set; }
+
+        [MaxLength(256)]
+        public string SenderName { get; set; } = string.Empty;
+
+        public DateTime SentAt { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public bool SenderIsAdmin { get; set; }
+        public bool AdminOnly { get; set; }
+        public bool PlaySound { get; set; }
+        public bool FromWebhook { get; set; }
+    }
+
+    public sealed record AhelpHistoryFilter(
+        Guid Player,
+        int? RoundId,
+        DateTime? From,
+        DateTime? To,
+        string? Text);
+
+    public sealed record AhelpRoundInfo(int Id, DateTime? StartedAt, string ServerName);
 
     public class Preference
     {

@@ -121,6 +121,7 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Content.Goobstation.Common.CCVar;
+using Content.Server._Maid.Administration.AhelpHistory;
 using Content.Server.Administration.Managers;
 using Content.Server.Afk;
 using Content.Server.Database;
@@ -128,6 +129,7 @@ using Content.Server.Discord;
 using Content.Server.GameTicking;
 using Content.Server.Players.RateLimiting;
 using Content.Server.Preferences.Managers;
+using Content.Shared._Maid.CVars;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
@@ -161,6 +163,7 @@ namespace Content.Server.Administration.Systems
         [Dependency] private readonly IServerDbManager _dbManager = default!;
         [Dependency] private readonly PlayerRateLimitManager _rateLimit = default!;
         [Dependency] private readonly IServerPreferencesManager _preferencesManager = default!;
+        [Dependency] private readonly AhelpHistorySystem _ahelpHistory = default!;
 
         [GeneratedRegex(@"^https://(?:(?:canary|ptb)\.)?discord\.com/api/webhooks/(\d+)/((?!.*/).*)$")]
         private static partial Regex DiscordRegex();
@@ -788,6 +791,18 @@ namespace Content.Server.Administration.Systems
             if (_rateLimit.CountAction(eventArgs.SenderSession, RateLimitKey) != RateLimitStatus.Allowed)
                 return;
 
+            var maxLength = _config.GetCVar(MaidCVars.AhelpMaxMessageLength);
+            if (message.Text.Length > maxLength)
+            {
+                var tooLong = new BwoinkTextMessage(
+                    message.UserId,
+                    SystemUserId,
+                    Loc.GetString("bwoink-system-message-too-long", ("limit", maxLength)),
+                    playSound: false);
+                RaiseNetworkEvent(tooLong, senderSession.Channel);
+                return;
+            }
+
             var bwoinkParams = new BwoinkParams(message,
                 eventArgs.SenderSession.UserId,
                 senderAdmin,
@@ -856,6 +871,16 @@ namespace Content.Server.Administration.Systems
             var msg = new BwoinkTextMessage(bwoinkParams.Message.UserId, bwoinkParams.SenderId, bwoinkText, playSound: playSound, adminOnly: bwoinkParams.Message.AdminOnly);
 
             LogBwoink(msg);
+
+            _ahelpHistory.Record(
+                bwoinkParams.Message.UserId,
+                bwoinkParams.SenderId,
+                bwoinkParams.SenderName,
+                bwoinkParams.Message.Text,
+                bwoinkParams.FromWebhook || bwoinkParams.SenderAdmin != null,
+                bwoinkParams.Message.AdminOnly,
+                playSound,
+                bwoinkParams.FromWebhook);
 
             var admins = GetTargetAdmins();
 

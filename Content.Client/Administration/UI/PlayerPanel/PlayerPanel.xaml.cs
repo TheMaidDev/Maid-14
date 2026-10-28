@@ -94,6 +94,7 @@ public sealed partial class PlayerPanel : FancyWindow
     public event Action<NetUserId?>? OnOpenNotes;
     public event Action<NetUserId?>? OnOpenBans;
     public event Action<NetUserId?>? OnAhelp;
+    public event Action<NetUserId?>? OnOpenAhelpHistory;
     public event Action<string?>? OnKick;
     public event Action<string?>? OnCamera;
     public event Action<NetUserId?>? OnOpenBanPanel;
@@ -121,6 +122,7 @@ public sealed partial class PlayerPanel : FancyWindow
         NotesButton.OnPressed += _ => OnOpenNotes?.Invoke(TargetPlayer);
         ShowBansButton.OnPressed += _ => OnOpenBans?.Invoke(TargetPlayer);
         AhelpButton.OnPressed += _ => OnAhelp?.Invoke(TargetPlayer);
+        AhelpHistoryButton.OnPressed += _ => OnOpenAhelpHistory?.Invoke(TargetPlayer);
         WhitelistToggle.OnPressed += _ =>
         {
             OnWhitelistToggle?.Invoke(TargetPlayer, _isWhitelisted);
@@ -203,6 +205,7 @@ public sealed partial class PlayerPanel : FancyWindow
         KickButton.Disabled = !_adminManager.CanCommand("kick");
         CameraButton.Disabled = !_adminManager.CanCommand("camera");
         NotesButton.Disabled = !_adminManager.CanCommand("adminnotes");
+        AhelpHistoryButton.Disabled = !_adminManager.CanCommand("ahelphistory");
         ShowBansButton.Disabled = !_adminManager.CanCommand("banlist");
         WhitelistToggle.Disabled =
             !(_adminManager.CanCommand("whitelistadd") && _adminManager.CanCommand("whitelistremove"));

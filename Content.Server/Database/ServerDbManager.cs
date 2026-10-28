@@ -495,6 +495,14 @@ namespace Content.Server.Database
         /// <param name="player">Guid of the player to get the value for.</param>
         /// <returns>Value of player's reputation.</returns>
         Task<float> GetPlayerReputation(Guid player);
+
+        Task AddAhelpMessageAsync(AhelpMessage message);
+
+        Task<List<AhelpMessage>> GetAhelpHistoryAsync(AhelpHistoryFilter filter, int limit, int skip);
+
+        Task<int> GetAhelpHistorySkipAsync(Guid player, int anchorId);
+
+        Task<List<AhelpRoundInfo>> GetAhelpRoundInfosAsync(int[] roundIds);
     }
 
     /// <summary>
@@ -1303,6 +1311,30 @@ namespace Content.Server.Database
         {
             DbReadOpsMetric.Inc();
             return RunDbCommand(() => _db.GetPlayerReputation(player));
+        }
+
+        public Task AddAhelpMessageAsync(AhelpMessage message)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.AddAhelpMessageAsync(message));
+        }
+
+        public Task<List<AhelpMessage>> GetAhelpHistoryAsync(AhelpHistoryFilter filter, int limit, int skip)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetAhelpHistoryAsync(filter, limit, skip));
+        }
+
+        public Task<int> GetAhelpHistorySkipAsync(Guid player, int anchorId)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetAhelpHistorySkipAsync(player, anchorId));
+        }
+
+        public Task<List<AhelpRoundInfo>> GetAhelpRoundInfosAsync(int[] roundIds)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetAhelpRoundInfosAsync(roundIds));
         }
 
         private async void HandleDatabaseNotification(DatabaseNotification notification)

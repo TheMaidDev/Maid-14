@@ -27,14 +27,14 @@ namespace Content.Client.Administration.UI.Bwoink
     [GenerateTypedNameReferences]
     public sealed partial class BwoinkPanel : BoxContainer
     {
-        private readonly Action<string> _messageSender;
+        private readonly Func<string, bool> _messageSender;
 
         public int Unread { get; private set; } = 0;
         public DateTime LastMessage { get; private set; } = DateTime.MinValue;
         private List<string> PeopleTyping { get; set; } = new();
         public event Action<string>? InputTextChanged;
 
-        public BwoinkPanel(Action<string> messageSender)
+        public BwoinkPanel(Func<string, bool> messageSender)
         {
             RobustXamlLoader.Load(this);
 
@@ -61,7 +61,9 @@ namespace Content.Client.Administration.UI.Bwoink
             if (string.IsNullOrWhiteSpace(args.Text))
                 return;
 
-            _messageSender.Invoke(args.Text);
+            if (!_messageSender.Invoke(args.Text))
+                return;
+
             SenderLineEdit.Clear();
         }
 
