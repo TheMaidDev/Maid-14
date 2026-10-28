@@ -3,9 +3,10 @@
   category: personal
   name: Магпай
   desc: Уэуэуэ
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: _Maid/CustomGhosts/magpie.rsi
+    color: "#fff8"
     layers:
     - state: magpie
       shader: unshaded

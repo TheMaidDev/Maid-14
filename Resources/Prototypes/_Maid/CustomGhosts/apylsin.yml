@@ -3,9 +3,10 @@
   category: personal
   name: Кто нахуй
   desc: гооол
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: _Maid/CustomGhosts/bird.rsi
+    color: "#fff8"
     layers:
     - state: bird
       shader: unshaded
@@ -20,7 +21,7 @@
   category: personal
   name: Нарси побольшьбе
   desc: Пиздец побольшьбе
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: Mobs/Demons/narsie.rsi
     color: "#ffff"
@@ -38,9 +39,10 @@
   category: personal
   name: Нарси
   desc: Пиздец
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: Mobs/Demons/narsie.rsi
+    color: "#fff8"
     scale: 0.2, 0.2
     layers:
     - state: narsie

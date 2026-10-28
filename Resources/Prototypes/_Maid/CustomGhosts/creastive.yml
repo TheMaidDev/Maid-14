@@ -3,9 +3,10 @@
   category: personal
   name: Нико
   desc: Существо из другого мира
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: _Maid/CustomGhosts/niko.rsi
+    color: "#fff8"
     layers:
     - map: ["enum.DamageStateVisualLayers.Base", "movement"]
       state: niko

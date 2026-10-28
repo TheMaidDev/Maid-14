@@ -53,17 +53,12 @@ public sealed partial class CustomGhostPrototype : IPrototype, IInheritingProtot
     }
 
     /// <summary>
-    /// Adds new components, overrides if existed already
+    /// Adds new components, overrides if existed already.
+    /// Replaced components are NOT merged with the base ghost ones, so e.g. Sprite must be fully specified
+    /// (including color "#fff8" for the ghost transparency).
     /// </summary>
     [DataField]
     public ComponentRegistry AddComponents { get; private set; } = new();
-
-
-    /// <summary>
-    /// Merge INTO already instantiated component. You probably don't want to do that (atleast i wouldnt)
-    /// </summary>
-    [DataField]
-    public ComponentRegistry MergeEntityComponents { get; private set; } = new();
 
     /// <summary>
     /// If null, the default of "custom-ghost-[id]-name" will be used.
