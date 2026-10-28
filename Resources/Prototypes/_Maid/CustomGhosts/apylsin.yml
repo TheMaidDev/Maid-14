@@ -7,6 +7,9 @@
   - type: Sprite
     sprite: _Maid/CustomGhosts/bird.rsi
     color: "#fff8"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     layers:
     - state: bird
       shader: unshaded
@@ -25,6 +28,9 @@
   - type: Sprite
     sprite: Mobs/Demons/narsie.rsi
     color: "#ffff"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     layers:
     - state: narsie
       shader: unshaded
@@ -43,6 +49,9 @@
   - type: Sprite
     sprite: Mobs/Demons/narsie.rsi
     color: "#fff8"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     scale: 0.2, 0.2
     layers:
     - state: narsie

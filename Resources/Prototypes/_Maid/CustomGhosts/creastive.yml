@@ -7,6 +7,9 @@
   - type: Sprite
     sprite: _Maid/CustomGhosts/niko.rsi
     color: "#fff8"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     layers:
     - map: ["enum.DamageStateVisualLayers.Base", "movement"]
       state: niko
