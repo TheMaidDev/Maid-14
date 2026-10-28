@@ -298,6 +298,10 @@ namespace Content.Server.Disposal.Tube
         // Covers deletions that bypass ConstructionBeforeDeleteEvent, e.g. welding via DestroyEntity.
         private void OnTerminating(EntityUid uid, DisposalTubeComponent component, ref EntityTerminatingEvent args)
         {
+            // The whole grid/map is going away, so there is nowhere to eject to.
+            if (TerminatingOrDeleted(Transform(uid).ParentUid))
+                return;
+
             DisconnectTube(uid, component);
         }
         // MAID END eject on tube delete
@@ -419,10 +423,15 @@ namespace Content.Server.Disposal.Tube
 
         public void DisconnectTube(EntityUid _, DisposalTubeComponent tube)
         {
+            // MAID BEGIN eject on tube delete
+            // Eject even from an already disconnected tube, so nothing is left inside to be deleted with it.
+            /*
             if (!tube.Connected)
             {
                 return;
             }
+            */
+            // MAID END eject on tube delete
 
             tube.Connected = false;
 
