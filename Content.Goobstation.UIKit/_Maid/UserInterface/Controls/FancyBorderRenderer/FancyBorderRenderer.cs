@@ -24,17 +24,12 @@ internal static class FancyBorderRenderer
 
         var frameTopOffset = firstLineHeight;
         var adjustedBoundsTop = bounds.Top + frameTopOffset;
-        var notchWidth = firstLineWidth + (NotchPaddingX * 2);
         var notchLeft = bounds.Left + NotchOffsetX;
-        var notchRight = notchLeft + notchWidth;
+        var notchRight = bounds.Right - NotchOffsetX;
         var notchTop = adjustedBoundsTop;
         var notchBottom = adjustedBoundsTop + (firstLineHeight / 2) + NotchPaddingY;
 
-        // MAID BEGIN rt-update UIBox2 validates its input since RT 280/286, never build an inverted box
-        var adjustedLeft = bounds.Left + Margin;
-        var adjustedRight = Math.Max(adjustedLeft, bounds.Right - Margin);
-        var adjustedBounds = new UIBox2(adjustedLeft, adjustedBoundsTop, adjustedRight, Math.Max(adjustedBoundsTop, bounds.Bottom));
-        // MAID END rt-update
+        var adjustedBounds = new UIBox2(bounds.Left + Margin, adjustedBoundsTop, bounds.Right - Margin, bounds.Bottom);
 
         var fillTriangles = BuildFill(adjustedBounds, notchLeft, notchRight, notchBottom, OuterRadius);
         handle.DrawPrimitives(DrawPrimitiveTopology.TriangleList, fillTriangles, fill);
