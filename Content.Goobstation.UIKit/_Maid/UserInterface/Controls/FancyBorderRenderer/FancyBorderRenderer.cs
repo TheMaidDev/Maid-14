@@ -25,7 +25,8 @@ internal static class FancyBorderRenderer
         var frameTopOffset = firstLineHeight;
         var adjustedBoundsTop = bounds.Top + frameTopOffset;
         var notchLeft = bounds.Left + NotchOffsetX;
-        var notchRight = bounds.Right - NotchOffsetX;
+        var notchWidth = firstLineWidth + (NotchPaddingX * 2);
+        var notchRight = notchLeft + notchWidth;
         var notchTop = adjustedBoundsTop;
         var notchBottom = adjustedBoundsTop + (firstLineHeight / 2) + NotchPaddingY;
 
