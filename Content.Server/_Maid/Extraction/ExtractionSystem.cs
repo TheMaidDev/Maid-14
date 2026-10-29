@@ -153,6 +153,8 @@ public sealed partial class ExtractionSystem : EntitySystem
 
         _reghost.Clear();
 
+        UpdatePendingDeviceUis(now);
+
         var query = EntityQueryEnumerator<AntagExtractableComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
@@ -928,6 +930,7 @@ public sealed partial class ExtractionSystem : EntitySystem
         _reghost.Clear();
         _landing.Clear();
         _extracted.Clear();
+        _nextKeypadInput.Clear();
     }
 
     #endregion

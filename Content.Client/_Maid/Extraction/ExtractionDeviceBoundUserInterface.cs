@@ -22,13 +22,16 @@ public sealed class ExtractionDeviceBoundUserInterface : BoundUserInterface
         _menu.RefreshButton.OnPressed += _ => SendMessage(new ExtractionDeviceRefreshMessage());
         _menu.ZoneButton.OnPressed += _ => SendMessage(new ExtractionDeviceRequestZoneMessage());
         _menu.PodButton.OnPressed += _ => SendMessage(new ExtractionDeviceCallPodMessage());
+
+        // the server's update on open can arrive before the UI exists here, so ask again
+        SendMessage(new ExtractionDeviceRefreshMessage());
     }
 
-    protected override void UpdateState(BoundUserInterfaceState state)
+    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
     {
-        base.UpdateState(state);
+        base.ReceiveMessage(message);
 
-        if (state is ExtractionDeviceUiState deviceState)
+        if (message is ExtractionDeviceUiState deviceState)
             _menu?.UpdateState(deviceState);
     }
 }

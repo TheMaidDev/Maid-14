@@ -18,6 +18,14 @@ namespace Content.Server._Maid.Extraction;
 /// </summary>
 public sealed partial class ExtractionSystem
 {
+    /// <summary>
+    /// Shortest time between two keypad presses of one player. Faster than anyone types,
+    /// but makes scripted guessing of the code hopeless and stops sound and admin log spam.
+    /// </summary>
+    private static readonly TimeSpan KeypadCooldown = TimeSpan.FromSeconds(0.1);
+
+    private readonly Dictionary<EntityUid, TimeSpan> _nextKeypadInput = new();
+
     private void InitializePod()
     {
         SubscribeLocalEvent<AntagExtractableComponent, LaunchDropPodActionEvent>(OnLaunchPod);
@@ -280,8 +288,21 @@ public sealed partial class ExtractionSystem
         UpdatePodUi(ent);
     }
 
+    private bool KeypadThrottled(EntityUid actor)
+    {
+        var now = _timing.CurTime;
+        if (_nextKeypadInput.TryGetValue(actor, out var next) && now < next)
+            return true;
+
+        _nextKeypadInput[actor] = now + KeypadCooldown;
+        return false;
+    }
+
     private void OnKeypad(Entity<DropPodComponent> ent, ref DropPodKeypadMessage args)
     {
+        if (KeypadThrottled(args.Actor))
+            return;
+
         if (!ent.Comp.Locked || ent.Comp.EnteredCode.Length >= GetCodeLength(ent))
             return;
 
@@ -293,6 +314,9 @@ public sealed partial class ExtractionSystem
 
     private void OnKeypadClear(Entity<DropPodComponent> ent, ref DropPodKeypadClearMessage args)
     {
+        if (KeypadThrottled(args.Actor))
+            return;
+
         ent.Comp.EnteredCode = string.Empty;
         ent.Comp.WrongCode = false;
         _audio.PlayPvs(ent.Comp.KeypadSound, ent.Owner);
@@ -301,7 +325,7 @@ public sealed partial class ExtractionSystem
 
     private void OnKeypadEnter(Entity<DropPodComponent> ent, ref DropPodKeypadEnterMessage args)
     {
-        if (!ent.Comp.Locked)
+        if (KeypadThrottled(args.Actor) || !ent.Comp.Locked)
             return;
 
         var code = CompOrNull<AntagExtractableComponent>(ent.Comp.Extractee)?.Code;

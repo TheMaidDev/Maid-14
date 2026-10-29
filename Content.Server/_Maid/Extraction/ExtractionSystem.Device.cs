@@ -64,12 +64,12 @@ public sealed partial class ExtractionSystem
 
     private void OnDeviceUiOpened(Entity<ExtractionDeviceComponent> ent, ref BoundUIOpenedEvent args)
     {
-        UpdateDeviceUi(ent);
+        RequestDeviceUi(ent);
     }
 
     private void OnDeviceRefresh(Entity<ExtractionDeviceComponent> ent, ref ExtractionDeviceRefreshMessage args)
     {
-        UpdateDeviceUi(ent);
+        RequestDeviceUi(ent);
     }
 
     private void OnDeviceRequestZone(Entity<ExtractionDeviceComponent> ent, ref ExtractionDeviceRequestZoneMessage args)
@@ -77,7 +77,7 @@ public sealed partial class ExtractionSystem
         if (TryGetDeviceOwner(ent, args.Actor, out var owner))
             TryRequestZone(owner);
 
-        UpdateDeviceUi(ent);
+        RequestDeviceUi(ent);
     }
 
     private void OnDeviceCallPod(Entity<ExtractionDeviceComponent> ent, ref ExtractionDeviceCallPodMessage args)
@@ -85,12 +85,42 @@ public sealed partial class ExtractionSystem
         if (TryGetDeviceOwner(ent, args.Actor, out var owner))
             TryCallPod(owner);
 
-        UpdateDeviceUi(ent);
+        RequestDeviceUi(ent);
+    }
+
+    /// <summary>
+    /// Updates the device UI now, or once its cooldown is over if it was updated just before.
+    /// </summary>
+    private void RequestDeviceUi(Entity<ExtractionDeviceComponent> device)
+    {
+        var now = _timing.CurTime;
+        if (now < device.Comp.NextUiUpdate)
+        {
+            device.Comp.UiUpdatePending = true;
+            return;
+        }
+
+        device.Comp.UiUpdatePending = false;
+        device.Comp.NextUiUpdate = now + device.Comp.UiUpdateCooldown;
+        UpdateDeviceUi(device);
+    }
+
+    private void UpdatePendingDeviceUis(TimeSpan now)
+    {
+        var query = EntityQueryEnumerator<ExtractionDeviceComponent>();
+        while (query.MoveNext(out var uid, out var device))
+        {
+            if (device.UiUpdatePending && now >= device.NextUiUpdate)
+                RequestDeviceUi((uid, device));
+        }
     }
 
     private void UpdateDeviceUi(Entity<ExtractionDeviceComponent> device)
     {
-        if (device.Comp.Owner is not { } uid || !TryComp<AntagExtractableComponent>(uid, out var comp))
+        // only the owner may see it, and the state goes to them alone
+        if (device.Comp.Owner is not { } uid
+            || !TryComp<AntagExtractableComponent>(uid, out var comp)
+            || !_ui.IsUiOpen(device.Owner, ExtractionDeviceUiKey.Key, uid))
             return;
 
         var ent = new Entity<AntagExtractableComponent>(uid, comp);
@@ -135,7 +165,7 @@ public sealed partial class ExtractionSystem
             comp.Unlocked && !comp.Extracted && comp.RequestsUsed < comp.MaxRequests,
             CanCallPod(ent, now));
 
-        _ui.SetUiState(device.Owner, ExtractionDeviceUiKey.Key, state);
+        _ui.ServerSendUiMessage(device.Owner, ExtractionDeviceUiKey.Key, state, uid);
     }
 
     private string GetPodStatus(Entity<AntagExtractableComponent> ent, TimeSpan now)

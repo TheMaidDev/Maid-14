@@ -18,6 +18,14 @@ public sealed class SharedExtractionDeviceSystem : EntitySystem
         // using it in hand would fall back to activating it after a refused open, and warn twice
         SubscribeLocalEvent<ExtractionDeviceComponent, UseInHandEvent>(OnUseInHand, before: new[] { typeof(ActivatableUISystem) });
         SubscribeLocalEvent<ExtractionDeviceComponent, ActivatableUIOpenAttemptEvent>(OnOpenAttempt);
+        // a client can send an open message directly, skipping the activation checks above
+        SubscribeLocalEvent<ExtractionDeviceComponent, BoundUserInterfaceMessageAttempt>(OnMessageAttempt);
+    }
+
+    private void OnMessageAttempt(Entity<ExtractionDeviceComponent> ent, ref BoundUserInterfaceMessageAttempt args)
+    {
+        if (ent.Comp.Owner != args.Actor)
+            args.Cancel();
     }
 
     private void OnUseInHand(Entity<ExtractionDeviceComponent> ent, ref UseInHandEvent args)

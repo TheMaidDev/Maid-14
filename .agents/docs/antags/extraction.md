@@ -29,6 +29,14 @@ Generic way for an antagonist with objectives to leave the round early. SpaceNin
 - `ExtractionZoneComponent`: zone size.
 - Ninja config sits in `NinjaSpawn` (events.yml) and in the Goob token rule and ninja implant, all with `# MAID` markers. Ninja throwing stars carry the gear marker in their prototype.
 
+## Security notes
+
+- BUI states are networked to every client that receives the UI entity, not only to its viewers. The device data (code, objectives, zones) is therefore sent as a BUI message to the owner only, never as a state. The pod keypad state holds only lengths and status.
+- A client can send a raw BUI open message and skip ActivatableUI checks; the device cancels every BUI message from anyone but its owner.
+- Device UI rebuilds are throttled (`uiUpdateCooldown`, 0.5 s; skipped requests are answered later). Keypad presses are throttled per player (0.1 s), so code guessing is hopeless and sound/admin-log spam is bounded.
+- `AntagExtractableComponent` is sent only to its owner, so other clients cannot see who is an extractable antag or their code.
+- Known and accepted: the keypad input is shared, another player can mess up the digits being typed; device `Owner` and pod `Extractee` are networked.
+
 ## Decisions worth keeping
 
 - Generic system, neutral texts; no "clan" flavour in defaults (removed on request).

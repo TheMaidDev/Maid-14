@@ -17,4 +17,17 @@ public sealed partial class ExtractionDeviceComponent : Component
     /// </summary>
     [DataField]
     public LocId UnrecognizedMessage = "extraction-device-unrecognized";
+
+    /// <summary>
+    /// Shortest time between two UI updates. Building one counts objective progress, so spamming
+    /// the buttons must not rebuild it every message. Requests in between are answered later.
+    /// </summary>
+    [DataField]
+    public TimeSpan UiUpdateCooldown = TimeSpan.FromSeconds(0.5);
+
+    [ViewVariables]
+    public TimeSpan NextUiUpdate;
+
+    [ViewVariables]
+    public bool UiUpdatePending;
 }

@@ -87,6 +87,8 @@ public sealed class ExtractionObjectiveEntry(string title, bool completed, bool 
 
 /// <summary>
 /// Everything the extraction device shows. Texts that depend on server-only data come already localized.
+/// Sent as a message to the owner only: BUI states are networked to every client that sees the device,
+/// and this one carries the pod code, the objectives and the zone locations.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class ExtractionDeviceUiState(
@@ -98,7 +100,7 @@ public sealed class ExtractionDeviceUiState(
     string zone,
     string pod,
     bool canRequestZone,
-    bool canCallPod) : BoundUserInterfaceState
+    bool canCallPod) : BoundUserInterfaceMessage
 {
     public readonly bool Unlocked = unlocked;
     public readonly List<ExtractionObjectiveEntry> Objectives = objectives;
