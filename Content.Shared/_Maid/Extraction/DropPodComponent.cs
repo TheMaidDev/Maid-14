@@ -17,37 +17,37 @@ public sealed partial class DropPodComponent : Component
     /// The only one allowed inside. Networked so the client predicts insertion the same way;
     /// cleared when the extractee goes away so it never points to a deleted entity.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField, ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
     public EntityUid? Extractee;
 
     /// <summary>
     /// When the pod hit the station, the client plays the landing animation right after it.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField, ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
     public TimeSpan LandedAt;
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public string LandingState = "landing";
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public string BaseState = "base";
 
     /// <summary>
     /// Length of the landing animation: 0.5 s first frame, then 8 frames of 0.05 s.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public TimeSpan LandingAnimationLength = TimeSpan.FromSeconds(0.9);
 
-    [DataField, AutoNetworkedField]
+    [DataField, ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
     public bool Locked = true;
 
-    [DataField, AutoNetworkedField]
+    [DataField, ViewVariables(VVAccess.ReadOnly), AutoNetworkedField]
     public bool Launching;
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public TimeSpan LaunchDelay = TimeSpan.FromSeconds(15);
 
-    [DataField, AutoPausedField]
+    [DataField, ViewVariables(VVAccess.ReadOnly), AutoPausedField]
     public TimeSpan LaunchAt;
 
     /// <summary>
@@ -60,37 +60,37 @@ public sealed partial class DropPodComponent : Component
     /// <summary>
     /// How long before leaving on its own the extractee is warned.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public TimeSpan AutoLaunchWarning = TimeSpan.FromMinutes(1);
 
-    [DataField, AutoPausedField]
+    [DataField, ViewVariables(VVAccess.ReadOnly), AutoPausedField]
     public TimeSpan? AutoLaunchAt;
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public bool AutoLaunchWarned;
 
     /// <summary>
     /// Seconds of the countdown shown to the occupant as a popup.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public List<int> CountdownPopups = new() { 10, 5, 4, 3, 2, 1 };
 
     /// <summary>
     /// Last countdown second already announced to the occupant.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public int LastCountdownSecond;
 
     /// <summary>
     /// Length of the lift-off animation.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public float LaunchAnimationDuration = 2f;
 
     /// <summary>
     /// Sprite layers of the pod flying away, the real pod is deleted when the animation starts.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public List<SpriteSpecifier> LaunchSprite = new()
     {
         new SpriteSpecifier.Rsi(new ResPath("_Maid/Structures/Storage/drop_pod.rsi"), "base"),
@@ -100,13 +100,13 @@ public sealed partial class DropPodComponent : Component
     /// <summary>
     /// Sprite offset of the pod, so the lift-off starts where the pod is drawn.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public Vector2 LaunchSpriteOffset = new(0f, 0.25f);
 
     /// <summary>
     /// Point light colour for each glow state.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public Dictionary<DropPodGlow, Color> GlowColors = new()
     {
         { DropPodGlow.Locked, Color.FromHex("#ff3b3b") },
@@ -115,23 +115,23 @@ public sealed partial class DropPodComponent : Component
         { DropPodGlow.Launching, Color.FromHex("#ffd23b") },
     };
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public EntProtoId LaunchAction = "ActionLaunchDropPod";
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? LaunchActionEntity;
 
     /// <summary>
     /// Rubble decal left where the pod hit.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public string LandingDecal = "DropPodRubble";
 
     /// <summary>
     /// Decal position from the corner of the landing tile. Decals are drawn from their bottom left corner,
     /// so a 64x64 decal is moved half a tile back to sit centered, and up like the pod sprite.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public Vector2 LandingDecalOffset = new(-0.5f, -0.25f);
 
     [DataField]
