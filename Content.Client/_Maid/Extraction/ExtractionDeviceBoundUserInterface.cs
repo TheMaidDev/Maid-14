@@ -20,7 +20,7 @@ public sealed class ExtractionDeviceBoundUserInterface : BoundUserInterface
 
         _menu = this.CreateWindow<ExtractionDeviceMenu>();
         _menu.RefreshButton.OnPressed += _ => SendMessage(new ExtractionDeviceRefreshMessage());
-        _menu.ZoneButton.OnPressed += _ => SendMessage(new ExtractionDeviceRequestZoneMessage());
+        _menu.OnZoneRequested += () => SendMessage(new ExtractionDeviceRequestZoneMessage());
         _menu.PodButton.OnPressed += _ => SendMessage(new ExtractionDeviceCallPodMessage());
 
         // the server's update on open can arrive before the UI exists here, so ask again

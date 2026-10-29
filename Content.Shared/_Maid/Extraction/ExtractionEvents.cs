@@ -100,7 +100,8 @@ public sealed class ExtractionDeviceUiState(
     string zone,
     string pod,
     bool canRequestZone,
-    bool canCallPod) : BoundUserInterfaceMessage
+    bool canCallPod,
+    bool zoneRequested) : BoundUserInterfaceMessage
 {
     public readonly bool Unlocked = unlocked;
     public readonly List<ExtractionObjectiveEntry> Objectives = objectives;
@@ -110,6 +111,11 @@ public sealed class ExtractionDeviceUiState(
     public readonly string Zone = zone;
     public readonly string Pod = pod;
     public readonly bool CanRequestZone = canRequestZone;
+
+    /// <summary>
+    /// Zones were already requested once, so the zone button re-assigns them and asks for confirmation.
+    /// </summary>
+    public readonly bool ZoneRequested = zoneRequested;
     public readonly bool CanCallPod = canCallPod;
 }
 

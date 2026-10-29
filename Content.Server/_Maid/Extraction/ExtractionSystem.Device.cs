@@ -163,7 +163,8 @@ public sealed partial class ExtractionSystem
             zone,
             GetPodStatus(ent, now),
             comp.Unlocked && !comp.Extracted && comp.RequestsUsed < comp.MaxRequests,
-            CanCallPod(ent, now));
+            CanCallPod(ent, now),
+            comp.RequestsUsed > 0);
 
         _ui.ServerSendUiMessage(device.Owner, ExtractionDeviceUiKey.Key, state, uid);
     }
