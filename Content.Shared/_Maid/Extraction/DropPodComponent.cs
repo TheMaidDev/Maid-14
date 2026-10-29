@@ -134,32 +134,32 @@ public sealed partial class DropPodComponent : Component
     [DataField, ViewVariables(VVAccess.ReadOnly)]
     public Vector2 LandingDecalOffset = new(-0.5f, -0.25f);
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier LaunchSound = new SoundPathSpecifier("/Audio/Effects/teleport_departure.ogg");
 
     /// <summary>
     /// Played every second of the launch countdown. None yet, the sound is picked later.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier? CountdownSound;
 
     /// <summary>
     /// Engine sound started with the launch countdown and stopped if the launch is cancelled.
     /// Loops only if its params say so.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier? EngineSound;
 
     [ViewVariables]
     public EntityUid? EngineSoundStream;
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier KeypadSound = new SoundPathSpecifier("/Audio/Machines/Nuke/general_beep.ogg");
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier WrongCodeSound = new SoundPathSpecifier("/Audio/Machines/Nuke/angry_beep.ogg");
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public SoundSpecifier UnlockSound = new SoundPathSpecifier("/Audio/Machines/Nuke/confirm_beep.ogg");
 
     /// <summary>
@@ -171,21 +171,21 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public bool WrongCode;
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public LocId InsideMessage = "extraction-pod-inside";
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public LocId NotInsideMessage = "extraction-pod-not-inside";
 
     /// <summary>
     /// Gets <c>$seconds</c>.
     /// </summary>
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public LocId LaunchingMessage = "extraction-pod-launching";
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public LocId LaunchCancelledMessage = "extraction-pod-launch-cancelled";
 
-    [DataField]
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
     public LocId SealedMessage = "extraction-pod-sealed";
 }
