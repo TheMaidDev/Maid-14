@@ -139,21 +139,3 @@
     sprite: _Maid/Structures/Storage/drop_pod.rsi
     state: icon
   - type: DropPodLandingTest
-
-# welding spark particles around the pod during the last seconds of the launch countdown
-- type: entity
-  id: DropPodLaunchSparks
-  categories: [ HideSpawnMenu ]
-  components:
-  - type: Transform
-  - type: ParticleEmitter
-    effect: SfWeldingSparks
-  - type: PointLight
-    color: orange
-    radius: 1.5
-    energy: 0.8
-  - type: TimedDespawn
-    lifetime: 30
-  - type: Tag
-    tags:
-    - HideContextMenu

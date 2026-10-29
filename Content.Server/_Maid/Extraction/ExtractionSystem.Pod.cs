@@ -375,28 +375,6 @@ public sealed partial class ExtractionSystem
     private void OnPodShutdown(Entity<DropPodComponent> ent, ref ComponentShutdown args)
     {
         _audio.Stop(ent.Comp.EngineSoundStream);
-        StopLaunchSparks(ent);
-    }
-
-    private void StartLaunchSparks(Entity<DropPodComponent> pod)
-    {
-        if (pod.Comp.LaunchSparksEffect is not { } effect || pod.Comp.LaunchSparks.Count > 0)
-            return;
-
-        foreach (var offset in pod.Comp.LaunchSparksOffsets)
-        {
-            pod.Comp.LaunchSparks.Add(SpawnAttachedTo(effect, new EntityCoordinates(pod.Owner, offset)));
-        }
-    }
-
-    private void StopLaunchSparks(Entity<DropPodComponent> pod)
-    {
-        foreach (var spark in pod.Comp.LaunchSparks)
-        {
-            QueueDel(spark);
-        }
-
-        pod.Comp.LaunchSparks.Clear();
     }
 
     private void OnLaunchPod(Entity<AntagExtractableComponent> ent, ref LaunchDropPodActionEvent args)
@@ -437,7 +415,6 @@ public sealed partial class ExtractionSystem
     {
         pod.Comp.Launching = false;
         pod.Comp.EngineSoundStream = _audio.Stop(pod.Comp.EngineSoundStream);
-        StopLaunchSparks(pod);
         Dirty(pod);
         UpdatePodUi(pod);
         SetGlow(pod, pod.Comp.Locked ? DropPodGlow.Locked : DropPodGlow.Unlocked);
@@ -465,9 +442,6 @@ public sealed partial class ExtractionSystem
                 continue;
 
             pod.LastCountdownSecond = remaining;
-
-            if (remaining <= pod.LaunchSparksSeconds)
-                StartLaunchSparks((uid, pod));
 
             if (pod.CountdownSound != null)
                 _audio.PlayPvs(pod.CountdownSound, uid);

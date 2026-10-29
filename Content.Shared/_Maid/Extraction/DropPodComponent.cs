@@ -82,28 +82,6 @@ public sealed partial class DropPodComponent : Component
     public int LastCountdownSecond;
 
     /// <summary>
-    /// Effect spawned around the pod during the last seconds of the launch countdown, like engines firing.
-    /// Null disables it.
-    /// </summary>
-    [DataField]
-    public EntProtoId? LaunchSparksEffect = "DropPodLaunchSparks";
-
-    /// <summary>
-    /// Seconds before lift-off when the sparks start; they last until the pod leaves.
-    /// </summary>
-    [DataField]
-    public int LaunchSparksSeconds = 5;
-
-    /// <summary>
-    /// Where the spark emitters sit, relative to the pod.
-    /// </summary>
-    [DataField]
-    public List<Vector2> LaunchSparksOffsets = new() { new(-0.35f, -0.3f), new(0.35f, -0.3f) };
-
-    [ViewVariables]
-    public List<EntityUid> LaunchSparks = new();
-
-    /// <summary>
     /// Length of the lift-off animation.
     /// </summary>
     [DataField]
