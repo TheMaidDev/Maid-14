@@ -338,6 +338,11 @@ public abstract class SharedItemSystem : EntitySystem
         if (!TryComp(uid, out ItemComponent? item))
             return;
 
+        // MAID BEGIN storage resize overflow
+        // Storage relocates or ejects the item itself on resize, so remember where it was.
+        Container.TryGetContainingContainer((uid, null, null), out var oldContainer);
+        // MAID END storage resize overflow
+
         if (args.Activated)
         {
             if (itemToggleSize.ActivatedShape != null)
@@ -394,6 +399,8 @@ public abstract class SharedItemSystem : EntitySystem
                 }
             }
 
+            // MAID BEGIN storage resize overflow
+            /*
             if (!wasInPocket && TryComp(container.Owner,
                 out StorageComponent? storage)) // Goobstation - reinsert item in storage because size changed
             {
@@ -404,7 +411,16 @@ public abstract class SharedItemSystem : EntitySystem
                     _handsSystem.PickupOrDrop(args.User, uid, animate: false);
                 }
             }
+            */
+            // MAID END storage resize overflow
         }
+        // MAID BEGIN storage resize overflow
+        else if (oldContainer?.ID == StorageComponent.ContainerId)
+        {
+            // Storage ejected the item because it no longer fits, so hand it to whoever toggled it.
+            _handsSystem.PickupOrDrop(args.User, uid, animate: false);
+        }
+        // MAID END storage resize overflow
 
         Dirty(uid, item);
     }

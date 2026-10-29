@@ -51,8 +51,9 @@
     ClothingHeadHatSurgcapBlue: 4
     ClothingHeadHatSurgcapPurple: 4
     ClothingShoesBootsWinterMed: 2
-    NitrousOxideTankFilled: 2 #Maid
-    VehicleWheelchairFolded: 3 #Maid
+    # NitrousOxideTankFilled: 2 #Maid
+    # VehicleWheelchairFolded: 3 #Maid
+    ClothingBeltMedicalRig: 2 #Maid
   contrabandInventory:
     ClothingUniformJumpskirtOfLife: 1
     ToyFigurineMedicalDoctor: 1

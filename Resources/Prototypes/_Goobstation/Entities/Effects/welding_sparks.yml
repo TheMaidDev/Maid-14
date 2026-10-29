@@ -21,6 +21,8 @@
   - type: Tag
     tags:
     - HideContextMenu
+  - type: TimedDespawn # MAID welding sparks cleanup
+    lifetime: 120 # MAID welding sparks cleanup
 
 - type: entity
   parent: EffectWeldingSparks

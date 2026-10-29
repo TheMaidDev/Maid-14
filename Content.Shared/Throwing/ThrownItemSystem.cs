@@ -125,6 +125,9 @@ namespace Content.Shared.Throwing
             if (args.OtherEntity == component.Thrower)
                 return;
 
+            if (!component.HitEntities.Add(args.OtherEntity)) // Maid start throw hit dedupe
+                return;
+
             ThrowCollideInteraction(component, args.OurEntity, args.OtherEntity);
         }
 

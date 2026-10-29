@@ -75,7 +75,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             Access="Internal"
             Icon="{xe:Tex '/Textures/_Maid/Interface/MenuBar/language.png'}"
             BoundKey = "{x:Static is:ContentKeyFunctions.OpenLanguageMenu}"
-            ToolTip="Open the Language Menu"
+            ToolTip="{Loc 'game-hud-open-language-menu-button-tooltip'}"
             MinSize="96 32"
             HorizontalExpand="True"
             AppendStyleClass="{x:Static style:StyleBase.ButtonOpenLeft}"

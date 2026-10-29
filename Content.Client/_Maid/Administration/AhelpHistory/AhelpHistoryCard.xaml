@@ -1,0 +1,20 @@
+<BoxContainer xmlns="https://spacestation14.io"
+              xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+              Orientation="Vertical"
+              HorizontalExpand="True"
+              Margin="4 2 4 6">
+    <BoxContainer Orientation="Horizontal">
+        <Label Name="SenderLabel" Margin="6 4 6 2" />
+        <Label Name="TagLabel" Visible="False" StyleClasses="LabelSmall" Margin="0 4 6 2" />
+        <Control HorizontalExpand="True" />
+        <Label Name="TimeLabel" Visible="False" StyleClasses="LabelSmall" Margin="6 4 6 2" />
+        <Button Name="MoveToButton" Text="{Loc 'ahelp-history-move-to'}" Visible="False"
+                StyleClasses="ButtonSmall" Margin="6 2 0 0" VerticalAlignment="Center" Access="Public" />
+    </BoxContainer>
+    <PanelContainer Name="DividerPanel" Margin="6 0 6 0">
+        <PanelContainer.PanelOverride>
+            <gfx:StyleBoxFlat BorderColor="#3f3f3f" BorderThickness="0 0 0 1" />
+        </PanelContainer.PanelOverride>
+    </PanelContainer>
+    <RichTextLabel Name="MessageText" Margin="7 4 7 0" />
+</BoxContainer>

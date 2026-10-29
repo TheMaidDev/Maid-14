@@ -55,3 +55,9 @@
   parent: BaseHydroToolRecipe
   id: HydroponicsToolClippers
   result: HydroponicsToolClippers
+# MAID start plant analyzer
+- type: latheRecipe 
+  parent: HandheldHealthAnalyzer 
+  id: PlantAnalyzer
+  result: PlantAnalyzer
+# MAID end plant analyzer

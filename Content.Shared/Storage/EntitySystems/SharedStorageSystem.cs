@@ -288,13 +288,108 @@ public abstract class SharedStorageSystem : EntitySystem
             return;
         }
 
+        // MAID BEGIN storage resize overflow
+        /*
         UpdateOccupied((container.Owner, storage));
 
         if (!ItemFitsInGridLocation((itemEnt.Owner, itemEnt.Comp), (container.Owner, storage), loc))
         {
             ContainerSystem.Remove(itemEnt.Owner, container, force: true);
         }
+        */
+        // Rebuild the occupied grid without the resized item. Otherwise the fit check ignores the
+        // item's own (already resized) cells, so it always passes and the item overflows the grid.
+        storage.StoredItems.Remove(itemEnt.Owner);
+        UpdateOccupied((container.Owner, storage));
+
+        if (!ItemFitsInGridLocation((itemEnt.Owner, itemEnt.Comp), (container.Owner, storage), loc))
+        {
+            if (!TryGetAvailableGridSpace((container.Owner, storage), itemEnt, out var newLoc))
+            {
+                // Not in StoredItems anymore, so removal won't clear cells using the new shape.
+                ContainerSystem.Remove(itemEnt.Owner, container, force: true);
+                return;
+            }
+
+            loc = newLoc.Value;
+        }
+
+        storage.StoredItems[itemEnt.Owner] = loc;
+        AddOccupiedEntity((container.Owner, storage), itemEnt, loc);
+        UpdateUI((container.Owner, storage));
+        // MAID END storage resize overflow
     }
+
+    // MAID BEGIN storage resize overflow
+    /// <summary>
+    /// Checks whether an item stored in a storage grid would still fit in it with a different size or shape.
+    /// Unset values keep the item's current ones. Returns true if the item isn't in a storage grid.
+    /// </summary>
+    public bool StoredItemFitsResized(EntityUid uid, ProtoId<ItemSizePrototype>? size, List<Box2i>? shape)
+    {
+        if (!_itemQuery.TryComp(uid, out var item) ||
+            !TryGetStorageLocation((uid, item), out var container, out var storage, out var loc))
+            return true;
+
+        var newSize = ItemSystem.GetSizePrototype(size ?? item.Size);
+        if (newSize > GetMaxItemSize((container.Owner, storage)))
+            return false;
+
+        IReadOnlyList<Box2i> baseShape = shape ?? item.Shape ?? newSize.DefaultShape;
+
+        // Check against a scratch grid without the item itself, so the storage state isn't touched.
+        var occupied = new Dictionary<Vector2i, ulong>();
+        RemoveOccupied(storage.Grid, occupied);
+        foreach (var (stored, storedLoc) in storage.StoredItems)
+        {
+            if (stored != uid && _itemQuery.TryComp(stored, out var storedItem))
+                AddOccupied((stored, storedItem), storedLoc, occupied);
+        }
+
+        var noIgnored = new Dictionary<Vector2i, ulong>();
+        var fits = ItemFitsInGridLocation(occupied, AdjustShape(baseShape, loc.Rotation, loc.Position), noIgnored);
+
+        if (!fits)
+        {
+            var bounds = storage.Grid.GetBoundingBox();
+            for (var y = bounds.Bottom; y <= bounds.Top && !fits; y++)
+            {
+                for (var x = bounds.Left; x <= bounds.Right && !fits; x++)
+                {
+                    for (var turn = 0; turn < 4 && !fits; turn++)
+                    {
+                        var angle = Angle.FromDegrees(90 * turn);
+                        fits = ItemFitsInGridLocation(occupied, AdjustShape(baseShape, angle, new Vector2i(x, y)), noIgnored);
+                    }
+                }
+            }
+        }
+
+        return fits;
+    }
+
+    /// <summary>
+    /// Same as <see cref="SharedItemSystem.GetAdjustedItemShape(List{Box2i}, Entity{ItemComponent?}, Angle, Vector2i)"/>
+    /// but for an arbitrary shape.
+    /// </summary>
+    private static List<Box2i> AdjustShape(IReadOnlyList<Box2i> shapes, Angle rotation, Vector2i position)
+    {
+        var boundingShape = shapes.GetBoundingBox();
+        var boundingCenter = ((Box2) boundingShape).Center;
+        var matty = Matrix3Helpers.CreateTransform(boundingCenter, rotation);
+        var drift = boundingShape.BottomLeft - matty.TransformBox(boundingShape).BottomLeft;
+
+        var adjusted = new List<Box2i>(shapes.Count);
+        foreach (var shape in shapes)
+        {
+            var transformed = matty.TransformBox(shape).Translated(drift);
+            var floored = new Box2i(transformed.BottomLeft.Floored(), transformed.TopRight.Floored());
+            adjusted.Add(floored.Translated(position));
+        }
+
+        return adjusted;
+    }
+    // MAID END storage resize overflow
 
     private void OnNestedStorageCvar(bool obj)
     {

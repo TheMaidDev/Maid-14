@@ -76,8 +76,8 @@
     SmokeGrenade: 4 #Maid
   # security officers need to follow a diet regimen!
   contrabandInventory:
-    WeaponMeleeNeedle: 2
-    FoodDonutHomer: 12
+    # WeaponMeleeNeedle: 2 #Maid
+    # FoodDonutHomer: 12 #Maid
     FoodBoxDonut: 2
     #box evidence
   emaggedInventory: # Goobstation

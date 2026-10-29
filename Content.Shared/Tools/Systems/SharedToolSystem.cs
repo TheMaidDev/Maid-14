@@ -268,7 +268,14 @@ public abstract partial class SharedToolSystem : EntitySystem
         };
 
         // Goobstation - Moved `TryStartDoAfter` into a check and added `UseToolEvent`.
+        // MAID BEGIN welding sparks cleanup
+        /*
         if (_doAfterSystem.TryStartDoAfter(doAfterArgs, out id))
+        */
+        // Instant DoAfters have already ended, so nothing would clean up their effects.
+        if (_doAfterSystem.TryStartDoAfter(doAfterArgs, out id)
+            && _doAfterSystem.IsRunning(id))
+        // MAID END welding sparks cleanup
         {
             RaiseLocalEvent(tool, new UseToolEvent(user, target, id.Value.Index, doAfterLength));
         }

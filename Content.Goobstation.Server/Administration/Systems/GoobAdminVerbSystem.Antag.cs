@@ -40,7 +40,10 @@ public sealed partial class GoobAdminVerbSystem
         {
             Text = Loc.GetString("admin-verb-text-make-changeling"),
             Category = VerbCategory.Antag,
-            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Changeling/changeling_abilities.rsi"), "transform"),
+            // MAID BEGIN core antag icons
+            /* Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Goobstation/Changeling/changeling_abilities.rsi"), "transform"), */
+            Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_Maid/Interface/Actions/changeling.rsi"), "absorb"),
+            // MAID END core antag icons
             Act = () =>
             {
                 if (!HasComp<SiliconComponent>(args.Target))

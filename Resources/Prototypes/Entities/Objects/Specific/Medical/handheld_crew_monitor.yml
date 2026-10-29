@@ -38,6 +38,7 @@
     sprite: Objects/Specific/Medical/handheldcrewmonitor.rsi
     state: scanner
   - type: ActivatableUI
+    inHandsOnly: false
     key: enum.CrewMonitoringUIKey.Key
   - type: UserInterface
     interfaces:

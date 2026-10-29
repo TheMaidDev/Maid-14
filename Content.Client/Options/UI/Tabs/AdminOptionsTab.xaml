@@ -26,6 +26,12 @@
                        StyleClasses="LabelKeyText"/>
                 <ui:OptionSlider Name="NotificationsVolumeSlider" Title="{Loc 'ui-options-admin-notifications-volume'}"/>
                 <!-- Goobstation End - Admin Notifications -->
+                <!-- MAID BEGIN admin dead chat -->
+                <Label Text="{Loc 'ui-options-admin-misc-title'}"
+                       StyleClasses="LabelKeyText"/>
+                <CheckBox Name="DeadChatAdminCheckBox" Text="{Loc 'ui-options-admin-dead-chat-admin'}" />
+                <ui:OptionSlider Name="AhelpVolumeSlider" Title="{Loc 'ui-options-admin-ahelp-volume'}"/>
+                <!-- MAID END admin dead chat -->
             </BoxContainer>
         </ScrollContainer>
         <ui:OptionsTabControlRow Name="Control" Access="Public" />

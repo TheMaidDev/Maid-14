@@ -73,8 +73,8 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
             )
             .ToList();
 
-        var roundstartTargetBudget = GetTargetBudget(component, TimeSpan.Zero) + readyPlayersCount * component.RoundstartScorePerPlayer;
-        var accumulatedScore = new AdaptiveScore();
+        var roundstartTargetBudget = GetTargetBudget(component, TimeSpan.Zero);
+        var accumulatedScore = new AdaptiveScore() + readyPlayersCount * component.RoundstartScorePerPlayer;
 
         Log($"Spawning roundstart rules with budget {roundstartTargetBudget} (of {readyPlayersCount} players)...");
 

@@ -293,10 +293,11 @@
   - type: SpeedModifiedOnWield
     walkModifier: 0.8 # goob edit V
     sprintModifier: 0.8 # goob edit ^
-  - type: CursorOffsetRequiresWield
-  - type: EyeCursorOffset
-    maxOffset: 8 # Goobstation - Sniper rifles buff
-    pvsIncrease: 0.8 # Goobstation - Sniper rifles buff
+#  - type: CursorOffsetRequiresWield # MAID settings port - old build telescope
+#  - type: EyeCursorOffset # MAID settings port - old build telescope
+#    maxOffset: 8 # Goobstation - Sniper rifles buff
+#    pvsIncrease: 0.8 # Goobstation - Sniper rifles buff
+  - type: Telescope # MAID settings port - old build telescope
   - type: StaticPrice
     price: 3500
   - type: MagazineVisuals
