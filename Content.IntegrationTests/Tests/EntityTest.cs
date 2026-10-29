@@ -107,7 +107,8 @@ namespace Content.IntegrationTests.Tests
             // Goobstation edit end
 
             // Goob start run this test in batches of 10k because fuck you. we got too much shit.
-            const int batchSize = 10000;
+            // MAID lower test memory - was 10000
+            const int batchSize = 5000;
 
             for (var batchStart = 0; batchStart < protoIds.Count; batchStart += batchSize)
             {
@@ -138,9 +139,14 @@ namespace Content.IntegrationTests.Tests
                     // i mean yeah you could run the test in batches of entities but its not really a stress test then is it.
 
                     const int maxTicks = 15; // (default wizden)
+                    // MAID BEGIN lower test memory
+                    /*
                     const long
                         memoryLimitBytes =
                             13L * 1024 * 1024 * 1024; // 13 GB, depends on how close you wanna fly to the sun.
+                    */
+                    const long memoryLimitBytes = 9L * 1024 * 1024 * 1024; // 9 GB
+                    // MAID END lower test memory
 
                     var warninglog = true; // if we stop caring about this test turn this off.
 
@@ -159,7 +165,7 @@ namespace Content.IntegrationTests.Tests
                             await TestContext.Progress.WriteLineAsync(
                                 "Warning:\n" +
                                 $"[SpawnAndDeleteAllEntitiesOnDifferentMaps] Memory usage reached {memoryUsed / (1024 * 1024 * 1024.0):F2} GB at tick {tick + 1} out of {maxTicks} \n" +
-                                "Stopping early (limit: 13 GB)." +
+                                "Stopping early (limit: 9 GB)." + // MAID lower test memory
                                 $"\nWe spawned a total of {protoIds.Count} entities and held on for {tick + 1} ticks. We're probably fine."
                             );
 
@@ -191,6 +197,10 @@ namespace Content.IntegrationTests.Tests
                         Assert.That(entityMan.EntityCount, Is.AtMost(1));
                     });
 
+                // MAID BEGIN lower test memory
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                // MAID END lower test memory
             }
             await pair.CleanReturnAsync();
         }
@@ -284,7 +294,8 @@ namespace Content.IntegrationTests.Tests
                 .ToList();
 
             // Goob start run this test in batches of 10k because fuck you. we got too much shit.
-            const int batchSize = 10000;
+            // MAID lower test memory - was 10000
+            const int batchSize = 5000;
 
             for (var batchStart = 0; batchStart < protoIds.Count; batchStart += batchSize)
             {
@@ -316,7 +327,12 @@ namespace Content.IntegrationTests.Tests
                 // i mean yeah you could run the test in batches of entities but its not really a stress test then is it.
 
                 const int maxTicks = 15; // (default wizden)
+                // MAID BEGIN lower test memory
+                /*
                 const long memoryLimitBytes = 13L * 1024 * 1024 * 1024; // 13 GB
+                */
+                const long memoryLimitBytes = 9L * 1024 * 1024 * 1024; // 9 GB
+                // MAID END lower test memory
 
                 var warninglog = true; // if we stop caring about this test turn this off.
 
@@ -335,7 +351,7 @@ namespace Content.IntegrationTests.Tests
                         await TestContext.Progress.WriteLineAsync(
                             "Warning:\n" +
                             $"[SpawnAndDirtyAllEntities] Memory usage reached {memoryUsed / (1024 * 1024 * 1024.0):F2} GB at tick {tick + 1} out of {maxTicks}\n" +
-                            "Stopping early (limit: 13 GB)." +
+                            "Stopping early (limit: 9 GB)." + // MAID lower test memory
                             $"\nWe spawned and dirtied {protoIds.Count} entities and held on for {tick + 1} ticks. We're probably fine."
                         );
 
@@ -370,6 +386,11 @@ namespace Content.IntegrationTests.Tests
                     // i can't believe you've done this.
                     Assert.That(sEntMan.EntityCount, Is.AtMost(1));
                 });
+
+                // MAID BEGIN lower test memory
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                // MAID END lower test memory
             } // Goob end, yeah im putting the whole test in a for loop.
 
             await pair.CleanReturnAsync();
