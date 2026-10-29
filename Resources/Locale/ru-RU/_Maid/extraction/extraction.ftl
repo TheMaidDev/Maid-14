@@ -44,7 +44,6 @@ extraction-pod-leaving-soon = Капсула покинет станцию че�
 }, с вами или без вас!
 extraction-pod-left-without = Капсула покинула станцию без вас. Другой не будет.
 extraction-pod-lost = Капсула не смогла приземлиться: места посадки больше нет. Вызов потрачен, другого не будет.
-}.
 extraction-pod-destroyed = Капсула уничтожена. Другой не будет.
 extraction-pod-inside = Нажмите «СТАРТ», чтобы взлететь.
 extraction-pod-not-inside = Нужно находиться внутри своей капсулы.

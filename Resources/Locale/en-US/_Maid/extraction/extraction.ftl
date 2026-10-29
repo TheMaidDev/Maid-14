@@ -40,7 +40,6 @@ extraction-pod-leaving-soon = The pod leaves the station in { $seconds } { $seco
 }, with or without you!
 extraction-pod-left-without = The pod left the station without you. There will be no other.
 extraction-pod-lost = The pod could not land: its landing point is gone. The call is spent, there will be no other.
-}.
 extraction-pod-destroyed = The pod was destroyed. There will be no other.
 extraction-pod-inside = Press "START" to lift off.
 extraction-pod-not-inside = You must be inside your pod.
