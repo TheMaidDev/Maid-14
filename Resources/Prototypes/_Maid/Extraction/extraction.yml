@@ -140,20 +140,14 @@
     state: icon
   - type: DropPodLandingTest
 
-# sparks around the pod during the last seconds of the launch countdown, same sprite as welding sparks
+# welding spark particles around the pod during the last seconds of the launch countdown
 - type: entity
   id: DropPodLaunchSparks
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
-  - type: Sprite
-    noRot: true
-    drawdepth: Effects
-    sprite: /Textures/_Goobstation/Effects/welding_effect.rsi
-    layers:
-    - state: smoke
-    - state: welding_sparks
-      shader: unshaded
+  - type: ParticleEmitter
+    effect: SfWeldingSparks
   - type: PointLight
     color: orange
     radius: 1.5
