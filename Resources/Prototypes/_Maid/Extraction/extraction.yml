@@ -146,8 +146,8 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
-  - type: ParticleEmitter
-    effect: SfWeldingSparks
+  - type: ClientEffect
+    effect: DropPodLaunchSparksEmitter
   - type: PointLight
     color: orange
     radius: 1.5
@@ -157,3 +157,12 @@
   - type: Tag
     tags:
     - HideContextMenu
+
+# client-only particle emitter of DropPodLaunchSparks, spawned by ClientEffectSystem
+- type: entity
+  id: DropPodLaunchSparksEmitter
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+  - type: ParticleEmitter
+    effect: SfWeldingSparks
