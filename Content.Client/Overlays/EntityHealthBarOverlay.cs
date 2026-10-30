@@ -195,7 +195,7 @@ public sealed class EntityHealthBarOverlay : Overlay
             const float startX = 8f;
             var endX = widthOfMob - 8f;
 
-            var xProgress = (endX - startX) * deathProgress.ratio + startX;
+            var xProgress = (endX - startX) * Math.Clamp(deathProgress.ratio, 0f, 1f) + startX; // MAID rt-update inverted Box2
 
             var boxBackground = new Box2(new Vector2(startX, 0f) / EyeManager.PixelsPerMeter, new Vector2(endX, 3f) / EyeManager.PixelsPerMeter);
             boxBackground = boxBackground.Translated(position);
