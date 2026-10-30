@@ -91,6 +91,18 @@ public sealed partial class CableSystem : EntitySystem
         if (TerminatingOrDeleted(uid))
             return;
 
+        // MAID BEGIN grid split cables
+        // RT 292 removed ReAnchorEvent: grid splitting now unanchors and re-anchors entities. In that case the
+        // old tile still exists, so only treat it as a cut when the tile under the cable is actually gone.
+        if (args.Transform.GridUid is { } gridUid
+            && TryComp<MapGridComponent>(gridUid, out var grid)
+            && _map.TryGetTileRef(gridUid, grid, args.Transform.Coordinates, out var tileRef)
+            && !tileRef.Tile.IsEmpty)
+        {
+            return;
+        }
+        // MAID END grid split cables
+
         // This entity should not be un-anchorable. But this can happen if the grid-tile is deleted (RCD, explosion,
         // etc). In that case: behave as if the cable had been cut.
         Spawn(cable.CableDroppedOnCutPrototype, Transform(uid).Coordinates);
