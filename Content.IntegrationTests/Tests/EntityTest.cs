@@ -334,6 +334,11 @@ namespace Content.IntegrationTests.Tests
                 const long memoryLimitBytes = 9L * 1024 * 1024 * 1024; // 9 GB
                 // MAID END lower test memory
 
+                // MAID BEGIN lower test memory
+                // The client needs several ticks to receive the spawned entities, the assert below fails if we stop too early.
+                const int minTicks = 5;
+                // MAID END lower test memory
+
                 var warninglog = true; // if we stop caring about this test turn this off.
 
                 for (var tick = 0; tick < maxTicks; tick++)
@@ -345,8 +350,14 @@ namespace Content.IntegrationTests.Tests
                     // debug logging but tbh just use debugger
                     // await TestContext.Progress.WriteLineAsync($"[EntityTest SpawnAndDirtyAllEntities] Memory usage = {memoryUsed / (1024 * 1024 * 1024.0):F2} GB at tick {tick + 1}");
 
+                    // MAID BEGIN lower test memory
+                    /*
                     if (memoryUsed < memoryLimitBytes)
                         continue;
+                    */
+                    if (tick + 1 < minTicks || memoryUsed < memoryLimitBytes)
+                        continue;
+                    // MAID END lower test memory
                     if (warninglog)
                         await TestContext.Progress.WriteLineAsync(
                             "Warning:\n" +
