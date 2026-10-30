@@ -74,6 +74,15 @@
   id: FireExtinguisher
   description: It extinguishes fires.
   components:
+  - type: RandomExplodeOnHit
+    brokenPrototype: ScrapFireExtinguisher
+    maxTotalIntensity: 40
+  - type: Explosive
+    explosionType: ExtinguisherBurst
+    totalIntensity: 20
+    intensitySlope: 5
+    maxIntensity: 4
+    canCreateVacuum: false
   - type: Sprite
     sprite: Objects/Misc/fire_extinguisher.rsi
     layers:

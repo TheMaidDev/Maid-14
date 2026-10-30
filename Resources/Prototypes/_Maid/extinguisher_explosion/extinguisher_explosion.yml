@@ -1,0 +1,9 @@
+﻿- type: explosion
+  id: ExtinguisherBurst
+  damagePerIntensity:
+    types:
+      Blunt: 8
+      Piercing: 5
+  lightColor: "#99CCFF"
+  fireColor: "#FFFFFF"
+  texturePath: /Textures/Effects/fire_greyscale.rsi
