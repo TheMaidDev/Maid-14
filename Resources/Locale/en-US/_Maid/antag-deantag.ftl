@@ -1,0 +1,9 @@
+cmd-deantag-desc = Removes antagonist status from a player or entity.
+cmd-deantag-help = deantag <CKey|EntityID> [all|id]
+cmd-deantag-arg-target = <CKey|EntityID>
+cmd-deantag-arg-id = [all|id]
+cmd-deantag-no-entity = That player has no attached entity.
+cmd-deantag-target-not-found = No player or entity found for '{ $target }'.
+cmd-deantag-unknown-id = Unknown deantag prototype '{ $id }'.
+cmd-deantag-no-mind = The target has no mind.
+cmd-deantag-done = Deantag done. Removed antags: { $antags }

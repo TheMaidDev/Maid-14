@@ -1,0 +1,18 @@
+# The id must match the antag prototype of the mind role. Roles with that antag are always removed by "deantag";
+# the lists below are extra cleanup. Antags without an entry here only lose their mind roles.
+- type: deantag
+  id: Traitor
+
+- type: deantag
+  id: TraitorSleeper
+
+- type: deantag
+  id: Rev
+  removeComponents:
+  - Revolutionary
+
+- type: deantag
+  id: HeadRev
+  removeComponents:
+  - HeadRevolutionary
+  - Revolutionary
