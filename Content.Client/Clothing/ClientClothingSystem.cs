@@ -378,7 +378,8 @@ public sealed class ClientClothingSystem : ClothingSystem
                         if (!string.IsNullOrEmpty(clothingComponent.ClothingType))
                         {
                             displacementData = inventory.FemaleDisplacements.GetValueOrDefault($"{clothingComponent.ClothingType}-{bodyTypeName}")
-                                ?? inventory.FemaleDisplacements.GetValueOrDefault(clothingComponent.ClothingType);
+                                ?? inventory.FemaleDisplacements.GetValueOrDefault(clothingComponent.ClothingType)
+                                ?? inventory.FemaleDisplacements.GetValueOrDefault(slot); // MAID slim fallback
                             break;
                         }
 
