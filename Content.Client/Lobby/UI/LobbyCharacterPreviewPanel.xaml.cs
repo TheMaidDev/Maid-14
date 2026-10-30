@@ -95,9 +95,16 @@ public sealed partial class LobbyCharacterPreviewPanel : Control
             var spriteView = new SpriteView
             {
                 OverrideDirection = direction,
+                // MAID BEGIN integer preview scale
+                /*
                 Scale = new Vector2(3.25f, 3.25f),
                 MaxSize = new Vector2(112, 112),
                 Stretch = SpriteView.StretchMode.Fill,
+                */
+                Scale = new Vector2(3f, 3f),
+                MaxSize = new Vector2(112, 112),
+                Stretch = SpriteView.StretchMode.None,
+                // MAID END integer preview scale
             };
             spriteView.SetEntity(uid);
             ViewBox.AddChild(spriteView);
