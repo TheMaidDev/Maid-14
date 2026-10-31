@@ -194,8 +194,8 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
                 conditionControl.ProgressTexture.Progress = condition.Progress;
                 var titleMessage = new FormattedMessage();
                 var descriptionMessage = new FormattedMessage();
-                titleMessage.AddText(condition.Title);
-                descriptionMessage.AddText(condition.Description);
+                titleMessage.AddMarkupPermissive(condition.Title);
+                descriptionMessage.AddMarkupPermissive(condition.Description);
 
                 conditionControl.Title.SetMessage(titleMessage);
                 conditionControl.Description.SetMessage(descriptionMessage);
@@ -211,7 +211,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             var briefingControl = new ObjectiveBriefingControl();
             var text = new FormattedMessage();
             text.PushColor(Color.Yellow);
-            text.AddText(briefing);
+            text.AddMarkupPermissive(briefing);
             briefingControl.Label.SetMessage(text);
             _window.Objectives.AddChild(briefingControl);
         }

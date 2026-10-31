@@ -194,7 +194,7 @@ public sealed class PartStatusSystem : EntitySystem
             : "inspect-part-status-title-other";
 
 
-        message.AddText(Loc.GetString(titlestring, ("entity", entity)));
+        message.AddMarkupPermissive(Loc.GetString(titlestring, ("entity", entity)));
         message.PushNewline();
 
         CreateBodyPartMessage(partStatusSet, entity == examiner, entity, ref message);
@@ -219,7 +219,7 @@ public sealed class PartStatusSystem : EntitySystem
 
             var locString = "inspect-part-status-line";
 
-            message.AddText(Loc.GetString(locString,
+            message.AddMarkupPermissive(Loc.GetString(locString,
                 ("entity", examinedEntity),
                 ("isSelf", inspectingSelf),
                 ("partType", partStatus.PartType.ToString()),

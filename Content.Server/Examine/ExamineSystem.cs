@@ -49,8 +49,8 @@ namespace Content.Server.Examine
         public override void Initialize()
         {
             base.Initialize();
-            _entityNotFoundMessage.AddText(Loc.GetString("examine-system-entity-does-not-exist"));
-            _entityOutOfRangeMessage.AddText(Loc.GetString("examine-system-cant-see-entity"));
+            _entityNotFoundMessage.AddMarkupPermissive(Loc.GetString("examine-system-entity-does-not-exist"));
+            _entityOutOfRangeMessage.AddMarkupPermissive(Loc.GetString("examine-system-cant-see-entity"));
 
             SubscribeNetworkEvent<ExamineSystemMessages.RequestExamineInfoMessage>(ExamineInfoRequest);
         }

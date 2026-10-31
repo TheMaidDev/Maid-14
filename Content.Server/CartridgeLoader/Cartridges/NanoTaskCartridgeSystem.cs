@@ -77,11 +77,11 @@ public sealed class NanoTaskCartridgeSystem : SharedNanoTaskCartridgeSystem
 
         printed.Task = item;
         var msg = new FormattedMessage();
-        msg.AddText(Loc.GetString("nano-task-printed-description", ("description", item.Description)));
+        msg.AddMarkupPermissive(Loc.GetString("nano-task-printed-description", ("description", item.Description)));
         msg.PushNewline();
-        msg.AddText(Loc.GetString("nano-task-printed-requester", ("requester", item.TaskIsFor)));
+        msg.AddMarkupPermissive(Loc.GetString("nano-task-printed-requester", ("requester", item.TaskIsFor)));
         msg.PushNewline();
-        msg.AddText(item.Priority switch {
+        msg.AddMarkupPermissive(item.Priority switch {
             NanoTaskPriority.High => Loc.GetString("nano-task-printed-high-priority"),
             NanoTaskPriority.Medium => Loc.GetString("nano-task-printed-medium-priority"),
             NanoTaskPriority.Low => Loc.GetString("nano-task-printed-low-priority"),

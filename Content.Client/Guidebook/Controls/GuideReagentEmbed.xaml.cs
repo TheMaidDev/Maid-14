@@ -205,7 +205,7 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
         GenerateSources(reagent);
 
         FormattedMessage description = new();
-        description.AddText(reagent.LocalizedDescription);
+        description.AddMarkupPermissive(reagent.LocalizedDescription);
         description.PushNewline();
         description.AddMarkupOrThrow(Loc.GetString("guidebook-reagent-physical-description",
             ("description", reagent.LocalizedPhysicalDescription)));

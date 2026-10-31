@@ -172,7 +172,7 @@ public sealed class PartStatusExaminedEvent : EntityEventArgs
     public void PushText(string text, int priority = 0)
     {
         var msg = new FormattedMessage();
-        msg.AddText(text);
+        msg.AddMarkupPermissive(text);
         PushMessage(msg, priority);
     }
 
@@ -220,7 +220,7 @@ public sealed class PartStatusExaminedEvent : EntityEventArgs
     public void AddText(string text, int priority = 0)
     {
         var msg = new FormattedMessage();
-        msg.AddText(text);
+        msg.AddMarkupPermissive(text);
         AddMessage(msg, priority);
     }
 

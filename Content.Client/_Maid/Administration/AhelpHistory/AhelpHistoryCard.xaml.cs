@@ -51,7 +51,7 @@ public sealed partial class AhelpHistoryCard : BoxContainer
         }
 
         var message = new FormattedMessage();
-        message.AddText(entry.Message);
+        message.AddMarkupPermissive(entry.Message);
         MessageText.SetMessage(message);
     }
 
