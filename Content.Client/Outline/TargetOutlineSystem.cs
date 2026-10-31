@@ -278,7 +278,7 @@ public sealed class TargetOutlineSystem : EntitySystem
             // highlight depending on whether its in or out of range
             sprite.PostShader = valid ? _shaderTargetValid : _shaderTargetInvalid;
             */
-            _sprite.SetPostShader(sprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.TargetOutline, valid ? _shaderTargetValid : _shaderTargetInvalid));
+            _sprite.SetPostShader(sprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.TargetOutline, valid ? _shaderTargetValid! : _shaderTargetInvalid!));
             // MAID END Multi postshader
             sprite.RenderOrder = EntityManager.CurrentTick.Value;
             _highlightedSprites.Add(sprite);

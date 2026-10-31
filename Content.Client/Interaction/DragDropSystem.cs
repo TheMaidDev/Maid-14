@@ -571,7 +571,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
             // highlight depending on whether its in or out of range
             inRangeSprite.PostShader = valid.Value ? _dropTargetInRangeShader : _dropTargetOutOfRangeShader;
             */
-            _sprite.SetPostShader(inRangeSprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.DragDropTarget, valid.Value ? _dropTargetInRangeShader : _dropTargetOutOfRangeShader));
+            _sprite.SetPostShader(inRangeSprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.DragDropTarget, valid.Value ? _dropTargetInRangeShader! : _dropTargetOutOfRangeShader!));
             // MAID END Multi postshader
             inRangeSprite.RenderOrder = EntityManager.CurrentTick.Value;
             _highlightedSprites.Add(inRangeSprite);
