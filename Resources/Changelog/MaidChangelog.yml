@@ -1761,3 +1761,11 @@ Entries:
       message: Раундстарт геймрулы правильнее
   id: 172
   time: '2026-10-31T04:14:19.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Tweak
+      message: Движок обновлён до v293.0.1
+    - type: Add
+      message: Поддержка Mac
+  id: 173
+  time: '2026-10-31T04:14:56.0000000+00:00'
