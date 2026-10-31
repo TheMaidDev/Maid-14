@@ -191,7 +191,7 @@ public sealed class SurgeryBui : BoundUserInterface
             return;
 
         var stepName = new FormattedMessage();
-        stepName.AddText(_entities.GetComponent<MetaDataComponent>(step).EntityName);
+        stepName.AddMarkupPermissive(_entities.GetComponent<MetaDataComponent>(step).EntityName);
         var stepButton = new SurgeryStepButton { Step = step };
         stepButton.Button.OnPressed += _ => SendPredictedMessage(new SurgeryStepChosenBuiMsg(netPart, surgeryId, stepId, _isBody));
 
@@ -314,7 +314,7 @@ public sealed class SurgeryBui : BoundUserInterface
             stepButton.Button.Disabled = status != StepStatus.Next;
 
             var stepName = new FormattedMessage();
-            stepName.AddText(_entities.GetComponent<MetaDataComponent>(stepButton.Step).EntityName);
+            stepName.AddMarkupPermissive(_entities.GetComponent<MetaDataComponent>(stepButton.Step).EntityName);
 
             if (status == StepStatus.Complete)
                 stepButton.Button.Modulate = Color.Green;

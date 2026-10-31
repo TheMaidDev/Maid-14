@@ -90,9 +90,9 @@ public sealed partial class GuidebookError : BoxContainer
 
     public GuidebookError(string original, string? error) : this()
     {
-        Original.AddText(original);
+        Original.AddMarkupPermissive(original);
 
         if (error is not null)
-            Error.AddText(error);
+            Error.AddMarkupPermissive(error);
     }
 }
