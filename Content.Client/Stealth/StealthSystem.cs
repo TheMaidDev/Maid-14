@@ -80,6 +80,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using Content.Client.Interactable.Components;
 using Content.Shared.Stealth;
 using Content.Shared.Stealth.Components;
@@ -125,9 +126,26 @@ public sealed class StealthSystem : SharedStealthSystem
             return;
 
         _sprite.SetColor((uid, sprite), Color.White);
+        // MAID BEGIN Stealth multi postshader
+        /*
         sprite.PostShader = enabled ? _shader : null;
         sprite.GetScreenTexture = enabled;
         sprite.RaiseShaderEvent = enabled;
+        */
+        if (enabled)
+        {
+            _sprite.SetPostShader((uid, sprite), new SpriteComponent.PostShaderArgs(MaidPostShaderIds.Stealth, _shader)
+            {
+                GetScreenTexture = true,
+                RaiseShaderEvent = true,
+                After = MaidPostShaderIds.BeforeStealth,
+            });
+        }
+        else
+        {
+            _sprite.RemovePostShader((uid, sprite), MaidPostShaderIds.Stealth);
+        }
+        // MAID END Stealth multi postshader
 
         if (!enabled)
         {
