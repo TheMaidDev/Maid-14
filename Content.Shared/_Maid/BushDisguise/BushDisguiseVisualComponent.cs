@@ -7,7 +7,7 @@ namespace Content.Shared._Maid.BushDisguise;
 /// The entity drawn in place of a disguised player.
 /// The client copies its sprite from <see cref="Source"/> (or <see cref="SourceProto"/> as a fallback).
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
 public sealed partial class BushDisguiseVisualComponent : Component
 {
     [DataField, AutoNetworkedField]
