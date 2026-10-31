@@ -144,9 +144,11 @@
           !type:PhysShapeCircle
           # radius: 0.1 # MAID Plant collision
           radius: 0.25 # MAID Plant collision
-        density: 190
+        # density: 190 # MAID Plant collision
+        density: 50 # MAID Plant collision
         mask:
         - HighImpassable
+        - MidImpassable # MAID Plant collision
         layer: # MAID Plant collision
         - MidImpassable # MAID Plant collision
   - type: Sprite

@@ -23,6 +23,12 @@ public sealed partial class BushDisguiseComponent : Component
     public EntProtoId VisualPrototype = "MaidBushDisguiseVisual";
 
     /// <summary>
+    /// How far from the user the plant can be put down. Throwing is unaffected.
+    /// </summary>
+    [DataField]
+    public float MaxDropDistance = 0.7f;
+
+    /// <summary>
     /// Set only while the do-after is finishing, so that the pickup is not blocked.
     /// </summary>
     [ViewVariables]
