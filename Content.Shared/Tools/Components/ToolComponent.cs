@@ -38,6 +38,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes; // MAID rt-update
 using Content.Shared.Tools.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -50,7 +51,7 @@ namespace Content.Shared.Tools.Components;
 public sealed partial class ToolComponent : Component
 {
     [DataField]
-    public PrototypeFlags<ToolQualityPrototype> Qualities  = [];
+    public HashSet<ProtoId<ToolQualityPrototype>> Qualities  = [];
 
     /// <summary>
     ///     For tool interactions that have a delay before action this will modify the rate, time to wait is divided by this value

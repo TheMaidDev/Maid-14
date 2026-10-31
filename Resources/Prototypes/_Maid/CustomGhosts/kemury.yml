@@ -7,8 +7,13 @@
   - !type:CkeyRestriction
     ckey:
     - Kemuri
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: _Maid/CustomGhosts/kemuri_ghost.rsi
+    color: "#fff8"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     layers:
     - state: animated
+      shader: unshaded

@@ -25,6 +25,7 @@ using Content.Shared.Database;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using CableCuttingFinishedEvent = Content.Shared.Tools.Systems.CableCuttingFinishedEvent;
 using SharedToolSystem = Content.Shared.Tools.Systems.SharedToolSystem;
 
@@ -56,7 +57,7 @@ public sealed partial class CableSystem : EntitySystem
 
         if (cable.CuttingQuality != null)
         {
-            args.Handled = _toolSystem.UseTool(args.Used, args.User, uid, cable.CuttingDelay, cable.CuttingQuality, new CableCuttingFinishedEvent());
+            args.Handled = _toolSystem.UseTool(args.Used, args.User, uid, cable.CuttingDelay, cable.CuttingQuality!.Value, new CableCuttingFinishedEvent()); // MAID rt-update
         }
     }
 
@@ -90,6 +91,18 @@ public sealed partial class CableSystem : EntitySystem
         // We don't want to spawn an entity when deleted.
         if (TerminatingOrDeleted(uid))
             return;
+
+        // MAID BEGIN grid split cables
+        // RT 292 removed ReAnchorEvent: grid splitting now unanchors and re-anchors entities. In that case the
+        // old tile still exists, so only treat it as a cut when the tile under the cable is actually gone.
+        if (args.Transform.GridUid is { } gridUid
+            && TryComp<MapGridComponent>(gridUid, out var grid)
+            && _map.TryGetTileRef(gridUid, grid, args.Transform.Coordinates, out var tileRef)
+            && !tileRef.Tile.IsEmpty)
+        {
+            return;
+        }
+        // MAID END grid split cables
 
         // This entity should not be un-anchorable. But this can happen if the grid-tile is deleted (RCD, explosion,
         // etc). In that case: behave as if the cable had been cut.

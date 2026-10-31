@@ -42,7 +42,8 @@ namespace Content.Server.Atmos.EntitySystems
             SubscribeLocalEvent<AirtightComponent, ComponentInit>(OnAirtightInit);
             SubscribeLocalEvent<AirtightComponent, ComponentShutdown>(OnAirtightShutdown);
             SubscribeLocalEvent<AirtightComponent, AnchorStateChangedEvent>(OnAirtightPositionChanged);
-            SubscribeLocalEvent<AirtightComponent, ReAnchorEvent>(OnAirtightReAnchor);
+            // MAID rt-update ReAnchorEvent removed in RT 292, AnchorStateChangedEvent is raised instead
+            // SubscribeLocalEvent<AirtightComponent, ReAnchorEvent>(OnAirtightReAnchor);
             SubscribeLocalEvent<AirtightComponent, MoveEvent>(OnAirtightMoved);
         }
 
@@ -91,6 +92,8 @@ namespace Content.Server.Atmos.EntitySystems
             RaiseLocalEvent(uid, ref airtightEv, true);
         }
 
+        // MAID BEGIN rt-update ReAnchorEvent removed
+        /*
         private void OnAirtightReAnchor(EntityUid uid, AirtightComponent airtight, ref ReAnchorEvent args)
         {
             foreach (var gridId in new[] { args.OldGrid, args.Grid })
@@ -103,6 +106,8 @@ namespace Content.Server.Atmos.EntitySystems
                 RaiseLocalEvent(uid, ref airtightEv, true);
             }
         }
+        */
+        // MAID END rt-update ReAnchorEvent removed
 
         private void OnAirtightMoved(Entity<AirtightComponent> ent, ref MoveEvent ev)
         {

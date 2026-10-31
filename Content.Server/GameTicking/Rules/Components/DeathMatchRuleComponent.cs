@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Roles;
 using Content.Shared.Storage;
@@ -49,6 +50,6 @@ public sealed partial class DeathMatchRuleComponent : Component
     /// <summary>
     /// The gear all players spawn with.
     /// </summary>
-    [DataField("gear", customTypeSerializer: typeof(PrototypeIdSerializer<StartingGearPrototype>)), ViewVariables(VVAccess.ReadWrite)]
-    public string Gear = "DeathMatchGear";
+    [DataField("gear"), ViewVariables(VVAccess.ReadWrite)]
+    public ProtoId<StartingGearPrototype> Gear = "DeathMatchGear";
 }

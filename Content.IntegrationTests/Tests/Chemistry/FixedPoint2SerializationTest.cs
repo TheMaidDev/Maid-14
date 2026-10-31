@@ -56,7 +56,7 @@ namespace Content.IntegrationTests.Tests.Chemistry
         public void DeserializeNullDefinitionTest()
         {
             var node = new MappingDataNode().Add("unit", ValueDataNode.Null());
-            var definition = Serialization.Read<FixedPoint2TestDefinition>(node);
+            var definition = Serialization.Read<FixedPoint2TestDefinition>(node, notNullableOverride: true); // MAID rt-update
 
             Assert.That(definition.Unit, Is.Null);
         }

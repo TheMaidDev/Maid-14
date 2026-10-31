@@ -80,6 +80,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Diagnostics.CodeAnalysis;
+using Robust.Shared.Prototypes;
 using System.Linq;
 using Content.Shared.Dataset;
 using Content.Goobstation.Maths.FixedPoint;
@@ -147,6 +148,35 @@ namespace Content.Shared.Random.Helpers
             // Shouldn't happen
             throw new InvalidOperationException($"Invalid weighted pick for {prototype.ID}!");
         }
+
+        // MAID BEGIN rt-update generic weighted random
+        public static ProtoId<T> Pick<T>(this IWeightedRandomPrototype<T> prototype, System.Random random)
+            where T : class, IPrototype
+        {
+            var picks = prototype.Weights;
+            var sum = picks.Values.Sum();
+            var accumulated = 0f;
+
+            var rand = random.NextFloat() * sum;
+
+            foreach (var (key, weight) in picks)
+            {
+                accumulated += weight;
+
+                if (accumulated >= rand)
+                    return key;
+            }
+
+            throw new InvalidOperationException($"Invalid weighted pick for {prototype.ID}!");
+        }
+
+        public static ProtoId<T> Pick<T>(this IWeightedRandomPrototype<T> prototype, IRobustRandom? random = null)
+            where T : class, IPrototype
+        {
+            IoCManager.Resolve(ref random);
+            return random.Pick(prototype.Weights);
+        }
+        // MAID END rt-update generic weighted random
 
         public static T Pick<T>(this IRobustRandom random, Dictionary<T, float> weights)
             where T: notnull

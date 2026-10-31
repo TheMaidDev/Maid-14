@@ -180,7 +180,7 @@ namespace Content.Server.GameTicking
         /// </remarks>
         private void LoadMaps()
         {
-            if (_mapManager.MapExists(DefaultMap))
+            if (_map.MapExists(DefaultMap))
                 return;
 
             AddGamePresetRules();
@@ -859,7 +859,8 @@ namespace Content.Server.GameTicking
 
             EntityManager.FlushEntities();
 
-            _mapManager.Restart();
+            // MAID rt-update IMapManager.Restart removed; FlushEntities above already deletes all maps
+            // _map.Restart();
 
             _banManager.Restart();
 

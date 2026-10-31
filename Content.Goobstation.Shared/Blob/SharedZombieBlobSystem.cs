@@ -27,7 +27,7 @@ public abstract class SharedZombieBlobSystem : EntitySystem
         SubscribeLocalEvent<BoundUserInterfaceMessageAttempt>(OnBoundUserInterface, after: [typeof(SharedInteractionSystem)]);
     }
 
-    private void OnBoundUserInterface(BoundUserInterfaceMessageAttempt args)
+    private void OnBoundUserInterface(ref BoundUserInterfaceMessageAttempt args) // MAID rt-update
     {
         if(
             args.Cancelled ||

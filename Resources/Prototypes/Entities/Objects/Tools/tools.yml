@@ -485,7 +485,7 @@
   - type: MultipleTool
     statusShowBehavior: true
     entries:
-      - behavior: Screwing
+      - behavior: [ Screwing ] # MAID rt-update
         sprite:
           sprite: _Maid/Objects/Tools/drill.rsi # Maid
           state: drill_screw
@@ -493,7 +493,7 @@
           path: /Audio/Items/drill_use.ogg
         changeSound:
           path: /Audio/Items/change_drill.ogg
-      - behavior: Anchoring
+      - behavior: [ Anchoring ] # MAID rt-update
         sprite:
           sprite: _Maid/Objects/Tools/drill.rsi # Maid
           state: drill_bolt
@@ -698,7 +698,7 @@
   - type: MultipleTool
     statusShowBehavior: true
     entries:
-      - behavior: Screwing
+      - behavior: [ Screwing ] # MAID rt-update
         sprite:
           sprite: Objects/Tools/omnitool.rsi
           state: omnitool-screwing
@@ -706,7 +706,7 @@
           path: /Audio/Items/drill_use.ogg
         changeSound:
           path: /Audio/Items/change_drill.ogg
-      - behavior: Prying
+      - behavior: [ Prying ] # MAID rt-update
         sprite:
           sprite: Objects/Tools/omnitool.rsi
           state: omnitool-prying
@@ -714,7 +714,7 @@
           path: /Audio/Items/jaws_pry.ogg
         changeSound:
           path: /Audio/Items/change_drill.ogg
-      - behavior: Anchoring
+      - behavior: [ Anchoring ] # MAID rt-update
         sprite:
           sprite: Objects/Tools/omnitool.rsi
           state: omnitool-wrenching
@@ -722,7 +722,7 @@
           path: /Audio/Items/ratchet.ogg
         changeSound:
           path: /Audio/Items/change_drill.ogg
-      - behavior: Cutting
+      - behavior: [ Cutting ] # MAID rt-update
         sprite:
           sprite: Objects/Tools/omnitool.rsi
           state: omnitool-snipping
@@ -730,7 +730,7 @@
           path: /Audio/Items/jaws_cut.ogg
         changeSound:
           path: /Audio/Items/change_drill.ogg
-      - behavior: Pulsing
+      - behavior: [ Pulsing ] # MAID rt-update
         sprite:
           sprite: Objects/Tools/omnitool.rsi
           state: omnitool-pulsing

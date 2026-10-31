@@ -233,12 +233,12 @@
   - type: PseudoItem
     storedOffset: 20,0
     shape:
-    - 0,3,0,2
+    - 0,2,0,3 # MAID rt-update inverted Box2i fixed
     - 1,3,2,3
-    - 3,3,3,2
-    - 4,4,5,0
-    - 6,3,6,0
-    - 7,1,7,0
+    - 3,2,3,3 # MAID rt-update inverted Box2i fixed
+    - 4,0,5,4 # MAID rt-update inverted Box2i fixed
+    - 6,0,6,3 # MAID rt-update inverted Box2i fixed
+    - 7,0,7,1 # MAID rt-update inverted Box2i fixed
   - type: Sprite # goob - in game visuals
     layers:
     - map: [ "enum.HumanoidVisualLayers.Groin" ]

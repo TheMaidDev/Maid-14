@@ -25,6 +25,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NodeContainer.NodeGroups;
 using Content.Shared.Atmos;
@@ -43,6 +45,7 @@ namespace Content.Server.NodeContainer.Nodes
     [Virtual]
     public partial class PipeNode : Node, IGasMixtureHolder, IRotatableNode
     {
+        private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
         /// <summary>
         ///     The directions in which this pipe can connect to other pipes around it.
         /// </summary>
@@ -210,7 +213,7 @@ namespace Content.Server.NodeContainer.Nodes
             if (!xform.Anchored || grid == null)
                 yield break;
 
-            var pos = grid.TileIndicesFor(xform.Coordinates);
+            var pos = RtMapSystem.TileIndicesFor(grid.Owner, grid, xform.Coordinates);
 
             for (var i = 0; i < PipeDirectionHelpers.PipeDirections; i++)
             {
@@ -251,7 +254,7 @@ namespace Content.Server.NodeContainer.Nodes
         {
             var offsetPos = pos.Offset(pipeDir.ToDirection());
 
-            foreach (var entity in grid.GetAnchoredEntities(offsetPos))
+            foreach (var entity in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, offsetPos))
             {
                 if (!nodeQuery.TryGetComponent(entity, out var container))
                     continue;

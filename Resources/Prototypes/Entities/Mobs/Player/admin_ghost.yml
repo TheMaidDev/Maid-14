@@ -279,7 +279,7 @@
   components:
   - type: Action
     icon: { sprite: Structures/Machines/parts.rsi, state: box_0 }
-    iconOn: Structures/Machines/parts.rsi/box_2.png
+    iconOn: { sprite: Structures/Machines/parts.rsi, state: box_2 } # MAID rt-update
     keywords: [ "AI", "console", "interface" ]
     priority: -10
 
@@ -300,7 +300,7 @@
   components:
   - type: Action
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: comms_console }
-    iconOn: Interface/Actions/actions_ai.rsi/comms_console.png
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: comms_console } # MAID rt-update
     keywords: [ "AI", "console", "interface" ]
     priority: -4
   - type: InstantAction
@@ -314,7 +314,7 @@
   components:
   - type: Action
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: mass_scanner }
-    iconOn: Interface/Actions/actions_ai.rsi/mass_scanner.png
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: mass_scanner } # MAID rt-update
     keywords: [ "AI", "console", "interface" ]
     priority: -6
   - type: InstantAction
@@ -337,7 +337,7 @@
   components:
   - type: Action
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: crew_monitor }
-    iconOn: Interface/Actions/actions_ai.rsi/crew_monitor.png
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: crew_monitor } # MAID rt-update
     keywords: [ "AI", "console", "interface" ]
     priority: -8
   - type: InstantAction
@@ -351,7 +351,7 @@
   components:
   - type: Action
     icon: { sprite: Interface/Actions/actions_ai.rsi, state: station_records }
-    iconOn: Interface/Actions/actions_ai.rsi/station_records.png
+    iconOn: { sprite: Interface/Actions/actions_ai.rsi, state: station_records } # MAID rt-update
     keywords: [ "AI", "console", "interface" ]
     priority: -7
   - type: InstantAction

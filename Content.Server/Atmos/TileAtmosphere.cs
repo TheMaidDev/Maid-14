@@ -34,6 +34,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared.Atmos;
@@ -45,7 +46,8 @@ namespace Content.Server.Atmos
     ///     You shouldn't use this directly, use <see cref="AtmosphereSystem"/> instead.
     /// </summary>
     [Access(typeof(AtmosphereSystem), typeof(GasTileOverlaySystem), typeof(AtmosDebugOverlaySystem))]
-    public sealed class TileAtmosphere : IGasMixtureHolder
+    [DataDefinition] // MAID rt-update
+    public sealed partial class TileAtmosphere : IGasMixtureHolder
     {
         [ViewVariables]
         public int ArchivedCycle;

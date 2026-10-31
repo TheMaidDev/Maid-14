@@ -15,6 +15,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.Power.Components;
 using Content.Server.Power.Nodes;
@@ -27,6 +29,7 @@ namespace Content.Server.Power.EntitySystems
     [UsedImplicitly]
     public sealed class CableVisSystem : EntitySystem
     {
+        private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
         [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
         [Dependency] private readonly NodeContainerSystem _nodeContainer = default!;
 
@@ -47,7 +50,7 @@ namespace Content.Server.Power.EntitySystems
                 return;
 
             var mask = WireVisDirFlags.None;
-            var tile = grid.TileIndicesFor(transform.Coordinates);
+            var tile = RtMapSystem.TileIndicesFor(grid.Owner, grid, transform.Coordinates);
 
             foreach (var reachable in node.ReachableNodes)
             {
@@ -55,7 +58,7 @@ namespace Content.Server.Power.EntitySystems
                     continue;
 
                 var otherTransform = Transform(reachable.Owner);
-                var otherTile = grid.TileIndicesFor(otherTransform.Coordinates);
+                var otherTile = RtMapSystem.TileIndicesFor(grid.Owner, grid, otherTransform.Coordinates);
                 var diff = otherTile - tile;
 
                 mask |= diff switch

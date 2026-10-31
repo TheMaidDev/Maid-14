@@ -10,6 +10,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
@@ -22,7 +23,8 @@ public sealed partial class GuideEntryPrototype : GuideEntry, IPrototype
 }
 
 [Virtual]
-public class GuideEntry
+[DataDefinition] // MAID rt-update
+public partial class GuideEntry
 {
     /// <summary>
     ///     The file containing the contents of this guide.

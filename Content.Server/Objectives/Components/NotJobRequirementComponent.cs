@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Server.Objectives.Systems;
 using Content.Shared.Roles;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -18,8 +19,8 @@ public sealed partial class NotJobRequirementComponent : Component
     /// <summary>
     /// ID of the job to ban from having this objective.
     /// </summary>
-    [DataField(required: true, customTypeSerializer: typeof(PrototypeIdSerializer<JobPrototype>))]
-    public string Job = string.Empty;
+    [DataField(required: true)]
+    public ProtoId<JobPrototype> Job = string.Empty;
 
     // MisandryBox/JobObjectives - Double negative to not break compatibility
     [DataField]

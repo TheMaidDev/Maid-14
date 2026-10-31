@@ -26,8 +26,8 @@
       content: syndicate-business-card-base
     - type: PaperVisuals
       headerImagePath: "/Textures/Interface/Paper/paper_heading_syndicate_logo.svg.96dpi.png"
-      headerMargin: 0.0, 0.0, 0.0, 2.0
+      headerMargin: 0.0, 2.0, 0.0, 0.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
       backgroundImagePath: "/Textures/Interface/Paper/paper_background_blood_red.svg.96dpi.png"
-      backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0
-      contentMargin: 4.0, 4.0, 4.0, 4.0
+      backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
+      contentMargin: 4.0, 4.0, 4.0, 4.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
       maxWritableArea: 400.0, 256.0

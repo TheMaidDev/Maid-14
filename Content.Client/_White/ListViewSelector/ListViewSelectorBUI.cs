@@ -84,7 +84,7 @@ public sealed class ListViewSelectorBUI(EntityUid owner, Enum uiKey) : BoundUser
         {
             var itemName = item.Name;
             var itemDesc = item.Description;
-            if (_prototypeManager.TryIndex(item.Id, out var itemPrototype, false))
+            if (_prototypeManager.TryIndex(item.Id, out var itemPrototype)) // MAID rt-update
             {
                 itemName = itemPrototype.Name;
                 itemDesc = itemPrototype.Description;

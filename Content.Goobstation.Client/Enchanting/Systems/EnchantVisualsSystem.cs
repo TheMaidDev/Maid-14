@@ -20,6 +20,9 @@ namespace Content.Goobstation.Client.Enchanting.Systems;
 public sealed class EnchantVisualsSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!; // MAID rt-update
+
+    private const string PostShaderId = "enchant"; // MAID rt-update
 
     public readonly ProtoId<ShaderPrototype> Shader = "Enchant";
 
@@ -27,18 +30,34 @@ public sealed class EnchantVisualsSystem : EntitySystem
     {
         base.Initialize();
 
+        SubscribeLocalEvent<EnchantedComponent, ComponentStartup>(OnStartup); // MAID rt-update
         SubscribeLocalEvent<EnchantedComponent, AfterAutoHandleStateEvent>(OnHandleState);
         SubscribeLocalEvent<EnchantedComponent, HeldVisualsUpdatedEvent>(OnHeldVisualsUpdated);
         SubscribeLocalEvent<EnchantedComponent, EquipmentVisualsUpdatedEvent>(OnEquipmentVisualsUpdated);
     }
 
+    // MAID BEGIN rt-update sprite post-shaders are keyed by id since RT 286 and must not be set before the sprite is initialized
+    private void OnStartup(Entity<EnchantedComponent> ent, ref ComponentStartup args)
+    {
+        ApplyShader(ent);
+    }
+
     private void OnHandleState(Entity<EnchantedComponent> ent, ref AfterAutoHandleStateEvent args)
     {
-        if (!TryComp<SpriteComponent>(ent, out var sprite))
+        ApplyShader(ent);
+    }
+
+    private void ApplyShader(EntityUid uid)
+    {
+        if (!TryComp<SpriteComponent>(uid, out var sprite) || !sprite.Initialized)
             return;
 
-        sprite.PostShader = _proto.Index(Shader).InstanceUnique();
+        if (_sprite.HasPostShader((uid, sprite), PostShaderId))
+            return;
+
+        _sprite.SetPostShader((uid, sprite), new SpriteComponent.PostShaderArgs(PostShaderId, _proto.Index(Shader).InstanceUnique()));
     }
+    // MAID END rt-update
 
     private void OnHeldVisualsUpdated(Entity<EnchantedComponent> ent, ref HeldVisualsUpdatedEvent args)
     {
