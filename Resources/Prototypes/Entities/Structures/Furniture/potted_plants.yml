@@ -131,7 +131,7 @@
   description: A little bit of nature contained in a pot.
   abstract: true
   components:
-  - type: SpriteFade
+  # - type: SpriteFade # MAID Plant collision
   - type: Transform
     noRot: true
   - type: InteractionOutline
@@ -142,10 +142,13 @@
       fix1:
         shape:
           !type:PhysShapeCircle
-          radius: 0.1
+          # radius: 0.1 # MAID Plant collision
+          radius: 0.25 # MAID Plant collision
         density: 190
         mask:
         - HighImpassable
+        layer: # MAID Plant collision
+        - MidImpassable # MAID Plant collision
   - type: Sprite
     drawdepth: Overdoors
     offset: "0.0,0.3"
