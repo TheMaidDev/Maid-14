@@ -271,8 +271,17 @@ public sealed class LobbyUIController : UIController, IOnStateEntered<LobbyState
             return;
         }
 
+        // MAID BEGIN per direction dummies
+        /*
         var dummy = LoadProfileEntity(humanoid, null, true);
         PreviewPanel.SetSprite(dummy);
+        */
+        var dummies = new EntityUid[4];
+        for (var i = 0; i < dummies.Length; i++)
+            dummies[i] = LoadProfileEntity(humanoid, null, true);
+
+        PreviewPanel.SetSprites(dummies);
+        // MAID END per direction dummies
         PreviewPanel.SetSummaryText(humanoid.Summary);
     }
 
