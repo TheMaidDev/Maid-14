@@ -80,7 +80,8 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
     {
         // The regular item pickup would be blocked, so swap it for one that starts the do-after.
         var pickupText = Loc.GetString("pick-up-verb-get-data-text");
-        args.Verbs.RemoveWhere(verb => verb.Text == pickupText);
+        var pickupInventoryText = Loc.GetString("pick-up-verb-get-data-text-inventory");
+        args.Verbs.RemoveWhere(verb => verb.Text == pickupText || verb.Text == pickupInventoryText);
 
         if (args.Hands == null || !args.CanAccess || !args.CanInteract)
             return;
@@ -131,6 +132,10 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         args.Handled = true;
 
         if (_net.IsClient)
+            return;
+
+        // Someone else may have grabbed it, or it may have been shut away, while we were busy.
+        if (_container.IsEntityInContainer(ent))
             return;
 
         if (HasComp<BushDisguisedComponent>(args.User) || _hands.EnumerateHeld(args.User).Any())
@@ -187,7 +192,6 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         _meta.SetEntityDescription(visual, meta.EntityDescription);
 
         var visualComp = EnsureComp<BushDisguiseVisualComponent>(visual);
-        visualComp.User = user;
         visualComp.Source = bush;
         visualComp.SourceProto = meta.EntityPrototype?.ID;
         Dirty(visual, visualComp);
@@ -213,7 +217,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         if (disguised.Visual is { } visual)
             QueueDel(visual);
 
-        RemCompDeferred<BushDisguisedComponent>(user);
+        RemComp<BushDisguisedComponent>(user);
         _identity.QueueIdentityUpdate(user);
     }
 
@@ -231,6 +235,9 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
     private void OnTransformSpeakerName(Entity<BushDisguisedComponent> ent, ref TransformSpeakerNameEvent args)
     {
+        if (TerminatingOrDeleted(ent.Comp.Bush))
+            return;
+
         args.VoiceName = Name(ent.Comp.Bush);
 
         if (TryComp<SpeechComponent>(ent.Comp.Bush, out var speech))
@@ -239,7 +246,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
     private void OnGetIdentityShortInfo(Entity<BushDisguisedComponent> ent, ref TryGetIdentityShortInfoEvent args)
     {
-        if (args.RequestForAccessLogging)
+        if (args.RequestForAccessLogging || TerminatingOrDeleted(ent.Comp.Bush))
             return;
 
         args.Title = Name(ent.Comp.Bush);
@@ -247,6 +254,9 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
     private void OnGetIdentityEntity(Entity<BushDisguisedComponent> ent, ref GetIdentityRepresentationEntityEvent args)
     {
+        if (TerminatingOrDeleted(ent.Comp.Bush))
+            return;
+
         args.Uid = ent.Comp.Bush;
     }
 

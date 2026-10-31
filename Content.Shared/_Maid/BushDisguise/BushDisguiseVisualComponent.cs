@@ -11,9 +11,6 @@ namespace Content.Shared._Maid.BushDisguise;
 public sealed partial class BushDisguiseVisualComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public EntityUid User;
-
-    [DataField, AutoNetworkedField]
     public EntityUid Source;
 
     [DataField, AutoNetworkedField]
