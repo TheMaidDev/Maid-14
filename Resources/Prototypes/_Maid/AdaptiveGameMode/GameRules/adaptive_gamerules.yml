@@ -1,3 +1,4 @@
+# Roundstart Rules
 - type: entity
   parent: Zombie
   id: AdaptiveZombie
@@ -61,3 +62,135 @@
   - type: GameRule
     minPlayers: 0
     cancelPresetOnTooFewPlayers: false
+
+# Midround Rules with Adaptive Scores
+- type: entity
+  parent: AnomalySpawn
+  id: AdaptiveAnomalySpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: AnomalyPyroclastic
+
+- type: entity
+  parent: BluespaceArtifact
+  id: AdaptiveBluespaceArtifact
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore: 5
+    combatScore: 0
+
+- type: entity
+  parent: ClosetSkeleton
+  id: AdaptiveClosetSkeleton
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore: 3
+    combatScore: 0
+
+- type: entity
+  parent: GasLeak
+  id: AdaptiveGasLeak
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore: 5
+    combatScore: 0
+
+- type: entity
+  parent: PowerGridCheck
+  id: AdaptivePowerGridCheck
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore: 5
+    conditions:
+    - !type:HasComponent
+      components:
+      - ActiveGameRule
+
+- type: entity
+  parent: SolarFlare
+  id: AdaptiveSolarFlare
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore: 3
+    conditions:
+    - !type:HasComponent
+      components:
+      - ActiveGameRule
+
+- type: entity
+  parent: SlimesSpawn
+  id: AdaptiveSlimesSpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: MobSlimeXenobioBabyGrey
+    count: 5
+
+- type: entity
+  parent: SnakeSpawn
+  id: AdaptiveSnakeSpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: MobPurpleSnake
+    count: 5
+
+- type: entity
+  parent: SpiderSpawn
+  id: AdaptiveSpiderSpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: MobGiantSpiderAngry
+    count: 5
+
+- type: entity
+  parent: SpiderClownSpawn
+  id: AdaptiveSpiderClownSpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: MobClownSpider
+    count: 5
+
+- type: entity
+  parent: IonStorm
+  id: AdaptiveIonStorm
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore:
+      base: 3
+      target: 0
+      in: 600
+
+- type: entity
+  parent: KingRatMigration
+  id: AdaptiveKingRatMigration
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: SpawnPointGhostRatKing
+
+- type: entity
+  parent: LoneAbductorSpawn
+  id: AdaptiveLoneAbductorSpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: MobLoneAbductor
+
+- type: entity
+  parent: DuoAbductorSpawn
+  id: AdaptiveDuoAbductorSpawn
+  components:
+  - type: AdaptivePotentialScoreEntity
+    prototype: MobAbductorScientist
+    count: 2
+
+- type: entity
+  parent: UnknownShuttleInstigator
+  id: AdaptiveUnknownShuttleInstigator
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore:
+      base: 7
+      target: 0
+      in: 300
+    combatScore:
+      base: 3
+      target: 0
+      in: 300

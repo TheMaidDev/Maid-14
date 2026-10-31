@@ -20,6 +20,12 @@ public sealed partial class AdaptiveRuleComponent : Component
     [DataField]
     public AdaptiveScore RoundstartScorePerPlayer = new();
 
+    [DataField]
+    public int RoundstartMaxRules = 5;
+
+    [DataField]
+    public bool RoundstartUsePotentialScore = true;
+
     /// <summary>
     /// Gamerules that get added at round start.
     /// </summary>
@@ -36,10 +42,22 @@ public sealed partial class AdaptiveRuleComponent : Component
     public TimeSpan MidroundSpawnAttemptAt = TimeSpan.Zero;
 
     /// <summary>
+    /// Major midround rules can spawn only if `current score` is less than `target score * this`
+    /// </summary>
+    [DataField]
+    public float MajorMidroundRulesMaxScorePercentage = 1f;
+
+    /// <summary>
     /// Gamerules that can spawn midround.
     /// </summary>
     [DataField]
     public List<AdaptiveRuleParam> MidroundRules = new();
+
+    /// <summary>
+    /// See <see cref="MajorMidroundRulesMaxScorePercentage"/>
+    /// </summary>
+    [DataField]
+    public List<AdaptiveRuleParam> MajorMidroundRules = new();
 
     [DataField]
     public List<AdaptiveSpawnedRule> SpawnedRules = new();

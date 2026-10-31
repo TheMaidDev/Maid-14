@@ -10,8 +10,7 @@ namespace Content.Server._Maid.AdaptiveGameMode.ScoreCounters;
 [ByRefEvent]
 public struct GetAdaptiveScoreEvent()
 {
-    public float ChaosScore = 0f;
-    public float CombatScore = 0f;
+    public AdaptiveScore Score;
 
     /// <summary>
     /// Stored list of score records added during the calculation. Defined only if tracking is enabled.
@@ -29,8 +28,8 @@ public struct GetAdaptiveScoreEvent()
 
     public void Add(EntityUid uid, float chaos, float combat)
     {
-        ChaosScore += chaos;
-        CombatScore += combat;
+        Score.Chaos += chaos;
+        Score.Combat += combat;
 
         if (Records != null)
         {
@@ -39,8 +38,6 @@ public struct GetAdaptiveScoreEvent()
     }
 
     public void Add(EntityUid uid, float score) => Add(uid, score, score);
-
-    public float Average => (ChaosScore + CombatScore) / 2f;
 }
 
 public record struct AdaptiveScoreRecord(EntityUid Entity, float Chaos, float Combat);
