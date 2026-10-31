@@ -15,6 +15,9 @@
     mode: SnapgridCenter
   components:
   - type: DragonRift
+  # MAID BEGIN track spawned dragons
+  - type: EntitiesTracker
+  # MAID END track spawned dragons
   # MAID BEGIN adaptive scores
   - type: AdaptiveScoreStatic
     chaosScore: 5

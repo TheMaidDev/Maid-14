@@ -27,6 +27,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Random; // Goobstation - Buff carp rift
 using Robust.Shared.Utility;
+using Content.Shared._Maid.EntitiesTracker; // MAID track spawned dragons
 
 namespace Content.Server.Dragon;
 
@@ -42,6 +43,7 @@ public sealed class DragonRiftSystem : EntitySystem
     [Dependency] private readonly NavMapSystem _navMap = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly EntitiesTrackerSystem _entitiesTracker = default!; // MAID track spawned dragons
 
     public override void Initialize()
     {
@@ -104,6 +106,10 @@ public sealed class DragonRiftSystem : EntitySystem
             {
                 comp.SpawnAccumulator -= comp.SpawnCooldown;
                 var ent = Spawn(_random.Prob(comp.StrongSpawnChance) ? comp.SpawnPrototypeStrong : comp.SpawnPrototype, xform.Coordinates); // Goobstation - Buff carp rift
+
+                // MAID BEGIN track spawned dragons
+                _entitiesTracker.TrackEntity(uid, ent);
+                // MAID END track spawned dragons
 
                 // Update their look to match the leader.
                 if (TryComp<RandomSpriteComponent>(comp.Dragon, out var randomSprite))
