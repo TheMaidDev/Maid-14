@@ -245,9 +245,6 @@
   - type: AntagObjectives # Goobstation
     objectives:
     - NukeopsDetonateObjective
-  # - type: AdaptiveScoreStatic # MAID adaptive gamemode
-  #   chaosScore: 5 # Account for nuke # MAID adaptive gamemode
-
 
 - type: entity
   parent: BaseNukeopsRule

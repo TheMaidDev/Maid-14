@@ -285,9 +285,9 @@
     layers:
     - state: gold
     - state: departmenthead
-      color: "#1B67A5"
+      color: "#1900ff"
     - state: subdepartment
-      color: "#1B67A5"
+      color: "#fffb00"
     - state: captain
   - type: Item
     heldPrefix: gold

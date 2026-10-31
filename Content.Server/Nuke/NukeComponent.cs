@@ -32,6 +32,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Server.Explosion.EntitySystems;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Explosion;
@@ -136,8 +137,8 @@ namespace Content.Server.Nuke
         ///     information (e.g., the light that the explosion gives off).
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("explosionType", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<ExplosionPrototype>))]
-        public string ExplosionType = default!;
+        [DataField("explosionType", required: true)]
+        public ProtoId<ExplosionPrototype> ExplosionType = default!;
 
         /// <summary>
         ///     The maximum intensity the explosion can have on a single time. This limits the maximum damage and tile

@@ -89,7 +89,10 @@ public sealed partial class StampCollection : Container
     /// </summary>
     private UIBox2 Shrink(UIBox2 box, Vector2 shrinkHe)
     {
-        return new UIBox2(box.TopLeft + shrinkHe, box.BottomRight - shrinkHe);
+        // MAID BEGIN rt-update UIBox2 validates its input since RT 280/286, never shrink past zero size
+        var topLeft = box.TopLeft + shrinkHe;
+        return new UIBox2(topLeft, Vector2.Max(topLeft, box.BottomRight - shrinkHe));
+        // MAID END rt-update
     }
 
     /// <summary>

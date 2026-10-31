@@ -46,6 +46,7 @@
     - VendingMachineSovietSoda #Boda
     - VendingMachineSpaceUp
     - VendingMachineStarkist
+    - VendingMachineSodaRed #maid
 #    - VendingMachineSweetToof # Goobstation #Maid
     chance: 1
 

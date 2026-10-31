@@ -5,6 +5,16 @@ shared-solution-container-component-on-examine-main-text = Содержит [col
 examinable-solution-has-recognizable-chemicals = В этом растворе вы можете распознать { $recognizedString }.
 examinable-solution-recognized = [color={$color}]{$chemical}[/color]
 
+examinable-solution-on-examine-volume = Содержимый раствор { $fillLevel ->
+    [exact] содержит [color=white]{$current}/{$max}u[/color].
+   *[other] [bold]{ -solution-vague-fill-level(fillLevel: $fillLevel) }[/bold].
+}
+
+examinable-solution-on-examine-volume-no-max = Содержимый раствор { $fillLevel ->
+    [exact] содержит [color=white]{$current}u[/color].
+   *[other] [bold]{ -solution-vague-fill-level(fillLevel: $fillLevel) }[/bold].
+}
+
 examinable-solution-on-examine-volume-puddle = Лужа { $fillLevel ->
     [exact] [color=white]{$current} ед.[/color]
     [full] огромна и разливается!

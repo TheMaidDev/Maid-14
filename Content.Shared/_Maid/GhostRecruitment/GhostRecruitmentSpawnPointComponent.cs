@@ -6,8 +6,8 @@ namespace Content.Shared._Maid.GhostRecruitment;
 [RegisterComponent]
 public sealed partial class GhostRecruitmentSpawnPointComponent : Component
 {
-    [DataField("prototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>), required: true)]
-    public string EntityPrototype = default!;
+    [DataField("prototype", required: true)]
+    public EntProtoId EntityPrototype = default!;
 
     [DataField("recruitmentName")]
     public string RecruitmentName = "default";

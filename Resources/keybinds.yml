@@ -403,6 +403,7 @@ binds:
 - function: SmartEquipBack # Goobstation - Smart equip to back
   type: State # Goobstation - Smart equip to back
   key: F # Goobstation - Smart equip to back
+  mod1: Shift # MAID settings port - F is offer item
 - function: OpenBackpack
   type: State
   key: V
@@ -676,6 +677,14 @@ binds:
 - function: ToggleKnockdown
   type: State
   key: R
+  # MAID settings port start
+- function: OfferItem
+  type: State
+  key: F
+- function: LookUp
+  type: State
+  key: Space
+  # MAID settings port end
 - function: OpenAbilitiesMenu
   type: State
   key: K

@@ -22,6 +22,6 @@ public sealed partial class SpawnOnOverloadComponent : Component
     /// <summary>
     /// The entity prototype to spawn when the device overloads
     /// </summary>
-    [DataField("spawnedPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string Prototype = "PuddleSparkle";
+    [DataField("spawnedPrototype")]
+    public EntProtoId Prototype = "PuddleSparkle";
 }

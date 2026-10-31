@@ -14,7 +14,7 @@ public abstract partial class SharedAtmosphereSystem
 
     private void OnBreathToolShutdown(Entity<BreathToolComponent> entity, ref ComponentShutdown args)
     {
-        DisconnectInternals(entity);
+        DisconnectInternals(entity, forced: true); // MAID tank drop disconnect
     }
 
     public void DisconnectInternals(Entity<BreathToolComponent> entity, bool forced = false)

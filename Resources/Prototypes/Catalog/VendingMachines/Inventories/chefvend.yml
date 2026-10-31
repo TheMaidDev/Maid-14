@@ -113,6 +113,7 @@
     FoodBoxDonkpocket: 1
     FoodFrozenSandwich: 2
     FoodFrozenSandwichStrawberry: 2
+    BoxMousetrap: 1 #Maid 
   emaggedInventory: # Goobstation
     WeaponCroissant: 3
     WeaponBaguette: 2

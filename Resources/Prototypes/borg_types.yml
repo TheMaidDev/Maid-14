@@ -110,7 +110,7 @@
   - BorgModuleMining
   - BorgModuleTraversal
   - BorgModuleAppraisal
-  - BorgModulePKA # Lavaland
+  # - BorgModulePKA # Lavaland #Maid вырезано
 
   radioChannels:
   - Supply

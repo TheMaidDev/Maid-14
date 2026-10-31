@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Text;
 using Content.Goobstation.UIKit._Maid.UserInterface.Controls;
 using Content.Goobstation.UIKit._Maid.UserInterface.RichText;
+using Content.Goobstation.UIKit._Maid.Utils;
 using Content.Goobstation.UIKit.UserInterface.RichText;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
@@ -462,7 +463,7 @@ internal struct CustomRichTextEntry
 
         var boxPadding = (BoxPadding * uiScale);
 
-        return new UIBox2(
+        return UIBox2Utils.CreateSafe(
                 new Vector2(drawBox.Left + (margin - boxPadding) - sPixelWidth, baseLineBase.Y - boxPadding),
                 new Vector2(drawBox.Right - (margin - boxPadding) - sPixelWidth, baseLine.Y - GetLineHeight(defaultFont, uiScale, lineHeightScale) + boxPadding));
     }

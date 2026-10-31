@@ -12,6 +12,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NodeContainer.Nodes;
@@ -27,6 +29,7 @@ namespace Content.Server.Power.Nodes
     [Virtual]
     public partial class CableDeviceNode : Node
     {
+        private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
         /// <summary>
         /// If disabled, this cable device will never connect.
         /// </summary>
@@ -54,7 +57,7 @@ namespace Content.Server.Power.Nodes
             if (!xform.Anchored || grid == null)
                 yield break;
 
-            var gridIndex = grid.TileIndicesFor(xform.Coordinates);
+            var gridIndex = RtMapSystem.TileIndicesFor(grid.Owner, grid, xform.Coordinates);
 
             foreach (var node in NodeHelpers.GetNodesInTile(nodeQuery, grid, gridIndex))
             {

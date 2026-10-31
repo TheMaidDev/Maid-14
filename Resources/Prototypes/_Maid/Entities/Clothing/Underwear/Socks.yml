@@ -243,3 +243,12 @@
   - type: Sprite
     sprite: _Maid/Clothing/Underwear/Socks/thin_thigh.rsi
 
+- type: entity
+  parent: ClothingUnderwearSocksBase
+  id: ClothingUnderwearSocksGray2sh0nka
+  name: серые чулки
+  suffix: fluff
+  description: Вау. Они.. серые?
+  components:
+    - type: Sprite
+      sprite: _Maid/Clothing/Underwear/Socks/gray.rsi

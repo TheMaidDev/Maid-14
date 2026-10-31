@@ -74,6 +74,7 @@
     ClothingOuterVestDetective: 2
     ClothingOuterCoatGentle: 1
 #    ClothingOuterCoatInspector: 1
+    ClothingOuterCoatInspector: 1
     ClothingOuterCoatJensen: 1
     ClothingUniformJumpsuitDetectiveGrey: 2
     ClothingUniformJumpskirtDetectiveGrey: 2
@@ -86,5 +87,8 @@
     SmokingPipeFilledTobacco: 1
     Matchbox: 2
 # Maid edit end
+  contrabandInventory: #Maid
+   ToyFigurineDetective: 1 #Maid
+   DrinkWhiskeyBottleFull: 1 #Maid
   emaggedInventory: # Goobstation
     CameraBug: 1

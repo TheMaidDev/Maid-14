@@ -65,5 +65,13 @@ namespace Content.Shared.Throwing
         /// </summary>
         [DataField]
         public Vector2? OriginalScale = null;
+
+        // Maid start throw hit dedupe
+        /// <summary>
+        ///     Entities already hit during this throw. Prevents hitting the same target twice, e.g. after bouncing off a wall.
+        /// </summary>
+        [ViewVariables]
+        public HashSet<EntityUid> HitEntities = new();
+        // Maid end throw hit dedupe
     }
 }

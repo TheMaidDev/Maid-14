@@ -462,6 +462,70 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.ToTable("admin_watchlists", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.AhelpMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("ahelp_messages_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AdminOnly")
+                        .HasColumnType("boolean")
+                        .HasColumnName("admin_only");
+
+                    b.Property<bool>("FromWebhook")
+                        .HasColumnType("boolean")
+                        .HasColumnName("from_webhook");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("message");
+
+                    b.Property<bool>("PlaySound")
+                        .HasColumnType("boolean")
+                        .HasColumnName("play_sound");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<int?>("RoundId")
+                        .HasColumnType("integer")
+                        .HasColumnName("round_id");
+
+                    b.Property<bool>("SenderIsAdmin")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sender_is_admin");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("sender_name");
+
+                    b.Property<Guid>("SenderUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sender_user_id");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.HasKey("Id")
+                        .HasName("PK_ahelp_messages");
+
+                    b.HasIndex("RoundId")
+                        .HasDatabaseName("IX_ahelp_messages_round_id");
+
+                    b.HasIndex("PlayerUserId", "Id")
+                        .HasDatabaseName("IX_ahelp_messages_player_user_id_ahelp_messages_id");
+
+                    b.ToTable("ahelp_messages", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.Antag", b =>
                 {
                     b.Property<int>("Id")
@@ -1897,6 +1961,17 @@ namespace Content.Server.Database.Migrations.Postgres
                     b.Navigation("LastEditedBy");
 
                     b.Navigation("Player");
+
+                    b.Navigation("Round");
+                });
+
+            modelBuilder.Entity("Content.Server.Database.AhelpMessage", b =>
+                {
+                    b.HasOne("Content.Server.Database.Round", "Round")
+                        .WithMany()
+                        .HasForeignKey("RoundId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_ahelp_messages_round_round_id");
 
                     b.Navigation("Round");
                 });

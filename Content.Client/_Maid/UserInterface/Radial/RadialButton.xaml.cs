@@ -8,7 +8,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Client._Maid.UserInterface.Radial;
 
-[GenerateTypedNameReferences, Virtual, PublicAPI]
+[GenerateTypedNameReferences, PublicAPI] // MAID rt-update
 public sealed partial class RadialButton : Control
 {
     [Animatable] public Vector2 Offset { get; set; }

@@ -6,6 +6,7 @@ using Content.Goobstation.Shared.Particles;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
+using Robust.Client.UserInterface; // MAID rt-update
 using Robust.Shared.Configuration;
 using Robust.Shared.Graphics.RSI;
 using Robust.Shared.Map;
@@ -27,6 +28,7 @@ public sealed partial class ParticleSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
+    [Dependency] private readonly IClyde _clyde = default!; // MAID rt-update
     [Dependency] private readonly IResourceCache _resource = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
@@ -386,6 +388,18 @@ public sealed partial class ParticleSystem : EntitySystem
         return emitter;
     }
 
+    // MAID BEGIN rt-update same helper as Goob upstream
+    private Box2 GetWorldViewport()
+    {
+        var size = (_eye.MainViewport as Control)?.PixelSize ?? _clyde.ScreenSize;
+        var a = _eye.ScreenToMap(Vector2.Zero).Position;
+        var b = _eye.ScreenToMap(new Vector2(size.X, 0)).Position;
+        var c = _eye.ScreenToMap(new Vector2(0, size.Y)).Position;
+        var d = _eye.ScreenToMap(new Vector2(size.X, size.Y)).Position;
+        return new Box2(Vector2.Min(Vector2.Min(a, b), Vector2.Min(c, d)), Vector2.Max(Vector2.Max(a, b), Vector2.Max(c, d)));
+    }
+    // MAID END rt-update
+
     public override void FrameUpdate(float frameTime)
     {
         _pendingSubEmitters.Clear();
@@ -413,7 +427,7 @@ public sealed partial class ParticleSystem : EntitySystem
         var currentMapId = eye.Position.MapId;
         var ageCheck = TimeSpan.FromSeconds(frameTime);
 
-        var viewport = _eye.GetWorldViewport();
+        var viewport = GetWorldViewport(); // MAID rt-update (engine GetWorldViewport builds an inverted Box2 when the eye is rotated, asserts in Debug)
         var pad = MathF.Max(viewport.Width, viewport.Height) * (ViewBoundsPaddingFactor - 1f) * 0.5f;
         var viewBounds = viewport.Enlarged(pad);
 

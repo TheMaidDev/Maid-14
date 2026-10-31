@@ -53,7 +53,7 @@ namespace Content.Shared.Localizations
 
             _loc.LoadCulture(culture);
             _loc.LoadCulture(fallbackCulture); // Localization from Corvax
-            _loc.SetFallbackCluture(fallbackCulture); // Localization from Corvax
+            _loc.SetFallbackCulture /* MAID rt-update */(fallbackCulture); // Localization from Corvax
             _loc.AddFunction(culture, "MANY", FormatMany); // Localization from Corvax: To prevent problems in auto-generated locale files
             _loc.AddFunction(culture, "PRESSURE", FormatPressure);
             _loc.AddFunction(culture, "POWERWATTS", FormatPowerWatts);

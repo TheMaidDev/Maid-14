@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.Prototypes;
 using Content.Shared.Tools;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -24,8 +25,8 @@ public sealed partial class PneumaticCannonComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public PneumaticCannonPower Power = PneumaticCannonPower.Medium;
 
-    [DataField("toolModifyPower", customTypeSerializer:typeof(PrototypeIdSerializer<ToolQualityPrototype>))]
-    public string ToolModifyPower = "Anchoring";
+    [DataField("toolModifyPower")]
+    public ProtoId<ToolQualityPrototype> ToolModifyPower = "Anchoring";
 
     /// <summary>
     ///     How long to stun for if they shoot the pneumatic cannon at high power.

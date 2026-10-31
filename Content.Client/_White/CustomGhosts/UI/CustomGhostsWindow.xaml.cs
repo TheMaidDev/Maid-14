@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using Robust.Shared.Serialization.Manager; // MAID custom ghosts
-using Content.Shared._Maid.Utils; // MAID custom ghosts
 using Content.Client.Lobby;
 using Content.Shared._RMC14.GhostColor;
 using Content.Shared._White.CustomGhostSystem;
@@ -31,7 +29,6 @@ public sealed partial class CustomGhostsWindow : DefaultWindow
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IEntitySystemManager _entSys = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly ISerializationManager _serManager = default!; // MAID custom ghosts
     private readonly SpriteSystem _sprite = default!;
 
     private static readonly TimeSpan SelectionCooldown = TimeSpan.FromSeconds(1);
@@ -120,7 +117,6 @@ public sealed partial class CustomGhostsWindow : DefaultWindow
         var ghostEnt = _entMan.Spawn("MobObserver");
 
         _entMan.AddComponents(ghostEnt, ghostProto.AddComponents, true);
-        _entMan.MergeEntityComponents(ghostEnt, ghostProto.MergeEntityComponents, _serManager);
 
         _previewEntities.Add(ghostEnt);
         _entMan.RemoveComponent<GhostColorComponent>(ghostEnt);

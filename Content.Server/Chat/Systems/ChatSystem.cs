@@ -171,6 +171,7 @@ public sealed partial class ChatSystem : SharedChatSystem
 {
     [Dependency] private readonly IReplayRecordingManager _replay = default!;
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
+    [Dependency] private readonly INetConfigurationManager _netConfigurationManager = default!; // MAID admin dead chat
     [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly IChatSanitizationManager _sanitizer = default!;
     [Dependency] private readonly IAdminManager _adminManager = default!;
@@ -986,7 +987,8 @@ public sealed partial class ChatSystem : SharedChatSystem
         var playerName = Name(source);
         string wrappedMessage;
 
-        if (_adminManager.IsAdmin(player))
+        if (_adminManager.IsAdmin(player)
+            && _netConfigurationManager.GetClientCVar(player.Channel, MaidCVars.DeadChatAdmin)) // MAID admin dead chat
         {
             wrappedMessage = Loc.GetString("chat-manager-send-admin-dead-chat-wrap-message",
                 ("adminChannelName", Loc.GetString("chat-manager-admin-channel-name")),

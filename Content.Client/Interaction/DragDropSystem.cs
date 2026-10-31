@@ -99,6 +99,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using System.Numerics;
 using Content.Client.CombatMode;
 using Content.Client.Gameplay;
@@ -558,6 +559,8 @@ public sealed class DragDropSystem : SharedDragDropSystem
                         && _interactionSystem.InRangeUnobstructed(user.Value, entity);
             }
 
+            // MAID BEGIN Multi postshader
+            /*
             if (inRangeSprite.PostShader != null &&
                 inRangeSprite.PostShader != _dropTargetInRangeShader &&
                 inRangeSprite.PostShader != _dropTargetOutOfRangeShader)
@@ -567,6 +570,9 @@ public sealed class DragDropSystem : SharedDragDropSystem
 
             // highlight depending on whether its in or out of range
             inRangeSprite.PostShader = valid.Value ? _dropTargetInRangeShader : _dropTargetOutOfRangeShader;
+            */
+            _sprite.SetPostShader(inRangeSprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.DragDropTarget, valid.Value ? _dropTargetInRangeShader! : _dropTargetOutOfRangeShader!));
+            // MAID END Multi postshader
             inRangeSprite.RenderOrder = EntityManager.CurrentTick.Value;
             _highlightedSprites.Add(inRangeSprite);
         }
@@ -576,11 +582,16 @@ public sealed class DragDropSystem : SharedDragDropSystem
     {
         foreach (var highlightedSprite in _highlightedSprites)
         {
+            // MAID BEGIN Multi postshader
+            /*
             if (highlightedSprite.PostShader != _dropTargetInRangeShader && highlightedSprite.PostShader != _dropTargetOutOfRangeShader)
                 continue;
 
             highlightedSprite.PostShader = null;
-            highlightedSprite.RenderOrder = 0;
+            */
+            _sprite.RemovePostShader(highlightedSprite, MaidPostShaderIds.DragDropTarget);
+            // MAID END Multi postshader
+            if (!MaidPostShaderIds.HasOtherHighlight(_sprite, highlightedSprite, MaidPostShaderIds.DragDropTarget)) highlightedSprite.RenderOrder = 0; // MAID Multi postshader
         }
 
         _highlightedSprites.Clear();

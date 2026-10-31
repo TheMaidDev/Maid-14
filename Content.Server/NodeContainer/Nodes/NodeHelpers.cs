@@ -9,6 +9,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.NodeContainer;
 using Robust.Shared.Map;
@@ -21,9 +23,10 @@ namespace Content.Server.NodeContainer.Nodes
     /// </summary>
     public static class NodeHelpers
     {
+        private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
         public static IEnumerable<Node> GetNodesInTile(EntityQuery<NodeContainerComponent> nodeQuery, MapGridComponent grid, Vector2i coords)
         {
-            foreach (var entityUid in grid.GetAnchoredEntities(coords))
+            foreach (var entityUid in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, coords))
             {
                 if (!nodeQuery.TryGetComponent(entityUid, out var container))
                     continue;
@@ -61,20 +64,20 @@ namespace Content.Server.NodeContainer.Nodes
         {
             if (includeSameTile)
             {
-                foreach (var uid in grid.GetAnchoredEntities(coords))
+                foreach (var uid in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, coords))
                     yield return (Direction.Invalid, uid);
             }
 
-            foreach (var uid in grid.GetAnchoredEntities(coords + (0, 1)))
+            foreach (var uid in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, coords + (0, 1)))
                 yield return (Direction.North, uid);
 
-            foreach (var uid in grid.GetAnchoredEntities(coords + (0, -1)))
+            foreach (var uid in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, coords + (0, -1)))
                 yield return (Direction.South, uid);
 
-            foreach (var uid in grid.GetAnchoredEntities(coords + (1, 0)))
+            foreach (var uid in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, coords + (1, 0)))
                 yield return (Direction.East, uid);
 
-            foreach (var uid in grid.GetAnchoredEntities(coords + (-1, 0)))
+            foreach (var uid in RtMapSystem.GetAnchoredEntities(grid.Owner, grid, coords + (-1, 0)))
                 yield return (Direction.West, uid);
         }
     }

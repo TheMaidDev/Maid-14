@@ -178,9 +178,16 @@ namespace Content.Client.Viewport
 
             var drawBox = GetDrawBox();
             var drawBoxGlobal = drawBox.Translated(GlobalPixelPosition);
+            // MAID BEGIN rt-update screen overlays reset transform
+            // RT 293 resets the screen handle transform to identity around every screen overlay,
+            // so the control position must be restored after each overlay pass.
+            var controlTransform = handle.DrawingHandleScreen.GetTransform();
             _viewport.RenderScreenOverlaysBelow(handle, this, drawBoxGlobal);
+            handle.DrawingHandleScreen.SetTransform(controlTransform);
             handle.DrawingHandleScreen.DrawTextureRect(_viewport.RenderTarget.Texture, drawBox);
             _viewport.RenderScreenOverlaysAbove(handle, this, drawBoxGlobal);
+            handle.DrawingHandleScreen.SetTransform(controlTransform);
+            // MAID END rt-update screen overlays reset transform
         }
 
         public void Screenshot(CopyPixelsDelegate<Rgba32> callback)

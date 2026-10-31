@@ -1,11 +1,9 @@
 using Content.Server.Preferences.Managers;
 using Content.Server.Database; // MAID custom ghosts
-using Content.Shared._Maid.Utils;
 using Content.Shared._RMC14.GhostColor;
 using Content.Shared._White.CustomGhostSystem;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.Manager;
 
 namespace Content.Server._White.CustomGhosts;
 
@@ -14,7 +12,6 @@ public sealed class CustomGhostSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IServerPreferencesManager _prefs = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
-    [Dependency] private readonly ISerializationManager _serManager = default!;
     [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly UserDbDataManager _userDb = default!; // MAID custom ghosts
 
@@ -79,7 +76,6 @@ public sealed class CustomGhostSystem : EntitySystem
             Dirty(uid, component);
 
             EntityManager.AddComponents(uid, customGhost.AddComponents);
-            EntityManager.MergeEntityComponents(uid, customGhost.MergeEntityComponents, _serManager);
 
             _meta.SetEntityName(uid, $"{customGhost.DisplayName} ({Name(uid)})");
             _meta.SetEntityDescription(uid, customGhost.DisplayDesc);

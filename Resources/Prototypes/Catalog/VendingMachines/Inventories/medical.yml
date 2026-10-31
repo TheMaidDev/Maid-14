@@ -130,4 +130,5 @@
 #    FoodSnackLollypopWrappedLexorin: 3 # Maid
 #    FoodSnackLollypopWrappedMysteryEvil: 5 # Goobstation - end # Maid
   contrabandInventory:
-    FoodApple: 1
+#    FoodApple: 1 #Maid
+    DrinkDoctorsDelightGlass: 1 #Maid

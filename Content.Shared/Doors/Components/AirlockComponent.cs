@@ -17,6 +17,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.DeviceLinking;
 using Content.Shared.Doors.Systems;
 using Robust.Shared.Audio;
@@ -99,8 +100,8 @@ public sealed partial class AirlockComponent : Component
     /// <summary>
     /// The receiver port for turning off automatic closing.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
-    public string AutoClosePort = "AutoClose";
+    [DataField]
+    public ProtoId<SinkPortPrototype> AutoClosePort = "AutoClose";
 
     #region Graphics
 

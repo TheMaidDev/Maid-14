@@ -9,6 +9,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Serialization.Manager.Attributes;
 using System.Numerics;
 using Robust.Shared.Noise;
 using Robust.Shared.Prototypes;
@@ -20,7 +21,8 @@ namespace Content.Server.Worldgen.Prototypes;
 ///     This is a config for noise channels, used by worldgen.
 /// </summary>
 [Virtual]
-public class NoiseChannelConfig
+[DataDefinition] // MAID rt-update
+public partial class NoiseChannelConfig
 {
     /// <summary>
     ///     The noise type used by the noise generator.

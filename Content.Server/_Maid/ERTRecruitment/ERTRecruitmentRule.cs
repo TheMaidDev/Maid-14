@@ -23,7 +23,6 @@ public sealed class ERTRecruitmentRule : StationEventSystem<ERTRecruitmentRuleCo
 {
     [Dependency] private readonly IChatManager _chat = default!;
     [Dependency] private readonly GhostRecruitmentSystem _recruitment = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly MapLoaderSystem _map = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
     [Dependency] private readonly ChatSystem _chatSystem = default!;
@@ -196,7 +195,7 @@ public sealed class ERTRecruitmentRule : StationEventSystem<ERTRecruitmentRuleCo
         if (Deleted(shuttleId))
         {
             _logger.Error( $"Tried to load shuttle as a map, aborting.");
-            _mapManager.DeleteMap(mapId);
+            _mapSystem.DeleteMap(mapId);
             return false;
         }
         */

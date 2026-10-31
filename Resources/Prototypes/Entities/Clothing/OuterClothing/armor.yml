@@ -291,9 +291,9 @@
   description: An armored vest with advanced shielding to protect against energy weapons.
   components:
   - type: Sprite
-    sprite: Clothing/OuterClothing/Armor/armor_reflec.rsi
+    sprite: _Maid/Clothing/OuterClothing/Armor/armor_reflec.rsi #Maid
   - type: Clothing
-    sprite: Clothing/OuterClothing/Armor/armor_reflec.rsi
+    sprite: _Maid/Clothing/OuterClothing/Armor/armor_reflec.rsi #Maid
   - type: Armor
     coverage:
     - Chest

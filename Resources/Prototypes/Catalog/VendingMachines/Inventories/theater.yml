@@ -124,22 +124,22 @@
     ClothingOuterBumblebeeCostume: 3 #Maid
     
   contrabandInventory:
-    ClothingHeadHatRichard: 1
+    # ClothingHeadHatRichard: 1 #Maid
     ClothingShoesBling: 1
     ClothingShoesBootsCowboyFancy: 1
     ClothingOuterDogi: 1
-    ClothingMaskSexyClown: 1
+    # ClothingMaskSexyClown: 1 #Maid
     ClothingMaskSexyMime: 1
     ClothingHeadHatCowboyBountyHunter: 1
     ToyFigurineBoxer: 1
     ToyFigurineMusician: 1
-    WeaponLauncherTaiwanPond: 1 # Goobstation
-    GrenadeToy: 5 # Goobstation
-    ClothingShoesResonant: 1 # Goobstation
-    ClothingNeckCloakResonant: 1 # Goobstation
-    ClothingUniformJumpsuitResonant: 1 # Goobstation
-    ClothingOuterArmorHereticCostume: 1 # Goobstation
-    ToyBladeEldritch: 1 # Goobstation
+    # WeaponLauncherTaiwanPond: 1 # Goobstation #Maid
+    # GrenadeToy: 5 # Goobstation #Maid
+    # ClothingShoesResonant: 1 # Goobstation #Maid
+    # ClothingNeckCloakResonant: 1 # Goobstation #Maid
+    # ClothingUniformJumpsuitResonant: 1 # Goobstation #Maid
+    # ClothingOuterArmorHereticCostume: 1 # Goobstation #Maid
+    # ToyBladeEldritch: 1 # Goobstation #Maid
   emaggedInventory: # goob
     ClothingOuterPonchoClassicRobust: 1
     ClothingHeadHatCowboyBrownRobust: 1

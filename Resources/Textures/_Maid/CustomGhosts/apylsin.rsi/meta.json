@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "license": "CC-BY-NC-SA-4.0",
+  "copyright": "Provided by apylsin",
+  "size": {
+    "x": 24,
+    "y": 24
+  },
+  "states": [
+    {
+      "name": "animated",
+      "directions": 4
+    }
+  ]
+}

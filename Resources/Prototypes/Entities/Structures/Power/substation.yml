@@ -280,7 +280,7 @@
     sprite: _Maid/Structures/Power/substation.rsi # Maid
     layers:
     - state: substation_wall
-    - state: screen # MAID fix wallmount substation shading
+    - state: screen_wall # MAID fix wallmount substation shading
       shader: unshaded
   - type: Battery
     maxCharge: 2000000

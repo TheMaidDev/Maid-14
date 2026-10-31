@@ -143,6 +143,7 @@ using Content.Shared._Shitmed.Damage;
 using Content.Shared._Shitmed.Targeting;
 using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Warps;
+using Content.Shared._Maid.Administration;
 using Robust.Shared.Utility;
 
 namespace Content.Server.Ghost
@@ -436,6 +437,17 @@ namespace Content.Server.Ghost
                 return;
             }
 
+            // MAID BEGIN admin invisibility
+            // The warp list hides invisible admins, but a stale list or a crafted id could still target them.
+            // Admin ghosts can see each other, so they are still allowed to warp.
+            if (TryComp<AdminInvisibilityComponent>(target, out var targetInvisibility)
+                && targetInvisibility.Invisible
+                && !HasComp<AdminInvisibilityComponent>(attached))
+            {
+                return;
+            }
+            // MAID END admin invisibility
+
             WarpTo(attached, target);
         }
 
@@ -499,6 +511,9 @@ namespace Content.Server.Ghost
             while (query.MoveNext(out var uid, out var mindContainer, out var meta))
             {
                 if (uid == except)
+                    continue;
+
+                if (TryComp<AdminInvisibilityComponent>(uid, out var adminInvisibility) && adminInvisibility.Invisible) // MAID admin invisibility
                     continue;
 
                 var mind = mindContainer.Mind;
@@ -617,6 +632,9 @@ namespace Content.Server.Ghost
             while (entityQuery.MoveNext(out var uid, out var _, out var vis))
             {
                 if (!_tag.HasTag(uid, AllowGhostShownByEventTag))
+                    continue;
+
+                if (TryComp<AdminInvisibilityComponent>(uid, out var adminInvisibility) && adminInvisibility.Invisible) // MAID admin invisibility
                     continue;
 
                 if (visible)

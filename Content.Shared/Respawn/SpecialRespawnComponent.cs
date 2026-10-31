@@ -32,8 +32,8 @@ public sealed partial class SpecialRespawnComponent: Component
     /// The prototypeID of the entity to be respawned
     /// </summary>
     [ViewVariables]
-    [DataField("prototype", required:true, customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string Prototype = "";
+    [DataField("prototype", required:true)]
+    public EntProtoId Prototype = "";
 
     // MAID BEGIN nuke disk respawn
     [ViewVariables]

@@ -304,7 +304,7 @@ ToySiobhan: null
 VendingMachineBoozeUnlocked: null
 VendingMachineBoxingDrobe: null
 VendingMachineCourierDrobe: null
-VendingMachineMNKDrobe: null
+#VendingMachineMNKDrobe: null # Maid
 VendingMachineRepDrobe: null
 WallPaper: null
 WarpPointAI: null
@@ -424,10 +424,10 @@ GeneratorPlasmaMachineCircuitboard: PortableGeneratorPacmanMachineCircuitboard
 GeneratorUraniumMachineCircuitboard: PortableGeneratorSuperPacmanMachineCircuitboard
 
 # 2023-12-10
-SpawnPointSeniorResearcher: null
-SpawnPointSeniorOfficer: null
-SpawnPointSeniorEngineer: null
-SpawnPointSeniorPhysician: null
+#SpawnPointSeniorResearcher: null # Maid
+#SpawnPointSeniorOfficer: null # Maid
+#SpawnPointSeniorEngineer: null # Maid
+#SpawnPointSeniorPhysician: null # Maid
 
 # 2023-12-12
 #No this is not the CMO hardsuit, their prototype IDs were just confusingly similar
@@ -488,13 +488,13 @@ CrystalSubspaceStockPart: null
 TransmitterSubspaceStockPart: null
 
 # 2024-01-10
-ClothingHeadHatHoodRad: null
+#ClothingHeadHatHoodRad: null # Restored
 
 # 2024-01-12
-SpaceMedipen: null
+#SpaceMedipen: null # Goobstation/Maid
 
 # 2024-01-18
-ClothingHeadHelmetVoidParamed: null
+#ClothingHeadHelmetVoidParamed: null # Restored
 
 # 2024-01-19
 DefaultStationBeaconTeslaEngine: null
@@ -523,11 +523,11 @@ VehicleSecwayStealObjective: null
 #VehicleKeyATV: null Goobstation - Re-add vehicles
 VehicleKeySkeleton: null
 #VehicleKeySyndicateSegway: null Goobstation - Re-add vehicles
-VehicleKeySkeletonMotorcycle: null
+#VehicleKeySkeletonMotorcycle: null # CorvaxGoob - Re-add vehicles
 #VehicleSecway: null Goobstation - Re-add vehicles
 #VehicleATV: null Goobstation - Re-add vehicles
 #VehicleSyndicateSegway: null Goobstation - Re-add vehicles
-VehicleSkeletonMotorcycle: null
+#VehicleSkeletonMotorcycle: null # CorvaxGoob - Re-add vehicles
 VehicleUnicycle: null
 VehicleUnicycleFolded: null
 ActionVehicleHorn: null
@@ -535,8 +535,8 @@ ActionVehicleHorn: null
 #CrateFunSyndicateSegway: null Goobstation - Re-add vehicles
 MobTaxiBot: null
 # MobSupplyBot: null
-SpawnVehicleMotobike: null
-SpawnVehicleATV: null
+#SpawnVehicleMotobike: null # CorvaxGoob - Re-add vehicles
+#SpawnVehicleATV: null # Goobstation - Re-add vehicles
 #SpawnVehicleSecway: null Goobstation - Re-add vehicles
 #SpawnVehicleJanicart: null Goobstation - Re-add vehicles
 #VehicleJanicart: null Goobstation - Re-add vehicles
@@ -600,7 +600,7 @@ ImprovisedExplosiveEmpty: FireBombEmpty
 ImprovisedExplosiveFuel: FireBombFuel
 
 # 2024-03-16
-ClothingHeadHatHairflower: FoodPoppy
+#ClothingHeadHatHairflower: FoodPoppy # Restored
 
 # 2024-03-21
 RPED: null
@@ -727,12 +727,12 @@ LogicGate: LogicGateOr
 #MaterialReclaimerMachineCircuitboard: null #Maid
 
 # 2024-08-11
-FoodTacoBeef: FoodTacoShell
-FoodTacoChicken: FoodTacoShell
-FoodTacoFish: FoodTacoShell
-FoodTacoBeefSupreme: FoodTacoShell
-FoodTacoChickenSupreme: FoodTacoShell
-FoodTacoRat: FoodTacoShell
+#FoodTacoBeef: FoodTacoShell # Restored
+#FoodTacoChicken: FoodTacoShell # Restored
+#FoodTacoFish: FoodTacoShell # Restored
+#FoodTacoBeefSupreme: FoodTacoShell # Restored
+#FoodTacoChickenSupreme: FoodTacoShell # Restored
+#FoodTacoRat: FoodTacoShell # Restored
 
 FoodMeatHumanKebab: FoodKebabSkewer
 FoodMeatLizardtailKebab: FoodKebabSkewer
@@ -756,8 +756,8 @@ CentcomPDAFake: null
 CentcomIDCardSyndie: null
 
 # 2024-09-06
-AntimovCircuitBoard: null
-OverlordCircuitBoard: null
+#AntimovCircuitBoard: null # Restored
+#OverlordCircuitBoard: null # Restored
 
 # 2024-09-08
 HatBase: null
@@ -891,10 +891,10 @@ PosterContrabandLustyExomorph: PosterContrabandRealExomorph
 PosterContrabandBustyBackdoorExoBabes6: PosterContrabandRouny
 
 # 2025-02-20
-MagazineBoxAntiMaterielBig: null
-MagazineBoxCaselessRifle10x24: null
-MagazineBoxCaselessRifleBig: null
-MagazinePistolHighCapacityRubber: null
+#MagazineBoxAntiMaterielBig: null # Restored
+#MagazineBoxCaselessRifle10x24: null # Goobstation
+#MagazineBoxCaselessRifleBig: null # Goobstation
+#MagazinePistolHighCapacityRubber: null # Restored
 
 # 2025-03-09 - Shitmed Woundmed, separating torsos into chest and groin
 TorsoHuman: ChestHuman
@@ -924,7 +924,7 @@ CargoMailTeleporter: MailTeleporter
 ClothingMaskBlushingMime: ClothingMaskSexyMime
 ClothingMaskBlushingClown: ClothingMaskSexyMime
 MachineMaterialSilo: null
-CrateMaterialSilo: null
+#CrateMaterialSilo: null # Restored
 
 # 2025-03-29
 ClothingBackpackDuffelSyndicateRaidBundle: ClothingBackpackSyndicateRaidBundle
@@ -996,8 +996,8 @@ CigaretteMilk: CigaretteHaloperidol
 CigaretteBread: CigaretteBbqSauce
 
 # 2025-05-09
-ClothingOuterHardsuitBasic: ClothingOuterHardsuitEVA
-ClothingHeadHelmetHardsuitBasic: null
+#ClothingOuterHardsuitBasic: ClothingOuterHardsuitEVA # Maid
+#ClothingHeadHelmetHardsuitBasic: null # Maid
 SuitStorageBasic: SuitStorageEVA
 
 # 2025-05-18
@@ -1016,8 +1016,8 @@ WeaponEnergyTurretStationMachineCircuitboard: WeaponEnergyTurretSecurityMachineC
 SpawnHonkBot: SpawnMobHonkBot
 
 # 2025-06-01
-CrateFoodPizzaLarge: CrateFoodPizza
-CrateFoodSoftdrinksLarge: CrateFoodSoftdrinks
+#CrateFoodPizzaLarge: CrateFoodPizza # Restored
+#CrateFoodSoftdrinksLarge: CrateFoodSoftdrinks # Restored
 
 # 2025-06-09
 BarSignAlignTile: BarSign
@@ -1051,31 +1051,31 @@ BarSignWhiskeyEchoesAlignTile: BarSignWhiskeyEchoes
 ClothingNeckHeadphones: ClothingMultipleHeadphones
 
 # 2025-10-04 Maid
-UniqueLockerNanorepFilled: null
-UniqueLockerBlueshieldOfficerFilled: null
-ContrabandDetectorSecure: null
-ContrabandDetector: null
-ContrabandDetectorFrame: null
-CrateSecurityTrackingMindshieldImplants: null
-ContrabandDetectorCircuitboard: null
+#UniqueLockerNanorepFilled: null # Goobstation
+#UniqueLockerBlueshieldOfficerFilled: null # Goobstation
+#ContrabandDetectorSecure: null # Goobstation
+#ContrabandDetector: null # Goobstation
+#ContrabandDetectorFrame: null # Goobstation
+#CrateSecurityTrackingMindshieldImplants: null # Restored
+#ContrabandDetectorCircuitboard: null # Goobstation
 
-ATM: null
-WeaponEgun: null
+#ATM: null # Maid
+#WeaponEgun: null # Maid
 WeaponPoweredCrossbowUnfinished: null
 SuperSynthesizerInstrumentDerderiot: null
 EngiLootSpawner: null
-Eftpos: null
+#Eftpos: null # Maid
 GreyHampter: null
 OmntnsHammer: null
 ClothingOuterWinterSyndieMeaty: null
-ClothingUnderwearBottomPantiesQM: null
-ClothingUnderwearBottomPantiesSlim: null
-ClothingUnderwearBottomPantiesWhite: null
+#ClothingUnderwearBottomPantiesQM: null # Maid
+#ClothingUnderwearBottomPantiesSlim: null # Maid
+#ClothingUnderwearBottomPantiesWhite: null # Maid
 ClothingUnderwearSocksGray2sh0nka: null
-ClothingUnderwearStockingsPink: null
-ClothingUnderwearTopBraHalterneck: null
-ClothingUnderwearTopCow: null
-Betty: null
+#ClothingUnderwearStockingsPink: null # Maid
+#ClothingUnderwearTopBraHalterneck: null # Maid
+#ClothingUnderwearTopCow: null # Maid
+#Betty: null # Goobstation
 
 # 2025-10-09
 FoodDonutJellySlugcat: FoodDonutJellyScurret
@@ -1175,3 +1175,6 @@ ClothingNeckCloakGay: ClothingNeckCloakMoth
 ClothingNeckCloakEnby: ClothingNeckCloakMoth
 ClothingNeckCloakPan: ClothingNeckCloakMoth
 ClothingNeckCloakTrans: ClothingNeckCloakMoth
+
+
+SoapGold: SoapDeluxe

@@ -25,8 +25,8 @@ namespace Content.Server.Construction.Completions;
 [UsedImplicitly, DataDefinition]
 public sealed partial class BuildMech : IGraphAction
 {
-    [DataField("mechPrototype", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
-    public string MechPrototype = string.Empty;
+    [DataField("mechPrototype", required: true)]
+    public EntProtoId MechPrototype = string.Empty;
 
     [DataField("container")]
     public string Container = "battery-container";

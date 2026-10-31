@@ -245,11 +245,11 @@
   description: A premium semi-automatic shotgun, and the pride of all security forces. Uses 12 Gauge shotgun shells. # Goob edit
   components: # intend for Enforcer to have wider choke for semi-auto function
   - type: Sprite
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/enforcer.rsi
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/enforcer-icons.rsi #Maid
   - type: Clothing
-    sprite: _Maid/Objects/Weapons/Guns/Shotguns/enforcer.rsi
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/enforcer-inhands.rsi #Maid
   - type: Item
-    sprite: Objects/Weapons/Guns/Shotguns/enforcer_inhands_64x.rsi
+    sprite: _Maid/Objects/Weapons/Guns/Shotguns/enforcer-inhands.rsi #Maid
     shape: # Goobstation
     - 0,0,4,1
   - type: BallisticAmmoProvider

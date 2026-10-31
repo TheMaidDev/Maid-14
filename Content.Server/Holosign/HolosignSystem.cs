@@ -15,6 +15,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq; // MAID rt-update
 using Content.Shared.Examine;
 using Content.Shared.Coordinates.Helpers;
 using Content.Server.Power.Components;
@@ -37,7 +38,6 @@ public sealed class HolosignSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
     // Goobstation end
@@ -81,8 +81,8 @@ public sealed class HolosignSystem : EntitySystem
         // places the holographic sign at the click location, snapped to grid.
         var coords = args.ClickLocation.SnapToGrid(EntityManager);
         var mapCoords = _transform.ToMapCoordinates(coords);
-        var look = _mapManager.TryFindGridAt(mapCoords, out var grid, out var gridComp)
-            ? _map.GetAnchoredEntities((grid, gridComp), mapCoords)
+        var look = _map.TryFindGridAt(mapCoords, out var grid, out var gridComp)
+            ? _map.GetAnchoredEntities((grid, gridComp), mapCoords).ToHashSet() /* MAID rt-update */
             : _lookup.GetEntitiesInRange(mapCoords, 0.1f);
         foreach (var entity in look)
         {

@@ -1181,7 +1181,7 @@
     entries:
       Burger: BlueTomato
       Taco: BlueTomato
-
+ 
 - type: entity
   name: blood tomato
   parent: FoodTomato

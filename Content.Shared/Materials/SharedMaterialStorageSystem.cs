@@ -270,6 +270,13 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
         return true;
     }
 
+    // MAID BEGIN rt-update ProtoId overload
+    public bool TryChangeMaterialAmount(Entity<MaterialStorageComponent?> entity, Dictionary<ProtoId<MaterialPrototype>, int> materials)
+    {
+        return TryChangeMaterialAmount(entity, materials.ToDictionary(p => p.Key.Id, p => p.Value));
+    }
+    // MAID END rt-update ProtoId overload
+
     /// <summary>
     /// Changes the amount of a specific material in the storage.
     /// Still respects the filters in place.

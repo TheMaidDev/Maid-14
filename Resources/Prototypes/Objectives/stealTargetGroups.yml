@@ -98,7 +98,7 @@
   name: steal-target-groups-captain-id-card
   sprite:
     sprite: _Maid/Objects/Misc/id_cards.rsi #Maid
-    state: ert_commander #no one will know the difference.
+    state: gold #Maid
 
 - type: stealTargetGroup
   id: JetpackCaptainFilled

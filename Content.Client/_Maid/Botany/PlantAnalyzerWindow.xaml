@@ -1,0 +1,148 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:botany="clr-namespace:Content.Client._Maid.Botany"
+                      Resizable="False"
+                      MinWidth="750"
+                      MinHeight="500">
+    <BoxContainer Orientation="Horizontal"
+                  Margin="10 6 10 10"
+                  SeparationOverride="6"
+                  VerticalExpand="True">
+
+        <PanelContainer StyleClasses="PlantAnalyzerColumn">
+            <BoxContainer Orientation="Vertical"
+                          MinWidth="250"
+                          MaxWidth="250"
+                          VerticalExpand="True"
+                          Margin="6"
+                          SeparationOverride="4">
+                <Label Name="PlantName"
+                       StyleClasses="LabelKeyText"
+                       HorizontalAlignment="Center"
+                       ClipText="True" />
+                <SpriteView Name="PlantSprite"
+                            OverrideDirection="South"
+                            Scale="2 2"
+                            SetSize="64 64"
+                            HorizontalAlignment="Center" />
+
+                <!-- Traits -->
+                <PanelContainer StyleClasses="PlantAnalyzerSection">
+                    <BoxContainer Name="TraitsSection" Orientation="Vertical" Margin="6 8">
+                        <Label Text="{Loc 'botany-ui-section-traits'}" StyleClasses="LabelKeyText" />
+                        <GridContainer Columns="3" HorizontalExpand="True">
+                            <Label Text="{Loc 'botany-ui-age'}" Margin="0 0 8 0" />
+                            <Label Name="Age" StyleClasses="LabelSubText" />
+                            <Control />
+                            <Label Text="{Loc 'botany-ui-growth-stage'}" Margin="0 0 8 0" />
+                            <Label Name="GrowthStage" StyleClasses="LabelSubText" />
+                            <Control />
+                            <Label Text="{Loc 'botany-ui-harvest-type'}" Margin="0 0 8 0" />
+                            <Label Name="HarvestType" StyleClasses="LabelSubText" />
+                            <Control />
+                            <Label Text="{Loc 'botany-ui-endurance'}" Margin="0 0 8 0" />
+                            <Label Name="Endurance" StyleClasses="LabelSubText" />
+                            <Label Name="EnduranceDelta" />
+                            <Label Text="{Loc 'botany-ui-yield'}" Margin="0 0 8 0" />
+                            <Label Name="Yield" StyleClasses="LabelSubText" />
+                            <Label Name="YieldDelta" />
+                            <Label Text="{Loc 'botany-ui-lifespan'}" Margin="0 0 8 0" />
+                            <Label Name="Lifespan" StyleClasses="LabelSubText" />
+                            <Label Name="LifespanDelta" />
+                            <Label Text="{Loc 'botany-ui-maturation'}" Margin="0 0 8 0" />
+                            <Label Name="Maturation" StyleClasses="LabelSubText" />
+                            <Label Name="MaturationDelta" />
+                            <Label Text="{Loc 'botany-ui-production'}" Margin="0 0 8 0" />
+                            <Label Name="Production" StyleClasses="LabelSubText" />
+                            <Label Name="ProductionDelta" />
+                            <Label Text="{Loc 'botany-ui-potency'}" Margin="0 0 8 0" />
+                            <Label Name="Potency" StyleClasses="LabelSubText" />
+                            <Label Name="PotencyDelta" />
+                        </GridContainer>
+                    </BoxContainer>
+                </PanelContainer>
+
+                <!-- Warnings -->
+                <PanelContainer StyleClasses="PlantAnalyzerSection" VerticalExpand="True">
+                    <BoxContainer Orientation="Vertical" Margin="6 8">
+                        <Label Text="{Loc 'botany-ui-section-warnings'}" StyleClasses="LabelKeyText" />
+                        <BoxContainer Name="Warnings" Orientation="Vertical" />
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
+        </PanelContainer>
+
+        <BoxContainer Name="Details"
+                      Orientation="Vertical"
+                      HorizontalExpand="True"
+                      SeparationOverride="4">
+
+            <!-- Status -->
+            <PanelContainer Name="StatusSection" StyleClasses="PlantAnalyzerSection">
+                <BoxContainer Orientation="Vertical" Margin="6 8">
+                    <Label Text="{Loc 'botany-ui-section-plant'}" StyleClasses="LabelKeyText" Margin="0 0 0 2" />
+                    <GridContainer Columns="2" VSeparationOverride="6" HSeparationOverride="6" HorizontalExpand="True">
+                        <botany:PlantAnalyzerMetric Name="Health" />
+                        <botany:PlantAnalyzerMetric Name="Growth" />
+                    </GridContainer>
+                </BoxContainer>
+            </PanelContainer>
+
+            <!-- Required conditions -->
+            <PanelContainer StyleClasses="PlantAnalyzerSection">
+                <BoxContainer Orientation="Vertical" Margin="6 8">
+                    <Label Text="{Loc 'botany-ui-section-conditions'}" StyleClasses="LabelKeyText" Margin="0 0 0 2" />
+                    <GridContainer Columns="2" VSeparationOverride="6" HSeparationOverride="6" HorizontalExpand="True">
+                        <botany:PlantAnalyzerMetric Name="Temperature" />
+                        <botany:PlantAnalyzerMetric Name="Pressure" />
+                        <botany:PlantAnalyzerMetric Name="Water" />
+                        <botany:PlantAnalyzerMetric Name="Nutrients" />
+                    </GridContainer>
+                </BoxContainer>
+            </PanelContainer>
+
+            <!-- Gas exchange -->
+            <BoxContainer SeparationOverride="4">
+                <PanelContainer StyleClasses="PlantAnalyzerSection" HorizontalExpand="True">
+                    <BoxContainer Orientation="Vertical" Margin="6 8">
+                        <Label Text="{Loc 'botany-ui-section-consumed-gases'}" StyleClasses="LabelKeyText" Margin="0 0 0 2" />
+                        <BoxContainer Name="Consumed" Orientation="Vertical" />
+                    </BoxContainer>
+                </PanelContainer>
+                <PanelContainer StyleClasses="PlantAnalyzerSection" HorizontalExpand="True">
+                    <BoxContainer Orientation="Vertical" Margin="6 8">
+                        <Label Text="{Loc 'botany-ui-section-exuded-gases'}" StyleClasses="LabelKeyText" Margin="0 0 0 2" />
+                        <BoxContainer Name="Exuded" Orientation="Vertical" />
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
+
+            <!-- Harvest chemicals -->
+            <PanelContainer StyleClasses="PlantAnalyzerSection" VerticalExpand="True">
+                <BoxContainer Orientation="Vertical" Margin="6 8">
+                    <Label Text="{Loc 'botany-ui-section-chemicals'}" StyleClasses="LabelKeyText" Margin="0 0 0 2" />
+                    <ScrollContainer MaxHeight="150" ReturnMeasure="True">
+                        <BoxContainer Name="Chemicals" Orientation="Vertical" />
+                    </ScrollContainer>
+                </BoxContainer>
+            </PanelContainer>
+
+            <!-- Mutations -->
+            <PanelContainer StyleClasses="PlantAnalyzerSection" VerticalExpand="True">
+                <BoxContainer Orientation="Vertical" Margin="6 8">
+                    <Label Text="{Loc 'botany-ui-section-mutations'}" StyleClasses="LabelKeyText" Margin="0 0 0 2" />
+                    <BoxContainer HorizontalExpand="True">
+                        <BoxContainer Name="Mutations" Orientation="Vertical" HorizontalExpand="True" />
+                        <PanelContainer StyleClasses="LowDivider" VerticalExpand="True" SetWidth="2" Margin="8 0" />
+                        <GridContainer Name="MutationLevels" Columns="2">
+                            <Label Text="{Loc 'botany-ui-mutation'}" Margin="0 0 8 0" />
+                            <Label Name="MutationLevel" StyleClasses="LabelSubText" />
+                            <Label Text="{Loc 'botany-ui-mutation-mod'}" Margin="0 0 8 0" />
+                            <Label Name="MutationMod" StyleClasses="LabelSubText" />
+                        </GridContainer>
+                    </BoxContainer>
+                </BoxContainer>
+            </PanelContainer>
+        </BoxContainer>
+    </BoxContainer>
+</controls:FancyWindow>

@@ -42,7 +42,8 @@ namespace Content.Server.NodeContainer.EntitySystems
             SubscribeLocalEvent<NodeContainerComponent, ComponentStartup>(OnStartupEvent);
             SubscribeLocalEvent<NodeContainerComponent, ComponentShutdown>(OnShutdownEvent);
             SubscribeLocalEvent<NodeContainerComponent, AnchorStateChangedEvent>(OnAnchorStateChanged);
-            SubscribeLocalEvent<NodeContainerComponent, ReAnchorEvent>(OnReAnchor);
+            // MAID rt-update ReAnchorEvent removed in RT 292, AnchorStateChangedEvent is raised instead
+            // SubscribeLocalEvent<NodeContainerComponent, ReAnchorEvent>(OnReAnchor);
             SubscribeLocalEvent<NodeContainerComponent, MoveEvent>(OnMoveEvent);
             SubscribeLocalEvent<NodeContainerComponent, ExaminedEvent>(OnExamine);
 
@@ -183,6 +184,8 @@ namespace Content.Server.NodeContainer.EntitySystems
             }
         }
 
+        // MAID BEGIN rt-update ReAnchorEvent removed
+        /*
         private void OnReAnchor(EntityUid uid, NodeContainerComponent component, ref ReAnchorEvent args)
         {
             foreach (var node in component.Nodes.Values)
@@ -191,6 +194,8 @@ namespace Content.Server.NodeContainer.EntitySystems
                 _nodeGroupSystem.QueueReflood(node);
             }
         }
+        */
+        // MAID END rt-update ReAnchorEvent removed
 
         private void OnMoveEvent(EntityUid uid, NodeContainerComponent container, ref MoveEvent ev)
         {

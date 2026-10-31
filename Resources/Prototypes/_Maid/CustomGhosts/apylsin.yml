@@ -1,11 +1,36 @@
 - type: customGhost
+  id: apylsinSkin1
+  category: personal
+  name: Призрак
+  desc: Призрак
+  addComponents:
+  - type: Sprite
+    sprite: _Maid/CustomGhosts/apylsin.rsi
+    color: "#fffb"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
+    layers:
+    - state: animated
+      shader: unshaded
+      sprite: _Maid/CustomGhosts/apylsin.rsi
+  restrictions:
+  - !type:CkeyRestriction
+    ckey:
+    - apylsin
+
+- type: customGhost
   id: apylsinBird
   category: personal
   name: Кто нахуй
   desc: гооол
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: _Maid/CustomGhosts/bird.rsi
+    color: "#fff8"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     layers:
     - state: bird
       shader: unshaded
@@ -20,10 +45,13 @@
   category: personal
   name: Нарси побольшьбе
   desc: Пиздец побольшьбе
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: Mobs/Demons/narsie.rsi
     color: "#ffff"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     layers:
     - state: narsie
       shader: unshaded
@@ -38,9 +66,13 @@
   category: personal
   name: Нарси
   desc: Пиздец
-  mergeEntityComponents:
+  addComponents:
   - type: Sprite
     sprite: Mobs/Demons/narsie.rsi
+    color: "#fff8"
+    noRot: true
+    overrideContainerOcclusion: true
+    drawdepth: Ghosts
     scale: 0.2, 0.2
     layers:
     - state: narsie

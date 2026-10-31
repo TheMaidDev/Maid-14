@@ -1,0 +1,11 @@
+- type: entity
+  parent: BaseMentalAction
+  id: ActionToggleAdminInvisibility
+  name: Toggle invisibility
+  description: Hide your ghost from other ghosts. Admins still see you.
+  components:
+  - type: Action
+    icon: _Maid/Interface/Actions/transparent_ghost.png
+    priority: -5
+  - type: InstantAction
+    event: !type:ToggleAdminInvisibilityActionEvent

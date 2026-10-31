@@ -178,7 +178,7 @@
       fix1:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.4,0.5,0.4,0.35"
+          bounds: "-0.4,0.35,0.4,0.5" # MAID rt-update inverted Box2 fixed
         density: 190
         mask:
         - None
@@ -215,6 +215,7 @@
   - type: Tag # Goobstation - Prevent RCD from making lights in one tile
     tags:
     - WallLight
+  - type: LightGlow # MAID settings port
   placement:
     mode: SnapgridCenter
     snap:
@@ -405,7 +406,7 @@
         fix1:
           shape:
             !type:PhysShapeAabb
-            bounds: "-0.1,0.5,0.1,0.255"
+            bounds: "-0.1,0.255,0.1,0.5" # MAID rt-update inverted Box2 fixed
           density: 190
           mask:
           - None

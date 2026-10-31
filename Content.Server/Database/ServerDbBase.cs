@@ -2190,6 +2190,99 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
             return reputation?.Reputation ?? 0f;
         }
 
+        public async Task AddAhelpMessageAsync(AhelpMessage message)
+        {
+            await using var db = await GetDb();
+
+            db.DbContext.AhelpMessages.Add(message);
+            await db.DbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<AhelpMessage>> GetAhelpHistoryAsync(AhelpHistoryFilter filter, int limit, int skip)
+        {
+            await using var db = await GetDb();
+
+            var query = db.DbContext.AhelpMessages
+                .AsNoTracking()
+                .Where(m => m.PlayerUserId == filter.Player);
+
+            if (filter.RoundId is { } roundId)
+                query = query.Where(m => m.RoundId == roundId);
+
+            if (filter.From is { } from)
+                query = query.Where(m => m.SentAt >= from);
+
+            if (filter.To is { } to)
+                query = query.Where(m => m.SentAt <= to);
+
+            if (!string.IsNullOrWhiteSpace(filter.Text))
+                query = query.Where(m => EF.Functions.Like(m.Message, "%" + filter.Text + "%"));
+
+            query = query
+                .OrderByDescending(m => m.SentAt)
+                .ThenByDescending(m => m.Id);
+
+            if (skip > 0)
+                query = query.Skip(skip);
+
+            query = query.Take(limit);
+
+            var messages = await query.ToListAsync();
+
+            foreach (var message in messages)
+            {
+                message.SentAt = NormalizeDatabaseTime(message.SentAt);
+            }
+
+            return messages;
+        }
+
+        public async Task<int> GetAhelpHistorySkipAsync(Guid player, int anchorId)
+        {
+            await using var db = await GetDb();
+
+            var anchor = await db.DbContext.AhelpMessages
+                .AsNoTracking()
+                .Where(m => m.Id == anchorId && m.PlayerUserId == player)
+                .Select(m => (DateTime?) m.SentAt)
+                .SingleOrDefaultAsync();
+
+            if (anchor is not { } anchorTime)
+                return 0;
+
+            var skip = await db.DbContext.AhelpMessages
+                .AsNoTracking()
+                .Where(m => m.PlayerUserId == player &&
+                            (m.SentAt > anchorTime ||
+                             (m.SentAt == anchorTime && m.Id > anchorId)))
+                .CountAsync();
+
+            return skip;
+        }
+
+        public async Task<List<AhelpRoundInfo>> GetAhelpRoundInfosAsync(int[] roundIds)
+        {
+            await using var db = await GetDb();
+
+            var rounds = await db.DbContext.Round
+                .AsNoTracking()
+                .Where(r => roundIds.Contains(r.Id))
+                .Select(r => new
+                {
+                    r.Id,
+                    r.StartDate,
+                    ServerName = (string?) r.Server.Name,
+                })
+                .ToListAsync();
+
+            return rounds
+                .Select(r => new AhelpRoundInfo(
+                    r.Id,
+                    NormalizeDatabaseTime(r.StartDate),
+                    r.ServerName ?? string.Empty))
+                .ToList();
+        }
+
         public abstract Task SendNotification(DatabaseNotification notification);
 
         // SQLite returns DateTime as Kind=Unspecified, Npgsql actually knows for sure it's Kind=Utc.

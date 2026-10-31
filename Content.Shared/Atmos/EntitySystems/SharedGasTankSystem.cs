@@ -38,7 +38,7 @@ public abstract class SharedGasTankSystem : EntitySystem
 
     private void OnGasShutdown(Entity<GasTankComponent> gasTank, ref ComponentShutdown args)
     {
-        DisconnectFromInternals(gasTank);
+        DisconnectFromInternals(gasTank, forced: true); // MAID tank drop disconnect
     }
 
     private void OnGasTankToggleInternals(Entity<GasTankComponent> ent, ref GasTankToggleInternalsMessage args)

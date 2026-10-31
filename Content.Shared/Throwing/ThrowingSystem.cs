@@ -270,6 +270,6 @@ public sealed class ThrowingSystem : EntitySystem
         const float massLimit = 5f;
 
         if (pushEv.Push || _gravity.IsWeightless(user.Value))
-            _physics.ApplyLinearImpulse(user.Value, -impulseVector / physics.Mass * pushbackRatio * MathF.Min(massLimit, physics.Mass), body: userPhysics);
+            _physics.ApplyLinearImpulse(user.Value, -direction.Normalized() * baseThrowSpeed * pushbackRatio * MathF.Min(massLimit, physics.Mass), body: userPhysics); // Maid - pushback from base throw speed like on core, not the friction-compensated one
     }
 }
