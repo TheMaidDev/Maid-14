@@ -66,7 +66,7 @@ namespace Content.Client.Interactable.Components
                 */
                 _entMan.System<SpriteSystem>().RemovePostShader(sprite, MaidPostShaderIds.InteractionOutline);
                 // MAID END Multi postshader
-                sprite.RenderOrder = 0;
+                if (!MaidPostShaderIds.HasOtherHighlight(_entMan.System<SpriteSystem>(), sprite, MaidPostShaderIds.InteractionOutline)) sprite.RenderOrder = 0; // MAID Multi postshader
             }
 
             _shader?.Dispose();

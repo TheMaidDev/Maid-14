@@ -45,7 +45,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
         if (ev.Sprite.PostShader == null)
             return;
         */
-        if (!_sprite.HasPostShader(ev.Sprite, MaidPostShaderIds.Holopad))
+        if (ev.Id != MaidPostShaderIds.Holopad)
             return;
         // MAID END Multi postshader
 

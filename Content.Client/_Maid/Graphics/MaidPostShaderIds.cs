@@ -1,3 +1,5 @@
+using Robust.Client.GameObjects;
+
 namespace Content.Client._Maid.Graphics;
 
 /// <summary>
@@ -21,4 +23,15 @@ public static class MaidPostShaderIds
     {
         InteractionOutline, TargetOutline, DragDropTarget, FloorOcclusion, Hologram, Holopad,
     };
+
+    /// <summary>
+    ///     True if another hover/target highlight than <paramref name="except"/> is still on the sprite.
+    ///     Those share <c>RenderOrder</c>, so it must not be reset while one remains.
+    /// </summary>
+    public static bool HasOtherHighlight(SpriteSystem system, SpriteComponent sprite, string except)
+    {
+        return except != InteractionOutline && system.HasPostShader(sprite, InteractionOutline)
+               || except != TargetOutline && system.HasPostShader(sprite, TargetOutline)
+               || except != DragDropTarget && system.HasPostShader(sprite, DragDropTarget);
+    }
 }

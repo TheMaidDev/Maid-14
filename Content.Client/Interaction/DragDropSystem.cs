@@ -591,7 +591,7 @@ public sealed class DragDropSystem : SharedDragDropSystem
             */
             _sprite.RemovePostShader(highlightedSprite, MaidPostShaderIds.DragDropTarget);
             // MAID END Multi postshader
-            highlightedSprite.RenderOrder = 0;
+            if (!MaidPostShaderIds.HasOtherHighlight(_sprite, highlightedSprite, MaidPostShaderIds.DragDropTarget)) highlightedSprite.RenderOrder = 0; // MAID Multi postshader
         }
 
         _highlightedSprites.Clear();

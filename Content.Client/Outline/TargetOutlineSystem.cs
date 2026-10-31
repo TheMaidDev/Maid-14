@@ -251,7 +251,7 @@ public sealed class TargetOutlineSystem : EntitySystem
                 if (_highlightedSprites.Remove(sprite))
                 {
                     _sprite.RemovePostShader(sprite, MaidPostShaderIds.TargetOutline);
-                    sprite.RenderOrder = 0;
+                    if (!MaidPostShaderIds.HasOtherHighlight(_sprite, sprite, MaidPostShaderIds.TargetOutline)) sprite.RenderOrder = 0; // MAID Multi postshader
                 }
                 // MAID END Multi postshader
 
@@ -298,7 +298,7 @@ public sealed class TargetOutlineSystem : EntitySystem
             */
             _sprite.RemovePostShader(sprite, MaidPostShaderIds.TargetOutline);
             // MAID END Multi postshader
-            sprite.RenderOrder = 0;
+            if (!MaidPostShaderIds.HasOtherHighlight(_sprite, sprite, MaidPostShaderIds.TargetOutline)) sprite.RenderOrder = 0; // MAID Multi postshader
         }
 
         _highlightedSprites.Clear();
