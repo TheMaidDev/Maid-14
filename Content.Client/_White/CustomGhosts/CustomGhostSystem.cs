@@ -1,22 +1,17 @@
-using Content.Shared._RMC14.GhostColor;
+using Content.Shared.Ghost;
 using Content.Shared._White.CustomGhostSystem;
-using Content.Shared._Maid.Utils;
 using Robust.Client.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
-using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.Manager;
-using Robust.Shared.Serialization.Markdown.Mapping;
 
 namespace Content.Client._White.CustomGhosts;
 
 public sealed class CustomGhostSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ISerializationManager _serManager = default!;
-    [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
@@ -34,7 +29,17 @@ public sealed class CustomGhostSystem : EntitySystem
         if (!_prototypeManager.TryIndex(ghostProto, out var customGhost))
             return;
 
+        // MAID custom ghosts: AddComponents replaces Sprite instead of merging it, so keep what GhostSystem set on the old one
+        var wasVisible = !TryComp<SpriteComponent>(ent, out var oldSprite) || oldSprite.Visible;
+
         _entityManager.AddComponents(ent.Owner, customGhost.AddComponents, true);
-        _entityManager.MergeEntityComponents(ent.Owner, customGhost.MergeEntityComponents, _serManager);
+
+        if (!TryComp<SpriteComponent>(ent, out var sprite))
+            return;
+
+        _sprite.SetVisible((ent.Owner, sprite), wasVisible);
+
+        if (TryComp<GhostComponent>(ent, out var ghost))
+            _sprite.LayerSetColor((ent.Owner, sprite), 0, ghost.Color);
     }
 }

@@ -2,7 +2,7 @@
 
 ## Context & References
 - Fork of SS14 Goob Station ("upstream").
-- Target SDK: `.NET 9`.
+- Target SDK: `.NET 10` (RT v294.0.1; solution is `SpaceStation14.slnx`, update it with `dotnet run --project RobustToolbox/Tools/Robust.SolutionGen -- update` after every RT feature update).
 - Engine submodule: `RobustToolbox/` (never modify).
 - Old reference build: `/home/ebi-claude/ss14-wd-022024` (commit `87a3ddb4ae`, read-only reference).
 

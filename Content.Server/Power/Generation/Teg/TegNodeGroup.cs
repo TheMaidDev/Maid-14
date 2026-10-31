@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using System.Linq;
 using Content.Server.NodeContainer;
 using Content.Server.NodeContainer.NodeGroups;
@@ -132,6 +134,7 @@ public sealed class TegNodeGroup : BaseNodeGroup
 [DataDefinition]
 public sealed partial class TegNodeGenerator : Node
 {
+    private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
     public override IEnumerable<Node> GetReachableNodes(
         TransformComponent xform,
         EntityQuery<NodeContainerComponent> nodeQuery,
@@ -142,7 +145,7 @@ public sealed partial class TegNodeGenerator : Node
         if (!xform.Anchored || grid == null)
             yield break;
 
-        var gridIndex = grid.TileIndicesFor(xform.Coordinates);
+        var gridIndex = RtMapSystem.TileIndicesFor(grid.Owner, grid, xform.Coordinates);
 
         var dir = xform.LocalRotation.GetDir();
         var a = FindCirculator(dir);
@@ -184,6 +187,7 @@ public sealed partial class TegNodeGenerator : Node
 [DataDefinition]
 public sealed partial class TegNodeCirculator : Node
 {
+    private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
     public override IEnumerable<Node> GetReachableNodes(
         TransformComponent xform,
         EntityQuery<NodeContainerComponent> nodeQuery,
@@ -194,7 +198,7 @@ public sealed partial class TegNodeCirculator : Node
         if (!xform.Anchored || grid == null)
             yield break;
 
-        var gridIndex = grid.TileIndicesFor(xform.Coordinates);
+        var gridIndex = RtMapSystem.TileIndicesFor(grid.Owner, grid, xform.Coordinates);
 
         var dir = xform.LocalRotation.GetDir();
         var searchDir = dir.GetClockwise90Degrees();

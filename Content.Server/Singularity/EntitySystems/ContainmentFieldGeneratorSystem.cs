@@ -138,7 +138,8 @@ public sealed class ContainmentFieldGeneratorSystem : EntitySystem
         SubscribeLocalEvent<ContainmentFieldGeneratorComponent, ExaminedEvent>(OnExamine);
         SubscribeLocalEvent<ContainmentFieldGeneratorComponent, ActivateInWorldEvent>(OnActivate);
         SubscribeLocalEvent<ContainmentFieldGeneratorComponent, AnchorStateChangedEvent>(OnAnchorChanged);
-        SubscribeLocalEvent<ContainmentFieldGeneratorComponent, ReAnchorEvent>(OnReanchorEvent);
+        // MAID rt-update ReAnchorEvent removed in RT 292, AnchorStateChangedEvent is raised instead
+        // SubscribeLocalEvent<ContainmentFieldGeneratorComponent, ReAnchorEvent>(OnReanchorEvent);
         SubscribeLocalEvent<ContainmentFieldGeneratorComponent, UnanchorAttemptEvent>(OnUnanchorAttempt);
         SubscribeLocalEvent<ContainmentFieldGeneratorComponent, ComponentRemove>(OnComponentRemoved);
         SubscribeLocalEvent<ContainmentFieldGeneratorComponent, EventHorizonAttemptConsumeEntityEvent>(PreventBreach);
@@ -221,10 +222,14 @@ public sealed class ContainmentFieldGeneratorSystem : EntitySystem
             RemoveConnections(generator);
     }
 
+    // MAID BEGIN rt-update ReAnchorEvent removed
+    /*
     private void OnReanchorEvent(Entity<ContainmentFieldGeneratorComponent> generator, ref ReAnchorEvent args)
     {
         GridCheck(generator);
     }
+    */
+    // MAID END rt-update ReAnchorEvent removed
 
     private void OnUnanchorAttempt(EntityUid uid, ContainmentFieldGeneratorComponent component,
         UnanchorAttemptEvent args)

@@ -13,6 +13,12 @@ SPDX-License-Identifier: MIT
 -->
 
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\RobustToolbox\Imports\Lidgren.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Shared.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Client.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Server.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Benchmarks.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Testing.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
   <PropertyGroup>
     <!-- Work around https://github.com/dotnet/project-system/issues/4314 -->
@@ -22,10 +28,15 @@ SPDX-License-Identifier: MIT
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>12</LangVersion>
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication> <!-- MAID rt-update -->
   </PropertyGroup>
+  <Import Project="..\MSBuild\Content.props" /> <!-- MAID rt-update -->
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
+    <!-- MAID rt-update: pin transitive deps for the generated BenchmarkDotNet project (as Goob) -->
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Moq" /> <!-- MAID rt-update -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content.Client\Content.Client.csproj" />
@@ -33,10 +44,5 @@ SPDX-License-Identifier: MIT
     <ProjectReference Include="..\Content.Shared\Content.Shared.csproj" />
     <ProjectReference Include="..\Content.Tests\Content.Tests.csproj" />
     <ProjectReference Include="..\Content.IntegrationTests\Content.IntegrationTests.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Benchmarks\Robust.Benchmarks.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Client\Robust.Client.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Server\Robust.Server.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Shared.Maths\Robust.Shared.Maths.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Shared\Robust.Shared.csproj" />
   </ItemGroup>
 </Project>

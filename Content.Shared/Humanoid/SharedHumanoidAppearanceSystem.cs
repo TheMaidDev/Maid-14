@@ -79,8 +79,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
     public static readonly ProtoId<SpeciesPrototype> DefaultSpecies = "Human";
 
     // WD EDIT START
-    [ValidatePrototypeId<BodyTypePrototype>]
-    public const string DefaultBodyType = "HumanNormal";
+    public static readonly ProtoId<BodyTypePrototype> DefaultBodyType = "HumanNormal";
     // WD EDIT END
 
     //Maid edit start

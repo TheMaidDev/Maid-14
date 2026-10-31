@@ -1731,3 +1731,41 @@ Entries:
         задержки от Админ призраков (заваривание дверей и прочее).
   id: 167
   time: '2026-10-28T23:59:21.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Tweak
+      message: Исправлен геймрул
+  id: 168
+  time: '2026-10-30T17:26:55.0000000+00:00'
+- author: SchrodingerCutie
+  changes:
+    - type: Fix
+      message: Предметы в инвентаре невидимого агоста больше не пропадают.
+  id: 169
+  time: '2026-10-30T17:29:20.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Fix
+      message: Адаптивный теперь запускается
+  id: 170
+  time: '2026-10-30T17:29:32.0000000+00:00'
+- author: Lysinesia
+  changes:
+    - type: Add
+      message: Огнетушитель теперь имеет свойство ломаться.
+  id: 171
+  time: '2026-10-30T17:29:33.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Fix
+      message: Раундстарт геймрулы правильнее
+  id: 172
+  time: '2026-10-31T04:14:19.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Tweak
+      message: Движок обновлён до v293.0.1
+    - type: Add
+      message: Поддержка Mac
+  id: 173
+  time: '2026-10-31T04:14:56.0000000+00:00'

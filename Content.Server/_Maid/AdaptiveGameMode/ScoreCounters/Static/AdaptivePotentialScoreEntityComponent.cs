@@ -6,11 +6,14 @@ namespace Content.Server._Maid.AdaptiveGameMode.ScoreCounters.Static;
 /// How much EXPECTED score it providers (counts only when choosing game rule)
 /// </summary>
 [RegisterComponent]
-public sealed partial class AdaptiveScoreStaticGameruleEntityComponent : Component
+public sealed partial class AdaptivePotentialScoreEntityComponent : Component
 {
-    [DataField("prototype", required: true)]
+    [DataField(required: true)]
     public EntProtoId Prototype { get; set; }
 
-    [DataField("count")]
+    [DataField]
     public int Count { get; set; } = 1;
+
+    [DataField]
+    public float CountPerPlayer { get; set; } = 0;
 }

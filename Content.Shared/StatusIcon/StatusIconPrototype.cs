@@ -78,6 +78,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Shared.Stealth.Components;
 using Content.Shared.Whitelist;
 using Robust.Shared.Prototypes;
@@ -170,6 +171,7 @@ public partial class StatusIconData : IComparable<StatusIconData>
 /// <summary>
 /// <see cref="StatusIconData"/> but in new convenient prototype form!
 /// </summary>
+[DataDefinition] // MAID rt-update
 public abstract partial class StatusIconPrototype : StatusIconData, IPrototype
 {
     /// <inheritdoc/>

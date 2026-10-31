@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 #nullable enable
+using System.IO; // MAID rt-update
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ public class ComponentQueryBenchmark
         ProgramShared.PathOffset = "../../../../";
         PoolManager.Startup(typeof(QueryBenchSystem).Assembly);
 
-        _pair = PoolManager.GetServerClient().GetAwaiter().GetResult();
+        _pair = PoolManager.GetServerClient(testContext: new ExternalTestContext("Benchmark", StreamWriter.Null)).GetAwaiter().GetResult(); // MAID rt-update RT 274 test context
         _entMan = _pair.Server.ResolveDependency<IEntityManager>();
 
         _itemQuery = _entMan.GetEntityQuery<ItemComponent>();

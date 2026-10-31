@@ -24,6 +24,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq; // MAID rt-update
 using Content.Server.Fluids.EntitySystems;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Coordinates;
@@ -79,7 +80,7 @@ namespace Content.IntegrationTests.Tests.Fluids
             // Remove all tiles
             await server.WaitPost(() =>
             {
-                var tiles = mapSystem.GetAllTiles(grid.Owner, grid.Comp);
+                var tiles = mapSystem.GetAllTiles(grid.Owner, grid.Comp).ToList(); // MAID rt-update (do not modify tiles while enumerating)
                 foreach (var tile in tiles)
                 {
                     mapSystem.SetTile(grid, tile.GridIndices, Tile.Empty);

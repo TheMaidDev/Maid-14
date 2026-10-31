@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.DeviceLinking;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
@@ -12,8 +13,8 @@ namespace Content.Goobstation.Server.MiscSignaller
     [RegisterComponent]
     public sealed partial class MiscSignallerComponent : Component
     {
-        [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<SourcePortPrototype>))]
-        public string Port = "Triggered";
+        [DataField]
+        public ProtoId<SourcePortPrototype> Port = "Triggered";
        
         [DataField]
         public TimeSpan ActivationInterval = TimeSpan.FromSeconds(3);

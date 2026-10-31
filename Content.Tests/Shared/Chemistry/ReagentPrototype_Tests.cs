@@ -43,7 +43,7 @@ namespace Content.Tests.Shared.Chemistry
                 var serializationManager = IoCManager.Resolve<ISerializationManager>();
                 serializationManager.Initialize();
 
-                var newReagent = serializationManager.Read<ReagentPrototype>(new MappingDataNode(proto));
+                var newReagent = serializationManager.Read<ReagentPrototype>(new MappingDataNode(proto), notNullableOverride: true); // MAID rt-update
 
                 Assert.That(defType, Is.EqualTo("reagent"));
                 Assert.That(newReagent.ID, Is.EqualTo("H2"));

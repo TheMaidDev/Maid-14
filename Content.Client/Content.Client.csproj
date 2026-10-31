@@ -35,7 +35,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   <PropertyGroup>
     <!-- Work around https://github.com/dotnet/project-system/issues/4314 -->
     <TargetFramework>$(TargetFramework)</TargetFramework>
-    <LangVersion>12</LangVersion>
     <IsPackable>false</IsPackable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\bin\Content.Client\</OutputPath>
@@ -45,22 +44,25 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <Configurations>Debug;Release;Tools;DebugOpt</Configurations>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
+  <Import Project="..\MSBuild\Content.props" /> <!-- MAID rt-update -->
   <ItemGroup>
     <PackageReference Include="Nett" />
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
+    <PackageReference Include="SixLabors.ImageSharp" /> <!-- MAID rt-update -->
+    <PackageReference Include="Pidgin" /> <!-- MAID rt-update -->
+    <PackageReference Include="Robust.Shared.AuthLib" /> <!-- MAID rt-update -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content.Goobstation.Shared\Content.Goobstation.Shared.csproj" />
     <ProjectReference Include="..\Content.Goobstation.UIKit\Content.Goobstation.UIKit.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Lidgren.Network\Lidgren.Network.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Shared.Maths\Robust.Shared.Maths.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Shared\Robust.Shared.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Client\Robust.Client.csproj" />
     <ProjectReference Include="..\Content.Shared\Content.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="_Shitcode\UserInterface\Systems\Ghost\Controls\" />
   </ItemGroup>
+  <Import Project="..\RobustToolbox\Imports\Shared.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Lidgren.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Client.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
   <Import Project="..\RobustToolbox\MSBuild\XamlIL.targets" />
 </Project>

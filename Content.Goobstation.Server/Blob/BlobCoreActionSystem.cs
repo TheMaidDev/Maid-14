@@ -54,7 +54,6 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly DamageableSystem _damageableSystem = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly BlobTileSystem _blobTileSystem = default!;
     //[Dependency] private readonly GridFixtureSystem _gridFixture = default!;
 
@@ -107,7 +106,7 @@ public sealed class BlobCoreActionSystem : SharedBlobCoreActionSystem
             || !args.ClickLocation.IsValid(EntityManager))
             return;
 
-        var location = args.ClickLocation.AlignWithClosestGridTile(entityManager: EntityManager, mapManager: _mapManager);
+        var location = args.ClickLocation.AlignWithClosestGridTile(entityManager: EntityManager); // MAID rt-update
         var gridUid = _transform.GetGrid(location);
 
         if (!TryComp<MapGridComponent>(gridUid, out var grid))

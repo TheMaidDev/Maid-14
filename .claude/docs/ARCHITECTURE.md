@@ -1,6 +1,6 @@
 # Maid-14 architecture
 
-Maid-14 = Space Station 14 (SS14) on the **RobustToolbox** engine (C#/.NET 9, YAML data, Fluent localisation), forked through Goob Station. Docs in this folder:
+Maid-14 = Space Station 14 (SS14) on the **RobustToolbox** engine (C#/.NET 10, YAML data, Fluent localisation), forked through Goob Station. Docs in this folder:
 - `ecs.md` — ECS overview and index of the engine-mechanics files in `ecs/` (`entities.md`, `components.md`, `networking.md`, `systems-engine.md`).
 - `systems.md` — entry point for content-system docs (none documented yet). Per-system docs live in `systems/<system>.md` (one file per system, added over time; subsystems may get their own files).
 - `rsi.md` — sprite packaging, sprite layers, the Appearance bridge, equipment art naming.

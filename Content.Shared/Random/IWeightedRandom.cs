@@ -16,3 +16,12 @@ public interface IWeightedRandomPrototype : IPrototype
     [ViewVariables]
     public Dictionary<string, float> Weights { get; }
 }
+
+// MAID BEGIN rt-update generic weighted random
+public interface IWeightedRandomPrototype<TProto> : IPrototype
+    where TProto : class, IPrototype
+{
+    [ViewVariables]
+    public Dictionary<ProtoId<TProto>, float> Weights { get; }
+}
+// MAID END rt-update generic weighted random

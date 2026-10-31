@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.Prototypes;
 using Content.Server.Emoting.Systems;
 using Content.Shared.Chat.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -21,8 +22,8 @@ public sealed partial class BodyEmotesComponent : Component
     /// <summary>
     ///     Emote sounds prototype id for body emotes.
     /// </summary>
-    [DataField("soundsId", customTypeSerializer: typeof(PrototypeIdSerializer<EmoteSoundsPrototype>))]
-    public string? SoundsId;
+    [DataField("soundsId")]
+    public ProtoId<EmoteSoundsPrototype>? SoundsId;
 
     /// <summary>
     ///     Loaded emote sounds prototype used for body emotes.

@@ -105,11 +105,18 @@ public sealed class SupermatterHalberdSystem : EntitySystem
 }
 
 [Serializable, NetSerializable]
-public sealed partial class SmHalberdExecuteDoAfterEvent(NetEntity? rayEffect) : DoAfterEvent
+// MAID BEGIN rt-update primary ctor breaks serialization generator
+public sealed partial class SmHalberdExecuteDoAfterEvent : DoAfterEvent
 {
-    public NetEntity? RayEffect = rayEffect;
+    public NetEntity? RayEffect;
 
-    public SmHalberdExecuteDoAfterEvent() : this(null) { }
+    public SmHalberdExecuteDoAfterEvent() { }
+
+    public SmHalberdExecuteDoAfterEvent(NetEntity? rayEffect)
+    {
+        RayEffect = rayEffect;
+    }
+// MAID END rt-update primary ctor breaks serialization generator
 
     public override DoAfterEvent Clone() => this;
 }

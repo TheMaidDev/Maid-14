@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.Prototypes;
 using System.Numerics;
 using Content.Server.Worldgen.Prototypes;
 using Content.Server.Worldgen.Systems.Debris;
@@ -46,6 +47,6 @@ public sealed partial class DebrisFeaturePlacerControllerComponent : Component
     /// <summary>
     ///     The noise channel to use as a density controller.
     /// </summary>
-    [DataField("densityNoiseChannel", customTypeSerializer: typeof(PrototypeIdSerializer<NoiseChannelPrototype>))]
-    public string DensityNoiseChannel { get; private set; } = default!;
+    [DataField("densityNoiseChannel")]
+    public ProtoId<NoiseChannelPrototype> DensityNoiseChannel { get; private set; } = default!;
 }

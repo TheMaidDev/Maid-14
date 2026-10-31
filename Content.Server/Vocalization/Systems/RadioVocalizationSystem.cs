@@ -45,7 +45,7 @@ public sealed partial class RadioVocalizationSystem : EntitySystem
     /// </summary>
     private bool TryPickRandomRadioChannel(EntityUid entity, out string channel)
     {
-        HashSet<string> potentialChannels = [];
+        HashSet<ProtoId<RadioChannelPrototype>> potentialChannels = []; // MAID rt-update
 
         // we don't have to check if this entity has an inventory. GetHandOrInventoryEntities will not yield anything
         // if an entity has no inventory or inventory slots
@@ -63,7 +63,7 @@ public sealed partial class RadioVocalizationSystem : EntitySystem
             return false;
         }
 
-        channel = _random.Pick(potentialChannels);
+        channel = _random.Pick(potentialChannels).Id; // MAID rt-update
 
         return true;
     }

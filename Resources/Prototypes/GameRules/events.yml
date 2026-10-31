@@ -251,10 +251,6 @@
     chaos: # Goobstation
       Anomaly: 100
     eventType: Chaotic # Goobstation
-  # MAID BEGIN anomaly score
-  - type: AdaptiveScoreStaticGameruleEntity
-    prototype: AnomalyPyroclastic # We can't reference base since its abstract
-  # MAID END anomaly score
   # Goobstation
   - type: GameRule
     delay:
@@ -272,11 +268,6 @@
       min:  30
       max:  30
     chaosScore: 40 # Goobstation
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStatic
-    chaosScore: 5
-    combatScore: 0
-  # MAID END adaptive scores
   - type: StationEvent
     startAnnouncementColor: "#18abf5"
     startAudio:
@@ -367,11 +358,6 @@
     chaosScore: 60
   - type: RandomEntityStorageSpawnRule
     prototype: MobSkeletonCloset
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStatic
-    chaosScore: 3
-    combatScore: 0
-  # MAID END adaptive scores
 
 - type: entity
   parent: BaseGameRule
@@ -633,11 +619,6 @@
   - type: GameRule
     chaosScore: 80 # most of the time scrubbers just clean it
   - type: GasLeakRule
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStatic
-    chaosScore: 5
-    combatScore: 0
-  # MAID END adaptive scores
 
 - type: entity
   id: KudzuGrowth
@@ -677,14 +658,6 @@
   - type: GameRule
     chaosScore: 80
   - type: PowerGridCheckRule
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStatic
-    chaosScore: 5
-    conditions:
-    - !type:HasComponent
-      components:
-      - ActiveGameRule
-  # MAID END adaptive scores
 
 - type: entity
   parent: BaseGameRule
@@ -719,14 +692,6 @@
     extraCount: 2
     lightBreakChancePerSecond: 0.0003
     doorToggleChancePerSecond: 0.001
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStatic
-    chaosScore: 3
-    conditions:
-    - !type:HasComponent
-      components:
-      - ActiveGameRule
-  # MAID END adaptive scores
 
 - type: entity
   id: VentClog
@@ -767,11 +732,6 @@
   # Goobstation
   - type: GameRule
     chaosScore: 200
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStaticGameruleEntity
-    prototype: MobSlimeXenobioBabyGrey
-    count: 5
-  # MAID END adaptive scores
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
       children:
@@ -796,11 +756,6 @@
   # Goobstation
   - type: GameRule
     chaosScore: 240
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStaticGameruleEntity
-    prototype: MobPurpleSnake
-    count: 5
-  # MAID END adaptive scores
   - type: VentCrittersRule
     table: !type:GroupSelector # DeltaV: EntityTable instead of spawn entries
       children:
@@ -827,11 +782,6 @@
   # Goobstation
   - type: GameRule
     chaosScore: 240
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStaticGameruleEntity
-    prototype: MobGiantSpiderAngry
-    count: 5
-  # MAID END adaptive scores
   - type: VentCrittersRule
     table: # DeltaV: EntityTable instead of spawn entries
       id: MobGiantSpiderAngry
@@ -855,11 +805,6 @@
   # Goobstation
   - type: GameRule
     chaosScore: 240
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStaticGameruleEntity
-    prototype: MobClownSpider
-    count: 5
-  # MAID END adaptive scores
   - type: VentCrittersRule
     playerRatio: 20 # DeltaV: Clown spiders are very robust
     table: # DeltaV: EntityTable instead of spawn entries
@@ -1036,13 +981,6 @@
   - type: GameRule
     chaosScore: 150
   - type: IonStormRule
-  # MAID BEGIN adaptive scores
-  - type: AdaptiveScoreStatic
-    chaosScore:
-      base: 3
-      target: 0
-      in: 600
-  # MAID END adaptive scores
 
 - type: entity
   id: MimicVendorRule

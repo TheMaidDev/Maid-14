@@ -40,7 +40,7 @@ public abstract class SharedMansusGraspSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IMapManager _mapMan = default!;
+    [Dependency] private readonly SharedMapSystem _mapSystem = default!; // MAID rt-update
 
     [Dependency] private readonly SharedDoorSystem _door = default!;
     [Dependency] private readonly DamageableSystem _damage = default!;

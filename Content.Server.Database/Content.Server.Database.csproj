@@ -16,7 +16,6 @@ SPDX-License-Identifier: MIT
   <PropertyGroup>
     <!-- Work around https://github.com/dotnet/project-system/issues/4314 -->
     <TargetFramework>$(TargetFramework)</TargetFramework>
-    <LangVersion>12</LangVersion>
     <IsPackable>false</IsPackable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\bin\Content.Server.Database\</OutputPath>
@@ -24,6 +23,7 @@ SPDX-License-Identifier: MIT
     <Nullable>enable</Nullable>
     <NoWarn>RA0003</NoWarn>
   </PropertyGroup>
+  <Import Project="..\MSBuild\Content.props" /> <!-- MAID rt-update -->
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

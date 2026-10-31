@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.Prototypes;
 using Content.Shared.Tag;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
@@ -19,6 +20,6 @@ public sealed partial class PriorityDockComponent : Component
     /// Tag to match on the docking request, if this dock is to be prioritised.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite),
-     DataField("tag", customTypeSerializer: typeof(PrototypeIdSerializer<TagPrototype>))]
-    public string? Tag;
+     DataField("tag")]
+    public ProtoId<TagPrototype>? Tag;
 }

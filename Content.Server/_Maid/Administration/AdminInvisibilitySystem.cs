@@ -13,6 +13,7 @@ public sealed class AdminInvisibilitySystem : SharedAdminInvisibilitySystem
 {
     [Dependency] private readonly FollowerSystem _follower = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedEyeSystem _eye = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly VisibilitySystem _visibility = default!;
 
@@ -20,7 +21,30 @@ public sealed class AdminInvisibilitySystem : SharedAdminInvisibilitySystem
     {
         base.Initialize();
 
+        SubscribeLocalEvent<AdminInvisibilityComponent, ComponentStartup>(OnStartup);
+        SubscribeLocalEvent<AdminInvisibilityComponent, GetVisMaskEvent>(OnGetVisMask);
         SubscribeLocalEvent<AdminInvisibilityComponent, ToggleAdminInvisibilityActionEvent>(OnToggleAction);
+    }
+
+    private void OnStartup(Entity<AdminInvisibilityComponent> ent, ref ComponentStartup args)
+    {
+        _eye.RefreshVisibilityMask(ent.Owner);
+    }
+
+    protected override void OnShutdown(Entity<AdminInvisibilityComponent> ent, ref ComponentShutdown args)
+    {
+        base.OnShutdown(ent, ref args);
+
+        if (Terminating(ent.Owner))
+            return;
+
+        _eye.RefreshVisibilityMask(ent.Owner);
+    }
+
+    private void OnGetVisMask(Entity<AdminInvisibilityComponent> ent, ref GetVisMaskEvent args)
+    {
+        if (ent.Comp.LifeStage <= ComponentLifeStage.Running)
+            args.VisibilityMask |= (int) VisibilityFlags.Admin;
     }
 
     private void OnToggleAction(Entity<AdminInvisibilityComponent> ent, ref ToggleAdminInvisibilityActionEvent args)

@@ -133,10 +133,10 @@
   - type: PaperVisuals
     backgroundImagePath: "/Textures/Interface/Paper/paper_background_perforated.svg.96dpi.png"
     headerImagePath: "/Textures/Interface/Paper/paper_heading_forensic_scanner.svg.96dpi.png"
-    headerMargin: 0.0, 0.0, 0.0, 4.0
+    headerMargin: 0.0, 4.0, 0.0, 0.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
     backgroundImageTile: true
-    backgroundPatchMargin: 6.0, 0.0, 6.0, 0.0
-    contentMargin: 12.0, 0.0, 6.0, 0.0
+    backgroundPatchMargin: 6.0, 0.0, 6.0, 0.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
+    contentMargin: 12.0, 0.0, 6.0, 0.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
     maxWritableArea: 368.0, 256.0
   - type: GuideHelp
     guides:
@@ -150,4 +150,4 @@
   components:
   - type: PaperVisuals
     headerImagePath: null
-    headerMargin: 0.0, 0.0, 0.0, 0.0
+    headerMargin: 0.0, 0.0, 0.0, 0.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
