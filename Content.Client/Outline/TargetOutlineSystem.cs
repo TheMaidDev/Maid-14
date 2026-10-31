@@ -81,6 +81,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using System.Numerics;
 using Content.Shared.Interaction;
 using Content.Shared.Whitelist;
@@ -110,6 +111,7 @@ public sealed class TargetOutlineSystem : EntitySystem
     [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!; // MAID Multi postshader
 
     private bool _enabled = false;
 
@@ -238,11 +240,20 @@ public sealed class TargetOutlineSystem : EntitySystem
             if (!valid)
             {
                 // was this previously valid?
+                // MAID BEGIN Multi postshader
+                /*
                 if (_highlightedSprites.Remove(sprite) && (sprite.PostShader == _shaderTargetValid || sprite.PostShader == _shaderTargetInvalid))
                 {
                     sprite.PostShader = null;
                     sprite.RenderOrder = 0;
                 }
+                */
+                if (_highlightedSprites.Remove(sprite))
+                {
+                    _sprite.RemovePostShader(sprite, MaidPostShaderIds.TargetOutline);
+                    sprite.RenderOrder = 0;
+                }
+                // MAID END Multi postshader
 
                 continue;
             }
@@ -257,6 +268,8 @@ public sealed class TargetOutlineSystem : EntitySystem
                 valid = (origin - target).LengthSquared() <= Range;
             }
 
+            // MAID BEGIN Multi postshader
+            /*
             if (sprite.PostShader != null &&
                 sprite.PostShader != _shaderTargetValid &&
                 sprite.PostShader != _shaderTargetInvalid)
@@ -264,6 +277,9 @@ public sealed class TargetOutlineSystem : EntitySystem
 
             // highlight depending on whether its in or out of range
             sprite.PostShader = valid ? _shaderTargetValid : _shaderTargetInvalid;
+            */
+            _sprite.SetPostShader(sprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.TargetOutline, valid ? _shaderTargetValid : _shaderTargetInvalid));
+            // MAID END Multi postshader
             sprite.RenderOrder = EntityManager.CurrentTick.Value;
             _highlightedSprites.Add(sprite);
         }
@@ -273,10 +289,15 @@ public sealed class TargetOutlineSystem : EntitySystem
     {
         foreach (var sprite in _highlightedSprites)
         {
+            // MAID BEGIN Multi postshader
+            /*
             if (sprite.PostShader != _shaderTargetValid && sprite.PostShader != _shaderTargetInvalid)
                 continue;
 
             sprite.PostShader = null;
+            */
+            _sprite.RemovePostShader(sprite, MaidPostShaderIds.TargetOutline);
+            // MAID END Multi postshader
             sprite.RenderOrder = 0;
         }
 

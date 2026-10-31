@@ -80,6 +80,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using Content.Client.Interactable.Components;
 using Content.Shared.Stealth;
 using Content.Shared.Stealth.Components;
@@ -92,7 +93,6 @@ namespace Content.Client.Stealth;
 public sealed class StealthSystem : SharedStealthSystem
 {
     private static readonly ProtoId<ShaderPrototype> Shader = "Stealth";
-    private const string StealthPostShaderId = "Stealth"; // MAID Stealth multi postshader
 
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
@@ -134,15 +134,16 @@ public sealed class StealthSystem : SharedStealthSystem
         */
         if (enabled)
         {
-            _sprite.SetPostShader((uid, sprite), new SpriteComponent.PostShaderArgs(StealthPostShaderId, _shader)
+            _sprite.SetPostShader((uid, sprite), new SpriteComponent.PostShaderArgs(MaidPostShaderIds.Stealth, _shader)
             {
                 GetScreenTexture = true,
                 RaiseShaderEvent = true,
+                After = MaidPostShaderIds.BeforeStealth,
             });
         }
         else
         {
-            _sprite.RemovePostShader((uid, sprite), StealthPostShaderId);
+            _sprite.RemovePostShader((uid, sprite), MaidPostShaderIds.Stealth);
         }
         // MAID END Stealth multi postshader
 
