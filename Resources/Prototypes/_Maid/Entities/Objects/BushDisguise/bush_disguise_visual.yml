@@ -1,0 +1,18 @@
+# Drawn in place of a player who is carrying a potted plant.
+# The sprite is replaced on the client with a copy of the plant's sprite, name and description are set by the server.
+- type: entity
+  id: MaidBushDisguiseVisual
+  name: potted plant
+  save: false
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    noRot: true
+    drawdepth: Mobs
+    sprite: Structures/Furniture/potted_plants.rsi
+    state: plant-01
+  - type: Clickable
+  - type: InteractionOutline
+  - type: BushDisguiseVisual

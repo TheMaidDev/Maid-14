@@ -161,6 +161,10 @@
     containers:
       stash: !type:ContainerSlot {}
   - type: Pullable
+  - type: Item # MAID Bush disguise
+    size: Huge # MAID Bush disguise
+  - type: MultiHandedItem # MAID Bush disguise
+  - type: BushDisguise # MAID Bush disguise
   - type: Damageable
     damageContainer: StructuralInorganic # The pot. Not the plant. Or is it plastic?
   - type: Destructible
