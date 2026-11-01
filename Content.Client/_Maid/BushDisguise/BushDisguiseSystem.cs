@@ -26,6 +26,12 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
     /// </summary>
     private readonly HashSet<EntityUid> _pendingHolders = new();
 
+    /// <summary>
+    /// Disguised players we have hidden. Checked every frame so nobody stays invisible without a visual.
+    /// </summary>
+    private readonly HashSet<EntityUid> _hiddenHolders = new();
+    private readonly List<EntityUid> _recheck = new();
+
     public override void Initialize()
     {
         base.Initialize();
@@ -45,6 +51,37 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
 
         if (_pendingHolders.Count > 0)
             _pendingHolders.RemoveWhere(TryHide);
+
+        if (_hiddenHolders.Count > 0)
+            RecheckHidden();
+    }
+
+    /// <summary>
+    /// Shows a hidden player again if their visual disappeared, and hides them again once it is back.
+    /// </summary>
+    private void RecheckHidden()
+    {
+        _recheck.Clear();
+        _recheck.AddRange(_hiddenHolders);
+
+        foreach (var uid in _recheck)
+        {
+            if (!TryComp<BushDisguisedComponent>(uid, out var disguised))
+            {
+                _hiddenHolders.Remove(uid);
+                continue;
+            }
+
+            if (disguised.Visual is { } visual && _readyVisuals.Contains(visual) && !TerminatingOrDeleted(visual))
+                continue;
+
+            _hiddenHolders.Remove(uid);
+
+            if (TryComp<SpriteComponent>(uid, out var sprite))
+                _sprite.SetVisible((uid, sprite), disguised.WasVisible);
+
+            _pendingHolders.Add(uid);
+        }
     }
 
     private void OnStartup(Entity<BushDisguisedComponent> ent, ref ComponentStartup args)
@@ -60,6 +97,7 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
     private void OnShutdown(Entity<BushDisguisedComponent> ent, ref ComponentShutdown args)
     {
         _pendingHolders.Remove(ent.Owner);
+        _hiddenHolders.Remove(ent.Owner);
 
         if (TryComp<SpriteComponent>(ent, out var sprite))
             _sprite.SetVisible((ent, sprite), ent.Comp.WasVisible);
@@ -89,6 +127,7 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
             return false;
 
         _sprite.SetVisible((uid, sprite), false);
+        _hiddenHolders.Add(uid);
         return true;
     }
 

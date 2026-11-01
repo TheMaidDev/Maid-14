@@ -12,6 +12,7 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Item;
 using Content.Shared.Mobs;
 using Content.Shared.Popups;
@@ -39,6 +40,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedIdentitySystem _identity = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedVirtualItemSystem _virtualItem = default!;
 
     private static readonly SpriteSpecifier.Texture PickupIcon = new(new("/Textures/Interface/VerbIcons/pickup.svg.192dpi.png"));
 
@@ -161,6 +163,20 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
             return;
 
         Disguise(args.User, ent);
+        BlockFreeHands(args.User, ent);
+    }
+
+    /// <summary>
+    /// The plant counts as a two-handed item, so mobs with more hands would keep free ones.
+    /// Fill those with virtual items too. They go away together with the other virtual items when the plant is dropped.
+    /// </summary>
+    private void BlockFreeHands(EntityUid user, EntityUid bush)
+    {
+        foreach (var hand in _hands.EnumerateHands(user).ToList())
+        {
+            if (_hands.HandIsEmpty(user, hand))
+                _virtualItem.TrySpawnVirtualItemInHand(bush, user, out _, empty: hand);
+        }
     }
 
     private void OnGotUnequippedHand(Entity<BushDisguiseComponent> ent, ref GotUnequippedHandEvent args)
