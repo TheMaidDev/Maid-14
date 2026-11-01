@@ -74,7 +74,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
     private void OnInteractHand(Entity<BushDisguiseComponent> ent, ref InteractHandEvent args)
     {
-        if (args.Handled || !ent.Comp.Enabled)
+        if (args.Handled)
             return;
 
         args.Handled = true;
@@ -88,7 +88,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         var pickupInventoryText = Loc.GetString("pick-up-verb-get-data-text-inventory");
         args.Verbs.RemoveWhere(verb => verb.Text == pickupText || verb.Text == pickupInventoryText);
 
-        if (!ent.Comp.Enabled || args.Hands == null || !args.CanAccess || !args.CanInteract)
+        if (args.Hands == null || !args.CanAccess || !args.CanInteract)
             return;
 
         var user = args.User;
@@ -108,8 +108,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
     private bool TryStartPickup(Entity<BushDisguiseComponent> ent, EntityUid user)
     {
-        if (!ent.Comp.Enabled
-            || HasComp<BushDisguisedComponent>(user)
+        if (HasComp<BushDisguisedComponent>(user)
             || !HasComp<HandsComponent>(user)
             || _container.IsEntityInContainer(ent))
             return false;

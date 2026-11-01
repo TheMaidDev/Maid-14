@@ -11,8 +11,6 @@
   parent: PottedPlantBase
   suffix: Dimension
   components:
-  - type: BushDisguise # MAID Bush disguise
-    enabled: false # MAID Bush disguise
   - type: Sprite
     layers:
     - state: plant-01
