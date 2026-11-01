@@ -177,10 +177,6 @@
     containers:
       stash: !type:ContainerSlot {}
   - type: Pullable
-  - type: Item # MAID Bush disguise
-    size: Huge # MAID Bush disguise
-  - type: MultiHandedItem # MAID Bush disguise
-  - type: BushDisguise # MAID Bush disguise
   - type: Damageable
     damageContainer: StructuralInorganic # The pot. Not the plant. Or is it plastic?
   - type: Destructible
@@ -197,70 +193,70 @@
 
 - type: entity
   id: PottedPlant0
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: applebush #whoever named this texture in the rsi sucks
 
 - type: entity
   id: PottedPlant1
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-01
 
 - type: entity
   id: PottedPlant2
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-02
 
 - type: entity
   id: PottedPlant3
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-03
 
 - type: entity
   id: PottedPlant4
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-04
 
 - type: entity
   id: PottedPlant5
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-05
 
 - type: entity
   id: PottedPlant6
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-06
 
 - type: entity
   id: PottedPlant7
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-07
 
 - type: entity
   id: PottedPlant8
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-08
 
 - type: entity
   id: PottedPlantBioluminscent #PottedPlant9 but i didn't want map conflicts
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   name: "bioluminescent potted plant"
   description: "It produces light!"
   components:
@@ -272,7 +268,7 @@
 
 - type: entity
   id: PottedPlant10
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   description: A pretty piece of nature contained in a pot.
   components:
   - type: Sprite
@@ -280,105 +276,105 @@
 
 - type: entity
   id: PottedPlant11
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-11
 
 - type: entity
   id: PottedPlant12
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-12
 
 - type: entity
   id: PottedPlant13
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-13
 
 - type: entity
   id: PottedPlant14
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-14
 
 - type: entity
   id: PottedPlant15
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-15
 
 - type: entity
   id: PottedPlant16
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-16
 
 - type: entity
   id: PottedPlant17
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-17
 
 - type: entity
   id: PottedPlant18
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-18
 
 - type: entity
   id: PottedPlant19
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-19
 
 - type: entity
   id: PottedPlant20
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-20
 
 - type: entity
   id: PottedPlant21
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-21
 
 - type: entity
   id: PottedPlant22
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-22
 
 - type: entity
   id: PottedPlant23
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-23
 
 - type: entity
   id: PottedPlant24
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   components:
   - type: Sprite
     state: plant-24
 
 - type: entity
   id: PottedPlantRD #PottedPlant25
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   name: "RD's potted plant"
   description: "A gift from the botanical staff, presented after the RD's reassignment. There's a tag on it that says \"Y'all come back now, y'hear?\"\nIt doesn't look very healthy..."
   components:
@@ -389,7 +385,7 @@
 
 - type: entity
   id: PottedPlant26
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   description: Is it just me, or is it blinking?
   components:
   - type: Sprite
@@ -399,7 +395,7 @@
 #enough differences to warrant getting a unique abstract prototype. It's just the name and description.
 - type: entity
   id: PottedPlant27
-  parent: PottedPlantBase
+  parent: PottedPlantBushBase # MAID Bush disguise
   name: plastic potted plant
   description: A fake, cheap looking, plastic tree. Perfect for people who kill every plant they touch.
   components:
