@@ -55,7 +55,8 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         SubscribeLocalEvent<BushDisguiseComponent, GetVerbsEvent<InteractionVerb>>(OnGetVerbs, after: [typeof(SharedItemSystem)]);
         SubscribeLocalEvent<BushDisguiseComponent, GettingPickedUpAttemptEvent>(OnGettingPickedUp);
         SubscribeLocalEvent<BushDisguiseComponent, BushPickupDoAfterEvent>(OnPickupDoAfter);
-        SubscribeLocalEvent<BushDisguiseComponent, GotEquippedHandEvent>(OnGotEquippedHand);
+        // After MultiHandedItem has spawned its virtual items, so a rejected plant takes them away again when it drops.
+        SubscribeLocalEvent<BushDisguiseComponent, GotEquippedHandEvent>(OnGotEquippedHand, after: [typeof(MultiHandedItemSystem)]);
         SubscribeLocalEvent<BushDisguiseComponent, GotUnequippedHandEvent>(OnGotUnequippedHand);
         SubscribeLocalEvent<BushDisguiseComponent, ComponentShutdown>(OnBushShutdown);
 
@@ -165,7 +166,9 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
         // The plant can also arrive without the pickup rules (stripping puts it in a hand with the blockers off).
         // That is fine as long as the hands are otherwise empty; if not, it falls back to the floor.
-        if (_hands.EnumerateHeld(args.User).Any(held => held != ent.Owner && !HasComp<VirtualItemComponent>(held)))
+        // Virtual items count only when they belong to this plant; others (e.g. a pull) can go away and free the hand.
+        if (_hands.EnumerateHeld(args.User).Any(held => held != ent.Owner
+                && (!TryComp<VirtualItemComponent>(held, out var virt) || virt.BlockingEntity != ent.Owner)))
         {
             _popup.PopupEntity(Loc.GetString("bush-disguise-hands-not-empty", ("bush", ent.Owner)), ent, args.User);
             _hands.TryDrop(args.User, ent.Owner, checkActionBlocker: false);
