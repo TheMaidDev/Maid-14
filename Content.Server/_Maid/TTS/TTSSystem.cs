@@ -9,6 +9,7 @@ using Content.Server.Light.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._EinsteinEngines.Language;
 using Content.Shared._EinsteinEngines.Language.Components;
+using Content.Shared._Maid.BushDisguise;
 using Content.Shared._Maid.CVars;
 using Content.Shared._Maid.TTS;
 using Content.Shared.GameTicking;
@@ -113,6 +114,10 @@ public sealed partial class TTSSystem : EntitySystem
     private async void OnEntitySpoke(EntityUid uid, TTSComponent component, EntitySpokeEvent args)
     {
         if (!_isEnabled || args.Message.Length > MaxMessageChars)
+            return;
+
+        // Someone carrying a bush has no voice of their own.
+        if (HasComp<BushDisguisedComponent>(uid))
             return;
 
         if (!args.Language.SpeechOverride.RequireSpeech)
