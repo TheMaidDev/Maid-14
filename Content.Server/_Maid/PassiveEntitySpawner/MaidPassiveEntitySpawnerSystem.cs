@@ -114,10 +114,9 @@ public sealed class MaidPassiveEntitySpawnerSystem : EntitySystem
 
     private void UpdateMultiplier(MaidPassiveEntitySpawnerComponent comp)
     {
-        //var playerCount = _playerManager.Sessions
-        //    .Count(session => session.Status == SessionStatus.InGame);
+        var playerCount = _playerManager.Sessions
+            .Count(session => session.Status == SessionStatus.InGame);
 
-        var playerCount = 20; // _playerManager.PlayerCount;
         if (comp.CachedPlayerCount == playerCount)
             return;
 
