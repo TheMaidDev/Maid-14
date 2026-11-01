@@ -22,6 +22,7 @@
   - YAML: use `#` comments per line.
   - Localization: no comments in `.ftl` files.
   - `{change}`: short, consistent 2–5 word task label.
+- **NEVER** coauthor yourself in any way (i. e. commit message, comments or claude github account (git credentials already configured)).
 
 ## Documentation
 - Project knowledge base for agents lives in `.claude/docs/`; start with `.claude/docs/ARCHITECTURE.md`.

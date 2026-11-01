@@ -659,10 +659,15 @@ public sealed class RCDSystem : EntitySystem
                     _ => Angle.Zero // Fallback
                 };
 
+                // MAID BEGIN RCD anchor fix
+                /*
                 // Convert EntityCoordinates to MapCoordinates
                 var entityCoords = _mapSystem.GridTileToLocal(gridUid, mapGrid, position);
                 var mapCoords = _transform.ToMapCoordinates(entityCoords);
                 var ent = Spawn(proto, mapCoords, rotation: rotation);
+                */
+                var ent = SpawnAttachedTo(proto, _mapSystem.GridTileToLocal(gridUid, mapGrid, position), rotation: rotation);
+                // MAID END RCD anchor fix
                 // End of funky changes
 
                 /* Funky - handled above
