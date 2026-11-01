@@ -64,7 +64,6 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
             return false;
 
         _sprite.LayerSetRsi((uid, dest), 0, layer.Rsi, layer.RsiState);
-        _sprite.SetOffset((uid, dest), source.Offset);
         _sprite.SetDrawDepth((uid, dest), source.DrawDepth);
         return true;
     }

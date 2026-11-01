@@ -146,11 +146,14 @@
           radius: 0.25 # MAID Plant collision
         # density: 190 # MAID Plant collision
         density: 50 # MAID Plant collision
-        mask:
-        - HighImpassable
-        - MidImpassable # MAID Plant collision
+        # mask: # MAID Plant collision
+        # - HighImpassable # MAID Plant collision
+        # - MidImpassable # MAID Plant collision
+        mask: # MAID Plant collision
+        - CrateMask # MAID Plant collision
         layer: # MAID Plant collision
         - MidImpassable # MAID Plant collision
+        - LowImpassable # MAID Plant collision
   - type: Sprite
     drawdepth: Overdoors
     offset: "0.0,0.3"

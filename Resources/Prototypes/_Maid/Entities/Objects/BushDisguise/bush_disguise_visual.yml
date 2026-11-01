@@ -11,6 +11,7 @@
   - type: Sprite
     noRot: true
     drawdepth: Mobs
+    offset: 0,0.3125
     sprite: Structures/Furniture/potted_plants.rsi
     state: plant-01
   - type: Clickable
