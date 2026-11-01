@@ -85,7 +85,7 @@
     # damageModifierSet: Metallic # Goob
   - type: Sprite
     drawdepth: WallMountedItems
-    sprite: Structures/Wallmounts/camera.rsi
+    sprite: _Maid/Structures/Wallmounts/camera.rsi
     layers:
       - map: [ "enum.SurveillanceCameraVisualsKey.Layer" ]
         state: camera
@@ -279,7 +279,7 @@
       damageModifierSet: Metallic
     - type: Sprite
       drawdepth: WallMountedItems
-      sprite: Structures/Wallmounts/camera.rsi
+      sprite: _Maid/Structures/Wallmounts/camera.rsi
       layers:
         - state: camera_off
   placement:
