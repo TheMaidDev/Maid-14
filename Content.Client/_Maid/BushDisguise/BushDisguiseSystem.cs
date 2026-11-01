@@ -1,17 +1,17 @@
+using System.Linq;
 using Content.Shared._Maid.BushDisguise;
 using Robust.Client.GameObjects;
-using Robust.Shared.GameStates;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.Manager;
 
 namespace Content.Client._Maid.BushDisguise;
 
 public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
 {
-    [Dependency] private readonly IComponentFactory _factory = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly ISerializationManager _serMan = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+
+    /// <summary>
+    /// Visuals still waiting for the plant they copy to show up on the client.
+    /// </summary>
+    private readonly HashSet<EntityUid> _pending = new();
 
     public override void Initialize()
     {
@@ -20,6 +20,14 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
         SubscribeLocalEvent<BushDisguisedComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<BushDisguisedComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<BushDisguiseVisualComponent, AfterAutoHandleStateEvent>(OnVisualState);
+    }
+
+    public override void FrameUpdate(float frameTime)
+    {
+        base.FrameUpdate(frameTime);
+
+        if (_pending.Count > 0)
+            _pending.RemoveWhere(TryCopySprite);
     }
 
     private void OnStartup(Entity<BushDisguisedComponent> ent, ref ComponentStartup args)
@@ -39,21 +47,25 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
 
     private void OnVisualState(Entity<BushDisguiseVisualComponent> ent, ref AfterAutoHandleStateEvent args)
     {
-        SpriteComponent? source = null;
+        if (!TryCopySprite(ent))
+            _pending.Add(ent);
+    }
 
-        if (TryComp<SpriteComponent>(ent.Comp.Source, out var live))
-            source = live;
-        else if (ent.Comp.SourceProto is { } protoId
-                 && _proto.TryIndex(protoId, out var proto)
-                 && proto.TryGetComponent<SpriteComponent>(out var protoSprite, _factory))
-            source = protoSprite;
+    /// <summary>
+    /// Copies the look of the plant onto the visual's own sprite.
+    /// Returns true when there is nothing more to do, false if the plant isn't ready yet.
+    /// </summary>
+    private bool TryCopySprite(EntityUid uid)
+    {
+        if (!TryComp<BushDisguiseVisualComponent>(uid, out var visual) || !TryComp<SpriteComponent>(uid, out var dest))
+            return true;
 
-        if (source == null)
-            return;
+        if (!TryComp<SpriteComponent>(visual.Source, out var source) || source.AllLayers.FirstOrDefault() is not { } layer)
+            return false;
 
-        // Remove then re-add so no layers of the placeholder sprite are left behind.
-        RemComp<SpriteComponent>(ent);
-        var dest = AddComp<SpriteComponent>(ent);
-        _serMan.CopyTo(source, ref dest, notNullableOverride: true);
+        _sprite.LayerSetRsi((uid, dest), 0, layer.Rsi, layer.RsiState);
+        _sprite.SetOffset((uid, dest), source.Offset);
+        _sprite.SetDrawDepth((uid, dest), source.DrawDepth);
+        return true;
     }
 }
