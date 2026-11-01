@@ -13,7 +13,14 @@ public sealed class EntitiesTrackerSystem : EntitySystem
     private void OnTrackedShutdown(Entity<TrackedEntityComponent> ent, ref ComponentShutdown args)
     {
         if (ent.Comp.Tracker is { } tracker && TryComp<EntitiesTrackerComponent>(tracker, out var trackerComp))
-            trackerComp.Entities.Remove(ent.Owner);
+        {
+            var oldCount = trackerComp.Entities.Count;
+            if (trackerComp.Entities.Remove(ent.Owner))
+            {
+                var ev = new TrackedEntitiesCountChangedEvent(oldCount, trackerComp.Entities.Count);
+                RaiseLocalEvent(tracker, ref ev);
+            }
+        }
     }
 
     private void OnTrackerShutdown(Entity<EntitiesTrackerComponent> ent, ref ComponentShutdown args)
@@ -46,12 +53,26 @@ public sealed class EntitiesTrackerSystem : EntitySystem
         {
             if (TryComp<EntitiesTrackerComponent>(trackedComp.Tracker.Value, out var oldTrackerComp))
             {
-                oldTrackerComp.Entities.Remove(entityUid);
+                var oldTracker = trackedComp.Tracker.Value;
+                var oldTrackerCount = oldTrackerComp.Entities.Count;
+                if (oldTrackerComp.Entities.Remove(entityUid))
+                {
+                    var oldEv = new TrackedEntitiesCountChangedEvent(oldTrackerCount, oldTrackerComp.Entities.Count);
+                    RaiseLocalEvent(oldTracker, ref oldEv);
+                }
             }
         }
 
         trackedComp.Tracker = trackerUid;
-        return trackerComp.Entities.Add(entityUid);
+        var oldCount = trackerComp.Entities.Count;
+        if (trackerComp.Entities.Add(entityUid))
+        {
+            var ev = new TrackedEntitiesCountChangedEvent(oldCount, trackerComp.Entities.Count);
+            RaiseLocalEvent(trackerUid, ref ev);
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -64,7 +85,14 @@ public sealed class EntitiesTrackerSystem : EntitySystem
             return false;
 
         if (entity.Comp.Tracker is { } tracker && TryComp<EntitiesTrackerComponent>(tracker, out var trackerComp))
-            trackerComp.Entities.Remove(entityUid);
+        {
+            var oldCount = trackerComp.Entities.Count;
+            if (trackerComp.Entities.Remove(entityUid))
+            {
+                var ev = new TrackedEntitiesCountChangedEvent(oldCount, trackerComp.Entities.Count);
+                RaiseLocalEvent(tracker, ref ev);
+            }
+        }
 
         entity.Comp.Tracker = null;
         RemCompDeferred<TrackedEntityComponent>(entityUid);
@@ -86,4 +114,43 @@ public sealed class EntitiesTrackerSystem : EntitySystem
 
         return tracker.Comp.Entities.Contains(entityUid);
     }
+
+    public bool TrackEntity(EntityUid tracker, EntityUid entity) =>
+        TrackEntity((tracker, null), (entity, null));
+
+    public bool UntrackEntity(EntityUid entity) =>
+        UntrackEntity((entity, null));
+
+    public bool UntrackEntity(Entity<EntitiesTrackerComponent?> tracker, EntityUid entityUid)
+    {
+        var trackerUid = tracker.Owner;
+        if (!Resolve(trackerUid, ref tracker.Comp, false))
+            return false;
+
+        var oldCount = tracker.Comp.Entities.Count;
+        var removed = tracker.Comp.Entities.Remove(entityUid);
+
+        if (TryComp<TrackedEntityComponent>(entityUid, out var trackedComp) && trackedComp.Tracker == trackerUid)
+        {
+            trackedComp.Tracker = null;
+            RemCompDeferred<TrackedEntityComponent>(entityUid);
+        }
+
+        if (removed)
+        {
+            var ev = new TrackedEntitiesCountChangedEvent(oldCount, tracker.Comp.Entities.Count);
+            RaiseLocalEvent(trackerUid, ref ev);
+        }
+
+        return removed;
+    }
+
+    public bool UntrackEntity(EntityUid tracker, EntityUid entity) =>
+        UntrackEntity((tracker, null), entity);
+
+    public int GetCount(EntityUid tracker) =>
+        GetCount((tracker, null));
+
+    public bool IsTracked(EntityUid tracker, EntityUid entityUid) =>
+        IsTracked((tracker, null), entityUid);
 }

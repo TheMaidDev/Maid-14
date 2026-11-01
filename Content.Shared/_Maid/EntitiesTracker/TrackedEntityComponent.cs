@@ -9,6 +9,6 @@ public sealed partial class TrackedEntityComponent : Component
     /// <summary>
     /// The entity tracker tracking this entity.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public EntityUid? Tracker;
 }
