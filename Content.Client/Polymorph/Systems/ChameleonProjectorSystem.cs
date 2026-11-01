@@ -38,7 +38,12 @@ public sealed class ChameleonProjectorSystem : SharedChameleonProjectorSystem
 
     private void OnHandleState(Entity<ChameleonDisguiseComponent> ent, ref AfterAutoHandleStateEvent args)
     {
+        // MAID BEGIN Chameleon sprite key
+        /*
         CopyComp<SpriteComponent>(ent);
+        */
+        CopySprite(ent);
+        // MAID END Chameleon sprite key
         CopyComp<GenericVisualizerComponent>(ent);
         CopyComp<SolutionContainerVisualsComponent>(ent);
         CopyComp<BurnStateVisualsComponent>(ent);
@@ -47,6 +52,23 @@ public sealed class ChameleonProjectorSystem : SharedChameleonProjectorSystem
         if (_appearanceQuery.TryComp(ent, out var appearance))
             _appearance.QueueUpdate(ent, appearance);
     }
+
+    // MAID BEGIN Chameleon sprite key
+    /// <summary>
+    /// Copies the source's sprite with the engine's own copy so layer map keys are kept.
+    /// Falls back to the prototype copy if the source entity is gone.
+    /// </summary>
+    private void CopySprite(Entity<ChameleonDisguiseComponent> ent)
+    {
+        if (_spriteQuery.TryComp(ent.Comp.SourceEntity, out var source) && _spriteQuery.TryComp(ent, out var dest))
+        {
+            _sprite.CopySprite((ent.Comp.SourceEntity, source), (ent, dest));
+            return;
+        }
+
+        CopyComp<SpriteComponent>(ent);
+    }
+    // MAID END Chameleon sprite key
 
     private void OnStartup(Entity<ChameleonDisguisedComponent> ent, ref ComponentStartup args)
     {
