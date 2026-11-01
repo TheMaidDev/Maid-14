@@ -15,6 +15,7 @@ using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Item;
 using Content.Shared.Mobs;
+using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Popups;
 using Content.Shared.Speech;
 using Content.Shared.Storage.EntitySystems;
@@ -105,7 +106,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
             args.Cancel();
     }
 
-    public bool TryStartPickup(Entity<BushDisguiseComponent> ent, EntityUid user)
+    private bool TryStartPickup(Entity<BushDisguiseComponent> ent, EntityUid user)
     {
         if (HasComp<BushDisguisedComponent>(user)
             || !HasComp<HandsComponent>(user)
@@ -224,7 +225,29 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         disguised.Visual = visual;
         Dirty(user, disguised);
 
+        // Someone may already be pulling us: make their hand show the plant too.
+        RetargetPullItem(user, user, visual);
+
         _identity.QueueIdentityUpdate(user);
+    }
+
+    /// <summary>
+    /// Points the puller's virtual item at a different entity, so the hand slot and the pull logic stay in sync
+    /// when the disguise starts or ends while someone is pulling the player.
+    /// </summary>
+    private void RetargetPullItem(EntityUid user, EntityUid from, EntityUid to)
+    {
+        if (!TryComp<PullableComponent>(user, out var pullable) || pullable.Puller is not { } puller)
+            return;
+
+        foreach (var held in _hands.EnumerateHeld(puller).ToList())
+        {
+            if (!TryComp<VirtualItemComponent>(held, out var virt) || virt.BlockingEntity != from)
+                continue;
+
+            virt.BlockingEntity = to;
+            Dirty(held, virt);
+        }
     }
 
     private void Undisguise(EntityUid user, EntityUid bush)
@@ -233,7 +256,10 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
             return;
 
         if (disguised.Visual is { } visual)
+        {
+            RetargetPullItem(user, visual, user);
             QueueDel(visual);
+        }
 
         RemComp<BushDisguisedComponent>(user);
         _identity.QueueIdentityUpdate(user);
@@ -284,7 +310,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
             return;
 
         args.Handled = true;
-        args.SpeechSoundProtoId = CompOrNull<SpeechComponent>(ent.Comp.Bush)?.SpeechSounds;
+        args.SpeechSoundProtoId = CompOrNull<SpeechComponent>(ent.Comp.Bush)?.SpeechSounds?.Id;
     }
 
     private void OnGetEmoteSounds(Entity<BushDisguisedComponent> ent, ref GetEmoteSoundsEvent args)
@@ -300,6 +326,10 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
     private void OnGetBlockingEntity(Entity<BushDisguisedComponent> ent, ref GetVirtualItemBlockingEntityEvent args)
     {
         // Whoever pulls us sees the plant in their hands, not our sprite with the plant's icon on top.
+        // Only for pulls: carrying and the like compare the blocking entity with the real player.
+        if (!TryComp<PullableComponent>(ent, out var pullable) || !pullable.BeingPulled)
+            return;
+
         if (ent.Comp.Visual is { } visual && !TerminatingOrDeleted(visual))
             args.Uid = visual;
     }

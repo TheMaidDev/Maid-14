@@ -62,7 +62,7 @@ public sealed class ChameleonProjectorSystem : SharedChameleonProjectorSystem
     {
         if (_spriteQuery.TryComp(ent.Comp.SourceEntity, out var source) && _spriteQuery.TryComp(ent, out var dest))
         {
-            _sprite.CopySprite((ent.Comp.SourceEntity, source), (ent, dest));
+            _sprite.CopySprite((ent.Comp.SourceEntity, source), (ent.Owner, dest));
             return;
         }
 

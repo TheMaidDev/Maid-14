@@ -73,7 +73,13 @@ public sealed class BushDisguiseSystem : SharedBushDisguiseSystem
             }
 
             if (disguised.Visual is { } visual && _readyVisuals.Contains(visual) && !TerminatingOrDeleted(visual))
+            {
+                // Something else may have made the player visible again.
+                if (TryComp<SpriteComponent>(uid, out var shown) && shown.Visible)
+                    _sprite.SetVisible((uid, shown), false);
+
                 continue;
+            }
 
             _hiddenHolders.Remove(uid);
 

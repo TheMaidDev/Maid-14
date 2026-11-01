@@ -131,7 +131,7 @@
   description: A little bit of nature contained in a pot.
   abstract: true
   components:
-  # - type: SpriteFade # MAID Plant collision
+  # - type: SpriteFade # MAID Bush disguise
   - type: Transform
     noRot: true
   - type: InteractionOutline
@@ -142,25 +142,26 @@
       fix1:
         shape:
           !type:PhysShapeCircle
-          # radius: 0.1 # MAID Plant mob push
-          radius: 0.35 # MAID Plant mob push
-        # density: 190 # MAID Plant mob push
-        density: 185 # MAID Plant mob push
-        restitution: 0.0 # MAID Plant mob push
-        # mask: # MAID Plant mob push
-        # - HighImpassable # MAID Plant mob push
-        mask: # MAID Plant mob push
-        - MobMask # MAID Plant mob push
-        layer: # MAID Plant mob push
-        - MobLayer # MAID Plant mob push
-      flammable: # MAID Plant mob push
-        shape: # MAID Plant mob push
-          !type:PhysShapeCircle # MAID Plant mob push
-          radius: 0.35 # MAID Plant mob push
-        hard: false # MAID Plant mob push
-        mask: # MAID Plant mob push
-        - FullTileLayer # MAID Plant mob push
-  - type: MobCollision # MAID Plant mob push
+          # radius: 0.1 # MAID Bush disguise
+          radius: 0.35 # MAID Bush disguise
+        # density: 190 # MAID Bush disguise
+        density: 185 # MAID Bush disguise
+        restitution: 0.0 # MAID Bush disguise
+        # mask: # MAID Bush disguise
+        # - HighImpassable # MAID Bush disguise
+        mask: # MAID Bush disguise
+        - MobMask # MAID Bush disguise
+        # No layer: the plant is only blocked by walls, nothing is blocked by it, it does not stop bullets or block sight.
+      flammable: # MAID Bush disguise
+        shape: # MAID Bush disguise
+          !type:PhysShapeCircle # MAID Bush disguise
+          radius: 0.35 # MAID Bush disguise
+        hard: false # MAID Bush disguise
+        mask: # MAID Bush disguise
+        - FullTileLayer # MAID Bush disguise
+        layer: # MAID Bush disguise
+        - MobLayer # MAID Bush disguise
+  - type: MobCollision # MAID Bush disguise
   - type: Sprite
     drawdepth: Overdoors
     offset: "0.0,0.3"
