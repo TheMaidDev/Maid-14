@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Goobstation.Common.Heretic;
 using Content.Goobstation.Common.Identity;
 using Content.Goobstation.Common.Speech;
 using Content.Shared._Shitcode.Heretic.Components;
@@ -61,6 +62,7 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         SubscribeLocalEvent<BushDisguisedComponent, GetIdentityRepresentationEntityEvent>(OnGetIdentityEntity);
         SubscribeLocalEvent<BushDisguisedComponent, GetSpeechSoundEvent>(OnGetSpeechSound);
         SubscribeLocalEvent<BushDisguisedComponent, GetEmoteSoundsEvent>(OnGetEmoteSounds);
+        SubscribeLocalEvent<BushDisguisedComponent, GetVirtualItemBlockingEntityEvent>(OnGetBlockingEntity);
         SubscribeLocalEvent<BushDisguisedComponent, AttackAttemptEvent>(OnAttackAttempt);
         SubscribeLocalEvent<BushDisguisedComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
@@ -277,6 +279,13 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
         args.Handled = true;
         args.EmoteSoundProtoId = null;
+    }
+
+    private void OnGetBlockingEntity(Entity<BushDisguisedComponent> ent, ref GetVirtualItemBlockingEntityEvent args)
+    {
+        // Whoever pulls us sees the plant in their hands, not our sprite with the plant's icon on top.
+        if (ent.Comp.Visual is { } visual && !TerminatingOrDeleted(visual))
+            args.Uid = visual;
     }
 
     #endregion
