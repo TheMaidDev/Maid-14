@@ -121,7 +121,7 @@ public sealed class MaidPassiveEntitySpawnerSystem : EntitySystem
             return;
 
         comp.CachedPlayerCount = playerCount;
-        var targetCount = Math.Max(1f, comp.TotalEntityAmountPerPlayer * playerCount);
+        var targetCount = Math.Max(2f, comp.TotalEntityAmountPerPlayer * playerCount);
         comp.SpawnMultiplier = CalculateMultiplier(targetCount, (float) comp.TotalSecondsAmount.TotalSeconds, (float) comp.BaseSpawnCooldown.TotalSeconds);
     }
 
