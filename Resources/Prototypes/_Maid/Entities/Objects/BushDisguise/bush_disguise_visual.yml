@@ -10,6 +10,7 @@
     noRot: true
   - type: Sprite
     noRot: true
+    visible: false
     drawdepth: Mobs
     offset: 0,0.3125
     sprite: Structures/Furniture/potted_plants.rsi
