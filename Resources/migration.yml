@@ -1178,3 +1178,6 @@ ClothingNeckCloakTrans: ClothingNeckCloakMoth
 
 
 SoapGold: SoapDeluxe
+
+# Old ChemDispenser Circuitboard
+ChemDispenserMachineCircuitboard: EnergyChemDispenserMachineCircuitboard
