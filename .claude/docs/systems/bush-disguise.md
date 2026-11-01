@@ -5,7 +5,7 @@ An empty-handed player can pick up a potted plant (`PottedPlant*`) and become th
 ## Pieces
 - `BushDisguiseComponent` sits on every plant through `PottedPlantBase` (so on all children, including `DimensionPot`). It holds the pickup delay, the visual prototype and the maximum drop distance; the delay and distance are the tunables.
 - The plant is also an `Item` (huge) with `MultiHandedItem`, so carrying it fills two hands. The system additionally fills any further free hands with virtual items, so mobs with more hands are fully blocked. Virtual items go away through `MultiHandedItem` when the plant leaves the hand.
-- `BushDisguisedComponent` is added to the holder (networked: the plant and the visual entity). `MaidBushDisguiseVisual` is a networked entity parented to the holder, with `BushDisguiseVisualComponent` naming its source plant and prototype, and a `TargetInteractionRelayComponent` so hits, pulls and clicks on it land on the real player.
+- `BushDisguisedComponent` is added to the holder (its networked fields are the plant and the visual entity). `MaidBushDisguiseVisual` is a networked entity parented to the holder, with `BushDisguiseVisualComponent` naming its source plant and prototype, and a `TargetInteractionRelayComponent` so hits, pulls and clicks on it land on the real player.
 
 ## Flow
 - Ordinary pickup is blocked: `GettingPickedUpAttemptEvent` is cancelled unless `PickupAllowed` is set, which only the do-after completion does around one `TryPickup`. Click and the pickup verb both go to the do-after instead (the vanilla pickup verbs are removed from the verb list). Pickup requires every hand to be empty. A `SecretStash` with an item hands it out first; the do-after only starts if the stash does not.
@@ -18,13 +18,12 @@ An empty-handed player can pick up a potted plant (`PottedPlant*`) and become th
 - The holder's sprite is hidden only after the visual is ready, in the same frame. A per-frame recheck un-hides a holder whose visual vanished and re-hides one that something else made visible. Nothing is predicted: everything waits for server state, so the swap costs one network round trip.
 
 ## Plant physics
-- Plants are mob-like: dynamic body, a hard fixture with no layer (only walls block it, nothing is blocked by it, bullets and sight pass), a non-hard `flammable` fixture carrying the mob layer, and `MobCollision`. Mobs and plants soft-push each other through the mob collision system, which only runs when the `movement.mob_pushing` CVar is on.
+- Plants are mob-like: dynamic body, a hard fixture with no layer (only walls block it, nothing is blocked by it, bullets and sight pass), a non-hard `flammable` fixture carrying the mob layer, and `MobCollision`. Mobs and plants soft-push each other through the mob collision system, which only runs when the `movement.mob_pushing` CVar is on (default off; the development and WizardsDen presets turn it on).
 - `SpriteFade` was removed from `PottedPlantBase`.
 
 ## Upstream touch points
 - `ChameleonProjector` (client) copies the source sprite with the engine's `SpriteSystem.CopySprite`, which keeps layer map keys; serializer copy loses them.
 
 ## Known gaps
-- `OfferItem` cannot hand over a plant (the pickup cancel applies); stripping can.
-- Verbs and strip on a disguised player target the visual and do not reach the player.
+- `OfferItem` cannot hand over a plant: its receive step uses the ordinary pickup, which the cancel blocks.
 - `DimensionPot` inherits all of this.
