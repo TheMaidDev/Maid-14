@@ -23,7 +23,6 @@ An empty-handed player can pick up a potted plant (`PottedPlant*`) and become th
 
 ## Upstream touch points
 - `ChameleonProjector` (client) copies the source sprite with the engine's `SpriteSystem.CopySprite`, which keeps layer map keys; serializer copy loses them.
-- `TransformSpeakerNameEvent`-style hooks, the virtual item blocking-entity event and the identity-representation event come from the Goobstation/Trauma layers and are reused, not owned.
 
 ## Known gaps
 - `OfferItem` cannot hand over a plant (the pickup cancel applies); stripping can.
