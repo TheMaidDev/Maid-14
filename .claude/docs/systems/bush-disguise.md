@@ -3,7 +3,7 @@
 An empty-handed player can pick up a potted plant (`PottedPlant*`) and become that plant: the player's own sprite is hidden, the plant is drawn in their place, and name, examine text, chat and identity are the plant's. Dropping the plant for any reason ends it. Code lives in the `_Maid` folders of Shared, Client and Server (`BushDisguise`).
 
 ## Pieces
-- `BushDisguiseComponent` sits on every plant through `PottedPlantBase` (so on all children, including `DimensionPot`). It holds the pickup delay, the visual prototype and the maximum drop distance; the delay and distance are the tunables.
+- `BushDisguiseComponent` sits on every plant through `PottedPlantBase` (so on all children). It holds an `Enabled` switch, the pickup delay, the visual prototype and the maximum drop distance; the delay and distance are the tunables. `DimensionPot` sets `Enabled` to false: it still inherits the item and physics changes, but cannot be picked up or used to disguise, as before.
 - The plant is also an `Item` (huge) with `MultiHandedItem`, so carrying it fills two hands. The system additionally fills any further free hands with virtual items, so mobs with more hands are fully blocked. Virtual items go away through `MultiHandedItem` when the plant leaves the hand.
 - `BushDisguisedComponent` is added to the holder (its networked fields are the plant and the visual entity). `MaidBushDisguiseVisual` is a networked entity parented to the holder, with `BushDisguiseVisualComponent` naming its source plant and prototype, and a `TargetInteractionRelayComponent` so hits, pulls and clicks on it land on the real player.
 
@@ -26,4 +26,3 @@ An empty-handed player can pick up a potted plant (`PottedPlant*`) and become th
 
 ## Known gaps
 - `OfferItem` cannot hand over a plant: its receive step uses the ordinary pickup, which the cancel blocks.
-- `DimensionPot` inherits all of this.

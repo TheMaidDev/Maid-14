@@ -11,6 +11,12 @@ namespace Content.Shared._Maid.BushDisguise;
 public sealed partial class BushDisguiseComponent : Component
 {
     /// <summary>
+    /// If false the plant never disguises anyone and cannot be picked up, as before the feature existed.
+    /// </summary>
+    [DataField]
+    public bool Enabled = true;
+
+    /// <summary>
     /// How long the user has to stand still to pick the plant up.
     /// </summary>
     [DataField]
