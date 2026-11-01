@@ -142,18 +142,25 @@
       fix1:
         shape:
           !type:PhysShapeCircle
-          # radius: 0.1 # MAID Plant collision
-          radius: 0.25 # MAID Plant collision
-        # density: 190 # MAID Plant collision
-        density: 50 # MAID Plant collision
-        # mask: # MAID Plant collision
-        # - HighImpassable # MAID Plant collision
-        # - MidImpassable # MAID Plant collision
-        mask: # MAID Plant collision
-        - CrateMask # MAID Plant collision
-        layer: # MAID Plant collision
-        - MidImpassable # MAID Plant collision
-        - LowImpassable # MAID Plant collision
+          # radius: 0.1 # MAID Plant mob push
+          radius: 0.35 # MAID Plant mob push
+        # density: 190 # MAID Plant mob push
+        density: 185 # MAID Plant mob push
+        restitution: 0.0 # MAID Plant mob push
+        # mask: # MAID Plant mob push
+        # - HighImpassable # MAID Plant mob push
+        mask: # MAID Plant mob push
+        - MobMask # MAID Plant mob push
+        layer: # MAID Plant mob push
+        - MobLayer # MAID Plant mob push
+      flammable: # MAID Plant mob push
+        shape: # MAID Plant mob push
+          !type:PhysShapeCircle # MAID Plant mob push
+          radius: 0.35 # MAID Plant mob push
+        hard: false # MAID Plant mob push
+        mask: # MAID Plant mob push
+        - FullTileLayer # MAID Plant mob push
+  - type: MobCollision # MAID Plant mob push
   - type: Sprite
     drawdepth: Overdoors
     offset: "0.0,0.3"
