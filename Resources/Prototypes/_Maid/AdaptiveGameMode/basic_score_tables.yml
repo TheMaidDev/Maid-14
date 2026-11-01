@@ -3,8 +3,6 @@
   conditions:
   - !type:Controlled
   - !type:Alive
-  - !type:HasComponentInChildren
-    component: Contraband
 
 - type: adaptiveScoreConditionsTable
   id: ActiveGamerule
