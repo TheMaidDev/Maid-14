@@ -15,6 +15,13 @@
     mode: SnapgridCenter
   components:
   - type: DragonRift
+  # MAID BEGIN track spawned dragons
+  - type: MaidPassiveEntitySpawner
+    baseSpawnCooldown: 3
+    totalEntityAmountPerPlayer: 0.8
+    totalSecondsAmount: 180
+  - type: EntitiesTracker
+  # MAID END track spawned dragons
   # MAID BEGIN adaptive scores
   - type: AdaptiveScoreStatic
     chaosScore: 5

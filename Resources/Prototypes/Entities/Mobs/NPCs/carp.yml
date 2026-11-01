@@ -315,6 +315,13 @@
   suffix: DragonBrood
   parent: MobCarp
   components:
+    # MAID BEGIN track spawned dragons
+    - type: UntrackEntityOnTrigger
+    - type: TriggerOnMobstateChange
+      mobState:
+      - Dead
+      - Critical
+    # MAID END track spawned dragons
     - type: GhostRole
       allowMovement: true
       allowSpeech: true
