@@ -163,6 +163,15 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
         if (_net.IsClient)
             return;
 
+        // The plant can also arrive without the pickup rules (stripping puts it in a hand with the blockers off).
+        // That is fine as long as the hands are otherwise empty; if not, it falls back to the floor.
+        if (_hands.EnumerateHeld(args.User).Any(held => held != ent.Owner && !HasComp<VirtualItemComponent>(held)))
+        {
+            _popup.PopupEntity(Loc.GetString("bush-disguise-hands-not-empty", ("bush", ent.Owner)), ent, args.User);
+            _hands.TryDrop(args.User, ent.Owner, checkActionBlocker: false);
+            return;
+        }
+
         Disguise(args.User, ent);
         BlockFreeHands(args.User, ent);
     }
