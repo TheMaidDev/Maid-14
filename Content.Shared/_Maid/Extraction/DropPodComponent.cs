@@ -85,7 +85,7 @@ public sealed partial class DropPodComponent : Component
     /// Length of the lift-off animation.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadOnly)]
-    public float LaunchAnimationDuration = 2f;
+    public float LaunchAnimationDuration = 3f;
 
     /// <summary>
     /// Sprite layers of the pod flying away, the real pod is deleted when the animation starts.

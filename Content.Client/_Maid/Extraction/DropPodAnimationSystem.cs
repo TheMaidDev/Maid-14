@@ -265,14 +265,17 @@ public sealed class DropPodAnimationSystem : EntitySystem
     private const float FadeStart = 0.5f;
 
     /// <summary>
-    /// Part of the rise covered at a steady speed; the rest is constant acceleration.
-    /// Without it the pod barely moves at first.
+    /// Part of the lift-off spent rising slowly at a steady speed before the acceleration kicks in.
     /// </summary>
-    private const float StartSpeedShare = 0.3f;
+    private const float AccelerationStart = 0.4f;
 
     /// <summary>
-    /// Leaves with some speed right away, then keeps accelerating evenly
-    /// (height = steady part + part growing with the square of time), and fades out
+    /// Height reached by the end of the steady part, in tiles.
+    /// </summary>
+    private const float SteadyRise = 0.6f;
+
+    /// <summary>
+    /// Rises slowly at a steady speed, then accelerates evenly up to the top, and fades out
     /// over the second half. Key frame times are deltas from the previous frame.
     /// </summary>
     private static Animation CreateAnimation(float duration, Vector2 offset)
@@ -327,6 +330,10 @@ public sealed class DropPodAnimationSystem : EntitySystem
     /// </summary>
     private static float RiseAt(float progress)
     {
-        return LaunchHeight * (StartSpeedShare * progress + (1f - StartSpeedShare) * progress * progress);
+        // steady speed all the way, plus a part growing with the square of the time since the acceleration started
+        var speed = SteadyRise / AccelerationStart;
+        var accelerated = Math.Max(0f, progress - AccelerationStart);
+        var boost = (LaunchHeight - speed) / ((1f - AccelerationStart) * (1f - AccelerationStart));
+        return speed * progress + boost * accelerated * accelerated;
     }
 }
