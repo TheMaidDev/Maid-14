@@ -15,9 +15,13 @@
     - state: welding_sparks
       shader: unshaded
   - type: AnimationPlayer
+  # MAID BEGIN welding glow
   - type: PointLight
-    color: orange
-    radius: 1.5
+    color: white
+    radius: 3
+    energy: 0
+  - type: WeldingGlow
+  # MAID END welding glow
   - type: Tag
     tags:
     - HideContextMenu

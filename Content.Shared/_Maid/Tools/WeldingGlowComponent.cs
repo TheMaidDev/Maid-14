@@ -1,48 +1,38 @@
+using Robust.Shared.GameStates;
+
 namespace Content.Shared._Maid.Tools;
 
 /// <summary>
-/// Makes a lit welder with a point light glow white and flicker while it is welding something.
-/// Visual only, driven on the client.
+/// Makes a welding sparks effect glow (using its light color) and flicker, fading in when it appears and out when it is released.
+/// The glow is derived from the timestamps, so the light's own values are never stored or restored.
 /// </summary>
-[RegisterComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class WeldingGlowComponent : Component
 {
     /// <summary>
-    /// Peak light energy while welding. The flicker moves between a fraction of this and the full value.
+    /// Peak light energy. The flicker moves between a fraction of this and the full value.
     /// </summary>
     [DataField]
     public float Energy = 4f;
 
     /// <summary>
-    /// Light radius while fully blended into the welding glow.
+    /// Light radius.
     /// </summary>
     [DataField]
     public float Radius = 3f;
 
     /// <summary>
-    /// Seconds to go from no glow to full glow when welding starts, and back when it stops.
+    /// Seconds to go from no glow to full glow when the effect appears, and back after it is released.
     /// </summary>
     [DataField]
     public float FadeTime = 0.7f;
 
-    /// <summary>
-    /// 0 is the normal welder light, 1 is the full flickering glow.
-    /// </summary>
-    [ViewVariables]
-    public float Blend;
+    [ViewVariables, AutoNetworkedField]
+    public TimeSpan StartTime;
 
     /// <summary>
-    /// Whether the original light values below are captured and the glow is applied.
+    /// Set when welding ended. The effect is deleted once the fade out finishes.
     /// </summary>
-    [ViewVariables]
-    public bool Active;
-
-    [ViewVariables]
-    public Color OriginalColor;
-
-    [ViewVariables]
-    public float OriginalEnergy;
-
-    [ViewVariables]
-    public float OriginalRadius;
+    [ViewVariables, AutoNetworkedField]
+    public TimeSpan? EndTime;
 }

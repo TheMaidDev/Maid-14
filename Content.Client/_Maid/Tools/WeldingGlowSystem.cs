@@ -1,7 +1,4 @@
 using Content.Shared._Maid.Tools;
-using Content.Shared.DoAfter;
-using Content.Shared.Tools.Components;
-using Content.Shared.Tools.Systems;
 using Robust.Client.GameObjects;
 using Robust.Shared.Timing;
 
@@ -17,76 +14,37 @@ public sealed class WeldingGlowSystem : EntitySystem
     /// </summary>
     private const float MinEnergyFraction = 0.25f;
 
-    private EntityQuery<DoAfterComponent> _doAfterQuery;
-
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        _doAfterQuery = GetEntityQuery<DoAfterComponent>();
-    }
-
     public override void FrameUpdate(float frameTime)
     {
+        var curTime = _timing.CurTime;
         var time = (float) _timing.RealTime.TotalSeconds;
 
-        var query = EntityQueryEnumerator<WeldingGlowComponent, PointLightComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out var glow, out var light, out var xform))
+        var query = EntityQueryEnumerator<WeldingGlowComponent, PointLightComponent>();
+        while (query.MoveNext(out var uid, out var glow, out var light))
         {
-            var welding = TryComp<WelderComponent>(uid, out var welder)
-                          && welder.Enabled
-                          && IsWelding(uid, xform.ParentUid);
-
-            if (!glow.Active)
-            {
-                if (!welding)
-                    continue;
-
-                glow.Active = true;
-                glow.OriginalColor = light.Color;
-                glow.OriginalEnergy = light.Energy;
-                glow.OriginalRadius = light.Radius;
-            }
-
-            var step = glow.FadeTime > 0f ? frameTime / glow.FadeTime : 1f;
-            glow.Blend = welding
-                ? MathF.Min(1f, glow.Blend + step)
-                : MathF.Max(0f, glow.Blend - step);
-
-            if (glow.Blend <= 0f)
-            {
-                glow.Active = false;
-                _lights.SetColor(uid, glow.OriginalColor, light);
-                _lights.SetEnergy(uid, glow.OriginalEnergy, light);
-                _lights.SetRadius(uid, glow.OriginalRadius, light);
-                continue;
-            }
-
-            var blend = glow.Blend * glow.Blend * (3f - 2f * glow.Blend);
+            var blend = GetBlend(glow, curTime);
+            var smooth = blend * blend * (3f - 2f * blend);
             var noise = FlickerNoise(time, uid.Id * 0.731f) * 0.5f + 0.5f;
             var flicker = glow.Energy * (MinEnergyFraction + (1f - MinEnergyFraction) * noise);
 
-            _lights.SetColor(uid, Color.InterpolateBetween(glow.OriginalColor, Color.White, blend), light);
-            _lights.SetEnergy(uid, MathHelper.Lerp(glow.OriginalEnergy, flicker, blend), light);
-            _lights.SetRadius(uid, MathHelper.Lerp(glow.OriginalRadius, glow.Radius, blend), light);
+            _lights.SetRadius(uid, glow.Radius, light);
+            _lights.SetEnergy(uid, flicker * smooth, light);
         }
     }
 
-    private bool IsWelding(EntityUid welder, EntityUid holder)
+    private static float GetBlend(WeldingGlowComponent glow, TimeSpan curTime)
     {
-        if (!_doAfterQuery.TryGetComponent(holder, out var doAfters))
-            return false;
+        if (glow.FadeTime <= 0f)
+            return glow.EndTime == null ? 1f : 0f;
 
-        foreach (var doAfter in doAfters.DoAfters.Values)
-        {
-            if (doAfter.Completed || doAfter.Cancelled)
-                continue;
+        var fadeIn = Math.Clamp((float) (curTime - glow.StartTime).TotalSeconds / glow.FadeTime, 0f, 1f);
+        if (glow.EndTime is not { } end)
+            return fadeIn;
 
-            if (doAfter.Args.Used == welder && doAfter.Args.Event is SharedToolSystem.ToolDoAfterEvent)
-                return true;
-        }
-
-        return false;
+        // Started fading out before fully faded in: continue from where the fade in got to.
+        var fadeInAtEnd = Math.Clamp((float) (end - glow.StartTime).TotalSeconds / glow.FadeTime, 0f, 1f);
+        var fadeOut = Math.Clamp(1f - (float) (curTime - end).TotalSeconds / glow.FadeTime, 0f, 1f);
+        return fadeInAtEnd * fadeOut;
     }
 
     /// <summary>
