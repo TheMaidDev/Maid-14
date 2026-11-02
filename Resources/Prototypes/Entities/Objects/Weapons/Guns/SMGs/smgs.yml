@@ -129,10 +129,12 @@
     - oni-cannot-shoot-guns-1
     - oni-cannot-shoot-guns-2
     - oni-cannot-shoot-guns-3
-  - type: Multishot # Goobstation V
-    missChance: 0.4
-    spreadMultiplier: 3
-    spreadAddition: 50 #very hard to hold two of these steady let alone steady while shooting them
+  # MAID EDIT START DualWield
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4
+  #   spreadMultiplier: 3
+  #   spreadAddition: 50 #very hard to hold two of these steady let alone steady while shooting them
+  # MAID EDIT END
   - type: AltFireMelee
     attackType: Heavy
   - type: MeleeWeapon
@@ -339,8 +341,10 @@
     zeroVisible: true
   - type: Appearance
   # Goobstation
-  - type: Multishot
-    missChance: 0.3
+  # MAID EDIT START DualWield
+  # - type: Multishot
+  #   missChance: 0.3
+  # MAID EDIT END
   - type: Item
     shape:
     - 0,0,2,1
