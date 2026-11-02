@@ -9,6 +9,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //using Content.Server.SpecForces;
+using Robust.Shared.Prototypes; // MAID rt-update
+
 namespace Content.Goobstation.Server.Blob.Components;
 
 [RegisterComponent]

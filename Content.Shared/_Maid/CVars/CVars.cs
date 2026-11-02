@@ -83,11 +83,17 @@ public sealed class MaidCVars
     /// </summary>
     public static readonly CVarDef<bool> DenyAliveTradeFTL =
         CVarDef.Create("maid.deny_alive_trade_ftl", false, CVar.SERVERONLY);
-  
+
     ///     Whether IC messages get their slang words automatically replaced with in-character ones.
     /// </summary>
     public static readonly CVarDef<bool> ChatSlangFilter =
         CVarDef.Create("ic.slang_filter", true, CVar.SERVER | CVar.REPLICATED | CVar.ARCHIVE);
+
+    public static readonly CVarDef<bool> AhelpHistory =
+        CVarDef.Create("ahelp.history", true, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> AhelpMaxMessageLength =
+        CVarDef.Create("ahelp.max_message_length", 2000, CVar.SERVER | CVar.REPLICATED);
 
     #endregion
 
@@ -131,7 +137,7 @@ public sealed class MaidCVars
     ///     Draw the glow around light fixtures.
     /// </summary>
     public static readonly CVarDef<bool> EnableLightsGlowing =
-        CVarDef.Create("maid.enable_lights_glowing", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.enable_lights_glowing", false, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     ///     Draw a film grain effect over the screen.

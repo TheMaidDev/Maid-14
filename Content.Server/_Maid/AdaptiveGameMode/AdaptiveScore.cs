@@ -12,11 +12,11 @@ public partial struct AdaptiveScore
     [DataField("combat")]
     public float Combat;
 
-    public float Average => Chaos + Combat;
+    public float Average => Chaos + Combat / 2;
 
     public static AdaptiveScore operator +(AdaptiveScore a, AdaptiveScore b)
     {
-        return new AdaptiveScore { Chaos = a.Chaos + b.Chaos, Combat = a.Combat + b.Combat };
+        return new AdaptiveScore { Chaos = a.Chaos + b.Chaos, Combat = a.Combat + b.Combat } ;
     }
 
     public static AdaptiveScore operator -(AdaptiveScore a, AdaptiveScore b)

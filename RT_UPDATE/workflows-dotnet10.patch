@@ -1,0 +1,84 @@
+# Apply with: git apply RT_UPDATE/workflows-dotnet10.patch (pushing .github/workflows needs a token with `workflow` scope)
+diff --git a/.github/workflows/build-map-renderer.yml b/.github/workflows/build-map-renderer.yml
+index 1d4be436a9..f158ad4958 100644
+--- a/.github/workflows/build-map-renderer.yml
++++ b/.github/workflows/build-map-renderer.yml
+@@ -55,7 +55,7 @@ jobs:
+       - name: Setup .NET Core
+         uses: actions/setup-dotnet@v4.1.0
+         with:
+-          dotnet-version: 9.0.x
++          dotnet-version: 10.0.x
+ 
+       - name: Install dependencies
+         run: dotnet restore
+diff --git a/.github/workflows/build-test-debug.yml b/.github/workflows/build-test-debug.yml
+index 49e7b3684b..b61031df9c 100644
+--- a/.github/workflows/build-test-debug.yml
++++ b/.github/workflows/build-test-debug.yml
+@@ -61,7 +61,7 @@ jobs:
+     - name: Setup .NET Core
+       uses: actions/setup-dotnet@v4.1.0
+       with:
+-        dotnet-version: 9.0.x
++        dotnet-version: 10.0.x
+ 
+     - name: Install dependencies
+       run: dotnet restore
+diff --git a/.github/workflows/publish.yml b/.github/workflows/publish.yml
+index 7b807f8ff1..111043e0ab 100644
+--- a/.github/workflows/publish.yml
++++ b/.github/workflows/publish.yml
+@@ -50,7 +50,7 @@ jobs:
+       if: env.skip == 'false'
+       uses: actions/setup-dotnet@v3.2.0
+       with:
+-        dotnet-version: 9.0.x
++        dotnet-version: 10.0.x
+ 
+     - name: Get Engine Tag
+       run: |
+diff --git a/.github/workflows/test-packaging.yml b/.github/workflows/test-packaging.yml
+index 495f390126..b58ea39892 100644
+--- a/.github/workflows/test-packaging.yml
++++ b/.github/workflows/test-packaging.yml
+@@ -17,7 +17,7 @@ on:
+     paths:
+       - '**.cs'
+       - '**.csproj'
+-      - '**.sln'
++      - '**.slnx'
+       - '**.git**'
+       - '**.yml'
+       # no docs on which one of these is supposed to work, so
+@@ -31,7 +31,7 @@ on:
+     paths:
+       - '**.cs'
+       - '**.csproj'
+-      - '**.sln'
++      - '**.slnx'
+       - '**.git**'
+       - '**.yml'
+       - 'RobustToolbox'
+@@ -66,7 +66,7 @@ jobs:
+       - name: Setup .NET Core
+         uses: actions/setup-dotnet@v4.1.0
+         with:
+-          dotnet-version: 9.0.x
++          dotnet-version: 10.0.x
+ 
+       - name: Install dependencies
+         run: dotnet restore
+diff --git a/.github/workflows/yaml-linter.yml b/.github/workflows/yaml-linter.yml
+index 2c04c9b774..02d6d27d80 100644
+--- a/.github/workflows/yaml-linter.yml
++++ b/.github/workflows/yaml-linter.yml
+@@ -45,7 +45,7 @@ jobs:
+       - name: Setup .NET Core
+         uses: actions/setup-dotnet@v4.1.0
+         with:
+-          dotnet-version: 9.0.x
++          dotnet-version: 10.0.x
+       - name: Install dependencies
+         run: dotnet restore
+       - name: Build

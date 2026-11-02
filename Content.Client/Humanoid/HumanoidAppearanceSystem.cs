@@ -80,6 +80,13 @@ public sealed class HumanoidAppearanceSystem : SharedHumanoidAppearanceSystem
         humanoidAppearance.Height = height;
         humanoidAppearance.Width = width;
 
+        // MAID EDIT START
+        // Unfucks scaled humanoid sprite jittering
+        var ppm = Robust.Client.Graphics.EyeManager.PixelsPerMeter;
+        height = MathF.Round(height * ppm) / ppm;
+        width = MathF.Round(width * ppm) / ppm;
+        // MAID EDIT END
+
         _sprite.SetScale((entity, sprite), new Vector2(width, height));
         // end Goobstation: port EE height/width sliders
 

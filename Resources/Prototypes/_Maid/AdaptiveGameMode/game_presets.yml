@@ -8,15 +8,3 @@
   rules:
   - AdaptiveRule
   - BasicRoundstartVariation
-
-- type: gamePreset
-  id: AdaptiveNonLinear
-  alias:
-  - adaptive-non-linear
-  - adaptivenonlinear
-  name: gamemode-adaptive-non-linear-title
-  showInVote: true
-  description: gamemode-adaptive-non-linear-description
-  rules:
-  - AdaptiveRuleNonLinear
-  - BasicRoundstartVariation

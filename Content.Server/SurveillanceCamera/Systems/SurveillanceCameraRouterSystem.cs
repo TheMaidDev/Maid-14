@@ -233,7 +233,7 @@ public sealed class SurveillanceCameraRouterSystem : EntitySystem
         var payload = new NetworkPayload()
         {
             { DeviceNetworkConstants.Command, SurveillanceCameraSystem.CameraSubnetData },
-            { SurveillanceCameraSystem.CameraSubnetData, router.SubnetFrequencyId }
+            { SurveillanceCameraSystem.CameraSubnetData, router.SubnetFrequencyId.Value.Id } // MAID rt-update ProtoId boxed into payload
         };
 
         _deviceNetworkSystem.QueuePacket(uid, origin, payload);

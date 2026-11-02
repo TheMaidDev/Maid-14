@@ -68,7 +68,7 @@ namespace Content.IntegrationTests.Tests
             var testMap = await pair.CreateTestMap();
 
             var entityMan = server.EntMan;
-            var mapMan = server.MapMan;
+            var mapMan = server.System<SharedMapSystem>(); // MAID rt-update
             var mapSys = entityMan.System<SharedMapSystem>();
 
             EntityUid generator = default;

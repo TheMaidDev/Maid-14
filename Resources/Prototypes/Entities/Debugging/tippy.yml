@@ -34,6 +34,6 @@
   # only supports background image.
   - type: PaperVisuals
     backgroundImagePath: "/Textures/Interface/Paper/paper_background_default.svg.96dpi.png"
-    backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0
+    backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
     backgroundModulate: "#ffffcc"
     fontAccentColor: "#000000"

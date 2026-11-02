@@ -41,10 +41,12 @@ namespace Content.Server.Power.EntitySystems
 
             //Anchoring
             SubscribeLocalEvent<ExtensionCableReceiverComponent, AnchorStateChangedEvent>(OnReceiverAnchorStateChanged);
-            SubscribeLocalEvent<ExtensionCableReceiverComponent, ReAnchorEvent>(OnReceiverReAnchor);
+            // MAID rt-update ReAnchorEvent removed in RT 292, AnchorStateChangedEvent is raised instead
+            // SubscribeLocalEvent<ExtensionCableReceiverComponent, ReAnchorEvent>(OnReceiverReAnchor);
 
             SubscribeLocalEvent<ExtensionCableProviderComponent, AnchorStateChangedEvent>(OnProviderAnchorStateChanged);
-            SubscribeLocalEvent<ExtensionCableProviderComponent, ReAnchorEvent>(OnProviderReAnchor);
+            // MAID rt-update ReAnchorEvent removed in RT 292, AnchorStateChangedEvent is raised instead
+            // SubscribeLocalEvent<ExtensionCableProviderComponent, ReAnchorEvent>(OnProviderReAnchor);
         }
 
         #region Provider
@@ -106,11 +108,15 @@ namespace Content.Server.Power.EntitySystems
             ResetReceivers(provider);
         }
 
+        // MAID BEGIN rt-update ReAnchorEvent removed
+        /*
         private void OnProviderReAnchor(Entity<ExtensionCableProviderComponent> provider, ref ReAnchorEvent args)
         {
             Disconnect(provider);
             Connect(provider);
         }
+        */
+        // MAID END rt-update ReAnchorEvent removed
 
         private void ResetReceivers(Entity<ExtensionCableProviderComponent> provider)
         {
@@ -221,11 +227,15 @@ namespace Content.Server.Power.EntitySystems
             }
         }
 
+        // MAID BEGIN rt-update ReAnchorEvent removed
+        /*
         private void OnReceiverReAnchor(Entity<ExtensionCableReceiverComponent> receiver, ref ReAnchorEvent args)
         {
             Disconnect(receiver);
             Connect(receiver);
         }
+        */
+        // MAID END rt-update ReAnchorEvent removed
 
         private void Connect(Entity<ExtensionCableReceiverComponent> receiver)
         {

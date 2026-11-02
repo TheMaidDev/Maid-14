@@ -1,0 +1,51 @@
+<ui:FancyWindow
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
+    Title="{Loc 'ahelp-history-title'}"
+    MinSize="640 480"
+    SetSize="820 620">
+
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" Margin="10 8 10 10">
+
+        <PanelContainer StyleClasses="MaidTexturedBackground">
+            <BoxContainer Orientation="Vertical" HorizontalExpand="True">
+                <BoxContainer Orientation="Horizontal" Margin="10 5 10 2">
+                    <Label Name="TargetLabel" />
+                    <Control HorizontalExpand="True" />
+                    <Label Name="TargetIdLabel" StyleClasses="LabelSubText" />
+                </BoxContainer>
+                <BoxContainer Orientation="Horizontal" Margin="10 2 10 2">
+                    <LineEdit Name="FilterText" HorizontalExpand="True" PlaceHolder="{Loc 'ahelp-history-filter-text'}" />
+                    <Button Name="SearchButton" Text="{Loc 'ahelp-history-filter-apply'}" StyleClasses="OpenLeft" MinWidth="92" Margin="4 0 0 0" />
+                </BoxContainer>
+                <BoxContainer Orientation="Horizontal" Margin="10 2 10 5">
+                    <LineEdit Name="FilterRound" MinWidth="120" PlaceHolder="{Loc 'ahelp-history-filter-round'}" />
+                    <LineEdit Name="FilterFrom" MinWidth="180" Margin="6 0 0 0" PlaceHolder="{Loc 'ahelp-history-filter-from'}" />
+                    <LineEdit Name="FilterTo" MinWidth="180" Margin="6 0 0 0" PlaceHolder="{Loc 'ahelp-history-filter-to'}" />
+                </BoxContainer>
+            </BoxContainer>
+        </PanelContainer>
+
+        <Label Name="StatusLabel" Visible="False" Margin="2 4 0 0" />
+
+        <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True" Margin="0 6 0 0">
+            <Control VerticalExpand="True" HorizontalExpand="True">
+                <PanelContainer StyleClasses="MaidTransparentBackground" HorizontalExpand="True" VerticalExpand="True" />
+                <ScrollContainer Name="LogScroll" HorizontalExpand="True" VerticalExpand="True" Margin="2 3">
+                    <BoxContainer Name="HistoryContainer" Orientation="Vertical" HorizontalExpand="True" Margin="7 7 7 7" />
+                </ScrollContainer>
+                <Label Name="NoEntriesLabel" Text="{Loc 'ahelp-history-empty'}" Visible="False" Align="Center" VerticalAlignment="Center" />
+            </Control>
+
+            <PanelContainer StyleClasses="MaidTexturedBackground" Margin="0 2 0 0">
+                <BoxContainer Orientation="Horizontal" Margin="10 5">
+                    <Button Name="PrevPageButton" Text="{Loc 'ahelp-history-prev'}" Disabled="True" StyleClasses="OpenRight" />
+                    <Button Name="NextPageButton" Text="{Loc 'ahelp-history-next'}" Disabled="True" StyleClasses="OpenLeft" />
+                    <Control HorizontalExpand="True" />
+                    <Label Text="{Loc 'ahelp-history-page-size'}" StyleClasses="LabelSubText" Margin="0 0 6 0" />
+                    <OptionButton Name="PageSizeOption" MinWidth="96" />
+                </BoxContainer>
+            </PanelContainer>
+        </BoxContainer>
+    </BoxContainer>
+</ui:FancyWindow>

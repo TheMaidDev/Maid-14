@@ -95,6 +95,16 @@ def install_hooks():
     print("Hooks need updating.")
 
     hooks_target_dir = Path("..")/".git"/"hooks"
+    if not hooks_target_dir.is_dir():
+        try:
+            repo_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+            res = subprocess.run(["git", "rev-parse", "--git-path", "hooks"], cwd=repo_dir, stdout=subprocess.PIPE, text=True)
+            if res.returncode == 0:
+                hooks_target_dir = Path(res.stdout.strip())
+        except Exception:
+            pass
+    if not hooks_target_dir.is_dir():
+        return
     hooks_source_dir = Path("hooks")
 
     # Clear entire tree since we need to kill deleted files too.
@@ -121,7 +131,7 @@ def reset_solution():
 def check_for_zip_download():
     # Check if .git exists,
     cur_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    if not os.path.isdir(os.path.join(cur_dir, ".git")):
+    if not os.path.exists(os.path.join(cur_dir, ".git")):
         print("It appears that you downloaded this repository directly from GitHub. (Using the .zip download option) \n"
               "When downloading straight from GitHub, it leaves out important information that git needs to function. "
               "Such as information to download the engine or even the ability to even be able to create contributions. \n"

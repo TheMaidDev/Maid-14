@@ -85,6 +85,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using System.Numerics;
 using Content.Shared.Atmos;
 using Content.Shared.Explosion.Components;
@@ -99,6 +101,7 @@ namespace Content.Server.Explosion.EntitySystems;
 // property of the grid itself?
 public sealed partial class ExplosionSystem
 {
+    private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
     /// <summary>
     ///     Set of tiles of each grid that are directly adjacent to space, along with the directions that face space.
     /// </summary>
@@ -392,7 +395,7 @@ public sealed partial class ExplosionSystem
         spaceDirections = NeighborFlag.Invalid;
         for (var i = 0; i < NeighbourVectors.Length; i++)
         {
-            if (!grid.TryGetTileRef(index + NeighbourVectors[i], out var neighborTile) || neighborTile.Tile.IsEmpty)
+            if (!RtMapSystem.TryGetTileRef(grid.Owner, grid, index + NeighbourVectors[i], out var neighborTile) || neighborTile.Tile.IsEmpty)
                 spaceDirections |= (NeighborFlag) (1 << i);
         }
 

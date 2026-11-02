@@ -21,8 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <OutputPath>..\bin\Content.IntegrationTests\</OutputPath>
     <IsPackable>false</IsPackable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <LangVersion>12</LangVersion>
   </PropertyGroup>
+  <Import Project="..\MSBuild\Content.props" /> <!-- MAID rt-update -->
   <ItemGroup>
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,6 +31,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Serilog" /> <!-- MAID rt-update -->
+    <PackageReference Include="YamlDotNet" /> <!-- MAID rt-update -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content.Client\Content.Client.csproj" />
@@ -40,12 +42,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <ProjectReference Include="..\Content.Server\Content.Server.csproj" />
     <ProjectReference Include="..\Content.Shared\Content.Shared.csproj" />
     <ProjectReference Include="..\Content.Tests\Content.Tests.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Client\Robust.Client.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Server\Robust.Server.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Shared.Maths\Robust.Shared.Maths.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.Shared\Robust.Shared.csproj" />
-    <ProjectReference Include="..\RobustToolbox\Robust.UnitTesting\Robust.UnitTesting.csproj" />
   </ItemGroup>
+  <Import Project="..\RobustToolbox\Imports\Shared.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Client.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Server.props" /> <!-- MAID rt-update -->
+  <Import Project="..\RobustToolbox\Imports\Testing.props" /> <!-- MAID rt-update -->
   <Import Project="..\RobustToolbox\MSBuild\Robust.Properties.targets" />
   <Import Project="..\RobustToolbox\MSBuild\Robust.CompNetworkGenerator.targets" />
 </Project>

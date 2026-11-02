@@ -8,6 +8,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes; // MAID rt-update
+using Content.Shared.Damage.Prototypes; // MAID rt-update
 using System.Linq;
 using Content.Goobstation.Common.Religion;
 using Content.Goobstation.Shared.Bible;
@@ -81,7 +83,7 @@ public sealed class WeakToHolySystem : EntitySystem
 
         DamageModifierSet modifierSet = new()
         {
-            Coefficients = new Dictionary<string, float>
+            Coefficients = new Dictionary<ProtoId<DamageTypePrototype>, float> // MAID rt-update
             {
                 { "Holy", holyCoefficient },
             },

@@ -74,7 +74,7 @@ public abstract partial class SharedGunSystem
         if (component.Proto == null)
             return;
 
-        var damageSpec = GetProjectileDamage(component.Proto);
+        var damageSpec = GetProjectileDamage(component.Proto.Value); // MAID rt-update
 
         if (damageSpec == null)
             return;

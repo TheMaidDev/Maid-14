@@ -329,7 +329,7 @@ public sealed partial class CriminalRecordsConsoleWindow : FancyWindow
         {
 
             var message = FormattedMessage.FromMarkupOrThrow(Loc.GetString($"criminal-records-console-{criminalRecord.Status.ToString().ToLower()}-reason"));
-            message.AddText($": {reason}");
+            message.AddMarkupPermissive($": {reason}");
 
             WantedReason.SetMessage(message);
             WantedReason.Visible = true;

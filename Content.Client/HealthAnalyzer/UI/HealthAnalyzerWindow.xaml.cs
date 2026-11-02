@@ -118,7 +118,6 @@ namespace Content.Client.HealthAnalyzer.UI
         public event Action<HealthAnalyzerMode, EntityUid>? OnModeChanged;
         private EntityUid _spriteViewEntity;
 
-        [ValidatePrototypeId<EntityPrototype>]
         private readonly EntProtoId _bodyView = "AlertSpriteView";
 
         private readonly Dictionary<TargetBodyPart, TextureButton> _bodyPartControls;
@@ -227,7 +226,7 @@ namespace Content.Client.HealthAnalyzer.UI
 
             var name = new FormattedMessage();
             name.PushColor(Color.White);
-            name.AddText(_entityManager.HasComponent<MetaDataComponent>(_target.Value)
+            name.AddMarkupPermissive(_entityManager.HasComponent<MetaDataComponent>(_target.Value)
                 ? Identity.Name(_target.Value, _entityManager)
                 : Loc.GetString("health-analyzer-window-entity-unknown-text"));
             NameLabel.SetMessage(name);

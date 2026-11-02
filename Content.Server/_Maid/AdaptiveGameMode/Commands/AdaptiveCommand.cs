@@ -37,19 +37,19 @@ public sealed class AdaptiveCommand : ToolshedCommand
     [CommandImplementation("getchaos")]
     public float GetChaos([PipedArgument] GetAdaptiveScoreEvent input)
     {
-        return input.ChaosScore;
+        return input.Score.Chaos;
     }
 
     [CommandImplementation("getcombat")]
     public float GetCombat([PipedArgument] GetAdaptiveScoreEvent input)
     {
-        return input.CombatScore;
+        return input.Score.Combat;
     }
 
     [CommandImplementation("getaverage")]
     public float GetAverage([PipedArgument] GetAdaptiveScoreEvent input)
     {
-        return input.Average;
+        return input.Score.Average;
     }
 
     [CommandImplementation("get")]

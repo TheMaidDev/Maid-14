@@ -6,7 +6,7 @@ namespace Content.Client._Maid;
 public sealed partial class EmoteOrderPrototype : IPrototype
 {
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; private set; } = default!;
 
     [DataField]
     public int Order = 0;

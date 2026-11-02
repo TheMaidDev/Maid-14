@@ -20,6 +20,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Server.Botany.Systems;
 using Content.Shared.Botany.Components;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -41,6 +42,6 @@ public sealed partial class ProduceComponent : SharedProduceComponent
     /// <summary>
     ///     Seed data used to create a <see cref="SeedComponent"/> when this produce has its seeds extracted.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<SeedPrototype>))]
-    public string? SeedId;
+    [DataField]
+    public ProtoId<SeedPrototype>? SeedId;
 }

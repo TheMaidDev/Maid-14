@@ -9,7 +9,7 @@ namespace Content.Shared._Maid.GameTicking.Prototypes;
 public sealed partial class AnimatedLobbyScreenPrototype : IPrototype
 {
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; private set; } = default!;
 
     [DataField("background", required: true)]
     public ResPath Path;

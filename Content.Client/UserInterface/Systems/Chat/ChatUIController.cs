@@ -65,6 +65,7 @@ using Content.Shared.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Damage.ForceSay;
 using Content.Shared.Decals;
+using Content.Shared.Examine; // MAID Skip far bubble raycast
 using Content.Shared.Input;
 using Content.Shared.Radio;
 using Content.Shared.Roles.RoleCodeword;
@@ -702,7 +703,16 @@ public sealed partial class ChatUIController : UIController
 
             var otherPos = _transform?.GetMapCoordinates(ent) ?? MapCoordinates.Nullspace;
 
-            if (occluded && !_examine.InRangeUnOccluded(
+            // MAID BEGIN Skip far bubble raycast
+            // Bubbles from far camera microphones (station AI) would raycast past the max range and spam warnings.
+            var farAway = otherPos.MapId == playerPos.MapId &&
+                          (otherPos.Position - playerPos.Position).LengthSquared() > ExamineSystemShared.MaxRaycastRange * ExamineSystemShared.MaxRaycastRange;
+            // MAID END Skip far bubble raycast
+
+            // MAID BEGIN Skip far bubble raycast
+            // if (occluded && !_examine.InRangeUnOccluded(
+            if (occluded && !farAway && !_examine.InRangeUnOccluded(
+            // MAID END Skip far bubble raycast
                     playerPos,
                     otherPos, 0f,
                     (ent, player), predicate))

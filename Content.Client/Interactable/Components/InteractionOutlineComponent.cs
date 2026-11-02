@@ -11,6 +11,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
@@ -36,21 +37,36 @@ namespace Content.Client.Interactable.Components
         {
             _lastRenderScale = renderScale;
             _inRange = inInteractionRange;
+            // MAID BEGIN Multi postshader
+            /*
             if (_entMan.TryGetComponent(uid, out SpriteComponent? sprite) && sprite.PostShader == null)
             {
                 // TODO why is this creating a new instance of the outline shader every time the mouse enters???
                 _shader = MakeNewShader(inInteractionRange, renderScale);
                 sprite.PostShader = _shader;
             }
+            */
+            if (_entMan.TryGetComponent(uid, out SpriteComponent? sprite) && _shader == null)
+            {
+                // TODO why is this creating a new instance of the outline shader every time the mouse enters???
+                _shader = MakeNewShader(inInteractionRange, renderScale);
+                _entMan.System<SpriteSystem>().SetPostShader(sprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.InteractionOutline, _shader));
+            }
+            // MAID END Multi postshader
         }
 
         public void OnMouseLeave(EntityUid uid)
         {
             if (_entMan.TryGetComponent(uid, out SpriteComponent? sprite))
             {
+                // MAID BEGIN Multi postshader
+                /*
                 if (sprite.PostShader == _shader)
                     sprite.PostShader = null;
-                sprite.RenderOrder = 0;
+                */
+                _entMan.System<SpriteSystem>().RemovePostShader(sprite, MaidPostShaderIds.InteractionOutline);
+                // MAID END Multi postshader
+                if (!MaidPostShaderIds.HasOtherHighlight(_entMan.System<SpriteSystem>(), sprite, MaidPostShaderIds.InteractionOutline)) sprite.RenderOrder = 0; // MAID Multi postshader
             }
 
             _shader?.Dispose();
@@ -60,14 +76,14 @@ namespace Content.Client.Interactable.Components
         public void UpdateInRange(EntityUid uid, bool inInteractionRange, int renderScale)
         {
             if (_entMan.TryGetComponent(uid, out SpriteComponent? sprite)
-                && sprite.PostShader == _shader
+                && _shader != null // MAID Multi postshader
                 && (inInteractionRange != _inRange || _lastRenderScale != renderScale))
             {
                 _inRange = inInteractionRange;
                 _lastRenderScale = renderScale;
 
                 _shader = MakeNewShader(_inRange, _lastRenderScale);
-                sprite.PostShader = _shader;
+                _entMan.System<SpriteSystem>().SetPostShader(sprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.InteractionOutline, _shader)); // MAID Multi postshader
             }
         }
 

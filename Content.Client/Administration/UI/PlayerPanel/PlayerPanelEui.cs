@@ -104,6 +104,7 @@ public sealed class PlayerPanelEui : BaseEui
         PlayerPanel.OnOpenBanPanel += id => _console.ExecuteCommand($"banpanel \"{id}\"");
         PlayerPanel.OnOpenBans += id => _console.ExecuteCommand($"banlist \"{id}\"");
         PlayerPanel.OnAhelp += id => _console.ExecuteCommand($"openahelp \"{id}\"");
+        PlayerPanel.OnOpenAhelpHistory += id => _console.ExecuteCommand($"ahelphistory \"{id}\"");
         PlayerPanel.OnWhitelistToggle += (id, whitelisted) =>
         {
             _console.ExecuteCommand(whitelisted ? $"whitelistremove \"{id}\"" : $"whitelistadd \"{id}\"");

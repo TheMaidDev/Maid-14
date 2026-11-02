@@ -22,8 +22,8 @@ public sealed partial class BloodReagentThreshold : EntityEffectCondition // TOD
     [DataField]
     public FixedPoint2 Max = FixedPoint2.MaxValue;
 
-    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<ReagentPrototype>))]
-    public string? Reagent = null;
+    [DataField]
+    public ProtoId<ReagentPrototype>? Reagent = null;
     public override bool Condition(EntityEffectBaseArgs args)
     {
         if (Reagent is null) return true;

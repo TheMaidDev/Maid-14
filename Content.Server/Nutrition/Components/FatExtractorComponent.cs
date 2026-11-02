@@ -50,8 +50,8 @@ public sealed partial class FatExtractorComponent : Component
     /// <summary>
     /// Meat spawned by the extractor.
     /// </summary>
-    [DataField("meatPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>)), ViewVariables(VVAccess.ReadWrite)]
-    public string MeatPrototype = "FoodMeat";
+    [DataField("meatPrototype"), ViewVariables(VVAccess.ReadWrite)]
+    public EntProtoId MeatPrototype = "FoodMeat";
 
     /// <summary>
     /// When the next update will occur

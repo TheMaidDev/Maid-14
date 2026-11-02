@@ -2,7 +2,7 @@
 
 ## Context & References
 - Fork of SS14 Goob Station ("upstream").
-- Target SDK: `.NET 9`.
+- Target SDK: `.NET 10` (RT v294.0.1; solution is `SpaceStation14.slnx`, update it with `dotnet run --project RobustToolbox/Tools/Robust.SolutionGen -- update` after every RT feature update).
 - Engine submodule: `RobustToolbox/` (never modify).
 - Old reference build: `/home/ebi-claude/ss14-wd-022024` (commit `87a3ddb4ae`, read-only reference).
 
@@ -22,6 +22,7 @@
   - YAML: use `#` comments per line.
   - Localization: no comments in `.ftl` files.
   - `{change}`: short, consistent 2–5 word task label.
+- **NEVER** coauthor yourself in any way (i. e. commit message, comments or claude github account (git credentials already configured)).
 
 ## Documentation
 - Project knowledge base for agents lives in `.claude/docs/`; start with `.claude/docs/ARCHITECTURE.md`.

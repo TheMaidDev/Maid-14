@@ -21,7 +21,7 @@ public abstract class SharedAdminInvisibilitySystem : EntitySystem
         _actions.AddAction(ent, ref ent.Comp.ToggleActionEntity, ent.Comp.ToggleAction);
     }
 
-    private void OnShutdown(Entity<AdminInvisibilityComponent> ent, ref ComponentShutdown args)
+    protected virtual void OnShutdown(Entity<AdminInvisibilityComponent> ent, ref ComponentShutdown args)
     {
         _actions.RemoveAction(ent.Owner, ent.Comp.ToggleActionEntity);
     }

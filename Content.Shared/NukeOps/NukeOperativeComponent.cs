@@ -75,6 +75,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.StatusIcon;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -91,6 +92,6 @@ public sealed partial class NukeOperativeComponent : Component
     /// <summary>
     ///
     /// </summary>
-    [DataField("syndStatusIcon", customTypeSerializer: typeof(PrototypeIdSerializer<FactionIconPrototype>))]
-    public string SyndStatusIcon = "SyndicateFaction";
+    [DataField("syndStatusIcon")]
+    public ProtoId<FactionIconPrototype> SyndStatusIcon = "SyndicateFaction";
 }

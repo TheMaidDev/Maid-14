@@ -321,13 +321,17 @@ public static class ServerPackaging
         // Should this be an asset pass?
         // For future archaeologists I just want audio rework to work and need the audio pass so
         // just porting this as is from python.
-        foreach (var fullPath in Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories))
+        // MAID BEGIN Skip BuildHost subfolders
+        // foreach (var fullPath in Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories))
+        // Only top-level dlls: subfolders (BuildHost-*, runtimes) hold Roslyn workspace junk that must not be packaged.
+        foreach (var fullPath in Directory.EnumerateFiles(sourcePath, "*.dll", SearchOption.TopDirectoryOnly))
+        // MAID END Skip BuildHost subfolders
         {
             var fileName = Path.GetFileNameWithoutExtension(fullPath);
 
             if (!ServerNotExtraAssemblies.Any(o => fileName.StartsWith(o)) && ServerExtraAssemblies.Any(o => fileName.StartsWith(o)))
             {
-                contentAssemblies.Add(fileName);
+                if (!contentAssemblies.Contains(fileName)) contentAssemblies.Add(fileName); // MAID Skip BuildHost subfolders
             }
         }
 

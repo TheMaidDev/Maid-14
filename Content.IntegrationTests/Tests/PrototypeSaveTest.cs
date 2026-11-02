@@ -98,7 +98,7 @@ public sealed class PrototypeSaveTest
             prototypes.Add(prototype);
         }
 
-        var context = new TestEntityUidContext();
+        var context = new TestEntityUidContext(server.ResolveDependency<ISerializationManager>()); // MAID rt-update
 
         await server.WaitAssertion(() =>
         {
@@ -193,9 +193,9 @@ public sealed class PrototypeSaveTest
         public string WritingComponent = string.Empty;
         public EntityPrototype? Prototype;
 
-        public TestEntityUidContext()
+        public TestEntityUidContext(ISerializationManager ser)
         {
-            SerializerProvider = new();
+            SerializerProvider = new(ser); // MAID rt-update
             SerializerProvider.RegisterSerializer(this);
         }
 

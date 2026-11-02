@@ -63,7 +63,6 @@ public sealed class EntityEffectSystem : EntitySystem
     [Dependency] private readonly ExplosionSystem _explosion = default!;
     [Dependency] private readonly FlammableSystem _flammable = default!;
     [Dependency] private readonly SharedFlashSystem _flash = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
@@ -531,13 +530,13 @@ public sealed class EntityEffectSystem : EntitySystem
             var transform = EntityManager.GetComponent<TransformComponent>(reagentArgs.TargetEntity);
             var mapCoords = _xform.GetMapCoordinates(reagentArgs.TargetEntity, xform: transform);
 
-            if (!_mapManager.TryFindGridAt(mapCoords, out var gridUid, out var grid) ||
+            if (!_map.TryFindGridAt(mapCoords, out var gridUid, out var grid) ||
                 !_map.TryGetTileRef(gridUid, grid, transform.Coordinates, out var tileRef))
             {
                 return;
             }
 
-            if (_spreader.RequiresFloorToSpread(args.Effect.PrototypeId) &&  _turf.IsSpace(tileRef)) //todo Goobstation? _turf should be tileRef but we dont have the RT for it?
+            if (_spreader.RequiresFloorToSpread(args.Effect.PrototypeId.Id) &&  _turf.IsSpace(tileRef)) //todo Goobstation? _turf should be tileRef but we dont have the RT for it?
                 return;
 
             var coords = _map.MapToGrid(gridUid, mapCoords);
@@ -671,7 +670,7 @@ public sealed class EntityEffectSystem : EntitySystem
 
     private void OnExecuteEmote(ref ExecuteEntityEffectEvent<Emote> args)
     {
-        if (args.Effect.EmoteId == null)
+        if (string.IsNullOrEmpty(args.Effect.EmoteId.Id)) // MAID rt-update
             return;
 
         if (args.Effect.ShowInChat)

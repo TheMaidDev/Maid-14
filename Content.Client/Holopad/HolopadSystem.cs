@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using Content.Shared.Chat.TypingIndicator;
 using Content.Shared.Holopad;
 using Robust.Client.GameObjects;
@@ -39,8 +40,14 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnShaderRender(Entity<HolopadHologramComponent> entity, ref BeforePostShaderRenderEvent ev)
     {
+        // MAID BEGIN Multi postshader
+        /*
         if (ev.Sprite.PostShader == null)
             return;
+        */
+        if (ev.Id != MaidPostShaderIds.Holopad)
+            return;
+        // MAID END Multi postshader
 
         UpdateHologramSprite(entity, entity.Comp.LinkedEntity);
     }
@@ -135,7 +142,12 @@ public sealed class HolopadSystem : SharedHolopadSystem
         instance.SetParameter("texHeight", texHeight);
         instance.SetParameter("t", (float)_timing.CurTime.TotalSeconds * holopadHologram.ScrollRate);
 
+        // MAID BEGIN Multi postshader
+        /*
         sprite.PostShader = instance;
         sprite.RaiseShaderEvent = true;
+        */
+        _sprite.SetPostShader(sprite, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.Holopad, instance) { RaiseShaderEvent = true });
+        // MAID END Multi postshader
     }
 }

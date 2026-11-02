@@ -36,7 +36,6 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly MapSystem _mapSystem = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
@@ -286,7 +285,7 @@ public sealed partial class TradeShuttleConsoleSystem : EntitySystem
             var candidateBox = Box2.CenteredAround(candidatePos, shuttleAABB.Size);
 
             var blocked = false;
-            _mapManager.FindGridsIntersecting(stationTransform.MapID, candidateBox, (_, _) =>
+            _mapSystem.FindGridsIntersecting(stationTransform.MapID, candidateBox, (_, _) =>
             {
                 blocked = true;
                 return false;

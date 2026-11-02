@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using Content.Server.Radiation.Components;
 using Content.Shared.Doors;
 using Content.Shared.Doors.Components;
@@ -14,12 +16,14 @@ namespace Content.Server.Radiation.Systems;
 // create and update map of radiation blockers
 public partial class RadiationSystem
 {
+    private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
     private void InitRadBlocking()
     {
         SubscribeLocalEvent<RadiationBlockerComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<RadiationBlockerComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<RadiationBlockerComponent, AnchorStateChangedEvent>(OnAnchorChanged);
-        SubscribeLocalEvent<RadiationBlockerComponent, ReAnchorEvent>(OnReAnchor);
+        // MAID rt-update ReAnchorEvent removed in RT 292, AnchorStateChangedEvent is raised instead
+        // SubscribeLocalEvent<RadiationBlockerComponent, ReAnchorEvent>(OnReAnchor);
 
         SubscribeLocalEvent<RadiationBlockerComponent, DoorStateChangedEvent>(OnDoorChanged);
 
@@ -52,6 +56,8 @@ public partial class RadiationSystem
         }
     }
 
+    // MAID BEGIN rt-update ReAnchorEvent removed
+    /*
     private void OnReAnchor(EntityUid uid, RadiationBlockerComponent component, ref ReAnchorEvent args)
     {
         // probably grid was split
@@ -60,6 +66,8 @@ public partial class RadiationSystem
         // and move it to the new one
         AddTile(uid, component);
     }
+    */
+    // MAID END rt-update ReAnchorEvent removed
 
     private void OnDoorChanged(EntityUid uid, RadiationBlockerComponent component, DoorStateChangedEvent args)
     {
@@ -114,7 +122,7 @@ public partial class RadiationSystem
 
         // save resistance into rad protection grid
         var gridId = trs.GridUid.Value;
-        var tilePos = grid.TileIndicesFor(trs.Coordinates);
+        var tilePos = RtMapSystem.TileIndicesFor(grid.Owner, grid, trs.Coordinates);
         AddToTile(gridId, tilePos, component.RadResistance);
 
         // and remember it as last valid position

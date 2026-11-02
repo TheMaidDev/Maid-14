@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.Prototypes;
 using Robust.Shared.Noise;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -28,6 +29,6 @@ public sealed partial class BiomeMetaLayer : IBiomeLayer
     [DataField("invert")]
     public bool Invert { get; private set; }
 
-    [DataField("template", required: true, customTypeSerializer: typeof(PrototypeIdSerializer<BiomeTemplatePrototype>))]
-    public string Template = string.Empty;
+    [DataField("template", required: true)]
+    public ProtoId<BiomeTemplatePrototype> Template = string.Empty;
 }
