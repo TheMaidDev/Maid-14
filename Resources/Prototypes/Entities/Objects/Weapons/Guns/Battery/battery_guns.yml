@@ -467,7 +467,7 @@
     availableModes:
     - SemiAuto
   - type: ProjectileBatteryAmmoProvider #Maid
-    proto: BulletTrailLaser #Maid
+    proto: XrayLaserProjectile #Maid
     fireCost: 62.5
   - type: StaticPrice
     price: 300
@@ -1273,6 +1273,6 @@
   name: xenoborg heavy laser gun
   parent: [WeaponAdvancedLaser, BaseXenoborgContraband]
   id: XenoborgHeavyLaserGun
-  components:
-  - type: HitscanBatteryAmmoProvider
-    proto: RedHeavyLaser
+#  components:
+#  - type: HitscanBatteryAmmoProvider
+#    proto: RedHeavyLaser
