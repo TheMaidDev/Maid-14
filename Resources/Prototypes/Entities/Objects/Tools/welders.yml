@@ -215,6 +215,8 @@
     radius: 1.5
     color: orange
     netsync: false
+  # MAID welding glow
+  - type: WeldingGlow
   - type: ItemTogglePointLight
   - type: Appearance
   - type: RequiresEyeProtection
