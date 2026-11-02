@@ -12,9 +12,34 @@
     radius: 1.4
     color: red
     energy: 0.7
-  - type: Trail
-    color: "#FF0033DD"
-    scale: 0.08
-    frequency: 0.02
-    lifetime: 0.5
-    lerpTime: 0.05
+#Maid edit start
+#  - type: Trail
+#    color: "#FF0033DD"
+#    scale: 0.08
+#    frequency: 0.02
+#    lifetime: 0.5
+#    lerpTime: 0.05
+- type: entity
+  name: laser bolt
+  id: BulletTrailLaserPractice
+  parent: BulletTrailLaser
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Heat: 1
+
+- type: entity
+  name: laser bolt
+  id: XrayLaserProjectile
+  parent: BulletTrailLaser
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Heat: 10
+        Radiation: 10
+        Ion: 15
+#Maid edit end
