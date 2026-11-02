@@ -21,7 +21,7 @@ public sealed class TransformSpeakerNameEvent : EntityEventArgs, IInventoryRelay
     public ProtoId<SpeechVerbPrototype>? SpeechVerb;
 
     /// <summary>
-    /// Set when the name is for a radio transmission. Disguises that only change how people nearby see the speaker leave it alone.
+    /// Set when the name is for a radio or telephone transmission. Disguises that only change how people nearby see the speaker leave it alone.
     /// </summary>
     public bool IsRadio; // MAID Bush radio name
 
