@@ -52,10 +52,13 @@ Generic way for an antagonist with objectives to leave the round early. SpaceNin
 - Dead extractee inside the pod still gets extracted — accepted.
 - A cuffed/stunned extractee pushed into an unlocked pod can still launch — intended.
 - Pod destructibility postponed; currently indestructible.
+- Anyone dragged onto the landing tile before touchdown gets gibbed (pod used as a trap) — accepted.
 - Pre-launch welding-spark particles were tried and removed on request (looked bad).
 - Device is not a PDA cartridge: spawn-in antags carry an agent ID, not a PDA, and a PDA would expose them on station messaging.
 
 ## Open / deferred
+
+- Gear marks (`ExtractionGearComponent`) are global and set at antag selection: another extractee carrying a bag with someone else's gear deletes it, and a crew-selected antag would have job items counted as own gear. Revisit when extraction is given to antags other than ninja.
 
 - Extracted bodies on the limbo map still count as living antags for dynamic/adaptive game mode tallies. TODO on the limbo move; exclude the map later.
 - Mind/body mismatch (clone, body swap): the extraction stays on the body, another player could use it. Deliberately left for the final pass.
