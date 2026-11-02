@@ -20,7 +20,7 @@ public sealed class WeldingGlowSystem : EntitySystem
 
     private void OnUseTool(Entity<WeldingGlowComponent> ent, ref UseToolEvent args)
     {
-        var particle = Spawn(ent.Comp.Prototype, new EntityCoordinates(args.User, Vector2.Zero));
+        var particle = SpawnAttachedTo(ent.Comp.Prototype, new EntityCoordinates(args.User, Vector2.Zero));
         if (!TryComp<WeldingGlowParticleComponent>(particle, out var comp))
         {
             Log.Error($"Welding glow prototype {ent.Comp.Prototype} of {ToPrettyString(ent)} has no {nameof(WeldingGlowParticleComponent)}");

@@ -10,6 +10,7 @@ namespace Content.Server._Maid.Tools;
 public sealed class WeldingGlowParticleSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
 
     private EntityQuery<DoAfterComponent> _doAfterQuery;
 
@@ -53,8 +54,7 @@ public sealed class WeldingGlowParticleSystem : EntitySystem
     private bool IsWelding(WeldingGlowParticleComponent glow)
     {
         return _doAfterQuery.TryGetComponent(glow.User, out var doAfters)
-               && doAfters.DoAfters.TryGetValue(glow.DoAfterIdx, out var doAfter)
-               && !doAfter.Completed
-               && !doAfter.Cancelled;
+               && _doAfter.TryGetDoAfter(doAfters, glow.DoAfterIdx, out var doAfter)
+               && doAfter is { Completed: false, Cancelled: false };
     }
 }
