@@ -441,7 +441,7 @@
     - StealResearchObjective
     - DoorjackObjective
     - SpiderChargeObjective
-    - TerrorObjective
+    # - TerrorObjective # MAID rem-ninja-threat-objective
     - MassArrestObjective
     - NinjaSurviveObjective
   - type: AntagSelection
