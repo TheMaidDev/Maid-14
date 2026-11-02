@@ -765,7 +765,7 @@
   name: syndicate agent
   components:
     - type: Sprite
-      sprite: Mobs/Species/Human/parts.rsi
+      sprite: _Maid/Mobs/Species/Human/parts.rsi
       state: full
     - type: RandomMetadata
       nameSegments: [ NamesDeathCommando ]
@@ -787,7 +787,7 @@
   name: Nuclear Operative
   components:
     - type: Sprite
-      sprite: Mobs/Species/Human/parts.rsi
+      sprite: _Maid/Mobs/Species/Human/parts.rsi
       state: full
     - type: RandomHumanoidSpawner
       settings: NukeOp

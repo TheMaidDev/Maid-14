@@ -2251,7 +2251,11 @@
       Min: 5
       Max: 10
       PotencyDivisor: 10
-    Enzyme:
+    Ichor:
+      Min: 2
+      Max: 6
+      PotencyDivisor: 10
+    CarpoToxin:
       Min: 5
       Max: 10
       PotencyDivisor: 10
