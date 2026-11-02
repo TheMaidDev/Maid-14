@@ -15,6 +15,7 @@ namespace Content.Server._Maid.Tools;
 public sealed class WeldingGlowSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
 
     private static readonly EntProtoId GlowProto = "EffectWeldingGlow";
 
@@ -32,7 +33,7 @@ public sealed class WeldingGlowSystem : EntitySystem
 
     private void OnUseTool(Entity<WelderComponent> ent, ref UseToolEvent args)
     {
-        var glow = Spawn(GlowProto, new EntityCoordinates(args.User, Vector2.Zero));
+        var glow = SpawnAttachedTo(GlowProto, new EntityCoordinates(args.User, Vector2.Zero));
         var comp = Comp<WeldingGlowComponent>(glow);
         comp.User = args.User;
         comp.DoAfterIdx = args.DoAfterIdx;
@@ -69,8 +70,7 @@ public sealed class WeldingGlowSystem : EntitySystem
     private bool IsWelding(WeldingGlowComponent glow)
     {
         return _doAfterQuery.TryGetComponent(glow.User, out var doAfters)
-               && doAfters.DoAfters.TryGetValue(glow.DoAfterIdx, out var doAfter)
-               && !doAfter.Completed
-               && !doAfter.Cancelled;
+               && _doAfter.TryGetDoAfter(doAfters, glow.DoAfterIdx, out var doAfter) // doAfters.DoAfters.TryGetValue(glow.DoAfterIdx, out var doAfter)
+               && doAfter is { Completed: false, Cancelled: false };
     }
 }
