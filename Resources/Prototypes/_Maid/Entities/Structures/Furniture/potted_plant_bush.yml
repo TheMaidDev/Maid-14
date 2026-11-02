@@ -1,0 +1,11 @@
+# Potted plants that can be picked up and worn as a disguise.
+# DimensionPot stays on PottedPlantBase: it is only pulled around, never carried.
+- type: entity
+  id: PottedPlantBushBase
+  parent: PottedPlantBase
+  abstract: true
+  components:
+  - type: Item
+    size: Huge
+  - type: MultiHandedItem
+  - type: BushDisguise

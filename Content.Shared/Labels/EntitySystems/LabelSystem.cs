@@ -69,7 +69,7 @@ public sealed partial class LabelSystem : EntitySystem
             return;
 
         var message = new FormattedMessage();
-        message.AddText(Loc.GetString("hand-labeler-has-label", ("label", ent.Comp.CurrentLabel)));
+        message.AddMarkupPermissive(Loc.GetString("hand-labeler-has-label", ("label", ent.Comp.CurrentLabel)));
         args.PushMessage(message);
     }
 

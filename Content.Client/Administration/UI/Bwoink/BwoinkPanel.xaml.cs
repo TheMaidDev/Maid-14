@@ -40,7 +40,7 @@ namespace Content.Client.Administration.UI.Bwoink
 
             var msg = new FormattedMessage();
             msg.PushColor(Color.LightGray);
-            msg.AddText(Loc.GetString("bwoink-system-messages-being-relayed-to-discord"));
+            msg.AddMarkupPermissive(Loc.GetString("bwoink-system-messages-being-relayed-to-discord"));
             msg.Pop();
             RelayedToDiscordLabel.SetMessage(msg);
 
@@ -94,7 +94,7 @@ namespace Content.Client.Administration.UI.Bwoink
                     ("players", string.Join(", ", PeopleTyping)),
                     ("count", PeopleTyping.Count));
 
-            msg.AddText(text);
+            msg.AddMarkupPermissive(text);
             msg.Pop();
 
             TypingIndicator.SetMessage(msg);

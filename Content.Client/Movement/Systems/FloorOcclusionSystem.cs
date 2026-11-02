@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client._Maid.Graphics; // MAID Multi postshader
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Robust.Client.GameObjects;
@@ -18,6 +19,7 @@ public sealed class FloorOcclusionSystem : SharedFloorOcclusionSystem
     private static readonly ProtoId<ShaderPrototype> HorizontalCut = "HorizontalCut";
 
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!; // MAID Multi postshader
 
     private EntityQuery<SpriteComponent> _spriteQuery;
 
@@ -59,6 +61,8 @@ public sealed class FloorOcclusionSystem : SharedFloorOcclusionSystem
 
         var shader = _proto.Index(HorizontalCut).Instance();
 
+        // MAID BEGIN Multi postshader
+        /*
         if (sprite.Comp.PostShader is not null && sprite.Comp.PostShader != shader)
             return;
 
@@ -70,5 +74,11 @@ public sealed class FloorOcclusionSystem : SharedFloorOcclusionSystem
         {
             sprite.Comp.PostShader = null;
         }
+        */
+        if (enabled)
+            _sprite.SetPostShader(sprite.Comp, new SpriteComponent.PostShaderArgs(MaidPostShaderIds.FloorOcclusion, shader));
+        else
+            _sprite.RemovePostShader(sprite.Comp, MaidPostShaderIds.FloorOcclusion);
+        // MAID END Multi postshader
     }
 }
