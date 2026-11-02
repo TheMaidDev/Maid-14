@@ -10,7 +10,7 @@ namespace Content.Shared._Maid.Extraction;
 public sealed partial class ExtractionDeviceComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public EntityUid? Owner;
+    public EntityUid? DeviceOwner;
 
     /// <summary>
     /// Popup for anyone else trying to open it.

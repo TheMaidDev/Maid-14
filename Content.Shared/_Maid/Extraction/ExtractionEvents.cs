@@ -128,7 +128,14 @@ public sealed class ExtractionDeviceUiState(
 public sealed class ExtractionDeviceRefreshMessage : BoundUserInterfaceMessage;
 
 [Serializable, NetSerializable]
-public sealed class ExtractionDeviceRequestZoneMessage : BoundUserInterfaceMessage;
+public sealed class ExtractionDeviceRequestZoneMessage(bool reroll) : BoundUserInterfaceMessage
+{
+    /// <summary>
+    /// The player confirmed moving zones that were already given. Without it a request is only taken as the first one,
+    /// so a quick double click can't spend the re-roll.
+    /// </summary>
+    public readonly bool Reroll = reroll;
+}
 
 [Serializable, NetSerializable]
 public sealed class ExtractionDeviceCallPodMessage : BoundUserInterfaceMessage;

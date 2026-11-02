@@ -167,7 +167,7 @@ public sealed partial class ExtractionSystem
     /// Drops a pod onto the tile at <paramref name="target"/>: clears the tile if asked, leaves the rubble decal,
     /// plays the impact and shakes nearby screens. Returns null when there is no grid to land on.
     /// </summary>
-    public EntityUid? LandDropPod(EntityCoordinates target, DropPodLanding landing, EntityUid? cause = null, bool crush = true)
+    public EntityUid? LandDropPod(EntityCoordinates target, DropPodLanding landing, EntityUid? cause = null)
     {
         if (!target.IsValid(EntityManager)
             || TerminatingOrDeleted(target.EntityId)
@@ -178,7 +178,7 @@ public sealed partial class ExtractionSystem
         var tile = _map.TileIndicesFor(grid, gridComp, target);
         var center = _map.GridTileToLocal(grid, gridComp, tile);
 
-        if (crush && landing.CrushLiving)
+        if (landing.CrushLiving)
             CrushLiving(cause, grid, gridComp, tile);
 
         var pod = Spawn(landing.PodPrototype, center);
@@ -325,7 +325,8 @@ public sealed partial class ExtractionSystem
 
     private void OnKeypadEnter(Entity<DropPodComponent> ent, ref DropPodKeypadEnterMessage args)
     {
-        if (KeypadThrottled(args.Actor) || !ent.Comp.Locked)
+        // an incomplete code is not an attempt: no sound, no log
+        if (KeypadThrottled(args.Actor) || !ent.Comp.Locked || ent.Comp.EnteredCode.Length < GetCodeLength(ent))
             return;
 
         var code = CompOrNull<AntagExtractableComponent>(ent.Comp.Extractee)?.Code;
@@ -344,8 +345,11 @@ public sealed partial class ExtractionSystem
         else
         {
             ent.Comp.WrongCode = true;
+            ent.Comp.WrongAttempts++;
             _audio.PlayPvs(ent.Comp.WrongCodeSound, ent.Owner);
-            _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.Actor):player} entered a wrong code on extraction drop pod {ToPrettyString(ent.Owner)}");
+            // the first wrong code and then every tenth, so guessing can't flood the logs
+            if (ent.Comp.WrongAttempts == 1 || ent.Comp.WrongAttempts % 10 == 0)
+                _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(args.Actor):player} entered a wrong code on extraction drop pod {ToPrettyString(ent.Owner)} ({ent.Comp.WrongAttempts} wrong codes so far)");
         }
 
         UpdatePodUi(ent);
@@ -509,11 +513,14 @@ public sealed partial class ExtractionSystem
         if (pod.Comp.Extractee is { } extractee
             && TryComp<AntagExtractableComponent>(extractee, out var extractable))
         {
-            extractable.Pod = null;
+            // an older pod (e.g. from before an admin reset) must not drop the reference to the current one
+            var current = extractable.Pod == pod.Owner;
+            if (current)
+                extractable.Pod = null;
 
             if (_container.TryGetContainingContainer(extractee, out var container) && container.Owner == pod.Owner)
                 Extract((extractee, extractable), coords);
-            else
+            else if (current)
                 Notify((extractee, extractable), Loc.GetString(extractable.Messages.PodLeftWithout));
         }
 

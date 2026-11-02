@@ -30,7 +30,7 @@ public sealed partial class ExtractionDeviceMenu : DefaultWindow
     /// <summary>
     /// Raised when a zone request should be sent: right away the first time, after confirmation for a re-assignment.
     /// </summary>
-    public event Action? OnZoneRequested;
+    public event Action<bool>? OnZoneRequested;
 
     private bool _zoneRequested;
     private bool _confirming;
@@ -46,7 +46,10 @@ public sealed partial class ExtractionDeviceMenu : DefaultWindow
     {
         if (!_zoneRequested)
         {
-            OnZoneRequested?.Invoke();
+            // the next click is a re-roll even before the server answers
+            _zoneRequested = true;
+            UpdateZoneButtonText();
+            OnZoneRequested?.Invoke(false);
             return;
         }
 
@@ -62,7 +65,7 @@ public sealed partial class ExtractionDeviceMenu : DefaultWindow
             return;
 
         StopConfirming();
-        OnZoneRequested?.Invoke();
+        OnZoneRequested?.Invoke(true);
     }
 
     private void StopConfirming()
@@ -118,7 +121,8 @@ public sealed partial class ExtractionDeviceMenu : DefaultWindow
         SetText(RerollsLabel, Loc.GetString("extraction-device-ui-rerolls", ("count", state.RerollsLeft)));
 
         ZoneButton.Disabled = !state.CanRequestZone;
-        _zoneRequested = state.ZoneRequested;
+        // a state sent before the first request was handled must not undo it
+        _zoneRequested |= state.ZoneRequested;
         if (!state.CanRequestZone)
             _confirming = false;
         UpdateZoneButtonText();

@@ -96,24 +96,3 @@ extraction-device-pod-landed-forever = на станции
 extraction-device-pod-launching = взлёт через { $seconds } с
 extraction-device-pod-gone = больше недоступна
 extraction-device-ui-objectives-header = Цели
-
-extraction-debug-verb-unlock = Отход: открыть
-extraction-debug-verb-pod-here = Отход: посадить открытую капсулу сюда
-extraction-debug-verb-skip = Отход: пропустить таймер
-extraction-debug-verb-status = Отход: состояние и код
-extraction-debug-verb-reset = Отход: сбросить
-extraction-debug-verb-pod-board = Отход: открыть капсулу и лететь самому
-extraction-debug-verb-pod-launch = Отход: взлететь сейчас
-extraction-debug-verb-device-take = Отход: сделать меня владельцем
-extraction-debug-no-grid = { $target } не стоит на гриде, капсуле некуда сесть.
-extraction-debug-pod-landed = { $target }: открытая капсула посажена.
-extraction-debug-skip-flight = Капсула садится сейчас.
-extraction-debug-skip-launch = Капсула взлетает сейчас.
-extraction-debug-skip-auto = Капсула улетает сама сейчас.
-extraction-debug-skip-nothing = Нечего пропускать: капсула не летит и не стоит на станции.
-extraction-debug-status = { $target }: отход { $unlocked }, код { $code }, запросы зон { $requests }, устройство { $device }.
-    Зоны: { $zones }
-    Капсула: { $pod }
-extraction-debug-pod-boarded = Капсула открыта, вы её пассажир: залезьте и нажмите «СТАРТ».
-extraction-debug-pod-launched = Капсула взлетела.
-extraction-debug-device-taken = Устройство теперь ваше.

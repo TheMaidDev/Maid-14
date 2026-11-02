@@ -24,11 +24,8 @@ Generic way for an antagonist with objectives to leave the round early. SpaceNin
 
 ## Debug tools
 
-Admin-only (`Admin` flag) verbs in the Debug category of the right-click menu, all admin-logged:
-- On any mob: unlock (same as `extraction:unlock`), land an already unlocked pod on its tile right away (no zone, flight, code or crushing; replaces its old pod), skip the current timer (pod flight, launch countdown, or auto-leave), status with the code, reset.
-- On a pod: unlock it and make the admin its extractee (to get in and fly away without the code), lift off now.
-- On a device: make the admin its owner.
-- `ExtractionDropPodLandingTest` (spawn menu) still drops an empty open pod with no extractee.
+- `ExtractionDropPodLandingTest` (spawn menu) drops an empty open pod with no extractee, for checking the landing.
+- Admin debug verbs (instant pod, skip timers, take over a pod/device) were tried and removed on request.
 
 ## Configuration surface
 
@@ -40,7 +37,9 @@ Admin-only (`Admin` flag) verbs in the Debug category of the right-click menu, a
 ## Security notes
 
 - BUI states are networked to every client that receives the UI entity, not only to its viewers. The device data (code, objectives, zones) is therefore sent as a BUI message to the owner only, never as a state. The pod keypad state holds only lengths and status.
-- A client can send a raw BUI open message and skip ActivatableUI checks; the device cancels every BUI message from anyone but its owner.
+- A client can send a raw BUI open message and skip ActivatableUI checks, and the engine closes out-of-range UIs only later in the tick. The device cancels every BUI message unless it comes from its owner while they carry it; the pod keypad cancels messages from anyone not in interaction range.
+- A zone re-roll needs the confirmed re-roll flag in the request, so a double click can't spend it. Enter with an incomplete code does nothing; wrong codes are admin-logged on the 1st and every 10th.
+- An extracted mind cannot take ghost roles (MAID check in `GhostRoleSystem.Request`).
 - Device UI rebuilds are throttled (`uiUpdateCooldown`, 0.5 s; skipped requests are answered later). Keypad presses are throttled per player (0.1 s), so code guessing is hopeless and sound/admin-log spam is bounded.
 - `AntagExtractableComponent` is sent only to its owner, so other clients cannot see who is an extractable antag or their code.
 - Known and accepted: the keypad input is shared, another player can mess up the digits being typed; device `Owner` and pod `Extractee` are networked.

@@ -32,7 +32,7 @@ public sealed partial class ExtractionSystem
         var user = ent.Owner;
         var device = Spawn(proto, Transform(user).Coordinates);
         var deviceComp = EnsureComp<ExtractionDeviceComponent>(device);
-        deviceComp.Owner = user;
+        deviceComp.DeviceOwner = user;
         Dirty(device, deviceComp);
         EnsureComp<ExtractionGearComponent>(device);
         ent.Comp.Device = device;
@@ -53,7 +53,7 @@ public sealed partial class ExtractionSystem
     private bool TryGetDeviceOwner(Entity<ExtractionDeviceComponent> device, EntityUid actor, out Entity<AntagExtractableComponent> owner)
     {
         owner = default;
-        if (device.Comp.Owner is not { } uid
+        if (device.Comp.DeviceOwner is not { } uid
             || uid != actor
             || !TryComp<AntagExtractableComponent>(uid, out var comp))
             return false;
@@ -74,7 +74,8 @@ public sealed partial class ExtractionSystem
 
     private void OnDeviceRequestZone(Entity<ExtractionDeviceComponent> ent, ref ExtractionDeviceRequestZoneMessage args)
     {
-        if (TryGetDeviceOwner(ent, args.Actor, out var owner))
+        if (TryGetDeviceOwner(ent, args.Actor, out var owner)
+            && (owner.Comp.RequestsUsed == 0 || args.Reroll))
             TryRequestZone(owner);
 
         RequestDeviceUi(ent);
@@ -118,7 +119,7 @@ public sealed partial class ExtractionSystem
     private void UpdateDeviceUi(Entity<ExtractionDeviceComponent> device)
     {
         // only the owner may see it, and the state goes to them alone
-        if (device.Comp.Owner is not { } uid
+        if (device.Comp.DeviceOwner is not { } uid
             || !TryComp<AntagExtractableComponent>(uid, out var comp)
             || !_ui.IsUiOpen(device.Owner, ExtractionDeviceUiKey.Key, uid))
             return;

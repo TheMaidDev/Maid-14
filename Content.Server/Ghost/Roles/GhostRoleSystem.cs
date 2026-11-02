@@ -503,6 +503,13 @@ public sealed class GhostRoleSystem : EntitySystem
         if (!_ghostRoles.TryGetValue(identifier, out var roleEnt))
             return;
 
+        // MAID BEGIN antag extraction
+        // a player who left the round through extraction stays out of it
+        if (_mindSystem.TryGetMind(player, out var requesterMind, out _)
+            && HasComp<Content.Server._Maid.Extraction.ExtractedMindComponent>(requesterMind))
+            return;
+        // MAID END antag extraction
+
         if (roleEnt.Comp.RaffleConfig is not null)
         {
             JoinRaffle(player, identifier);

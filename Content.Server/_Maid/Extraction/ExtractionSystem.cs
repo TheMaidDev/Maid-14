@@ -137,7 +137,6 @@ public sealed partial class ExtractionSystem : EntitySystem
 
         InitializePod();
         InitializeTest();
-        InitializeDebug();
         InitializeDevice();
     }
 
@@ -813,7 +812,7 @@ public sealed partial class ExtractionSystem : EntitySystem
         // the device and the pod must not keep pointing at a gone owner, they are networked
         if (ent.Comp.Device is { } device && TryComp<ExtractionDeviceComponent>(device, out var deviceComp))
         {
-            deviceComp.Owner = null;
+            deviceComp.DeviceOwner = null;
             Dirty(device, deviceComp);
         }
 

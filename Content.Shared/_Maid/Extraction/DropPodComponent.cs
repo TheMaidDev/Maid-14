@@ -177,6 +177,12 @@ public sealed partial class DropPodComponent : Component
     [ViewVariables]
     public bool WrongCode;
 
+    /// <summary>
+    /// Wrong codes entered so far, for the admin log.
+    /// </summary>
+    [ViewVariables]
+    public int WrongAttempts;
+
     [DataField, ViewVariables(VVAccess.ReadOnly)]
     public LocId InsideMessage = "extraction-pod-inside";
 

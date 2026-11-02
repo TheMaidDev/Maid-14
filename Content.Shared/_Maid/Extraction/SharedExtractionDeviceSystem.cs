@@ -10,6 +10,7 @@ namespace Content.Shared._Maid.Extraction;
 public sealed class SharedExtractionDeviceSystem : EntitySystem
 {
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -22,15 +23,19 @@ public sealed class SharedExtractionDeviceSystem : EntitySystem
         SubscribeLocalEvent<ExtractionDeviceComponent, BoundUserInterfaceMessageAttempt>(OnMessageAttempt);
     }
 
+    /// <summary>
+    /// Only the owner, and only while they carry the device (hands, pockets, bags): a client can send
+    /// UI messages to a device locked away elsewhere, the engine only closes the UI for range later in the tick.
+    /// </summary>
     private void OnMessageAttempt(Entity<ExtractionDeviceComponent> ent, ref BoundUserInterfaceMessageAttempt args)
     {
-        if (ent.Comp.Owner != args.Actor)
+        if (ent.Comp.DeviceOwner != args.Actor || !_transform.ContainsEntity(args.Actor, ent.Owner))
             args.Cancel();
     }
 
     private void OnUseInHand(Entity<ExtractionDeviceComponent> ent, ref UseInHandEvent args)
     {
-        if (args.Handled || ent.Comp.Owner == args.User)
+        if (args.Handled || ent.Comp.DeviceOwner == args.User)
             return;
 
         args.Handled = true;
@@ -39,7 +44,7 @@ public sealed class SharedExtractionDeviceSystem : EntitySystem
 
     private void OnOpenAttempt(Entity<ExtractionDeviceComponent> ent, ref ActivatableUIOpenAttemptEvent args)
     {
-        if (args.Cancelled || ent.Comp.Owner == args.User)
+        if (args.Cancelled || ent.Comp.DeviceOwner == args.User)
             return;
 
         args.Cancel();

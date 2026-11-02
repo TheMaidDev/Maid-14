@@ -1,3 +1,4 @@
+using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Storage.Components;
@@ -13,6 +14,7 @@ namespace Content.Shared._Maid.Extraction;
 public sealed class SharedDropPodSystem : EntitySystem
 {
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
 
@@ -22,6 +24,17 @@ public sealed class SharedDropPodSystem : EntitySystem
 
         SubscribeLocalEvent<DropPodComponent, StorageOpenAttemptEvent>(OnOpenAttempt);
         SubscribeLocalEvent<DropPodComponent, ContainerIsInsertingAttemptEvent>(OnInsertAttempt);
+        SubscribeLocalEvent<DropPodComponent, BoundUserInterfaceMessageAttempt>(OnMessageAttempt);
+    }
+
+    /// <summary>
+    /// The keypad works only for someone next to the pod. The engine closes a UI for range only later in the tick,
+    /// so without this a client could press keys from anywhere right after opening it.
+    /// </summary>
+    private void OnMessageAttempt(Entity<DropPodComponent> ent, ref BoundUserInterfaceMessageAttempt args)
+    {
+        if (!_interaction.InRangeUnobstructed(args.Actor, ent.Owner))
+            args.Cancel();
     }
 
     /// <summary>
