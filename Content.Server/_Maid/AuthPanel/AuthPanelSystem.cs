@@ -73,6 +73,7 @@ public sealed class AuthPanelSystem : EntitySystem
     private void OnRestart(RoundRestartCleanupEvent ev)
     {
         UsedCards.Clear();
+        Reason = "";
         _delay = null;
         _timeout = null;
     }
@@ -80,6 +81,7 @@ public sealed class AuthPanelSystem : EntitySystem
     private void ClearPanel()
     {
         UsedCards.Clear();
+        Reason = "";
         _delay = null;
         _timeout = null;
 
