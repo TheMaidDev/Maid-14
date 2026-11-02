@@ -48,7 +48,7 @@ public sealed partial class ExtractionSystem
             AddDebugVerb(args, "extraction-debug-verb-device-take", () => Reply(session, DebugTakeDevice((target, device), user)));
     }
 
-    private static void AddDebugVerb(GetVerbsEvent<Verb> args, string text, Action act)
+    private void AddDebugVerb(GetVerbsEvent<Verb> args, string text, Action act)
     {
         args.Verbs.Add(new Verb
         {
