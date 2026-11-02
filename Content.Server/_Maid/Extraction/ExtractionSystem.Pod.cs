@@ -167,7 +167,7 @@ public sealed partial class ExtractionSystem
     /// Drops a pod onto the tile at <paramref name="target"/>: clears the tile if asked, leaves the rubble decal,
     /// plays the impact and shakes nearby screens. Returns null when there is no grid to land on.
     /// </summary>
-    public EntityUid? LandDropPod(EntityCoordinates target, DropPodLanding landing, EntityUid? cause = null)
+    public EntityUid? LandDropPod(EntityCoordinates target, DropPodLanding landing, EntityUid? cause = null, bool crush = true)
     {
         if (!target.IsValid(EntityManager)
             || TerminatingOrDeleted(target.EntityId)
@@ -178,7 +178,7 @@ public sealed partial class ExtractionSystem
         var tile = _map.TileIndicesFor(grid, gridComp, target);
         var center = _map.GridTileToLocal(grid, gridComp, tile);
 
-        if (landing.CrushLiving)
+        if (crush && landing.CrushLiving)
             CrushLiving(cause, grid, gridComp, tile);
 
         var pod = Spawn(landing.PodPrototype, center);

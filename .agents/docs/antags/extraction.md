@@ -22,6 +22,14 @@ Generic way for an antagonist with objectives to leave the round early. SpaceNin
 7. **Launch.** Extractee inside presses the START action → pod seals for `launchDelay` (15 s, countdown popups; a 15 s engine startup sound plays and stops if the launch is cancelled; optional per-second countdown sound, empty by default). Leaving the pod cancels the launch. A landed pod leaves on its own after `autoLaunchDelay` (5 min, warning 1 min before) with or without the extractee.
 8. **Leaving.** Others inside are ejected onto the station. With `leaveStationItems` (off by default, on for ninja) station items drop and own gear (marked at antag selection) leaves; carried people always stay. The player becomes a ghost that cannot return; the mind keeps owning the living body, which is moved to a paused "extraction limbo" map. That keeps kill objectives against them uncompleted and survive objectives completed (survive also has a small MAID check for extracted minds). Round end summary gets an "evacuated N minutes after arrival" line.
 
+## Debug tools
+
+Admin-only (`Admin` flag) verbs in the Debug category of the right-click menu, all admin-logged:
+- On any mob: unlock (same as `extraction:unlock`), land an already unlocked pod on its tile right away (no zone, flight, code or crushing; replaces its old pod), skip the current timer (pod flight, launch countdown, or auto-leave), status with the code, reset.
+- On a pod: unlock it and make the admin its extractee (to get in and fly away without the code), lift off now.
+- On a device: make the admin its owner.
+- `ExtractionDropPodLandingTest` (spawn menu) still drops an empty open pod with no extractee.
+
 ## Configuration surface
 
 - `AntagExtractableComponent`: thresholds and objective lists, zone count/requests/anchors/blacklist, device prototype, code length, pod flight time, announcement delay range, `landing` block (pod prototype, crush living, impact sounds and near range, shake range/strength), `leaveStationItems`, `messages` block (every chat/announcement/round-end text as a LocId; defaults are neutral, an antag may override).

@@ -91,3 +91,24 @@ extraction-device-pod-landed-forever = on the station
 extraction-device-pod-launching = lifting off in { $seconds } s
 extraction-device-pod-gone = no longer available
 extraction-device-ui-objectives-header = Objectives
+
+extraction-debug-verb-unlock = Extraction: unlock
+extraction-debug-verb-pod-here = Extraction: land an open pod here
+extraction-debug-verb-skip = Extraction: skip timer
+extraction-debug-verb-status = Extraction: status and code
+extraction-debug-verb-reset = Extraction: reset
+extraction-debug-verb-pod-board = Extraction: unlock the pod and fly it myself
+extraction-debug-verb-pod-launch = Extraction: lift off now
+extraction-debug-verb-device-take = Extraction: make me the owner
+extraction-debug-no-grid = { $target } is not on a grid, the pod has nowhere to land.
+extraction-debug-pod-landed = { $target }: an open pod has landed.
+extraction-debug-skip-flight = The pod lands now.
+extraction-debug-skip-launch = The pod lifts off now.
+extraction-debug-skip-auto = The pod leaves on its own now.
+extraction-debug-skip-nothing = Nothing to skip: no pod is flying or standing on the station.
+extraction-debug-status = { $target }: extraction { $unlocked }, code { $code }, zone requests { $requests }, device { $device }.
+    Zones: { $zones }
+    Pod: { $pod }
+extraction-debug-pod-boarded = The pod is open and you are its extractee: get in and press "START".
+extraction-debug-pod-launched = The pod lifted off.
+extraction-debug-device-taken = The device is yours now.

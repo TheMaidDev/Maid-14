@@ -137,6 +137,7 @@ public sealed partial class ExtractionSystem : EntitySystem
 
         InitializePod();
         InitializeTest();
+        InitializeDebug();
         InitializeDevice();
     }
 
