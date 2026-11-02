@@ -1,50 +1,16 @@
-using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Maid.Tools;
 
 /// <summary>
-/// A light attached to a welding user that flickers while they weld, fading in when it appears and out when welding ends.
-/// The glow is derived from the timestamps, so the light's own values are never stored or restored.
+/// Put on a welder. While it welds something, a <see cref="WeldingGlowParticleComponent"/> light is attached to the user.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent]
 public sealed partial class WeldingGlowComponent : Component
 {
     /// <summary>
-    /// Peak light energy. The flicker moves between a fraction of this and the full value.
+    /// Light entity to attach to the welding user. Should have <see cref="WeldingGlowParticleComponent"/>.
     /// </summary>
-    [DataField]
-    public float Energy = 4f;
-
-    /// <summary>
-    /// Light radius.
-    /// </summary>
-    [DataField]
-    public float Radius = 3f;
-
-    /// <summary>
-    /// Seconds to go from no glow to full glow when the effect appears, and back after it is released.
-    /// </summary>
-    [DataField]
-    public float FadeTime = 0.7f;
-
-    [ViewVariables, AutoNetworkedField]
-    public TimeSpan StartTime;
-
-    /// <summary>
-    /// Set when welding ended. The entity is deleted once the fade out finishes.
-    /// </summary>
-    [ViewVariables, AutoNetworkedField]
-    public TimeSpan? EndTime;
-
-    /// <summary>
-    /// The welding user this light is attached to. Server only.
-    /// </summary>
-    [ViewVariables]
-    public EntityUid User;
-
-    /// <summary>
-    /// Index of the user's welding DoAfter. Server only.
-    /// </summary>
-    [ViewVariables]
-    public ushort DoAfterIdx;
+    [DataField(required: true)]
+    public EntProtoId Prototype;
 }

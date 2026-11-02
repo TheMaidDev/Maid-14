@@ -1,5 +1,5 @@
 - type: entity
-  id: EffectWeldingGlow
+  id: EffectWeldingGlowParticle
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
@@ -7,4 +7,4 @@
     color: white
     radius: 3
     energy: 0
-  - type: WeldingGlow
+  - type: WeldingGlowParticle

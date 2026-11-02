@@ -210,6 +210,10 @@
   - type: ToolTileCompatible # Goobstation
     delay: 2
   - type: Welder
+  # MAID BEGIN welding glow
+  - type: WeldingGlow
+    prototype: EffectWeldingGlowParticle
+  # MAID END welding glow
   - type: PointLight
     enabled: false
     radius: 1.5

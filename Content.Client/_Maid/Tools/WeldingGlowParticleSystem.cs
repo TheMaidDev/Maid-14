@@ -4,13 +4,13 @@ using Robust.Shared.Timing;
 
 namespace Content.Client._Maid.Tools;
 
-public sealed class WeldingGlowSystem : EntitySystem
+public sealed class WeldingGlowParticleSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
 
     /// <summary>
-    /// Lowest flicker value as a fraction of <see cref="WeldingGlowComponent.Energy"/>.
+    /// Lowest flicker value as a fraction of <see cref="WeldingGlowParticleComponent.Energy"/>.
     /// </summary>
     private const float MinEnergyFraction = 0.25f;
 
@@ -19,7 +19,7 @@ public sealed class WeldingGlowSystem : EntitySystem
         var curTime = _timing.CurTime;
         var time = (float) _timing.RealTime.TotalSeconds;
 
-        var query = EntityQueryEnumerator<WeldingGlowComponent, PointLightComponent>();
+        var query = EntityQueryEnumerator<WeldingGlowParticleComponent, PointLightComponent>();
         while (query.MoveNext(out var uid, out var glow, out var light))
         {
             var blend = GetBlend(glow, curTime);
@@ -32,7 +32,7 @@ public sealed class WeldingGlowSystem : EntitySystem
         }
     }
 
-    private static float GetBlend(WeldingGlowComponent glow, TimeSpan curTime)
+    private static float GetBlend(WeldingGlowParticleComponent glow, TimeSpan curTime)
     {
         if (glow.FadeTime <= 0f)
             return glow.EndTime == null ? 1f : 0f;
