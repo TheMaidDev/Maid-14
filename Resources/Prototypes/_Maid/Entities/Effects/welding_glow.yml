@@ -1,0 +1,10 @@
+- type: entity
+  id: EffectWeldingGlow
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+  - type: PointLight
+    color: white
+    radius: 3
+    energy: 0
+  - type: WeldingGlow

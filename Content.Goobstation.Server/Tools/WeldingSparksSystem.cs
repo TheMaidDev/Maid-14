@@ -1,6 +1,5 @@
 using Content.Goobstation.Common.Tools;
 using Content.Goobstation.Server._Maid.Tools; // MAID welding sparks cleanup
-using Content.Server._Maid.Tools; // MAID welding glow
 using Content.Goobstation.Shared.Tools;
 using Content.Server.Tools;
 using Content.Shared.Coordinates.Helpers;
@@ -16,7 +15,6 @@ namespace Content.Goobstation.Server.Tools;
 public sealed class WeldingSparksSystem : EntitySystem
 {
     [Dependency] private readonly ToolSystem _toolSystem = default!;
-    [Dependency] private readonly WeldingGlowSystem _glow = default!; // MAID welding glow
 
     public override void Initialize()
     {
@@ -150,10 +148,7 @@ public sealed class WeldingSparksSystem : EntitySystem
         if (!ent.Comp.SpawnedEffects.TryGetValue(args.DoAfter.Id, out var effect))
             return;
 
-        // MAID BEGIN welding glow
-        // QueueDel(effect);
-        _glow.Release(effect);
-        // MAID END welding glow
+        QueueDel(effect);
         ent.Comp.SpawnedEffects.Remove(args.DoAfter.Id);
         UntrackUser(args.DoAfter.Id.Uid, ent.Owner); // MAID welding sparks cleanup
     }

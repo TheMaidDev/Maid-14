@@ -3,7 +3,7 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._Maid.Tools;
 
 /// <summary>
-/// Makes a welding sparks effect glow (using its light color) and flicker, fading in when it appears and out when it is released.
+/// A light attached to a welding user that flickers while they weld, fading in when it appears and out when welding ends.
 /// The glow is derived from the timestamps, so the light's own values are never stored or restored.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
@@ -31,8 +31,20 @@ public sealed partial class WeldingGlowComponent : Component
     public TimeSpan StartTime;
 
     /// <summary>
-    /// Set when welding ended. The effect is deleted once the fade out finishes.
+    /// Set when welding ended. The entity is deleted once the fade out finishes.
     /// </summary>
     [ViewVariables, AutoNetworkedField]
     public TimeSpan? EndTime;
+
+    /// <summary>
+    /// The welding user this light is attached to. Server only.
+    /// </summary>
+    [ViewVariables]
+    public EntityUid User;
+
+    /// <summary>
+    /// Index of the user's welding DoAfter. Server only.
+    /// </summary>
+    [ViewVariables]
+    public ushort DoAfterIdx;
 }
