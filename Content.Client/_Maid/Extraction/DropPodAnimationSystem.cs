@@ -118,30 +118,58 @@ public sealed class DropPodAnimationSystem : EntitySystem
     }
 
     /// <summary>
-    /// Slow start, then quickly gone upwards. Key frame times are deltas from the previous frame.
+    /// How high the pod rises over the whole lift-off, in tiles.
+    /// </summary>
+    private const float LaunchHeight = 8f;
+
+    /// <summary>
+    /// Key frames the rise is sampled into; linear interpolation between them looks smooth.
+    /// </summary>
+    private const int LaunchSamples = 24;
+
+    /// <summary>
+    /// Part of the lift-off after which the sprite starts fading out, fully transparent at the end.
+    /// </summary>
+    private const float FadeStart = 0.5f;
+
+    /// <summary>
+    /// Rises with constant acceleration (height grows with the square of time) and fades out
+    /// over the second half. Key frame times are deltas from the previous frame.
     /// </summary>
     private static Animation CreateAnimation(float duration, Vector2 offset)
     {
+        var rise = new AnimationTrackComponentProperty
+        {
+            ComponentType = typeof(SpriteComponent),
+            Property = nameof(SpriteComponent.Offset),
+            InterpolationMode = AnimationInterpolationMode.Linear,
+        };
+
+        var step = duration / LaunchSamples;
+        rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset, 0f));
+        for (var i = 1; i <= LaunchSamples; i++)
+        {
+            var t = (float) i / LaunchSamples;
+            rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, LaunchHeight * t * t), step));
+        }
+
+        var fade = new AnimationTrackComponentProperty
+        {
+            ComponentType = typeof(SpriteComponent),
+            Property = nameof(SpriteComponent.Color),
+            InterpolationMode = AnimationInterpolationMode.Linear,
+            KeyFrames =
+            {
+                new AnimationTrackProperty.KeyFrame(Color.White, 0f),
+                new AnimationTrackProperty.KeyFrame(Color.White, duration * FadeStart),
+                new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), duration * (1f - FadeStart)),
+            },
+        };
+
         return new Animation
         {
             Length = TimeSpan.FromSeconds(duration),
-            AnimationTracks =
-            {
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(SpriteComponent),
-                    Property = nameof(SpriteComponent.Offset),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(offset, 0f),
-                        new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, 0.2f), duration * 0.4f),
-                        new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, 1.2f), duration * 0.25f),
-                        new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, 4f), duration * 0.2f),
-                        new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, 16f), duration * 0.15f),
-                    },
-                },
-            },
+            AnimationTracks = { rise, fade },
         };
     }
 }
