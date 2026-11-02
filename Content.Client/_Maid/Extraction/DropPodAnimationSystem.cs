@@ -107,7 +107,7 @@ public sealed class DropPodAnimationSystem : EntitySystem
             return;
 
         if (ev.Smoke != null)
-            SpawnSmoke(coordinates, ev.Smoke, ev.Duration);
+            SpawnSmoke(coordinates, ev.Smoke, ev.Duration, ev.Offset);
 
         var animationEnt = Spawn(null, coordinates);
         var sprite = AddComp<SpriteComponent>(animationEnt);
@@ -127,15 +127,15 @@ public sealed class DropPodAnimationSystem : EntitySystem
     }
 
     /// <summary>
-    /// How long the smoke stays after the pod is gone.
+    /// How far below the pod sprite the smoke trails, in tiles.
     /// </summary>
-    private const float SmokeLinger = 1f;
+    private static readonly Vector2 SmokeTrail = new(0f, -0.4f);
 
     /// <summary>
-    /// Smoke on the ground where the pod took off, drawn one depth below the rising pod so it stays behind it.
-    /// It puffs in, then thins out from the middle of the lift-off until a moment after the pod is gone.
+    /// Smoke under the rising pod: drawn one depth below it so it stays behind, rises along the same curve
+    /// a little lower, puffs in at the start and fades out together with the pod.
     /// </summary>
-    private void SpawnSmoke(EntityCoordinates coordinates, SpriteSpecifier smoke, float duration)
+    private void SpawnSmoke(EntityCoordinates coordinates, SpriteSpecifier smoke, float duration, Vector2 podOffset)
     {
         var smokeEnt = Spawn(null, coordinates);
         var sprite = AddComp<SpriteComponent>(smokeEnt);
@@ -144,17 +144,17 @@ public sealed class DropPodAnimationSystem : EntitySystem
         _sprite.AddLayer((smokeEnt, sprite), smoke);
         _sprite.SetColor((smokeEnt, sprite), Color.White.WithAlpha(0f));
 
-        var length = duration + SmokeLinger;
         var despawn = AddComp<TimedDespawnComponent>(smokeEnt);
-        despawn.Lifetime = length + 0.1f;
+        despawn.Lifetime = duration + 0.1f;
 
         var puff = 0.2f;
         var fadeFrom = duration * FadeStart;
         var animation = new Animation
         {
-            Length = TimeSpan.FromSeconds(length),
+            Length = TimeSpan.FromSeconds(duration),
             AnimationTracks =
             {
+                CreateRiseTrack(duration, podOffset + SmokeTrail),
                 new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
@@ -165,7 +165,7 @@ public sealed class DropPodAnimationSystem : EntitySystem
                         new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), 0f),
                         new AnimationTrackProperty.KeyFrame(Color.White, puff),
                         new AnimationTrackProperty.KeyFrame(Color.White, fadeFrom - puff),
-                        new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), length - fadeFrom),
+                        new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), duration - fadeFrom),
                     },
                 },
             },
@@ -202,20 +202,7 @@ public sealed class DropPodAnimationSystem : EntitySystem
     /// </summary>
     private static Animation CreateAnimation(float duration, Vector2 offset)
     {
-        var rise = new AnimationTrackComponentProperty
-        {
-            ComponentType = typeof(SpriteComponent),
-            Property = nameof(SpriteComponent.Offset),
-            InterpolationMode = AnimationInterpolationMode.Linear,
-        };
-
-        var step = duration / LaunchSamples;
-        rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset, 0f));
-        for (var i = 1; i <= LaunchSamples; i++)
-        {
-            var t = (float) i / LaunchSamples;
-            rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, LaunchHeight * (StartSpeedShare * t + (1f - StartSpeedShare) * t * t)), step));
-        }
+        var rise = CreateRiseTrack(duration, offset);
 
         var fade = new AnimationTrackComponentProperty
         {
@@ -235,5 +222,28 @@ public sealed class DropPodAnimationSystem : EntitySystem
             Length = TimeSpan.FromSeconds(duration),
             AnimationTracks = { rise, fade },
         };
+    }
+
+    /// <summary>
+    /// Sprite offset track of the rise, shared by the pod and its smoke so they move together.
+    /// </summary>
+    private static AnimationTrackComponentProperty CreateRiseTrack(float duration, Vector2 offset)
+    {
+        var rise = new AnimationTrackComponentProperty
+        {
+            ComponentType = typeof(SpriteComponent),
+            Property = nameof(SpriteComponent.Offset),
+            InterpolationMode = AnimationInterpolationMode.Linear,
+        };
+
+        var step = duration / LaunchSamples;
+        rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset, 0f));
+        for (var i = 1; i <= LaunchSamples; i++)
+        {
+            var t = (float) i / LaunchSamples;
+            rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, LaunchHeight * (StartSpeedShare * t + (1f - StartSpeedShare) * t * t)), step));
+        }
+
+        return rise;
     }
 }
