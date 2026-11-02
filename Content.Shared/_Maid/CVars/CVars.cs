@@ -83,7 +83,7 @@ public sealed class MaidCVars
     /// </summary>
     public static readonly CVarDef<bool> DenyAliveTradeFTL =
         CVarDef.Create("maid.deny_alive_trade_ftl", false, CVar.SERVERONLY);
-  
+
     ///     Whether IC messages get their slang words automatically replaced with in-character ones.
     /// </summary>
     public static readonly CVarDef<bool> ChatSlangFilter =
@@ -115,7 +115,7 @@ public sealed class MaidCVars
     /// Price of vending machine items that have no estimated price.
     /// </summary>
     public static readonly CVarDef<int> EconomyVendingDefaultPrice =
-        CVarDef.Create("maid.economy.vending_default_price", 67676767, CVar.SERVERONLY);
+        CVarDef.Create("maid.economy.vending_default_price", 15, CVar.SERVERONLY);
 
     #endregion
 
