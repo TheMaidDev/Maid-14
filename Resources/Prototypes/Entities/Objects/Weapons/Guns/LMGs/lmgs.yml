@@ -115,8 +115,10 @@
     price: 500
   - type: UseDelay
     delay: 1
-  - type: Multishot # Goobstation V
-    missChance: 0.4 #MISS CHANCE DOESNT WORK LMAO
+  # MAID EDIT START DualWield
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4 #MISS CHANCE DOESNT WORK LMAO
+  # MAID EDIT END
   - type: RestrictGunshotsByUserTag # Goobstation
     doesntContain:
     - Oni
