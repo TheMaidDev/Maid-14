@@ -28,9 +28,10 @@ public sealed class AuthPanelSystem : EntitySystem
     [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly SharedIdCardSystem _idCard = default!;
 
-    public Dictionary<AuthPanelAction, HashSet<EntityUid>> Counter = new();
-    public Dictionary<AuthPanelAction, HashSet<int>> CardIndexes = new();
+    public Dictionary<AuthPanelAction, HashSet<EntityUid>> UsedCards = new();
+
     public string Reason = "";
 
     /// <summary>
@@ -71,18 +72,16 @@ public sealed class AuthPanelSystem : EntitySystem
 
     private void OnRestart(RoundRestartCleanupEvent ev)
     {
-        Counter.Clear();
-        CardIndexes.Clear();
-
+        UsedCards.Clear();
+        Reason = "";
         _delay = null;
         _timeout = null;
     }
 
     private void ClearPanel()
     {
-        Counter.Clear();
-        CardIndexes.Clear();
-
+        UsedCards.Clear();
+        Reason = "";
         _delay = null;
         _timeout = null;
 
@@ -130,6 +129,7 @@ public sealed class AuthPanelSystem : EntitySystem
             if (aliveCount < playerCount / 2 && ghostList.Count > MinCount)
             {
                 _gameTicker.AddGameRule(ERTRecruitmentRuleComponent.EventName);
+                _adminLogger.Add(LogType.EventStarted, LogImpact.High, $"ERT called. Reason: {Reason}");
             }
             else
             {
@@ -141,21 +141,19 @@ public sealed class AuthPanelSystem : EntitySystem
                 }
                 _adminLogger.Add(LogType.EventStarted, LogImpact.High, $"ERT Declined - Not enough ghosts");
             }
-
-            foreach (var entities in Counter.Values)
-            {
-                foreach (var entity in entities)
-                {
-                    _adminLogger.Add(LogType.EventStarted, LogImpact.High,
-                        $"{ToPrettyString(entity):player} just called ERT. Reason: {Reason}");
-                }
-            }
         }
     }
 
     private void OnButtonPressed(EntityUid uid, AuthPanelComponent component, AuthPanelButtonPressedMessage args)
     {
-        var access = _access.FindAccessTags(args.Actor);
+        if (!_idCard.TryFindIdCard(args.Actor, out var idCard))
+        {
+            _popup.PopupEntity(Loc.GetString("auth-panel-no-access"),
+                args.Actor, args.Actor);
+            return;
+        }
+
+        var access = _access.FindAccessTags(idCard.Owner);
 
         if (!access.Contains("Command"))
         {
@@ -178,43 +176,29 @@ public sealed class AuthPanelSystem : EntitySystem
             return;
         }
 
-        if (!Counter.TryGetValue(args.Button, out var hashSet))
+        if (!UsedCards.TryGetValue(args.Button, out var cards))
         {
-            hashSet = new HashSet<EntityUid>();
-            Counter.Add(args.Button, hashSet);
+            cards = new HashSet<EntityUid>();
+            UsedCards.Add(args.Button, cards);
         }
 
-        if (hashSet.Count >= MinCount)
+        if (cards.Count >= MinCount)
             return;
 
-        if (!CardIndexes.TryGetValue(args.Button, out var cardSet))
-        {
-            cardSet = new HashSet<int>();
-            CardIndexes.Add(args.Button, cardSet);
-        }
-
-        if (cardSet.Contains(access.Count))
+        if (!cards.Add(idCard.Owner))
         {
             _popup.PopupEntity(Loc.GetString("auth-panel-used-ID"),
                 args.Actor, args.Actor);
             return;
         }
 
-        if (!hashSet.Add(args.Actor))
-        {
-            _popup.PopupEntity(Loc.GetString("auth-panel-pressed"),
-                args.Actor, args.Actor);
-            return;
-        }
-
-        cardSet.Add(access.Count);
         _delay = _timing.CurTime + TimeSpan.FromSeconds(DelayDuration);
 
         Reason = args.Reason;
         UpdateUserInterface(args.Button);
         _adminLogger.Add(LogType.EventStarted, LogImpact.High, $"{ToPrettyString(args.Actor):player} vote for {args.Button}. Reason: {Reason}");
 
-        if (hashSet.Count >= MinCount)
+        if (cards.Count >= MinCount)
         {
             var ev = new AuthPanelPerformActionEvent(args.Button);
             RaiseLocalEvent(uid, ev);
@@ -224,7 +208,7 @@ public sealed class AuthPanelSystem : EntitySystem
 
     public void UpdateUserInterface(AuthPanelAction rawaction)
     {
-        if (!Counter.TryGetValue(rawaction, out var hashSet))
+        if (!UsedCards.TryGetValue(rawaction, out var hashSet))
             return;
 
         var action = new AuthPanelConfirmationAction(rawaction, hashSet.Count, MinCount, Reason);

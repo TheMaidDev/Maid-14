@@ -272,6 +272,12 @@
     path: /Audio/Lobby/atomicamnesiammx.ogg
 
 - type: jukebox
+  id: weh-flap
+  name: Enrico - Weh-Flap
+  path:
+    path: /Audio/Lobby/weh-flap.ogg
+
+- type: jukebox
   id: the_future_soon
   name: Jonathan Coulton - The Future Soon
   path:
