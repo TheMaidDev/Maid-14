@@ -160,7 +160,7 @@ public sealed class RadioSystem : EntitySystem
         if (!_messages.Add(message))
             return;
 
-        var evt = new TransformSpeakerNameEvent(messageSource, MetaData(messageSource).EntityName);
+        var evt = new TransformSpeakerNameEvent(messageSource, MetaData(messageSource).EntityName) { IsRadio = true }; // MAID Bush radio name
         RaiseLocalEvent(messageSource, evt);
 
         var name = evt.VoiceName;
