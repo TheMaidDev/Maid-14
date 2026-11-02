@@ -8,7 +8,7 @@ public sealed partial class DualWieldComponent : Component
     /// <summary>
     /// EntityUid of the linked dual-wielded weapon
     /// </summary>
-    [DataField]
+    [DataField, AutoNetworkedField]
     public EntityUid? LinkedWeapon;
 
     /// <summary>
