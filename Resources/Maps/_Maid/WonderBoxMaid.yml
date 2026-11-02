@@ -125648,7 +125648,7 @@ entities:
       pos: -25.5,-22.5
       parent: 2
     - type: SiloUtilizer
-      silo: 18154
+      silo: 27456
 - proto: OxygenCanister
   entities:
   - uid: 18303
