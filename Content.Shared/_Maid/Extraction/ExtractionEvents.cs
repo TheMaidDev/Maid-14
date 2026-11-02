@@ -12,7 +12,7 @@ public sealed partial class LaunchDropPodActionEvent : InstantActionEvent;
 /// Tells clients to play the lift-off animation of a drop pod that is being deleted.
 /// </summary>
 [Serializable, NetSerializable]
-public sealed class DropPodLaunchAnimationEvent(NetCoordinates coordinates, float duration, List<SpriteSpecifier> layers, Vector2 offset) : EntityEventArgs
+public sealed class DropPodLaunchAnimationEvent(NetCoordinates coordinates, float duration, List<SpriteSpecifier> layers, Vector2 offset, SpriteSpecifier? smoke) : EntityEventArgs
 {
     public readonly NetCoordinates Coordinates = coordinates;
     public readonly float Duration = duration;
@@ -22,6 +22,11 @@ public sealed class DropPodLaunchAnimationEvent(NetCoordinates coordinates, floa
     /// Sprite offset of the pod, the lift-off starts from it.
     /// </summary>
     public readonly Vector2 Offset = offset;
+
+    /// <summary>
+    /// Smoke drawn behind the rising pod, null for none.
+    /// </summary>
+    public readonly SpriteSpecifier? Smoke = smoke;
 }
 
 /// <summary>

@@ -98,6 +98,12 @@ public sealed partial class DropPodComponent : Component
     };
 
     /// <summary>
+    /// Smoke left on the ground behind the pod while it lifts off, the same sprite as smoke grenades. Null for none.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    public SpriteSpecifier? LaunchSmoke = new SpriteSpecifier.Rsi(new ResPath("Effects/chemsmoke.rsi"), "chemsmoke");
+
+    /// <summary>
     /// Sprite offset of the pod, so the lift-off starts where the pod is drawn.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadOnly)]

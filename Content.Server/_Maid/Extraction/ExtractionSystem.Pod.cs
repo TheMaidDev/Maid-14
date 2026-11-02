@@ -520,7 +520,7 @@ public sealed partial class ExtractionSystem
         // anyone and anything else stuffed inside stays on the station
         _entityStorage.EmptyContents(pod.Owner);
 
-        RaiseNetworkEvent(new DropPodLaunchAnimationEvent(GetNetCoordinates(coords), pod.Comp.LaunchAnimationDuration, pod.Comp.LaunchSprite, pod.Comp.LaunchSpriteOffset),
+        RaiseNetworkEvent(new DropPodLaunchAnimationEvent(GetNetCoordinates(coords), pod.Comp.LaunchAnimationDuration, pod.Comp.LaunchSprite, pod.Comp.LaunchSpriteOffset, pod.Comp.LaunchSmoke),
             Filter.Pvs(pod.Owner));
         _audio.PlayPvs(pod.Comp.LaunchSound, coords);
 

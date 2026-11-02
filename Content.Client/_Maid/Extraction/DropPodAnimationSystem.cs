@@ -1,12 +1,15 @@
 using System.Numerics;
 using Content.Client.Storage.Visualizers;
 using Content.Shared._Maid.Extraction;
+using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 using Content.Shared.Storage;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Animations;
+using Robust.Shared.Map;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 using TimedDespawnComponent = Robust.Shared.Spawners.TimedDespawnComponent;
 
 namespace Content.Client._Maid.Extraction;
@@ -24,6 +27,7 @@ public sealed class DropPodAnimationSystem : EntitySystem
 
     private const string AnimationKey = "drop-pod-launch";
     private const string LandingKey = "drop-pod-landing";
+    private const string SmokeKey = "drop-pod-smoke";
 
     public override void Initialize()
     {
@@ -102,9 +106,14 @@ public sealed class DropPodAnimationSystem : EntitySystem
         if (!coordinates.IsValid(EntityManager))
             return;
 
+        if (ev.Smoke != null)
+            SpawnSmoke(coordinates, ev.Smoke, ev.Duration);
+
         var animationEnt = Spawn(null, coordinates);
         var sprite = AddComp<SpriteComponent>(animationEnt);
         sprite.NoRotation = true;
+        // above everything on the station and above the smoke
+        _sprite.SetDrawDepth((animationEnt, sprite), (int) DrawDepth.Effects);
 
         foreach (var layer in ev.Layers)
         {
@@ -115,6 +124,54 @@ public sealed class DropPodAnimationSystem : EntitySystem
         despawn.Lifetime = ev.Duration + 0.1f;
 
         _player.Play(animationEnt, CreateAnimation(ev.Duration, ev.Offset), AnimationKey);
+    }
+
+    /// <summary>
+    /// How long the smoke stays after the pod is gone.
+    /// </summary>
+    private const float SmokeLinger = 1f;
+
+    /// <summary>
+    /// Smoke on the ground where the pod took off, drawn one depth below the rising pod so it stays behind it.
+    /// It puffs in, then thins out from the middle of the lift-off until a moment after the pod is gone.
+    /// </summary>
+    private void SpawnSmoke(EntityCoordinates coordinates, SpriteSpecifier smoke, float duration)
+    {
+        var smokeEnt = Spawn(null, coordinates);
+        var sprite = AddComp<SpriteComponent>(smokeEnt);
+        sprite.NoRotation = true;
+        _sprite.SetDrawDepth((smokeEnt, sprite), (int) DrawDepth.Overdoors);
+        _sprite.AddLayer((smokeEnt, sprite), smoke);
+        _sprite.SetColor((smokeEnt, sprite), Color.White.WithAlpha(0f));
+
+        var length = duration + SmokeLinger;
+        var despawn = AddComp<TimedDespawnComponent>(smokeEnt);
+        despawn.Lifetime = length + 0.1f;
+
+        var puff = 0.2f;
+        var fadeFrom = duration * FadeStart;
+        var animation = new Animation
+        {
+            Length = TimeSpan.FromSeconds(length),
+            AnimationTracks =
+            {
+                new AnimationTrackComponentProperty
+                {
+                    ComponentType = typeof(SpriteComponent),
+                    Property = nameof(SpriteComponent.Color),
+                    InterpolationMode = AnimationInterpolationMode.Linear,
+                    KeyFrames =
+                    {
+                        new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), 0f),
+                        new AnimationTrackProperty.KeyFrame(Color.White, puff),
+                        new AnimationTrackProperty.KeyFrame(Color.White, fadeFrom - puff),
+                        new AnimationTrackProperty.KeyFrame(Color.White.WithAlpha(0f), length - fadeFrom),
+                    },
+                },
+            },
+        };
+
+        _player.Play(smokeEnt, animation, SmokeKey);
     }
 
     /// <summary>
@@ -133,7 +190,14 @@ public sealed class DropPodAnimationSystem : EntitySystem
     private const float FadeStart = 0.5f;
 
     /// <summary>
-    /// Rises with constant acceleration (height grows with the square of time) and fades out
+    /// Part of the rise covered at a steady speed; the rest is constant acceleration.
+    /// Without it the pod barely moves at first.
+    /// </summary>
+    private const float StartSpeedShare = 0.3f;
+
+    /// <summary>
+    /// Leaves with some speed right away, then keeps accelerating evenly
+    /// (height = steady part + part growing with the square of time), and fades out
     /// over the second half. Key frame times are deltas from the previous frame.
     /// </summary>
     private static Animation CreateAnimation(float duration, Vector2 offset)
@@ -150,7 +214,7 @@ public sealed class DropPodAnimationSystem : EntitySystem
         for (var i = 1; i <= LaunchSamples; i++)
         {
             var t = (float) i / LaunchSamples;
-            rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, LaunchHeight * t * t), step));
+            rise.KeyFrames.Add(new AnimationTrackProperty.KeyFrame(offset + new Vector2(0f, LaunchHeight * (StartSpeedShare * t + (1f - StartSpeedShare) * t * t)), step));
         }
 
         var fade = new AnimationTrackComponentProperty
