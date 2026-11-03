@@ -3,6 +3,8 @@ using System.Collections;
 using System.Reflection;
 using Content.Server._Maid.AdaptiveGameMode.MetaInfo;
 using Content.Server._Maid.AdaptiveGameMode.ScoreCounters.Conditions;
+using Content.Server._Maid.Extraction;
+using Content.Shared._Maid.Extraction;
 using Content.Shared.Mind;
 using Content.Shared.Roles;
 using Robust.Shared.Prototypes;
@@ -84,7 +86,24 @@ public sealed class AdaptiveScoreCollectorSystem : EntitySystem, IAdaptiveBalanc
             }
         }
 
+        // characters that left the round through extraction are kept alive on a paused map, they don't count
+        if (IsExtracted(ent, mob, mind))
+            return false;
+
         return conditions.All(condition => condition.ConditionMet(ent, mob, mind, _entityManager));
+    }
+
+    private bool IsExtracted(EntityUid ent, EntityUid? mob, Entity<MindComponent>? mind)
+    {
+        if (mind is { } m && HasComp<ExtractedMindComponent>(m))
+            return true;
+
+        return IsExtractedBody(ent) || mob is { } body && IsExtractedBody(body);
+    }
+
+    private bool IsExtractedBody(EntityUid uid)
+    {
+        return TryComp<AntagExtractableComponent>(uid, out var extractable) && extractable.Extracted;
     }
 #if DEBUG
     public IEnumerable<AdaptiveBalanceInfo> GetBalanceInfo()

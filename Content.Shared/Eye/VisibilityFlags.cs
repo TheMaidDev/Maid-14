@@ -29,5 +29,6 @@ namespace Content.Shared.Eye
         EldritchInfluence = 1 << 5, // Goobstation
         EldritchInfluenceSpent = 1 << 6, // Goobstation
         Admin = 1 << 7, // Reserved for admins in stealth mode and admin tools.
+        MaidExtraction = 1 << 8, // MAID antag extraction
     }
 }

@@ -7,6 +7,7 @@
 using Content.Server.Objectives.Components;
 using Content.Shared.Objectives.Components;
 using Content.Shared.Mind;
+using Content.Server._Maid.Extraction; // MAID antag extraction
 
 namespace Content.Server.Objectives.Systems;
 
@@ -26,6 +27,14 @@ public sealed class SurviveConditionSystem : EntitySystem
 
     private void OnGetProgress(EntityUid uid, SurviveConditionComponent comp, ref ObjectiveGetProgressEvent args)
     {
+        // MAID BEGIN antag extraction
+        if (TryComp<ExtractedMindComponent>(args.MindId, out var extracted))
+        {
+            args.Progress = extracted.Dead ? 0f : 1f;
+            return;
+        }
+        // MAID END antag extraction
+
         args.Progress = _mind.IsCharacterDeadIc(args.Mind) ? 0f : 1f;
     }
 }
