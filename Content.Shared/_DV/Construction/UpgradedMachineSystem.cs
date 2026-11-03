@@ -30,12 +30,12 @@ public sealed class UpgradedMachineSystem : EntitySystem
     }
 
     // MAID BEGIN return upgrade kit
-    private void OnDeconstructed(Entity<UpgradedMachineComponent> ent, MachineDeconstructedEvent args)
+    private void OnDeconstructed(EntityUid uid, UpgradedMachineComponent comp, MachineDeconstructedEvent args)
     {
-        if (_net.IsClient || ent.Comp.Kit is not {} kit)
+        if (_net.IsClient || comp.Kit is not {} kit)
             return;
 
-        Spawn(kit, Transform(ent).Coordinates);
+        Spawn(kit, Transform(uid).Coordinates);
     }
     // MAID END return upgrade kit
 }
