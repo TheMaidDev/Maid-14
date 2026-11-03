@@ -18,6 +18,7 @@ public sealed class StationSunShadowSystem : EntitySystem
     [Dependency] private readonly SharedRoofSystem _roof = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private static readonly ProtoId<TagPrototype> WindowTag = "Window";
 
@@ -29,6 +30,7 @@ public sealed class StationSunShadowSystem : EntitySystem
     private readonly HashSet<Vector2i> _gapFill = new();
     private readonly HashSet<Vector2i> _outer = new();
     private readonly Queue<Vector2i> _queue = new();
+    private readonly List<Vector2i> _ray = new();
 
     public override void Initialize()
     {
@@ -69,27 +71,48 @@ public sealed class StationSunShadowSystem : EntitySystem
         var query = EntityQueryEnumerator<StationSunGridComponent, MapGridComponent>();
         while (query.MoveNext(out var uid, out var state, out var gridComp))
         {
-            if (_timing.CurTime < state.NextUpdate)
+            if (!TryComp(state.Station, out StationSunShadowComponent? sun) ||
+                !TryComp(uid, out SunShadowComponent? shadow))
+            {
+                continue;
+            }
+
+            var now = _timing.CurTime;
+            if (now < state.NextMinUpdate)
                 continue;
 
-            state.NextUpdate = _timing.CurTime + UpdateDelay;
+            // The light direction is read from the grid's SunShadow (editable live) and follows the grid rotation.
+            var theta = _xform.GetWorldRotation(uid).Theta;
+            var changed = MathF.Abs(shadow.Direction.X - state.LastDirection.X) > 0.001f ||
+                          MathF.Abs(shadow.Direction.Y - state.LastDirection.Y) > 0.001f ||
+                          Math.Abs(theta - state.LastTheta) > 0.001;
 
-            if (!TryComp(state.Station, out StationSunShadowComponent? sun))
+            if (!changed && now < state.NextUpdate)
                 continue;
 
-            UpdateGrid((uid, gridComp, state), sun);
+            state.NextUpdate = now + UpdateDelay;
+            state.NextMinUpdate = now + TimeSpan.FromMilliseconds(250);
+            state.LastDirection = shadow.Direction;
+            state.LastTheta = theta;
+
+            UpdateGrid((uid, gridComp, state), sun, shadow.Direction, theta);
         }
     }
 
-    private void UpdateGrid(Entity<MapGridComponent, StationSunGridComponent> grid, StationSunShadowComponent sun)
+    private void UpdateGrid(Entity<MapGridComponent, StationSunGridComponent> grid,
+        StationSunShadowComponent sun,
+        Vector2 worldDir,
+        double gridTheta)
     {
-        // Light travels along the shadow direction, snapped to the dominant axis.
-        var dir = sun.Direction;
+        // Light direction is a world-space vector, bring it into the grid's local space.
+        var localDir = new Angle(-gridTheta).RotateVec(worldDir);
+
+        // Snapped to the dominant axis, only used to decide the cross-beam axis when filling gaps.
         Vector2i step;
-        if (MathF.Abs(dir.X) >= MathF.Abs(dir.Y))
-            step = new Vector2i(MathF.Sign(dir.X), 0);
+        if (MathF.Abs(localDir.X) >= MathF.Abs(localDir.Y))
+            step = new Vector2i(MathF.Sign(localDir.X), 0);
         else
-            step = new Vector2i(0, MathF.Sign(dir.Y));
+            step = new Vector2i(0, MathF.Sign(localDir.Y));
 
         _lit.Clear();
         ComputeOuterSpace(grid);
@@ -110,14 +133,18 @@ public sealed class StationSunShadowSystem : EntitySystem
                 _windowTiles.Add(_map.TileIndicesFor(grid.Owner, grid.Comp1, xform.Coordinates));
             }
 
+            var dirN = Vector2.Normalize(localDir);
+
             foreach (var origin in _windowTiles)
             {
-                if (!IsExposed(grid, origin, -step))
+                if (!IsExposed(grid, origin, -dirN))
                     continue;
 
-                var tile = origin;
-                for (var i = 0; i <= sun.WindowLightDepth; i++)
+                SampleTiles(origin, dirN, sun.WindowLightDepth);
+                for (var i = 0; i < _ray.Count; i++)
                 {
+                    var tile = _ray[i];
+
                     if (IsSpaceTile(grid, tile))
                         break;
 
@@ -126,7 +153,6 @@ public sealed class StationSunShadowSystem : EntitySystem
                         break;
 
                     _lit.Add(tile);
-                    tile += step;
                 }
             }
         }
@@ -210,12 +236,13 @@ public sealed class StationSunShadowSystem : EntitySystem
     /// <summary>
     /// A window is exposed if looking against the light we reach open space before hitting something solid.
     /// </summary>
-    private bool IsExposed(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i origin, Vector2i upstream)
+    private bool IsExposed(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i origin, Vector2 upstream)
     {
-        var tile = origin;
-        for (var i = 0; i < ExposureCheckDistance; i++)
+        SampleTiles(origin, upstream, ExposureCheckDistance);
+
+        for (var i = 1; i < _ray.Count; i++)
         {
-            tile += upstream;
+            var tile = _ray[i];
 
             // Space enclosed inside the station (a hole) is not a light source.
             if (IsSpaceTile(grid, tile))
@@ -227,6 +254,26 @@ public sealed class StationSunShadowSystem : EntitySystem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Fills <see cref="_ray"/> with the distinct tiles crossed by a ray from the centre of <paramref name="origin"/>
+    /// along <paramref name="dir"/> (normalized), up to <paramref name="length"/> tiles. The first entry is the origin.
+    /// </summary>
+    private void SampleTiles(Vector2i origin, Vector2 dir, float length)
+    {
+        _ray.Clear();
+        _ray.Add(origin);
+
+        var center = new Vector2(origin.X + 0.5f, origin.Y + 0.5f);
+        for (var t = 0.25f; t <= length; t += 0.25f)
+        {
+            var point = center + dir * t;
+            var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+
+            if (tile != _ray[_ray.Count - 1])
+                _ray.Add(tile);
+        }
     }
 
     /// <summary>

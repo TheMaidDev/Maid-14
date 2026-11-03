@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Content.Server._Maid.StationSunShadow;
 
 /// <summary>
@@ -16,4 +18,12 @@ public sealed partial class StationSunGridComponent : Component
     public HashSet<Vector2i> LitTiles = new();
 
     public TimeSpan NextUpdate;
+
+    /// <summary>
+    /// Throttle so a rotating grid does not recompute every frame.
+    /// </summary>
+    public TimeSpan NextMinUpdate;
+
+    public Vector2 LastDirection;
+    public double LastTheta;
 }
