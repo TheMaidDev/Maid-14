@@ -876,8 +876,7 @@ public sealed partial class ExtractionSystem : EntitySystem
 
     /// <summary>
     /// Moves the body to a paused map: nothing can reach or hurt it there, and it stays alive.
-    /// TODO MAID: exclude this map from antag and population counts (dynamic and adaptive game modes),
-    /// extracted bodies still count as living antagonists there.
+    /// The adaptive game mode score collector skips extracted characters, so they don't count as living antagonists.
     /// </summary>
     private void MoveToLimbo(EntityUid user)
     {
