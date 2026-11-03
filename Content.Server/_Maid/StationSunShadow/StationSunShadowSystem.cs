@@ -11,11 +11,11 @@ public sealed class StationSunShadowSystem : EntitySystem
         SubscribeLocalEvent<StationSunShadowComponent, StationGridAddedEvent>(OnGridAdded);
     }
 
-    private void OnGridAdded(Entity<StationSunShadowComponent> ent, StationGridAddedEvent args)
+    private void OnGridAdded(EntityUid uid, StationSunShadowComponent comp, StationGridAddedEvent args)
     {
         var shadow = EnsureComp<SunShadowComponent>(args.GridId);
-        shadow.Direction = ent.Comp.Direction;
-        shadow.Alpha = ent.Comp.Alpha;
+        shadow.Direction = comp.Direction;
+        shadow.Alpha = comp.Alpha;
         Dirty(args.GridId, shadow);
     }
 }
