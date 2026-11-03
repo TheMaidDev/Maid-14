@@ -29,8 +29,9 @@
 
 - type: job
   id: BlueshieldOfficer
-  name: Blueshield Officer
-  description: "Act as a bodyguard and advisor for Command and CentCom VIPs."
+  # MAID fix job localization
+  name: job-name-blueshield-officer
+  description: job-description-blueshield-officer
   playTimeTracker: JobBlueshieldOfficer
   requirements:
     - !type:DepartmentTimeRequirement
