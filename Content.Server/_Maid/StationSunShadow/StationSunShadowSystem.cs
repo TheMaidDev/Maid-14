@@ -149,21 +149,22 @@ public sealed class StationSunShadowSystem : EntitySystem
             if (_map.GetTileRef(grid.Owner, grid.Comp1, tile).Tile.IsEmpty)
                 return true;
 
-            if (IsBlocked(grid, tile))
+            // Looking back through another window means we are inside a room, not facing open space.
+            if (IsBlocked(grid, tile, windowsBlock: true))
                 return false;
         }
 
         return false;
     }
 
-    private bool IsBlocked(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i tile)
+    private bool IsBlocked(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i tile, bool windowsBlock = false)
     {
         foreach (var ent in _map.GetAnchoredEntities(grid.Owner, grid.Comp1, tile))
         {
             if (!TryComp(ent, out AirtightComponent? airtight) || !airtight.AirBlocked)
                 continue;
 
-            if (_tag.HasTag(ent, WindowTag))
+            if (!windowsBlock && _tag.HasTag(ent, WindowTag))
                 continue;
 
             return true;
