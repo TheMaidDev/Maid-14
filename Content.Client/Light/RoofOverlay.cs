@@ -113,7 +113,9 @@ public sealed class RoofOverlay : Overlay
 
                     worldHandle.SetTransform(matty);
 
-                    var tileEnumerator = _mapSystem.GetTilesEnumerator(grid.Owner, grid, bounds);
+                    // MAID sun hole roof
+                    // Include empty tiles so space enclosed inside a station can be roofed (tile roof bits decide what is drawn).
+                    var tileEnumerator = _mapSystem.GetTilesEnumerator(grid.Owner, grid, bounds, ignoreEmpty: false);
                     var roofEnt = (grid.Owner, grid.Comp, roof);
 
                     // Due to stencilling we essentially draw on unrooved tiles

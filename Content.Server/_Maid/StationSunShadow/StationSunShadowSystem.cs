@@ -134,14 +134,31 @@ public sealed class StationSunShadowSystem : EntitySystem
         if (step != Vector2i.Zero && sun.WindowLightGapFill > 0 && _lit.Count > 0)
             FillGaps(grid, step, sun.WindowLightGapFill);
 
-        // Every tile gets roofed except the lit ones; SetRoof only dirties on actual change.
+        // Every tile gets roofed except lit ones and space connected to the outside.
+        // Space enclosed inside the station (a hole) is roofed too, so no light comes through it.
         var roofGrid = (grid.Owner, (MapGridComponent?) grid.Comp1, (RoofComponent?) null);
-        foreach (var tileRef in _map.GetAllTiles(grid.Owner, grid.Comp1))
+        var size = grid.Comp1.TileSize;
+        var aabb = grid.Comp1.LocalAABB;
+        var minX = (int) MathF.Floor(aabb.Left / size);
+        var maxX = (int) MathF.Ceiling(aabb.Right / size);
+        var minY = (int) MathF.Floor(aabb.Bottom / size);
+        var maxY = (int) MathF.Ceiling(aabb.Top / size);
+
+        for (var x = minX; x <= maxX; x++)
         {
-            // Space-like tiles (lattice) are open to the sun, they are never roofed.
-            var open = _turf.IsSpace(tileRef) && _outer.Contains(tileRef.GridIndices);
-            var roofed = !_lit.Contains(tileRef.GridIndices) && !open;
-            _roof.SetRoof(roofGrid, tileRef.GridIndices, roofed);
+            for (var y = minY; y <= maxY; y++)
+            {
+                var index = new Vector2i(x, y);
+                var tileRef = _map.GetTileRef(grid.Owner, grid.Comp1, index);
+
+                bool roofed;
+                if (tileRef.Tile.IsEmpty || _turf.IsSpace(tileRef))
+                    roofed = !_outer.Contains(index);
+                else
+                    roofed = !_lit.Contains(index);
+
+                _roof.SetRoof(roofGrid, index, roofed);
+            }
         }
 
         grid.Comp2.LitTiles.Clear();
