@@ -1,5 +1,6 @@
 using Content.Server.Station.Systems;
 using Content.Shared.Light.Components;
+using Robust.Shared.Map.Components;
 
 namespace Content.Server._Maid.StationSunShadow;
 
