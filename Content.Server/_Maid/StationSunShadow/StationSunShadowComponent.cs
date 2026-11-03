@@ -26,4 +26,13 @@ public sealed partial class StationSunShadowComponent : Component
     /// </summary>
     [DataField]
     public Color SunColor = Color.FromHex("#B8B8C0");
+
+    /// <summary>
+    /// If true, sunlight passes through windows that face open space and lights this many tiles of the station behind them.
+    /// </summary>
+    [DataField]
+    public bool LightThroughWindows = true;
+
+    [DataField]
+    public int WindowLightDepth = 4;
 }
