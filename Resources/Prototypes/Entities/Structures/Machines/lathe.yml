@@ -360,6 +360,7 @@
   parent: BaseLathe
   id: BaseLatheLube
   components:
+  - type: StationAiWhitelist # MAID AI lathe access
   - type: ReagentSpeed
     solution: lube
     modifiers:
