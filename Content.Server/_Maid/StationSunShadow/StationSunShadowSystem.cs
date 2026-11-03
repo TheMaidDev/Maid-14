@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Server.Atmos.Components;
 using Content.Server.Station.Systems;
+using Content.Shared._Maid.StationSunShadow;
 using Content.Shared.Light.Components;
 using Content.Shared.Light.EntitySystems;
 using Content.Shared.Maps;
@@ -46,6 +47,8 @@ public sealed class StationSunShadowSystem : EntitySystem
         shadow.Direction = comp.Direction;
         shadow.Alpha = comp.Alpha;
         Dirty(grid, shadow);
+
+        EnsureComp<StationSunMarkerComponent>(grid);
 
         var mapUid = Transform(grid).MapUid;
         if (mapUid != null)

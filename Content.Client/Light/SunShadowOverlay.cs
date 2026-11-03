@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Numerics;
+using Content.Shared._Maid.StationSunShadow; // MAID station sun shadow
 using Content.Shared.Light.Components;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
@@ -83,6 +84,11 @@ public sealed class SunShadowOverlay : Overlay
             {
                 continue;
             }
+
+            // MAID station sun shadow
+            // Station grids get their shadow from StationSunShadowOverlay (whole silhouette, ambient light only).
+            if (_entManager.HasComponent<StationSunMarkerComponent>(grid.Owner))
+                continue;
 
             var direction = sun.Direction;
             var alpha = Math.Clamp(sun.Alpha, 0f, 1f);
