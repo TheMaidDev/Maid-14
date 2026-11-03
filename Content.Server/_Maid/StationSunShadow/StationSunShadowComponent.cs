@@ -18,7 +18,7 @@ public sealed partial class StationSunShadowComponent : Component
     public Vector2 Direction = new(0f, -40f);
 
     [DataField]
-    public float Alpha = 0.5f;
+    public float Alpha = 1f;
 
     /// <summary>
     /// Ambient light color applied to the map the station grid is on, so open space around the station is lit by the star.

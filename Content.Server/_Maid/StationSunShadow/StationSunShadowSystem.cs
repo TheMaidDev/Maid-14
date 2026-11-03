@@ -25,6 +25,7 @@ public sealed class StationSunShadowSystem : EntitySystem
 
     private static readonly TimeSpan UpdateDelay = TimeSpan.FromSeconds(2);
     private const int ExposureCheckDistance = 6;
+    private const float MaxShadowLength = 150f;
 
     private readonly List<Vector2i> _windowTiles = new();
     private readonly HashSet<Vector2i> _lit = new();
@@ -32,6 +33,8 @@ public sealed class StationSunShadowSystem : EntitySystem
     private readonly HashSet<Vector2i> _outer = new();
     private readonly Queue<Vector2i> _queue = new();
     private readonly List<Vector2i> _ray = new();
+    private readonly HashSet<Vector2i> _solid = new();
+    private readonly HashSet<Vector2i> _shadow = new();
 
     public override void Initialize()
     {
@@ -163,6 +166,8 @@ public sealed class StationSunShadowSystem : EntitySystem
         if (step != Vector2i.Zero && sun.WindowLightGapFill > 0 && _lit.Count > 0)
             FillGaps(grid, step, sun.WindowLightGapFill);
 
+        ComputeShadow(grid, localDir, worldDir.Length());
+
         // Every tile gets roofed except lit ones and space connected to the outside.
         // Space enclosed inside the station (a hole) is roofed too, so no light comes through it.
         var roofGrid = (grid.Owner, (MapGridComponent?) grid.Comp1, (RoofComponent?) null);
@@ -182,7 +187,7 @@ public sealed class StationSunShadowSystem : EntitySystem
 
                 bool roofed;
                 if (tileRef.Tile.IsEmpty || _turf.IsSpace(tileRef))
-                    roofed = !_outer.Contains(index);
+                    roofed = !_outer.Contains(index) || _shadow.Contains(index);
                 else
                     roofed = !_lit.Contains(index);
 
@@ -192,6 +197,77 @@ public sealed class StationSunShadowSystem : EntitySystem
 
         grid.Comp2.LitTiles.Clear();
         grid.Comp2.LitTiles.UnionWith(_lit);
+    }
+
+    /// <summary>
+    /// Finds space tiles inside the grid's bounds that lie in the shadow of the station mass. Those are roofed
+    /// so they stay fully dark even when they are open to space (cavities at the station edges).
+    /// The part of the shadow that reaches beyond the grid is drawn by the client overlay.
+    /// </summary>
+    private void ComputeShadow(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2 localDir, float length)
+    {
+        _shadow.Clear();
+        _solid.Clear();
+
+        length = MathF.Min(length, MaxShadowLength);
+        if (length < 0.01f || localDir.LengthSquared() < 0.0001f)
+            return;
+
+        var dir = Vector2.Normalize(localDir);
+        var perp = new Vector2(-dir.Y, dir.X);
+
+        var size = grid.Comp1.TileSize;
+        var aabb = grid.Comp1.LocalAABB;
+        var minX = (int) MathF.Floor(aabb.Left / size);
+        var maxX = (int) MathF.Ceiling(aabb.Right / size);
+        var minY = (int) MathF.Floor(aabb.Bottom / size);
+        var maxY = (int) MathF.Ceiling(aabb.Top / size);
+
+        foreach (var tileRef in _map.GetAllTiles(grid.Owner, grid.Comp1))
+        {
+            if (!_turf.IsSpace(tileRef))
+                _solid.Add(tileRef.GridIndices);
+        }
+
+        foreach (var solid in _solid)
+        {
+            if (!IsBoundary(solid))
+                continue;
+
+            var center = new Vector2(solid.X + 0.5f, solid.Y + 0.5f);
+
+            // Three parallel rays (centre and both edges) so no tile of the swept strip is skipped.
+            for (var k = -1; k <= 1; k++)
+            {
+                var origin = center + perp * (0.45f * k);
+
+                for (var t = 0f; t <= length; t += 0.5f)
+                {
+                    var point = origin + dir * t;
+                    var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+
+                    if (tile.X < minX || tile.X > maxX || tile.Y < minY || tile.Y > maxY)
+                        break;
+
+                    if (!_solid.Contains(tile))
+                        _shadow.Add(tile);
+                }
+            }
+        }
+    }
+
+    private bool IsBoundary(Vector2i tile)
+    {
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            for (var dy = -1; dy <= 1; dy++)
+            {
+                if ((dx != 0 || dy != 0) && !_solid.Contains(new Vector2i(tile.X + dx, tile.Y + dy)))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
