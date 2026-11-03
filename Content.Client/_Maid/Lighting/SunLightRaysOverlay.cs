@@ -24,7 +24,7 @@ public sealed class SunLightRaysOverlay : Overlay
     private readonly SharedRoofSystem _roof;
     private readonly SharedTransformSystem _xform;
 
-    private readonly List<Entity<MapGridComponent>> _grids = new();
+    private List<Entity<MapGridComponent>> _grids = new();
 
     public override OverlaySpace Space => OverlaySpace.WorldSpace;
 
