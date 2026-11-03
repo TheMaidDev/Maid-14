@@ -320,6 +320,8 @@
     graph: ShotgunSawn
     node: shotgunsawn
     deconstructionTarget: null
+  - type: DualWield
+    spreadMultiplier: 24 # Ибо нехуй
 
 - type: entity
   name: sawn-off shotgun
