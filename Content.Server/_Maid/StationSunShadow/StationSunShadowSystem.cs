@@ -24,6 +24,7 @@ public sealed class StationSunShadowSystem : EntitySystem
 
     private readonly List<Vector2i> _windowTiles = new();
     private readonly HashSet<Vector2i> _lit = new();
+    private readonly HashSet<Vector2i> _gapFill = new();
 
     public override void Initialize()
     {
@@ -125,6 +126,9 @@ public sealed class StationSunShadowSystem : EntitySystem
             }
         }
 
+        if (step != Vector2i.Zero && sun.WindowLightGapFill > 0 && _lit.Count > 0)
+            FillGaps(grid, step, sun.WindowLightGapFill);
+
         // Every tile gets roofed except the lit ones; SetRoof only dirties on actual change.
         var roofGrid = (grid.Owner, (MapGridComponent?) grid.Comp1, (RoofComponent?) null);
         foreach (var tileRef in _map.GetAllTiles(grid.Owner, grid.Comp1))
@@ -134,6 +138,48 @@ public sealed class StationSunShadowSystem : EntitySystem
 
         grid.Comp2.LitTiles.Clear();
         grid.Comp2.LitTiles.UnionWith(_lit);
+    }
+
+    /// <summary>
+    /// Lights floor tiles that sit in a narrow gap between two lit tiles across the light direction.
+    /// </summary>
+    private void FillGaps(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i step, int maxGap)
+    {
+        var lateral = step.X == 0 ? new Vector2i(1, 0) : new Vector2i(0, 1);
+        _gapFill.Clear();
+
+        foreach (var tile in _lit)
+        {
+            for (var gap = 1; gap <= maxGap; gap++)
+            {
+                if (!_lit.Contains(tile + lateral * (gap + 1)))
+                    continue;
+
+                var fillable = true;
+                for (var k = 1; k <= gap; k++)
+                {
+                    var between = tile + lateral * k;
+
+                    if (_lit.Contains(between) ||
+                        _map.GetTileRef(grid.Owner, grid.Comp1, between).Tile.IsEmpty ||
+                        IsBlocked(grid, between))
+                    {
+                        fillable = false;
+                        break;
+                    }
+                }
+
+                if (!fillable)
+                    continue;
+
+                for (var k = 1; k <= gap; k++)
+                {
+                    _gapFill.Add(tile + lateral * k);
+                }
+            }
+        }
+
+        _lit.UnionWith(_gapFill);
     }
 
     /// <summary>

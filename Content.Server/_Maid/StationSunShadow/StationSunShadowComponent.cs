@@ -35,4 +35,11 @@ public sealed partial class StationSunShadowComponent : Component
 
     [DataField]
     public int WindowLightDepth = 4;
+
+    /// <summary>
+    /// Unlit gaps up to this many tiles wide between two lit tiles (across the light direction) get filled,
+    /// so neighbouring window beams merge into one instead of looking like separate stripes.
+    /// </summary>
+    [DataField]
+    public int WindowLightGapFill = 2;
 }
