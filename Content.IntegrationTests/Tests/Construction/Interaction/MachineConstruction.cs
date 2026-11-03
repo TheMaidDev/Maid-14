@@ -100,7 +100,8 @@ public sealed class MachineConstruction : InteractionTest
 
     /// <summary>
     /// Machine upgrading (part ratings) was ripped out upstream in #24413, so we can only check
-    /// that higher tier parts are still accepted by machine frames as their base stack type.
+    /// that higher tier parts are still accepted by machine frames as their base stack type
+    /// and come back with the same rating when the machine is deconstructed.
     /// </summary>
     [Test]
     public async Task RebuildLatheWithHighTierParts()
@@ -113,7 +114,13 @@ public sealed class MachineConstruction : InteractionTest
         AssertPrototype(MachineFrame);
 
         // Reconstruct with better parts.
-        await Interact(ProtolatheBoard, Bin4, Bin4, Manipulator4, Manipulator4, Beaker, Beaker);
+        // Interact() spawns stack entities by their stack type, i.e. as basic parts, so the rated parts are spawned by prototype.
+        await Interact(ProtolatheBoard);
+        await InsertExactPrototype(Bin4);
+        await InsertExactPrototype(Bin4);
+        await InsertExactPrototype(Manipulator4);
+        await InsertExactPrototype(Manipulator4);
+        await Interact(Beaker, Beaker);
         await Interact(Screw);
         AssertPrototype(Protolathe);
 
@@ -142,6 +149,17 @@ public sealed class MachineConstruction : InteractionTest
             Assert.That(Count(Bin4), Is.EqualTo(2));
             Assert.That(Count(Manipulator4), Is.EqualTo(2));
         });
+    }
+
+    /// <summary>
+    /// Spawns an entity of exactly this prototype, picks it up and uses it on the target.
+    /// </summary>
+    private async Task InsertExactPrototype(string prototype)
+    {
+        EntityUid part = default;
+        await Server.WaitPost(() => part = SEntMan.SpawnEntity(prototype, SEntMan.GetCoordinates(PlayerCoords)));
+        await Pickup(SEntMan.GetNetEntity(part));
+        await Interact();
     }
     // MAID END revert machine parts
 }
