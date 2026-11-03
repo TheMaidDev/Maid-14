@@ -551,6 +551,7 @@
     - HVCable
     - CableTerminal
     - Deconstruct
+    - SurveillanceCameraGeneral
   - type: LimitedCharges
     maxCharges: 45
   - type: Sprite
