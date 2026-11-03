@@ -13,6 +13,7 @@ using Content.Shared.Movement.Components;
 using Content.Shared.Silicons.Borgs.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using System.Linq; // MAID no borg skins
 
 namespace Content.Shared.Silicons.Borgs;
 
@@ -83,10 +84,26 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         if (ent.Comp.SelectedBorgType != null)
             return;
 
+        // MAID BEGIN no borg skins
+        /*
         if (!Prototypes.HasIndex(args.Prototype) || !Prototypes.HasIndex(args.Subtype))
             return;
 
         SelectBorgModule(ent, args.Prototype, args.Subtype);
+        */
+        var selectedType = args.Prototype;
+        if (!Prototypes.HasIndex(selectedType))
+            return;
+
+        var defaultSubtype = Prototypes.EnumeratePrototypes<BorgSubtypePrototype>()
+            .FirstOrDefault(s => s.ParentBorgType == selectedType && (s.ID.EndsWith("_default") || s.ID.StartsWith("default_")))
+            ?? Prototypes.EnumeratePrototypes<BorgSubtypePrototype>().FirstOrDefault(s => s.ParentBorgType == selectedType);
+
+        if (defaultSubtype == null)
+            return;
+
+        SelectBorgModule(ent, selectedType, defaultSubtype.ID);
+        // MAID END no borg skins
     }
 
     //

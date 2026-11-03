@@ -32,7 +32,12 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
 
     private BorgTypePrototype? _selectedBorgType;
 
+    // MAID BEGIN no borg skins
+    /*
     public event Action<ProtoId<BorgTypePrototype>, ProtoId<BorgSubtypePrototype>>? ConfirmedBorgType;
+    */
+    public event Action<ProtoId<BorgTypePrototype>>? ConfirmedBorgType;
+    // MAID END no borg skins
 
     private static readonly List<ProtoId<GuideEntryPrototype>> GuidebookEntries = new() { "Cyborgs", "Robotics" };
 
@@ -62,9 +67,13 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
         HelpGuidebookIds = GuidebookEntries;
 
 
+        // MAID BEGIN no borg skins
+        /*
         SubtypeSelection.SubtypeSelected += () =>
             ConfirmTypeButton.Disabled = false;
-        // Goobstation-End: Customizable borgs sprites
+        */
+        SubtypeSelection.Visible = false;
+        // MAID END no borg skins
     }
 
     private void UpdateInformation(BorgTypePrototype prototype)
@@ -79,19 +88,31 @@ public sealed partial class BorgSelectTypeMenu : FancyWindow
         DescriptionLabel.Text = Loc.GetString($"borg-type-{prototype.ID}-desc");
         ChassisView.SetPrototype(prototype.DummyPrototype);
 
+        // MAID BEGIN no borg skins
+        /*
         // Goobstation: Customizable borgs sprites
         SubtypeSelection.FillContainer(prototype);
         ConfirmTypeButton.Disabled = true;
+        */
+        // MAID END no borg skins
     }
 
     private void ConfirmButtonPressed(BaseButton.ButtonEventArgs obj)
     {
+        // MAID BEGIN no borg skins
+        /*
         if (_selectedBorgType == null ||
             SubtypeSelection.SelectedBorgSubtype == null ||
             SubtypeSelection.SelectedBorgSubtype.ParentBorgType != _selectedBorgType)
             return;
 
         ConfirmedBorgType?.Invoke(_selectedBorgType, SubtypeSelection.SelectedBorgSubtype);
+        */
+        if (_selectedBorgType == null)
+            return;
+
+        ConfirmedBorgType?.Invoke(_selectedBorgType);
+        // MAID END no borg skins
     }
 
     private static string PrototypeName(BorgTypePrototype prototype)
