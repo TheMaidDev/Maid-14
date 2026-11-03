@@ -61,8 +61,14 @@ public sealed class DualWieldSystem : EntitySystem
                 return;
         }
 
+        var delay = TimeSpan.FromSeconds(comp.FireDelay);
+        var remainingGate = linkedGun.NextFire - _timing.CurTime;
+        if (remainingGate > delay)
+            delay = remainingGate;
+        delay += TimeSpan.FromMilliseconds(2);
+
         Timer.Spawn(
-            duration: TimeSpan.FromSeconds(comp.FireDelay),
+            duration: delay,
             onFired: () =>
             {
 
