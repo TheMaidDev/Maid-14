@@ -15,7 +15,7 @@ public sealed partial class StationSunShadowComponent : Component
     /// Direction the shadows are cast in (opposite to the light source). Length is capped by <c>SunShadowComponent.MaxLength</c>.
     /// </summary>
     [DataField]
-    public Vector2 Direction = new(0f, -4f);
+    public Vector2 Direction = new(0f, -5f);
 
     [DataField]
     public float Alpha = 0.5f;
@@ -34,12 +34,12 @@ public sealed partial class StationSunShadowComponent : Component
     public bool LightThroughWindows = true;
 
     [DataField]
-    public int WindowLightDepth = 4;
+    public int WindowLightDepth = 2;
 
     /// <summary>
     /// Unlit gaps up to this many tiles wide between two lit tiles (across the light direction) get filled,
     /// so neighbouring window beams merge into one instead of looking like separate stripes.
     /// </summary>
     [DataField]
-    public int WindowLightGapFill = 2;
+    public int WindowLightGapFill = 0;
 }

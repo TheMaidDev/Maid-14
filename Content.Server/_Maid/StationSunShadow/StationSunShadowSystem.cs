@@ -27,6 +27,8 @@ public sealed class StationSunShadowSystem : EntitySystem
     private readonly List<Vector2i> _windowTiles = new();
     private readonly HashSet<Vector2i> _lit = new();
     private readonly HashSet<Vector2i> _gapFill = new();
+    private readonly HashSet<Vector2i> _outer = new();
+    private readonly Queue<Vector2i> _queue = new();
 
     public override void Initialize()
     {
@@ -90,6 +92,7 @@ public sealed class StationSunShadowSystem : EntitySystem
             step = new Vector2i(0, MathF.Sign(dir.Y));
 
         _lit.Clear();
+        ComputeOuterSpace(grid);
 
         if (step != Vector2i.Zero)
         {
@@ -136,7 +139,8 @@ public sealed class StationSunShadowSystem : EntitySystem
         foreach (var tileRef in _map.GetAllTiles(grid.Owner, grid.Comp1))
         {
             // Space-like tiles (lattice) are open to the sun, they are never roofed.
-            var roofed = !_lit.Contains(tileRef.GridIndices) && !_turf.IsSpace(tileRef);
+            var open = _turf.IsSpace(tileRef) && _outer.Contains(tileRef.GridIndices);
+            var roofed = !_lit.Contains(tileRef.GridIndices) && !open;
             _roof.SetRoof(roofGrid, tileRef.GridIndices, roofed);
         }
 
@@ -196,8 +200,9 @@ public sealed class StationSunShadowSystem : EntitySystem
         {
             tile += upstream;
 
+            // Space enclosed inside the station (a hole) is not a light source.
             if (IsSpaceTile(grid, tile))
-                return true;
+                return _outer.Contains(tile);
 
             // Looking back through another window means we are inside a room, not facing open space.
             if (IsBlocked(grid, tile, windowsBlock: true))
@@ -205,6 +210,53 @@ public sealed class StationSunShadowSystem : EntitySystem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Finds all space-like tiles connected to the space outside the grid. Space enclosed by the station
+    /// (holes) is not part of it, so it neither lights tiles nor counts as open sky.
+    /// </summary>
+    private void ComputeOuterSpace(Entity<MapGridComponent, StationSunGridComponent> grid)
+    {
+        _outer.Clear();
+        _queue.Clear();
+
+        var size = grid.Comp1.TileSize;
+        var aabb = grid.Comp1.LocalAABB;
+        var margin = ExposureCheckDistance + 1;
+        var minX = (int) MathF.Floor(aabb.Left / size) - margin;
+        var maxX = (int) MathF.Ceiling(aabb.Right / size) + margin;
+        var minY = (int) MathF.Floor(aabb.Bottom / size) - margin;
+        var maxY = (int) MathF.Ceiling(aabb.Top / size) + margin;
+
+        var start = new Vector2i(minX, minY);
+        _outer.Add(start);
+        _queue.Enqueue(start);
+
+        while (_queue.Count > 0)
+        {
+            var tile = _queue.Dequeue();
+
+            for (var i = 0; i < 4; i++)
+            {
+                var next = i switch
+                {
+                    0 => tile + new Vector2i(1, 0),
+                    1 => tile + new Vector2i(-1, 0),
+                    2 => tile + new Vector2i(0, 1),
+                    _ => tile + new Vector2i(0, -1),
+                };
+
+                if (next.X < minX || next.X > maxX || next.Y < minY || next.Y > maxY)
+                    continue;
+
+                if (_outer.Contains(next) || !IsSpaceTile(grid, next))
+                    continue;
+
+                _outer.Add(next);
+                _queue.Enqueue(next);
+            }
+        }
     }
 
     /// <summary>
