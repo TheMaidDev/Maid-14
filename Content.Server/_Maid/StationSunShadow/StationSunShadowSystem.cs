@@ -17,5 +17,13 @@ public sealed class StationSunShadowSystem : EntitySystem
         shadow.Direction = comp.Direction;
         shadow.Alpha = comp.Alpha;
         Dirty(args.GridId, shadow);
+
+        var mapUid = Transform(args.GridId).MapUid;
+        if (mapUid == null)
+            return;
+
+        var light = EnsureComp<MapLightComponent>(mapUid.Value);
+        light.AmbientLightColor = comp.SunColor;
+        Dirty(mapUid.Value, light);
     }
 }
