@@ -65,6 +65,9 @@ public sealed class SunLightDebugOverlay : Overlay
         if (cursor.MapId == args.MapId)
             DescribeTile("Cursor tile", cursor, ambient);
 
+        if (StationSunShadowOverlay.DebugInfo.Length > 0)
+            _lines.Add(StationSunShadowOverlay.DebugInfo);
+
         var handle = args.ScreenHandle;
         var pos = new Vector2(10f, 120f);
         foreach (var line in _lines)

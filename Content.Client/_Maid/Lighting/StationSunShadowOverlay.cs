@@ -18,6 +18,7 @@ public sealed class StationSunShadowOverlay : Overlay
 {
     private const float MaxShadowLength = 150f;
     private const float SampleStep = 0.5f;
+    private const int MaxOtherGridTiles = 4000;
     private static readonly TimeSpan RefreshDelay = TimeSpan.FromSeconds(1);
 
     [Dependency] private readonly IEntityManager _entManager = default!;
@@ -29,7 +30,13 @@ public sealed class StationSunShadowOverlay : Overlay
     private readonly TurfSystem _turf;
 
     private readonly Dictionary<EntityUid, GridShadow> _cache = new();
+    private readonly List<Vector2> _sources = new();
     private readonly List<(EntityUid Uid, MapGridComponent Grid, GridShadow Shadow, Color Color)> _draw = new();
+
+    /// <summary>
+    /// Summary of the last shadow computation, shown by <c>sunlightdebug</c>.
+    /// </summary>
+    public static string DebugInfo = string.Empty;
 
     public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
@@ -135,6 +142,7 @@ public sealed class StationSunShadowOverlay : Overlay
 
         // World-space light direction brought into the grid's local space.
         var localDir = new Angle(-theta).RotateVec(Vector2.Normalize(worldDir));
+        var perp = new Vector2(-localDir.Y, localDir.X);
 
         // The whole station mass blocks the light, everything that is not space-like.
         foreach (var tileRef in _mapSystem.GetAllTiles(uid, grid))
@@ -143,19 +151,79 @@ public sealed class StationSunShadowOverlay : Overlay
                 shadow.Solid.Add(tileRef.GridIndices);
         }
 
+        // Points where shadow rays start, in the grid's local tile space.
+        _sources.Clear();
+
+        // Only the silhouette matters: a ray from an inner tile leaves through a boundary tile anyway.
         foreach (var solid in shadow.Solid)
         {
-            var center = new Vector2(solid.X + 0.5f, solid.Y + 0.5f);
+            if (IsBoundary(shadow.Solid, solid))
+                _sources.Add(new Vector2(solid.X + 0.5f, solid.Y + 0.5f));
+        }
 
-            for (var t = SampleStep; t <= length; t += SampleStep)
+        var ownSources = _sources.Count;
+
+        // Everything else on the map blocks the sun as well (docked shuttles, other parts of the station).
+        var mapId = _entManager.GetComponent<TransformComponent>(uid).MapID;
+        var invMatrix = _xform.GetInvWorldMatrix(uid);
+        var size = grid.TileSize;
+        var others = _entManager.EntityQueryEnumerator<MapGridComponent, TransformComponent>();
+        while (others.MoveNext(out var otherUid, out var otherGrid, out var otherXform))
+        {
+            if (otherUid == uid || otherXform.MapID != mapId || _entManager.HasComponent<MapComponent>(otherUid))
+                continue;
+
+            var otherMatrix = _xform.GetWorldMatrix(otherUid);
+            var toLocal = Matrix3x2.Multiply(otherMatrix, invMatrix);
+            var otherSize = otherGrid.TileSize;
+            var count = 0;
+
+            foreach (var tileRef in _mapSystem.GetAllTiles(otherUid, otherGrid))
             {
-                var point = center + localDir * t;
-                var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+                if (_turf.IsSpace(tileRef) || count++ > MaxOtherGridTiles)
+                    continue;
 
-                if (!shadow.Solid.Contains(tile))
-                    shadow.Tiles.Add(tile);
+                var center = new Vector2((tileRef.GridIndices.X + 0.5f) * otherSize, (tileRef.GridIndices.Y + 0.5f) * otherSize);
+                _sources.Add(Vector2.Transform(center, toLocal) / size);
             }
         }
+
+        // Three parallel rays per source (centre and both edges) so no tile in the swept strip is skipped.
+        for (var n = 0; n < _sources.Count; n++)
+        {
+            var source = _sources[n];
+
+            for (var k = -1; k <= 1; k++)
+            {
+                var origin = source + perp * (0.45f * k);
+
+                for (var t = 0f; t <= length; t += SampleStep)
+                {
+                    var point = origin + localDir * t;
+                    var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+
+                    if (!shadow.Solid.Contains(tile))
+                        shadow.Tiles.Add(tile);
+                }
+            }
+        }
+
+        DebugInfo = $"Station shadow: length={length:0.0}, solid tiles={shadow.Solid.Count}, " +
+                    $"ray sources={ownSources}+{_sources.Count - ownSources} (other grids), shadow tiles={shadow.Tiles.Count}";
+    }
+
+    private static bool IsBoundary(HashSet<Vector2i> solid, Vector2i tile)
+    {
+        for (var dx = -1; dx <= 1; dx++)
+        {
+            for (var dy = -1; dy <= 1; dy++)
+            {
+                if ((dx != 0 || dy != 0) && !solid.Contains(new Vector2i(tile.X + dx, tile.Y + dy)))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     private sealed class GridShadow
