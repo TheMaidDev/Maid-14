@@ -852,7 +852,7 @@ public sealed partial class ExtractionSystem : EntitySystem
         if (_mind.TryGetMind(user, out var mindId, out var mind))
         {
             characterName = mind.CharacterName ?? characterName;
-            EnsureComp<ExtractedMindComponent>(mindId);
+            EnsureComp<ExtractedMindComponent>(mindId).Dead = _mobState.IsDead(user);
 
             // the mind keeps owning the living body, so the character is alive for kill and survive objectives
             if (_ghost.SpawnGhost((mindId, mind), coords, canReturn: true) is { } ghost)

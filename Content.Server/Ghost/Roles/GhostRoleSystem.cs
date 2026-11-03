@@ -498,6 +498,14 @@ public sealed class GhostRoleSystem : EntitySystem
     /// </summary>
     /// <param name="player">The player.</param>
     /// <param name="identifier">ID of the ghost role.</param>
+    // MAID BEGIN antag extraction
+    private bool IsExtracted(ICommonSession player)
+    {
+        return _mindSystem.TryGetMind(player, out var mindId, out _)
+               && HasComp<Content.Server._Maid.Extraction.ExtractedMindComponent>(mindId);
+    }
+    // MAID END antag extraction
+
     public void Request(ICommonSession player, uint identifier)
     {
         if (!_ghostRoles.TryGetValue(identifier, out var roleEnt))
@@ -505,8 +513,7 @@ public sealed class GhostRoleSystem : EntitySystem
 
         // MAID BEGIN antag extraction
         // a player who left the round through extraction stays out of it
-        if (_mindSystem.TryGetMind(player, out var requesterMind, out _)
-            && HasComp<Content.Server._Maid.Extraction.ExtractedMindComponent>(requesterMind))
+        if (IsExtracted(player))
             return;
         // MAID END antag extraction
 
@@ -528,6 +535,12 @@ public sealed class GhostRoleSystem : EntitySystem
     {
         if (!_ghostRoles.TryGetValue(identifier, out var role))
             return false;
+
+        // MAID BEGIN antag extraction
+        // also covers raffles joined before the extraction and won after it
+        if (IsExtracted(player))
+            return false;
+        // MAID END antag extraction
 
         var ev = new TakeGhostRoleEvent(player);
         RaiseLocalEvent(role, ref ev);

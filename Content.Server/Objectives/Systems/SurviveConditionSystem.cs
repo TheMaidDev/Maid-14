@@ -28,9 +28,9 @@ public sealed class SurviveConditionSystem : EntitySystem
     private void OnGetProgress(EntityUid uid, SurviveConditionComponent comp, ref ObjectiveGetProgressEvent args)
     {
         // MAID BEGIN antag extraction
-        if (HasComp<ExtractedMindComponent>(args.MindId))
+        if (TryComp<ExtractedMindComponent>(args.MindId, out var extracted))
         {
-            args.Progress = 1f;
+            args.Progress = extracted.Dead ? 0f : 1f;
             return;
         }
         // MAID END antag extraction
