@@ -49,6 +49,10 @@
           state: icon
     - type: RandomSpawner
       rarePrototypes:
+        # MAID BEGIN
+        - CapacitorStockPart
+        - MatterBinStockPart
+        # MAID END
         - MicroManipulatorStockPart
         - CableHVStack10
         - WelderIndustrial

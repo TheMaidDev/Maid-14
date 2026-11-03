@@ -741,7 +741,7 @@
         components:
         - Electronics
         - MachineBoard
-    - id: MicroManipulatorStockPart
+    - id: CapacitorStockPart # MAID MicroManipulatorStockPart -> CapacitorStockPart
       whitelist:
         components:
         - StockPart

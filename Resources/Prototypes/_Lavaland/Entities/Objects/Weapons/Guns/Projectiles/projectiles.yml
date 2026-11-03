@@ -45,7 +45,8 @@
         Structural: 20
   # Short lifespan
   - type: TimedDespawn
-    lifetime: 0.18 # roughly 4 tiles
+    # lifetime: 0.18 # roughly 4 tiles # MAID kinetic bolt range
+    lifetime: 0.4 # MAID kinetic bolt range - 0.4s * 25 speed = ~10 tiles, edge of the screen like on the old build
   - type: GatheringProjectile
 
 - type: entity
