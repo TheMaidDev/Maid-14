@@ -66,6 +66,8 @@
   abstract: true
   components:
     - type: StationData
+    # MAID global sunlight
+    - type: StationSunShadow
 
 - type: entity
   id: BaseStationCargo
