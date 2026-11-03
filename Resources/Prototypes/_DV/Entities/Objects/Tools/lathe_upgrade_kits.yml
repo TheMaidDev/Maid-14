@@ -30,6 +30,7 @@
     components:
     - type: UpgradedMachine
       upgrade: lathe-upgrade-kit-hyper-convection
+      kit: LatheUpgradeKitHyper # MAID return upgrade kit
     - type: LatheUpgrade
       materialUseMultiplier: 0.5
       timeMultiplier: 1.5
@@ -50,6 +51,7 @@
     components:
     - type: UpgradedMachine
       upgrade: lathe-upgrade-kit-cryo-stabilizing
+      kit: LatheUpgradeKitCryo # MAID return upgrade kit
     - type: LatheUpgrade
       timeMultiplier: 0.5
     - type: LatheHeatProducing

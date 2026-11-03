@@ -384,6 +384,8 @@
     materialUseMultiplier: 0.5
     timeMultiplier: 1.5
   - type: LatheHeatProducing
+  - type: UpgradedMachine # MAID fix lathe upgrades
+    upgrade: lathe-upgrade-kit-hyper-convection # MAID fix lathe upgrades
   - type: ReagentSpeed
     modifiers:
       SpaceLube: 0.8 # being faster means less heat so lube needs to be nerfed
