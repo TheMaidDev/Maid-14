@@ -32,8 +32,9 @@
   components:
   - type: AutomationSlots
   - type: Automated
-  - type: UpgradedMachine
-    upgrade: upgrade-kit-automation
+  # MAID fix lathe upgrades: UpgradedMachine here blacklisted every upgrade kit on lathes/autodoc
+  # - type: UpgradedMachine
+  #   upgrade: upgrade-kit-automation
   - type: DeviceNetwork
     deviceNetId: Wireless
     receiveFrequencyId: BasicDevice
