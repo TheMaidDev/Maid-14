@@ -3,6 +3,7 @@ using Content.Server.Atmos.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.Light.Components;
 using Content.Shared.Light.EntitySystems;
+using Content.Shared.Maps;
 using Content.Shared.Tag;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
@@ -16,6 +17,7 @@ public sealed class StationSunShadowSystem : EntitySystem
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedRoofSystem _roof = default!;
     [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
 
     private static readonly ProtoId<TagPrototype> WindowTag = "Window";
 
@@ -113,7 +115,7 @@ public sealed class StationSunShadowSystem : EntitySystem
                 var tile = origin;
                 for (var i = 0; i <= sun.WindowLightDepth; i++)
                 {
-                    if (_map.GetTileRef(grid.Owner, grid.Comp1, tile).Tile.IsEmpty)
+                    if (IsSpaceTile(grid, tile))
                         break;
 
                     // The window tile itself is allowed, anything else solid stops the light.
@@ -133,7 +135,9 @@ public sealed class StationSunShadowSystem : EntitySystem
         var roofGrid = (grid.Owner, (MapGridComponent?) grid.Comp1, (RoofComponent?) null);
         foreach (var tileRef in _map.GetAllTiles(grid.Owner, grid.Comp1))
         {
-            _roof.SetRoof(roofGrid, tileRef.GridIndices, !_lit.Contains(tileRef.GridIndices));
+            // Space-like tiles (lattice) are open to the sun, they are never roofed.
+            var roofed = !_lit.Contains(tileRef.GridIndices) && !_turf.IsSpace(tileRef);
+            _roof.SetRoof(roofGrid, tileRef.GridIndices, roofed);
         }
 
         grid.Comp2.LitTiles.Clear();
@@ -161,7 +165,7 @@ public sealed class StationSunShadowSystem : EntitySystem
                     var between = tile + lateral * k;
 
                     if (_lit.Contains(between) ||
-                        _map.GetTileRef(grid.Owner, grid.Comp1, between).Tile.IsEmpty ||
+                        IsSpaceTile(grid, between) ||
                         IsBlocked(grid, between))
                     {
                         fillable = false;
@@ -192,7 +196,7 @@ public sealed class StationSunShadowSystem : EntitySystem
         {
             tile += upstream;
 
-            if (_map.GetTileRef(grid.Owner, grid.Comp1, tile).Tile.IsEmpty)
+            if (IsSpaceTile(grid, tile))
                 return true;
 
             // Looking back through another window means we are inside a room, not facing open space.
@@ -201,6 +205,15 @@ public sealed class StationSunShadowSystem : EntitySystem
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Empty tiles and space-like tiles such as lattice let light pass and are never roofed.
+    /// </summary>
+    private bool IsSpaceTile(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i tile)
+    {
+        var tileRef = _map.GetTileRef(grid.Owner, grid.Comp1, tile);
+        return tileRef.Tile.IsEmpty || _turf.IsSpace(tileRef);
     }
 
     private bool IsBlocked(Entity<MapGridComponent, StationSunGridComponent> grid, Vector2i tile, bool windowsBlock = false)
