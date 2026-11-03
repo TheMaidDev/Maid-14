@@ -38,6 +38,7 @@
       Steel: 125
       Glass: 75
       Plasma: 75
+  - type: DualWield  #MAID DualWield
 
 - type: entity
   parent: WeaponPlasmaCutter
