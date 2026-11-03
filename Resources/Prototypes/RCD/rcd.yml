@@ -286,7 +286,7 @@
 - type: rcd
   id: SurveillanceCameraGeneral
   category: Electrical
-  sprite: _Maid/Structures/Wallmounts/camera.rsi/cameracase.png
+  sprite: _Maid/Interface/Misc/cameracase.png
   mode: ConstructObject
   prototype: SurveillanceCameraGeneral
   cost: 5
