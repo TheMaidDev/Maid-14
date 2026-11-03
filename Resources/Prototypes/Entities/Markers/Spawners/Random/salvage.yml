@@ -153,7 +153,7 @@
   - type: RandomSpawner
     prototypes:
     - QuadraticCapacitorStockPart
-    - PicoManipulatorStockPart
+    - FemtoManipulatorStockPart # MAID PicoManipulatorStockPart -> FemtoManipulatorStockPart, upstream had a tier 3 part here
     - BluespaceMatterBinStockPart
     offset: 0.0
 # MAID END revert machine parts

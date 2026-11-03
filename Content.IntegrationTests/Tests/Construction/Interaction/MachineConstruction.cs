@@ -116,8 +116,17 @@ public sealed class MachineConstruction : InteractionTest
         // Reconstruct with better parts.
         // Interact() spawns stack entities by their stack type, i.e. as basic parts, so the rated parts are spawned by prototype.
         await Interact(ProtolatheBoard);
-        await InsertExactPrototype(Bin4);
-        await InsertExactPrototype(Bin4);
+
+        // A stack of 3 bins covers the split case: the frame takes 2 of them, 1 has to stay in hand as the same rated part.
+        var bins = await InsertExactPrototype(Bin4, 3);
+        await Server.WaitAssertion(() =>
+        {
+            var leftover = SEntMan.GetEntity(bins);
+            Assert.That(SEntMan.GetComponent<MetaDataComponent>(leftover).EntityPrototype?.ID, Is.EqualTo(Bin4));
+            Assert.That(SEntMan.GetComponent<StackComponent>(leftover).Count, Is.EqualTo(1));
+        });
+
+        // Single manipulators cover inserting a whole stack (first one) and splitting off the last needed part (second one).
         await InsertExactPrototype(Manipulator4);
         await InsertExactPrototype(Manipulator4);
         await Interact(Beaker, Beaker);
@@ -152,14 +161,22 @@ public sealed class MachineConstruction : InteractionTest
     }
 
     /// <summary>
-    /// Spawns an entity of exactly this prototype, picks it up and uses it on the target.
+    /// Spawns an entity of exactly this prototype (with the given stack count), picks it up and uses it on the target.
     /// </summary>
-    private async Task InsertExactPrototype(string prototype)
+    private async Task<NetEntity> InsertExactPrototype(string prototype, int count = 1)
     {
         EntityUid part = default;
-        await Server.WaitPost(() => part = SEntMan.SpawnEntity(prototype, SEntMan.GetCoordinates(PlayerCoords)));
-        await Pickup(SEntMan.GetNetEntity(part));
+        await Server.WaitPost(() =>
+        {
+            part = SEntMan.SpawnEntity(prototype, SEntMan.GetCoordinates(PlayerCoords));
+            if (count != 1)
+                Stack.SetCount(part, count);
+        });
+
+        var netPart = SEntMan.GetNetEntity(part);
+        await Pickup(netPart);
         await Interact();
+        return netPart;
     }
     // MAID END revert machine parts
 }
