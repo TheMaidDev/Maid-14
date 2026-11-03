@@ -50,7 +50,7 @@ public sealed class StationSunShadowOverlay : Overlay
 
         _draw.Clear();
 
-        var query = _entManager.AllEntityQuery<StationSunMarkerComponent, MapGridComponent, SunShadowComponent>();
+        var query = _entManager.EntityQueryEnumerator<StationSunMarkerComponent, MapGridComponent, SunShadowComponent>();
         while (query.MoveNext(out var uid, out _, out var grid, out var sun))
         {
             if (_entManager.GetComponent<TransformComponent>(uid).MapID != args.MapId)
