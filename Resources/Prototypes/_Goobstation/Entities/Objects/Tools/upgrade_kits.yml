@@ -23,6 +23,7 @@
     components:
     - type: UpgradedMachine
       upgrade: upgrade-kit-autodoc-bluespace
+      kit: AutodocUpgradeKitBluespace # MAID return upgrade kit
     - type: SurgeryIgnoreClothing
 
 # for entities that come pre-automated

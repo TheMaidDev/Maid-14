@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes; // MAID return upgrade kit
 
 namespace Content.Shared._DV.Construction;
 
@@ -19,4 +20,13 @@ public sealed partial class UpgradedMachineComponent : Component
     /// </summary>
     [DataField(required: true), AutoNetworkedField]
     public LocId Upgrade;
+
+    // MAID BEGIN return upgrade kit
+    /// <summary>
+    /// Upgrade kit spawned when the machine is deconstructed.
+    /// Leave null for machines that come pre-upgraded.
+    /// </summary>
+    [DataField]
+    public EntProtoId? Kit;
+    // MAID END return upgrade kit
 }
