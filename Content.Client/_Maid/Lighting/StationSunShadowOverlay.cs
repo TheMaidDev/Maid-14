@@ -219,6 +219,11 @@ public sealed class StationSunShadowOverlay : Overlay
         worldHandle.SetTransform(Matrix3x2.Identity);
     }
 
+    private static bool IsTransparent(string? prototype)
+    {
+        return prototype != null && (prototype.Contains("Grille") || prototype.Contains("SolarPanel"));
+    }
+
     private static Color Shade(Color ambient, float strength)
     {
         var f = 1f - Math.Clamp(strength, 0f, 1f);
@@ -498,11 +503,12 @@ public sealed class StationSunShadowOverlay : Overlay
         // Light passes through windows, they only matter as a start of a beam.
         shadow.Blocked.ExceptWith(shadow.WindowSet);
 
-        // Grilles let light through: a tile that has only a grille on it counts as open space, not as station mass.
+        // Grilles and solar panels let light through: a tile that has only such things on it counts as open space,
+        // not as station mass.
         var metas = _entManager.EntityQueryEnumerator<MetaDataComponent, TransformComponent>();
         while (metas.MoveNext(out var meta, out var xform))
         {
-            if (xform.GridUid != uid || !xform.Anchored || meta.EntityPrototype?.ID.Contains("Grille") != true)
+            if (xform.GridUid != uid || !xform.Anchored || !IsTransparent(meta.EntityPrototype?.ID))
                 continue;
 
             var tile = _mapSystem.TileIndicesFor(uid, grid, xform.Coordinates);
