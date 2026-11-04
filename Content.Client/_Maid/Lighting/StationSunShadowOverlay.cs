@@ -81,6 +81,7 @@ public sealed class StationSunShadowOverlay : Overlay
 
     private readonly Dictionary<EntityUid, GridShadow> _cache = new();
     private int[] _cursor = Array.Empty<int>();
+    private readonly List<Vector2i> _smoothKeys = new();
     private bool[] _floodOutside = Array.Empty<bool>();
     private int[] _floodQueue = Array.Empty<int>();
     private readonly List<Vector2> _sources = new();
@@ -90,6 +91,24 @@ public sealed class StationSunShadowOverlay : Overlay
     /// Summary of the last shadow computation, shown by <c>sunlightdebug</c>.
     /// </summary>
     public static string DebugInfo = string.Empty;
+
+    /// <summary>
+    /// Debug: stops all recomputation so flicker caused by changing data can be told from flicker caused by drawing.
+    /// Toggled with <c>sunfreeze</c>.
+    /// </summary>
+    public static bool Frozen;
+
+    /// <summary>
+    /// How fast sunlight through windows fades in and out (per second), so changes never pop.
+    /// </summary>
+    private const float LightFadeRate = 10f;
+
+    private int _recomputes;
+    private int _recomputesPerSecond;
+    private int _rescansPerSecond;
+    private int _rescans;
+    private TimeSpan _counterReset;
+
 
     public override OverlaySpace Space => OverlaySpace.BeforeLighting;
 
@@ -138,6 +157,23 @@ public sealed class StationSunShadowOverlay : Overlay
         // black, which is what the roof does too and does not depend on the target's alpha blending.
         var ambient = _entManager.GetComponent<MapLightComponent>(args.MapUid).AmbientLightColor;
 
+        // Per-second counters for the debug text, and fade the window light towards its latest value.
+        var timeNow = _timing.CurTime;
+        if (timeNow >= _counterReset)
+        {
+            _counterReset = timeNow + TimeSpan.FromSeconds(1);
+            _recomputesPerSecond = _recomputes;
+            _rescansPerSecond = _rescans;
+            _recomputes = 0;
+            _rescans = 0;
+        }
+
+        var fadeStep = 1f - MathF.Exp(-LightFadeRate * (float) _timing.FrameTime.TotalSeconds);
+        foreach (var (_, _, shadowData, _) in _draw)
+        {
+            SmoothLight(shadowData, fadeStep);
+        }
+
         var viewport = args.Viewport;
         var eye = viewport.Eye;
         var worldHandle = args.WorldHandle;
@@ -164,7 +200,7 @@ public sealed class StationSunShadowOverlay : Overlay
                     foreach (var tile in shadow.Solid)
                     {
                         var dark = 1f;
-                        if (shadow.Lit.TryGetValue(tile, out var coverage))
+                        if (shadow.Smooth.TryGetValue(tile, out var coverage))
                             dark = 1f - coverage;
 
                         if (dark < 0.01f)
@@ -224,6 +260,34 @@ public sealed class StationSunShadowOverlay : Overlay
         return prototype != null && (prototype.Contains("Grille") || prototype.Contains("SolarPanel"));
     }
 
+    /// <summary>
+    /// Moves the drawn window light a step towards the computed light, tiles appear and vanish smoothly.
+    /// </summary>
+    private void SmoothLight(GridShadow shadow, float step)
+    {
+        foreach (var (tile, target) in shadow.Lit)
+        {
+            var current = shadow.Smooth.GetValueOrDefault(tile);
+            shadow.Smooth[tile] = current + (target - current) * step;
+        }
+
+        _smoothKeys.Clear();
+        foreach (var tile in shadow.Smooth.Keys)
+        {
+            if (!shadow.Lit.ContainsKey(tile))
+                _smoothKeys.Add(tile);
+        }
+
+        foreach (var tile in _smoothKeys)
+        {
+            var fading = shadow.Smooth[tile] * (1f - step);
+            if (fading < 0.01f)
+                shadow.Smooth.Remove(tile);
+            else
+                shadow.Smooth[tile] = fading;
+        }
+    }
+
     private static Color Shade(Color ambient, float strength)
     {
         var f = 1f - Math.Clamp(strength, 0f, 1f);
@@ -236,6 +300,9 @@ public sealed class StationSunShadowOverlay : Overlay
     /// </summary>
     private void Refresh(EntityUid uid, MapGridComponent grid, Vector2 worldDir, GridShadow shadow)
     {
+        if (Frozen && shadow.NextRescan != TimeSpan.Zero)
+            return;
+
         var theta = _xform.GetWorldRotation(uid).Theta;
         var now = _timing.CurTime;
 
@@ -246,8 +313,10 @@ public sealed class StationSunShadowOverlay : Overlay
         if (!rescan && (!changed || now < shadow.NextDirectional))
             return;
 
+        _recomputes++;
         if (rescan)
         {
+            _rescans++;
             shadow.NextRescan = now + RefreshDelay;
             Rescan(uid, grid, shadow);
         }
@@ -377,7 +446,8 @@ public sealed class StationSunShadowOverlay : Overlay
         var exposed = ComputeLit(shadow, localDir);
 
         DebugInfo = $"Station sun: solid tiles={shadow.Solid.Count}, blockers={ownSources}+{_sources.Count - ownSources} (other grids), " +
-                    $"shadow strips={bins}, windows={shadow.Windows.Count} (exposed {exposed}), lit tiles={shadow.Lit.Count}";
+                    $"shadow strips={bins}, windows={shadow.Windows.Count} (exposed {exposed}), lit tiles={shadow.Lit.Count}, " +
+                    $"recomputes/s={_recomputesPerSecond}, rescans/s={_rescansPerSecond}{(Frozen ? " [FROZEN]" : string.Empty)}";
     }
 
     /// <summary>
@@ -782,6 +852,7 @@ public sealed class StationSunShadowOverlay : Overlay
         public readonly HashSet<Vector2i> WindowSet = new();
         public readonly List<Vector2i> Windows = new();
         public readonly Dictionary<Vector2i, float> Lit = new();
+        public readonly Dictionary<Vector2i, float> Smooth = new();
         public readonly HashSet<Vector2i> Enclosed = new();
         public int SolidHash;
         public bool EnclosedValid;
