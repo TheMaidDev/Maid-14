@@ -95,6 +95,7 @@ public sealed class SunLightDebugOverlay : Overlay
             var light = sunOverlay.GetLight(gridUid, index);
             roofMode = $"station: sunlight through window {light:0.00}";
             effectiveScale = light;
+            _lines.Add($"  tile state: {sunOverlay.Describe(gridUid, index)}");
         }
         else if (_entManager.HasComponent<ImplicitRoofComponent>(gridUid))
         {

@@ -468,6 +468,19 @@ public sealed class StationSunShadowOverlay : Overlay
         return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit.GetValueOrDefault(tile) : 0f;
     }
 
+    /// <summary>
+    /// Explains how the overlay treats a tile, for the debug overlay.
+    /// </summary>
+    public string Describe(EntityUid grid, Vector2i tile)
+    {
+        if (!_cache.TryGetValue(grid, out var shadow))
+            return "no data";
+
+        return $"solid={shadow.Solid.Contains(tile)} blocked={shadow.Blocked.Contains(tile)} " +
+               $"window={shadow.WindowSet.Contains(tile)} inShadow={shadow.Tiles.Contains(tile)} " +
+               $"sunlight={shadow.Lit.GetValueOrDefault(tile):0.00}";
+    }
+
     public IReadOnlyDictionary<Vector2i, float>? GetLitTiles(EntityUid grid)
     {
         return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit : null;
