@@ -23,7 +23,18 @@ public sealed partial class GunSystem
     {
         base.InitializeBallistic();
         SubscribeLocalEvent<BallisticAmmoProviderComponent, UpdateAmmoCounterEvent>(OnBallisticAmmoCount);
+        SubscribeLocalEvent<BallisticAmmoProviderComponent, AfterAutoHandleStateEvent>(OnBallisticAfterState); // MAID ammo counter on state
     }
+
+    // MAID BEGIN ammo counter on state
+    private void OnBallisticAfterState(Entity<BallisticAmmoProviderComponent> ent, ref AfterAutoHandleStateEvent args)
+    {
+        QueueAmmoCounterUpdate(ent);
+
+        if (Containers.TryGetContainingContainer((ent.Owner, null, null), out var container))
+            QueueAmmoCounterUpdate(container.Owner);
+    }
+    // MAID END ammo counter on state
 
     private void OnBallisticAmmoCount(EntityUid uid, BallisticAmmoProviderComponent component, UpdateAmmoCounterEvent args)
     {
