@@ -426,8 +426,25 @@ public sealed class StationSunShadowOverlay : Overlay
             return -1f;
 
         var p = Vector2.Dot(point, shadow.Dir);
-        var found = Array.BinarySearch(shadow.BinData, start, length, p - minGap);
-        var index = found >= 0 ? found : ~found - 1;
+        // Last blocker that is at least minGap upstream (the sandbox forbids Array.BinarySearch).
+        var target = p - minGap;
+        var lo = start;
+        var hi = start + length - 1;
+        var index = start - 1;
+        while (lo <= hi)
+        {
+            var mid = (lo + hi) >> 1;
+            if (shadow.BinData[mid] <= target)
+            {
+                index = mid;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid - 1;
+            }
+        }
+
         if (index < start)
             return -1f;
 
