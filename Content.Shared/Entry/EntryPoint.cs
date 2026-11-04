@@ -209,7 +209,7 @@ namespace Content.Shared.Entry
                     case [.., "partial", var number, "yaml" or "yml"]:
                     {
                         if (!int.TryParse(number, out var index) || index < 0)
-                            throw new FileLoadException($"Positive index after \"partial.\" expected, {number} found.");
+                            throw new PrototypeLoadException($"Positive index after \"partial.\" expected, {number} found.");
 
                         _prototypeManager.PartialFile(path, index);
                         continue;
