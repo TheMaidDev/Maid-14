@@ -692,7 +692,7 @@ TravelingChefSpawner: VisitorChefSpawner
 SyndieDisasterVictimSpawner: SyndieVisitorSpawner
 
 # 2024-06-15
-ClothingOuterCoatInspector: ClothingOuterCoatJensen
+#ClothingOuterCoatInspector: ClothingOuterCoatJensen
 
 # 2024-06-23
 FloorTileItemReinforced: PartRodMetal1
@@ -867,8 +867,8 @@ LightTree06: LightTree
 
 # 2024-12-22 # Lavaland Change: Migrations
 VendingMachineRestockSalvageEquipment: null
-ComputerSalvageExpedition: ComputerShuttleMiningLavaland
-SalvageExpeditionsComputerCircuitboard: LavalandShuttleConsoleCircuitboard
+#ComputerSalvageExpedition: ComputerShuttleMiningLavaland
+#SalvageExpeditionsComputerCircuitboard: LavalandShuttleConsoleCircuitboard
 
 # 2025-01-06
 BorgModuleRadiationDetection: null
@@ -1071,7 +1071,7 @@ ClothingOuterWinterSyndieMeaty: null
 #ClothingUnderwearBottomPantiesQM: null # Maid
 #ClothingUnderwearBottomPantiesSlim: null # Maid
 #ClothingUnderwearBottomPantiesWhite: null # Maid
-ClothingUnderwearSocksGray2sh0nka: null
+#ClothingUnderwearSocksGray2sh0nka: null
 #ClothingUnderwearStockingsPink: null # Maid
 #ClothingUnderwearTopBraHalterneck: null # Maid
 #ClothingUnderwearTopCow: null # Maid
