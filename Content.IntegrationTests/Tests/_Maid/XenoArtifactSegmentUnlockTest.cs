@@ -73,6 +73,39 @@ public sealed class XenoArtifactSegmentUnlockTest
         await pair.CleanReturnAsync();
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task ArtifexiumSkipsUntouchedSegmentsWhenAnotherWasTriggered(bool triggerFirstSegment)
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var entManager = server.ResolveDependency<IEntityManager>();
+        var system = entManager.System<SharedXenoArtifactSystem>();
+        await server.WaitPost(() =>
+        {
+            var uid = entManager.Spawn("TestSegmentUnlockArtifact");
+            Entity<XenoArtifactComponent> artifact = (uid, entManager.GetComponent<XenoArtifactComponent>(uid));
+            var root = AddNode(system, artifact);
+            var child = AddNode(system, artifact);
+            var untouched = AddNode(system, artifact);
+            system.AddEdge(artifact, root, child);
+            if (triggerFirstSegment)
+                system.SetNodeUnlocked(artifact, root);
+            system.TriggerXenoArtifact(artifact, triggerFirstSegment ? root : null, force: true);
+            var unlocking = entManager.GetComponent<XenoArtifactUnlockingComponent>(uid);
+            system.SetArtifexiumApplied((uid, unlocking), true);
+            system.FinishUnlockingState((uid, unlocking, artifact.Comp));
+            Assert.Multiple(() =>
+            {
+                Assert.That(root.Comp.Locked, Is.False);
+                Assert.That(child.Comp.Locked, Is.EqualTo(!triggerFirstSegment));
+                Assert.That(untouched.Comp.Locked, Is.EqualTo(triggerFirstSegment));
+            });
+            entManager.DeleteEntity(uid);
+        });
+        await pair.CleanReturnAsync();
+    }
+
     private static Entity<XenoArtifactNodeComponent> AddNode(SharedXenoArtifactSystem system, Entity<XenoArtifactComponent> artifact)
     {
         Assert.That(system.AddNode(artifact, "TestSegmentUnlockNode", out var node), Is.True);

@@ -197,7 +197,7 @@ public abstract partial class SharedXenoArtifactSystem
     */
     /// <summary>
     /// Selects at most one locked node per connected segment using only that segment's triggers.
-    /// Artifexium may replace one missing trigger in each segment, as in the original single-segment rule.
+    /// Artifexium may replace one missing trigger per participating segment; with no triggers all segments participate.
     /// </summary>
     public List<Entity<XenoArtifactNodeComponent>> GetNodesFromUnlockState(
         Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent)
@@ -207,6 +207,10 @@ public abstract partial class SharedXenoArtifactSystem
         {
             var segmentIndices = segment.Select(node => GetIndex((ent, ent.Comp2), node)).ToHashSet();
             var triggeredIndices = ent.Comp1.TriggeredNodeIndexes.Where(segmentIndices.Contains).ToHashSet();
+            // An untouched segment only participates when the entire window has no triggers.
+            if (triggeredIndices.Count == 0 && ent.Comp1.TriggeredNodeIndexes.Count != 0)
+                continue;
+
             var potentialNodes = new ValueList<Entity<XenoArtifactNodeComponent>>();
             foreach (var curNode in segment)
             {
