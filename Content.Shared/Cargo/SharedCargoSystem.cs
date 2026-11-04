@@ -20,6 +20,10 @@ public abstract class SharedCargoSystem : EntitySystem
 {
     [Dependency] protected readonly IGameTiming Timing = default!;
 
+    // MAID cargo order limits
+    public const int MaxOrderRequesterLength = 40;
+    public const int MaxOrderReasonLength = 100;
+
     public override void Initialize()
     {
         base.Initialize();

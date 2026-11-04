@@ -137,9 +137,12 @@
     availableModes:
     - FullAuto
     - SemiAuto
-  - type: Multishot # Only a pistol should support that for balancing reasons
-    missChance: 0
-    spreadAddition: 5
+  # MAID EDIT START
+  # - type: Multishot # Only a pistol should support that for balancing reasons
+  #   missChance: 0
+  #   spreadAddition: 5
+  - type: DualWield  #MAID DualWield
+  # MAID EDIT START
   - type: Item
     sprite: _Lavaland/Objects/Weapons/Guns/Basic/kinetic_pistol.rsi
     size: Small

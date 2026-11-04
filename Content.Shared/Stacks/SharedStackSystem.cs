@@ -22,6 +22,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Shared._Maid.Stacks; // MAID revert machine parts
 using Content.Shared.Examine;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -126,6 +127,20 @@ namespace Content.Shared.Stacks
             _storage.PlayPickupAnimation(args.Used, popupPos, userCoords, localRotation, args.User);
         }
 
+        // MAID BEGIN revert machine parts
+        /// <summary>
+        ///     Stacks with <see cref="StrictStackPrototypeComponent"/> only merge with stacks of the same entity prototype,
+        ///     so rated machine parts don't turn into basic ones (they share a stack type).
+        /// </summary>
+        protected bool CanMergePrototypes(EntityUid a, EntityUid b)
+        {
+            if (!HasComp<StrictStackPrototypeComponent>(a) && !HasComp<StrictStackPrototypeComponent>(b))
+                return true;
+
+            return Prototype(a)?.ID == Prototype(b)?.ID;
+        }
+        // MAID END revert machine parts
+
         private bool TryMergeStacks(
             EntityUid donor,
             EntityUid recipient,
@@ -142,6 +157,11 @@ namespace Content.Shared.Stacks
 
             if (string.IsNullOrEmpty(recipientStack.StackTypeId) || !recipientStack.StackTypeId.Equals(donorStack.StackTypeId))
                 return false;
+
+            // MAID BEGIN revert machine parts
+            if (!CanMergePrototypes(donor, recipient))
+                return false;
+            // MAID END revert machine parts
 
             transferred = Math.Min(donorStack.Count, GetAvailableSpace(recipientStack));
             SetCount(donor, donorStack.Count - transferred, donorStack);
@@ -370,6 +390,11 @@ namespace Content.Shared.Stacks
 
             if (insertStack.StackTypeId != targetStack.StackTypeId)
                 return false;
+
+            // MAID BEGIN revert machine parts
+            if (!CanMergePrototypes(insertEnt, targetEnt))
+                return false;
+            // MAID END revert machine parts
 
             var available = GetAvailableSpace(targetStack);
 

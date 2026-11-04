@@ -169,10 +169,13 @@
   - type: Appearance
   - type: StaticPrice
     price: 500
-  - type: Multishot # Goobstation V
-    missChance: 0.4
-    spreadMultiplier: 2
-    spreadAddition: 40
+  # MAID EDIT START
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4
+  #   spreadMultiplier: 2
+  #   spreadAddition: 40
+  - type: DualWield  #MAID DualWield
+  # MAID EDIT END
   - type: RestrictGunshotsByUserTag # Goobstation
     doesntContain:
     - Oni
@@ -383,5 +386,7 @@
         whitelist:
           tags:
             - CartridgeMagnum
-  - type: Multishot #Goob
-    spreadMultiplier: 30
+  # MAID EDIT START DualWield
+  # - type: Multishot #Goob
+  #   spreadMultiplier: 30
+  # MAID EDIT END

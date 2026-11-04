@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
                      xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                      Title="{Loc 'laws-ui-menu-title'}"
                      MinSize="200 100"
-                     SetSize="450 515">
+                     SetSize="600 500">
     <BoxContainer Orientation="Vertical"
                   HorizontalExpand="True"
                   VerticalExpand="True">

@@ -89,7 +89,8 @@
   - type: MachineBoard
     prototype: ShuttleGunSvalinnMachineGun
     stackRequirements:
-      Manipulator: 6
+      MatterBin: 2 # MAID
+      Manipulator: 4 # MAID 6 -> 4
       Steel: 5
       CableHV: 5
 
@@ -106,7 +107,8 @@
   - type: MachineBoard
     prototype: ShuttleGunPerforator
     stackRequirements:
-      Manipulator: 10
+      MatterBin: 4 # MAID
+      Manipulator: 6 # MAID 10 -> 6
       Steel: 10
       CableHV: 5
 
@@ -123,7 +125,8 @@
   - type: MachineBoard
     prototype: ShuttleGunFriendship
     stackRequirements:
-      Manipulator: 5
+      MatterBin: 3 # MAID
+      Manipulator: 2 # MAID 5 -> 2
       Steel: 7
       CableHV: 5
 
@@ -140,7 +143,8 @@
   - type: MachineBoard
     prototype: ShuttleGunDuster
     stackRequirements:
-      Manipulator: 10
+      MatterBin: 6 # MAID
+      Manipulator: 4 # MAID 10 -> 4
       Steel: 10
       CableHV: 5
       Uranium: 2
@@ -158,6 +162,7 @@
   - type: MachineBoard
     prototype: ShuttleGunKinetic
     stackRequirements:
-      Manipulator: 5
+      MatterBin: 2 # MAID
+      Manipulator: 3 # MAID 5-> 3
       Steel: 5
       CableHV: 2

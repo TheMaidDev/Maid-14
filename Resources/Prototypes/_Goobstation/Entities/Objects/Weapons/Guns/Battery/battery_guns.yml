@@ -83,10 +83,12 @@
     - oni-cannot-shoot-guns-3
   - type: BatteryDrinkerSource # Goobstation - Energycrit
     maxAmount: 180
-  - type: Multishot # Goobstation V
-    missChance: 0.4
-    spreadMultiplier: 3
-    spreadAddition: 50 #very hard to hold two of these steady let alone steady while shooting them
+  # MAID EDIT START DualWield
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4
+  #   spreadMultiplier: 3
+  #   spreadAddition: 50 #very hard to hold two of these steady let alone steady while shooting them
+  # MAID EDIT END
 
 - type: entity
   id: BaseWeaponCustomCellSmall
@@ -145,9 +147,12 @@
     magState: mag
     steps: 2
     zeroVisible: true
-  - type: Multishot
-    missChance: 0
-    spreadAddition: 10
+  # MAID EDIT START
+  # - type: Multishot
+  #   missChance: 0
+  #   spreadAddition: 10
+  - type: DualWield  #MAID DualWield
+  # MAID EDIT END
   - type: MeleeWeapon
     resetOnHandSelected: false
 
@@ -315,9 +320,12 @@
     - type: ProjectileBatteryAmmoProvider
       proto: BulletSyndicateDisabler
       fireCost: 100
-    - type: Multishot
-      spreadMultiplier: 1.25
-      spreadAddition: 10
+    # MAID EDIT START DualWield
+    # - type: Multishot
+    #   spreadMultiplier: 1.25
+    #   spreadAddition: 10
+    - type: DualWield # MAID dual-wield
+    # MAID EDIT END
     - type: BatterySelfRecharger
       autoRecharge: true
       autoRechargeRate: 50

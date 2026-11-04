@@ -111,10 +111,13 @@
       path: /Audio/Weapons/Guns/MagIn/revolver_magin.ogg
   - type: StaticPrice
     price: 500
-  - type: Multishot # Goobstation V
-    missChance: 0.4
-    spreadMultiplier: 3
-    spreadAddition: 40
+  # MAID START DualWield
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4
+  #   spreadMultiplier: 3
+  #   spreadAddition: 40
+  - type: DualWield  #MAID DualWield
+  # MAID EDIT END
   - type: RestrictGunshotsByUserTag # Goobstation
     doesntContain:
     - Oni

@@ -266,6 +266,9 @@
   - type: ComponentsImplant
     added:
     - type: SpaceNinja
+    - type: AntagExtractable # MAID antag extraction
+      threshold: 50 # MAID antag extraction
+      leaveStationItems: true # MAID antag extraction
 
 - type: entity
   parent: BaseSubdermalImplant

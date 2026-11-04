@@ -291,7 +291,8 @@ public abstract class SharedBushDisguiseSystem : EntitySystem
 
     private void OnTransformSpeakerName(Entity<BushDisguisedComponent> ent, ref TransformSpeakerNameEvent args)
     {
-        if (TerminatingOrDeleted(ent.Comp.Bush))
+        // The plant only changes how people nearby see the speaker; the radio still carries the real name.
+        if (args.IsRadio || TerminatingOrDeleted(ent.Comp.Bush))
             return;
 
         args.VoiceName = Name(ent.Comp.Bush);

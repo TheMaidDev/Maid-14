@@ -1,0 +1,9 @@
+ui-options-enable-lights-glowing = Enable lamp glow
+ui-options-grain-enabled = Screen grain
+ui-options-grain-strength = Grain strength
+ui-options-function-look-up = Look up/Aim
+ui-options-function-hold-look-up = Hold key to aim
+ui-options-function-offer-item = Offer item
+ui-options-admin-misc-title = Miscellaneous
+ui-options-admin-dead-chat-admin = Show ghost chat messages as admin messages
+ui-options-admin-ahelp-volume = Admin help sound volume

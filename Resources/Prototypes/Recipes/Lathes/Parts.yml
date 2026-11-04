@@ -82,7 +82,86 @@
     Steel: 50
     Plastic: 50
 
+# MAID BEGIN
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: CapacitorStockPart
+  result: CapacitorStockPart
+
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: MatterBinStockPart
+  result: MatterBinStockPart
+# MAID END
+
 - type: latheRecipe
   parent: BaseStockPartRecipe
   id: MicroManipulatorStockPart
   result: MicroManipulatorStockPart
+
+# MAID BEGIN revert machine parts
+#Rating 2
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: AdvancedCapacitorStockPart
+  result: AdvancedCapacitorStockPart
+  completetime: 3
+  materials:
+    Steel: 80
+    Plastic: 80
+    Plasma: 75
+
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: AdvancedMatterBinStockPart
+  result: AdvancedMatterBinStockPart
+  completetime: 3
+  materials:
+    Steel: 80
+    Plastic: 80
+    Plasma: 75
+
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: NanoManipulatorStockPart
+  result: NanoManipulatorStockPart
+  completetime: 3
+  materials:
+    Steel: 80
+    Plastic: 80
+    Plasma: 75
+
+#Rating 3
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: SuperCapacitorStockPart
+  result: SuperCapacitorStockPart
+  completetime: 3
+  materials:
+    Steel: 150
+    Plastic: 150
+    Plasma: 75
+    Gold: 75
+
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: SuperMatterBinStockPart
+  result: SuperMatterBinStockPart
+  completetime: 3
+  materials:
+    Steel: 150
+    Plastic: 150
+    Plasma: 75
+    Gold: 75
+
+- type: latheRecipe
+  parent: BaseStockPartRecipe
+  id: PicoManipulatorStockPart
+  result: PicoManipulatorStockPart
+  completetime: 3
+  materials:
+    Steel: 150
+    Plastic: 150
+    Plasma: 75
+    Gold: 75
+# MAID END revert machine parts

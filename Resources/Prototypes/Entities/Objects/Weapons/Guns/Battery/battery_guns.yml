@@ -198,10 +198,12 @@
       collection: MetalThud # Goobstation ^
   - type: BatteryDrinkerSource # Goobstation - Energycrit
     maxAmount: 180 # you probably don't want to drain your entire gun charging in battle
-  - type: Multishot # Goobstation V
-    missChance: 0.4
-    spreadMultiplier: 3
-    spreadAddition: 40
+  # MAID EDIT START DualWield
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4
+  #   spreadMultiplier: 3
+  #   spreadAddition: 40
+  # MAID EDIT END
 
 - type: entity
   id: BaseWeaponPowerCell
@@ -310,10 +312,13 @@
     wideAnimationRotation: 90 # -90 if it takes bayonets (hits with muzzle) 90 if not (hits with butt)
     soundHit:
       collection: MetalThud # Goobstation ^
-  - type: Multishot # Goobstation V
-    missChance: 0.4
-    spreadMultiplier: 2
-    spreadAddition: 40
+  # MAID EDIT START
+  # - type: Multishot # Goobstation V
+  #   missChance: 0.4
+  #   spreadMultiplier: 2
+  #   spreadAddition: 40
+  - type: DualWield  #MAID DualWield
+  # MAID EDIT END
 
 - type: entity
   name: svalinn laser pistol
@@ -368,14 +373,15 @@
     - oni-cannot-shoot-guns-1
     - oni-cannot-shoot-guns-2
     - oni-cannot-shoot-guns-3
-  - type: HitscanBatteryAmmoProvider
-    proto: RedMediumLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   - type: MagazineVisuals
     magState: mag
     steps: 5
     zeroVisible: true
   - type: Appearance
+  - type: DualWield  #MAID DualWield
 
 - type: entity
   name: makeshift laser pistol
@@ -405,12 +411,13 @@
   - type: Appearance
   - type: Clothing
     sprite: Objects/Weapons/Guns/Battery/makeshift.rsi
-  - type: HitscanBatteryAmmoProvider
-    proto: RedLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   - type: Battery
     maxCharge: 500
     startingCharge: 500
+  - type: DualWield  #MAID DualWield
 
 - type: entity
   name: tesla gun
@@ -466,8 +473,8 @@
     selectedMode: SemiAuto
     availableModes:
     - SemiAuto
-  - type: HitscanBatteryAmmoProvider
-    proto: RedLaserPractice
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: XrayLaserProjectile #Maid
     fireCost: 62.5
   - type: StaticPrice
     price: 300
@@ -504,8 +511,8 @@
     selectedMode: SemiAuto
     availableModes:
     - SemiAuto
-  - type: HitscanBatteryAmmoProvider
-    proto: RedLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 62.5
   # Goobstation
   - type: Item
@@ -539,8 +546,8 @@
     - SemiAuto
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser3.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: LightPulse # Goobstation
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 200
   - type: Battery
     maxCharge: 2000
@@ -548,6 +555,7 @@
   - type: BatterySelfRecharger # Goobstation - CentComm Job Revamp
     autoRecharge: true
     autoRechargeRate: 40
+  - type: DualWield  #MAID DualWield
 
 - type: entity
   name: pulse carbine
@@ -685,8 +693,8 @@
     fireRate: 1.5
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: RedHeavyLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 100
   - type: Tag
     tags:
@@ -755,8 +763,8 @@
   - type: Gun
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser3.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: XrayLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 100
   - type: MagazineVisuals
     magState: mag
@@ -1021,8 +1029,8 @@
   - type: Gun
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: RedMediumLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser
     fireCost: 100
   - type: BatterySelfRecharger
     autoRecharge: true
@@ -1041,6 +1049,7 @@
   - type: Appearance
   - type: StaticPrice
     price: 63
+  - type: DualWield  #MAID DualWield
 
 - type: entity
   name: C.H.I.M.P. handcannon
@@ -1128,8 +1137,8 @@
     fireRate: 0.5
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/laser_clown.ogg
-  - type: HitscanBatteryAmmoProvider
-    proto: RedMediumLaser
+  - type: ProjectileBatteryAmmoProvider #Maid
+    proto: BulletTrailLaser #Maid
     fireCost: 100
   - type: BatterySelfRecharger
     autoRecharge: true
@@ -1273,6 +1282,6 @@
   name: xenoborg heavy laser gun
   parent: [WeaponAdvancedLaser, BaseXenoborgContraband]
   id: XenoborgHeavyLaserGun
-  components:
-  - type: HitscanBatteryAmmoProvider
-    proto: RedHeavyLaser
+#  components:
+#  - type: HitscanBatteryAmmoProvider
+#    proto: RedHeavyLaser

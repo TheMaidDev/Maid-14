@@ -31,6 +31,10 @@
     - PowerCellSmall
     - PowerCellMedium
     - FlashlightLantern
+    # MAID BEGIN
+    - MatterBinStockPart
+    - CapacitorStockPart
+    # MAID END
     - MicroManipulatorStockPart
     - Beaker
     chance: 0.8
@@ -66,6 +70,10 @@
       - id: SheetGlass10
       - id: ToolboxElectricalFilled
       - id: ToolboxMechanicalFilled
+      # MAID BEGIN
+      - id: MatterBinStockPart
+      - id: CapacitorStockPart
+      # MAID END
       - id: MicroManipulatorStockPart
       - id: SlimeScannerXenobio # Goob edit
     # Rare Group

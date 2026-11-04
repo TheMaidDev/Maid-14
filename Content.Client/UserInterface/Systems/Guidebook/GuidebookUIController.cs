@@ -253,9 +253,18 @@ public sealed class GuidebookUIController : UIController, IOnStateEntered<LobbyS
         }
         _guideWindow.UpdateGuides(guides, rootEntries, forceRoot, selected);
 
+        // MAID BEGIN guidebook expand roots
+        /*
         // Expand up to depth-2.
         _guideWindow.Tree.SetAllExpanded(false);
         _guideWindow.Tree.SetAllExpanded(true, 1);
+        */
+        // Expand only root entries, plus the path to the selected entry.
+        _guideWindow.Tree.SetAllExpanded(false);
+        _guideWindow.Tree.SetAllExpanded(true, 0);
+        if (_guideWindow.Tree.SelectedItem is { } selectedItem)
+            _guideWindow.Tree.ExpandParentEntries(selectedItem.Index);
+        // MAID END guidebook expand roots
 
         _guideWindow.OpenCenteredRight();
     }

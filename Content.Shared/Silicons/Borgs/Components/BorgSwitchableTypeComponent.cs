@@ -64,6 +64,8 @@ public sealed partial class BorgToggleSelectTypeEvent : InstantActionEvent;
 /// UI message used by a borg to select their type with <see cref="BorgSwitchableTypeComponent"/>.
 /// </summary>
 /// <param name="prototype">The borg type prototype that the user selected.</param>
+// MAID BEGIN no borg skins
+/*
 [Serializable, NetSerializable]
 public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype, ProtoId<BorgSubtypePrototype> subtype) : BoundUserInterfaceMessage
 {
@@ -71,6 +73,13 @@ public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype, 
     // Goobstation: Customizable borgs sprites
     public ProtoId<BorgSubtypePrototype> Subtype = subtype;
 }
+*/
+[Serializable, NetSerializable]
+public sealed class BorgSelectTypeMessage(ProtoId<BorgTypePrototype> prototype) : BoundUserInterfaceMessage
+{
+    public ProtoId<BorgTypePrototype> Prototype = prototype;
+}
+// MAID END no borg skins
 
 /// <summary>
 /// UI key used by the selection menu for <see cref="BorgSwitchableTypeComponent"/>.

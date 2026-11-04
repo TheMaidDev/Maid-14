@@ -46,15 +46,237 @@
         Steel: 12
         Plastic: 12
     - type: StockPart # Goobstation
+    - type: StrictStackPrototype # MAID revert machine parts - rated parts must not turn into basic ones when split/merged
+
+# MAID BEGIN
+- type: entity
+  id: CapacitorStockPart
+  name: capacitor
+  parent: BaseStockPart
+  description: A basic capacitor used in the construction of a variety of devices.
+  suffix: Rating 1
+  components:
+    - type: Sprite
+      state: capacitor
+    - type: Tag
+      tags:
+        - CapacitorStockPart
+    - type: Stack
+      stackType: Capacitor
+# MAID END
+
 
 - type: entity
   id: MicroManipulatorStockPart
-  name: modular machine part
+  # name: modular machine part # MAID
+  name: manipulator # MAID
   parent: BaseStockPart
-  description: A basic machine part used in the construction of a variety of devices.
+  # description: A basic machine part used in the construction of a variety of devices. # MAID
+  description: A basic manipulator used in the construction of a variety of devices. # MAID
   suffix: Rating 1
   components:
     - type: Sprite
       state: micro_mani
     - type: Stack
       stackType: Manipulator
+
+# MAID BEGIN
+- type: entity
+  id: MatterBinStockPart
+  name: matter bin
+  parent: BaseStockPart
+  description: A basic matter bin used in the construction of a variety of devices.
+  suffix: Rating 1
+  components:
+    - type: Sprite
+      state: matter_bin
+    - type: Stack
+      stackType: MatterBin
+# MAID END
+
+# MAID BEGIN revert machine parts
+
+# Rating 2
+
+- type: entity
+  id: AdvancedCapacitorStockPart
+  name: advanced capacitor
+  parent: CapacitorStockPart
+  description: An advanced capacitor used in the construction of a variety of devices.
+  suffix: Rating 2
+  components:
+    - type: Sprite
+      state: adv_capacitor
+
+- type: entity
+  id: NanoManipulatorStockPart
+  name: advanced manipulator
+  parent: MicroManipulatorStockPart
+  description: An advanced manipulator used in the construction of a variety of devices.
+  suffix: Rating 2
+  components:
+    - type: Sprite
+      state: nano_mani
+
+- type: entity
+  id: AdvancedMatterBinStockPart
+  name: advanced matter bin
+  parent: MatterBinStockPart
+  description: An advanced matter bin used in the construction of a variety of devices.
+  suffix: Rating 2
+  components:
+    - type: Sprite
+      state: advanced_matter_bin
+
+# Rating 3
+
+- type: entity
+  id: SuperCapacitorStockPart
+  name: super capacitor
+  parent: CapacitorStockPart
+  description: A super capacitor used in the construction of a variety of devices.
+  suffix: Rating 3
+  components:
+    - type: Sprite
+      state: super_capacitor
+
+- type: entity
+  id: PicoManipulatorStockPart
+  name: super manipulator
+  parent: MicroManipulatorStockPart
+  description: A super manipulator used in the construction of a variety of devices.
+  suffix: Rating 3
+  components:
+    - type: Sprite
+      state: pico_mani
+
+- type: entity
+  id: SuperMatterBinStockPart
+  name: super matter bin
+  parent: MatterBinStockPart
+  description: A super matter bin used in the construction of a variety of devices.
+  suffix: Rating 3
+  components:
+    - type: Sprite
+      state: super_matter_bin
+
+# Rating 4
+
+- type: entity
+  id: QuadraticCapacitorStockPart
+  name: bluespace capacitor
+  parent: CapacitorStockPart
+  description: A bluespace capacitor used in the construction of a variety of devices.
+  suffix: Rating 4
+  components:
+    - type: Sprite
+      state: quadratic_capacitor
+
+- type: entity
+  id: FemtoManipulatorStockPart
+  name: bluespace manipulator
+  parent: MicroManipulatorStockPart
+  description: A bluespace manipulator used in the construction of a variety of devices.
+  suffix: Rating 4
+  components:
+    - type: Sprite
+      state: femto_mani
+
+- type: entity
+  id: BluespaceMatterBinStockPart
+  name: bluespace matter bin
+  parent: MatterBinStockPart
+  description: A bluespace matter bin used in the construction of a variety of devices.
+  suffix: Rating 4
+  components:
+    - type: Sprite
+      state: bluespace_matter_bin
+
+- type: entity
+  id: BaseSubspaceStockPart
+  name: subspace stock part
+  parent: BaseItem
+  description: What?
+  abstract: true
+  components:
+    - type: EmitSoundOnPickup
+      sound:
+        path: /Audio/_Maid/Items/handling/component_pickup.ogg
+    - type: EmitSoundOnDrop
+      sound:
+        path: /Audio/_Maid/Items/handling/component_drop.ogg
+    - type: EmitSoundOnLand
+      sound:
+        path: /Audio/_Maid/Items/handling/component_drop.ogg
+    - type: Sprite
+      sprite: _Maid/Objects/Misc/stock_parts.rsi
+    - type: Item
+      size: Tiny
+    - type: PhysicalComposition
+      materialComposition:
+        Steel: 12
+        Plastic: 12
+
+- type: entity
+  id: AnsibleSubspaceStockPart
+  name: subspace ansible
+  parent: BaseSubspaceStockPart
+  description: A compact module capable of sensing extradimensional activity.
+  components:
+    - type: Sprite
+      state: subspace_ansible
+
+- type: entity
+  id: FilterSubspaceStockPart
+  name: hyperwave filter
+  parent: BaseSubspaceStockPart
+  description: A tiny device capable of filtering and converting super-intense radiowaves.
+  components:
+    - type: Sprite
+      state: hyperwave_filter
+
+- type: entity
+  id: AmplifierSubspaceStockPart
+  name: subspace amplifier
+  parent: BaseSubspaceStockPart
+  description: A compact micro-machine capable of amplifying weak subspace transmissions.
+  components:
+    - type: Sprite
+      state: subspace_amplifier
+
+- type: entity
+  id: TreatmentSubspaceStockPart
+  name: subspace treatment disk
+  parent: BaseSubspaceStockPart
+  description: A compact micro-machine capable of stretching out hyper-compressed radio waves.
+  components:
+    - type: Sprite
+      state: treatment_disk
+
+- type: entity
+  id: AnalyzerSubspaceStockPart
+  name: subspace wavelength analyzer
+  parent: BaseSubspaceStockPart
+  description: A sophisticated analyzer capable of analyzing cryptic subspace wavelengths.
+  components:
+    - type: Sprite
+      state: wavelength_analyzer
+
+- type: entity
+  id: CrystalSubspaceStockPart
+  name: ansible crystal
+  parent: BaseSubspaceStockPart
+  description: A crystal made from pure glass used to transmit laser databursts to subspace.
+  components:
+    - type: Sprite
+      state: ansible_crystal
+
+- type: entity
+  id: TransmitterSubspaceStockPart
+  name: subspace transmitter
+  parent: BaseSubspaceStockPart
+  description: A large piece of equipment used to open a window into the subspace dimension.
+  components:
+    - type: Sprite
+      state: subspace_transmitter
+# MAID END revert machine parts

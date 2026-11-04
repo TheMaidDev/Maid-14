@@ -61,14 +61,16 @@
   - type: Tag
     tags:
     - WeaponPistolDualetta
-  - type: Multishot
-    missChance: 0
-    spreadMultiplier: 1
-    spreadAddition: 0
-  - type: RequiresDualWield
-    whitelist:
-      tags:
-      - WeaponPistolDualetta
+  # MAID EDIT START DualWield
+  # - type: Multishot
+  #   missChance: 0
+  #   spreadMultiplier: 1
+  #   spreadAddition: 0
+  # - type: RequiresDualWield
+  #   whitelist:
+  #     tags:
+  #     - WeaponPistolDualetta
+  # MAID EDIT END
 
 - type: entity
   parent: [ BaseItem, BaseSyndicateContraband ]

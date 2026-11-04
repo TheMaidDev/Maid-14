@@ -12,7 +12,6 @@
 - You probably have access to push into the PR branch. If not, request rights from user with @CREAsTIVE ping.
 - Never push to main directly without explicit permission.
 - Never edit `Content.Goobstation.*` or `Content.*.Database` without explicit permission.
-- Do not run `Content.Tests`, `Content.IntegrationTests`, or full builds unless asked.
 
 ## Upstream Modification Conventions
 - Everything in `_Maid/` folders is Maid-owned; edit freely without markers.

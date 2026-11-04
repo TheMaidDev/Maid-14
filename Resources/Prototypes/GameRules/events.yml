@@ -441,7 +441,7 @@
     - StealResearchObjective
     - DoorjackObjective
     - SpiderChargeObjective
-    - TerrorObjective
+    # - TerrorObjective # MAID rem-ninja-threat-objective
     - MassArrestObjective
     - NinjaSurviveObjective
   - type: AntagSelection
@@ -460,6 +460,16 @@
         sound: /Audio/_Maid/Misc/ninja_greeting.ogg #MAID Sound porting
       components:
       - type: SpaceNinja
+      - type: AntagExtractable # MAID antag extraction
+        thresholdMode: Percent # MAID antag extraction
+        threshold: 50 # MAID antag extraction
+        leaveStationItems: true # MAID antag extraction
+        optionalObjectives: # MAID antag extraction
+        - StealResearchObjective # MAID antag extraction
+        - DoorjackObjective # MAID antag extraction
+        - SpiderChargeObjective # MAID antag extraction
+        - TerrorObjective # MAID antag extraction
+        - MassArrestObjective # MAID antag extraction
       - type: NpcFactionMember
         factions:
         - Syndicate

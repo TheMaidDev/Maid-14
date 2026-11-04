@@ -499,6 +499,12 @@ namespace Content.Server.Cargo.Systems
             if (args.Actor is not { Valid: true } player)
                 return;
 
+            // MAID cargo order limits
+            if (args.Requester.Length > MaxOrderRequesterLength)
+                args.Requester = args.Requester[..MaxOrderRequesterLength];
+            if (args.Reason.Length > MaxOrderReasonLength)
+                args.Reason = args.Reason[..MaxOrderReasonLength];
+
             if (args.Amount <= 0)
                 return;
 

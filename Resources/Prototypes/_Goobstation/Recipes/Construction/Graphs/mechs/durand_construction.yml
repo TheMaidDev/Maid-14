@@ -88,7 +88,7 @@
           key: "enum.MechAssemblyVisuals.State"
           data: 9
 
-      - material: Manipulator
+      - material: Capacitor # MAID Manipulator -> Capacitor
         amount: 1
         completed:
         - !type:VisualizerDataInt

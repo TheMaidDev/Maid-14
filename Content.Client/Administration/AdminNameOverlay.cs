@@ -370,7 +370,8 @@ internal sealed class AdminNameOverlay : Overlay
                     color = roleColor;
                     symbol = IsFiltered(playerInfo.RoleProto) ? symbol : string.Empty;
                     text = IsFiltered(playerInfo.RoleProto)
-                        ? _roles.GetRoleSubtypeLabel(roleName, playerInfo.Subtype).ToUpper()
+                        // MAID fix double localization
+                        ? _roles.GetRoleSubtypeLabel(rolePrototype?.Name ?? RoleTypePrototype.FallbackName, playerInfo.Subtype).ToUpper()
                         : string.Empty;
                     break;
                 case AdminOverlayAntagFormat.Off: // Goobstation

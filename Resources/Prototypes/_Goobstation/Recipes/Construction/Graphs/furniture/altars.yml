@@ -119,7 +119,7 @@
       - !type:SnapToGrid
         southRotation: true
       steps:
-      - material: Manipulator
+      - material: Capacitor # MAID Manipulator -> Capacitor
         amount: 1
         doAfter: 3
     - to: ToolAltarNode
@@ -253,7 +253,7 @@
     - to: AltarConvertNode
       completed:
       - !type:SpawnPrototype
-        prototype: MicroManipulatorStockPart
+        prototype: CapacitorStockPart # MAID MicroManipulatorStockPart -> CapacitorStockPart
         amount: 1
       steps:
       - tool: Prying

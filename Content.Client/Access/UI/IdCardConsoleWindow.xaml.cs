@@ -59,7 +59,7 @@ namespace Content.Client.Access.UI
         private readonly List<string> _jobPrototypeIds = new();
 
         //Maid edit start
-        private const int AccessColumnCount = 7;
+        private const int AccessColumnCount = 5;
         private const int JobIconColumnCount = 10;
 
         [Dependency] private readonly IEntitySystemManager _entitySystem = default!;

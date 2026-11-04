@@ -54,7 +54,7 @@
         doAfter: 1
     - to: memory_cell
       steps:
-      - material: Manipulator
+      - material: Capacitor # MAID Manipulator -> Capacitor
         amount: 2
       - material: Cable
         amount: 2
@@ -114,7 +114,7 @@
         doAfter: 2
       completed:
       - !type:SpawnPrototype
-        prototype: MicroManipulatorStockPart
+        prototype: CapacitorStockPart # MAID MicroManipulatorStockPart -> CapacitorStockPart
       - !type:SpawnPrototype
         prototype: CableApcStack1
         amount: 2
