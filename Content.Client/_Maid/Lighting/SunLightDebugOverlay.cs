@@ -106,6 +106,16 @@ public sealed class SunLightDebugOverlay : Overlay
         var effective = rooved ? 0f : ambient * effectiveScale;
         _lines.Add($"{label} {index}: roof={roofMode}, ambient lum={effective:0.000}");
 
+        var tileRef = _mapSystem.GetTileRef(gridUid, grid, index);
+        var things = new List<string>();
+        foreach (var ent in _mapSystem.GetAnchoredEntities(gridUid, grid, index))
+        {
+            if (_entManager.TryGetComponent(ent, out MetaDataComponent? meta))
+                things.Add(meta.EntityPrototype?.ID ?? meta.EntityName);
+        }
+
+        _lines.Add($"  tile type={tileRef.Tile.TypeId}{(tileRef.Tile.IsEmpty ? " (empty)" : "")}, anchored: {(things.Count == 0 ? "-" : string.Join(", ", things))}");
+
         if (_entManager.TryGetComponent(gridUid, out SunShadowComponent? shadow))
             _lines.Add($"  grid shadow: dir=({shadow.Direction.X:0.0},{shadow.Direction.Y:0.0}) alpha={shadow.Alpha:0.00}");
     }
