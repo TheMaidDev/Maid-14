@@ -202,6 +202,10 @@ namespace Content.Shared.Entry
 
                 switch (parts)
                 {
+                    case [.., "partial", "yaml" or "yml"]:
+                        _prototypeManager.PartialFile(path, 0);
+                        break;
+
                     case [.., "partial", var number, "yaml" or "yml"]:
                     {
                         if (!int.TryParse(number, out var index) || index < 0)
@@ -210,10 +214,6 @@ namespace Content.Shared.Entry
                         _prototypeManager.PartialFile(path, index);
                         continue;
                     }
-
-                    case [.., "partial", "yaml" or "yml"]:
-                        _prototypeManager.PartialFile(path, 0);
-                        break;
                 }
             }
         }
