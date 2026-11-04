@@ -48,8 +48,9 @@ public sealed class StationSunShadowOverlay : Overlay
 
     /// <summary>
     /// ... and nothing solid may block the way for this many tiles after that, otherwise the window sits in a cavity.
+    /// Further away the shadow strips decide, so a far away blocker shades the window as well.
     /// </summary>
-    private const float FarRange = 32f;
+    private const float FarRange = 10f;
 
     /// <summary>
     /// A window's beam is split into this many parallel rays, each one tested for exposure on its own,
@@ -247,8 +248,6 @@ public sealed class StationSunShadowOverlay : Overlay
         shadow.Dir = localDir;
         shadow.Perp = perp;
 
-        var exposed = ComputeLit(shadow, localDir);
-
         // Points that block the sun, in the grid's local tile space: the grid's own solid tiles ...
         _sources.Clear();
         foreach (var solid in shadow.Solid)
@@ -319,6 +318,8 @@ public sealed class StationSunShadowOverlay : Overlay
                     shadow.BinMin[i] = p;
             }
         }
+
+        var exposed = ComputeLit(shadow, localDir);
 
         DebugInfo = $"Station sun: solid tiles={shadow.Solid.Count}, blockers={ownSources}+{_sources.Count - ownSources} (other grids), " +
                     $"shadow strips={bins}, windows={shadow.Windows.Count} (exposed {exposed}), lit tiles={shadow.Lit.Count}";
@@ -493,7 +494,21 @@ public sealed class StationSunShadowOverlay : Overlay
                 return false;
         }
 
-        return reachedSpace;
+        if (!reachedSpace)
+            return false;
+
+        // Beyond the checked range any blocker upstream in the same strip (however far) shades the window.
+        if (shadow.BinMin.Length > 0)
+        {
+            var bin = (int) MathF.Floor((Vector2.Dot(start, shadow.Perp) - shadow.QMin) / ShadowBinWidth);
+            if (bin >= 0 && bin < shadow.BinMin.Length &&
+                shadow.BinMin[bin] < Vector2.Dot(start, shadow.Dir) - (NearRange + FarRange))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
