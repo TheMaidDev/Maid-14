@@ -77,8 +77,9 @@ public sealed class SunLightRaysOverlay : Overlay
                 {
                     for (var y = minY; y <= maxY; y++)
                     {
-                        if (sunOverlay.IsShadowed(grid.Owner, new Vector2i(x, y)))
-                            handle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size), Color.Blue.WithAlpha(0.25f));
+                        var shade = sunOverlay.GetShadow(grid.Owner, new Vector2i(x, y));
+                        if (shade > 0.01f)
+                            handle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size), Color.Blue.WithAlpha(0.3f * shade));
                     }
                 }
             }
