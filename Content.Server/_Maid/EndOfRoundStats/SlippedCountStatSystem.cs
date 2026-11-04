@@ -19,9 +19,10 @@ public sealed class SlippedCountStatSystem : EntitySystem
     [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
 
-    private readonly Dictionary<SlipperData, int> _slips = new();
 
-    private readonly record struct SlipperData(string Name, string? Username);
+    private readonly Dictionary<EntityUid, SlipperData> _slips = new();
+
+    private readonly record struct SlipperData(string Name, string? Username, int Count);
 
     public override void Initialize()
     {
@@ -36,9 +37,12 @@ public sealed class SlippedCountStatSystem : EntitySystem
     private void OnSlip(ref SlipEvent args)
     {
         var slipped = args.Slipped;
-        var data = new SlipperData(Name(slipped), GetUsername(slipped));
+        _slips.TryGetValue(slipped, out var data);
 
-        _slips[data] = _slips.GetValueOrDefault(data) + 1;
+        _slips[slipped] = new SlipperData(
+            Name(slipped),
+            GetUsername(slipped) ?? data.Username,
+            data.Count + 1);
     }
 
     private string? GetUsername(EntityUid uid)
@@ -57,7 +61,7 @@ public sealed class SlippedCountStatSystem : EntitySystem
 
     private void OnRoundEnd(RoundEndTextAppendEvent ev)
     {
-        var total = _slips.Values.Sum();
+        var total = _slips.Values.Sum(data => data.Count);
 
         string line;
         if (total < _config.GetCVar(MaidCVars.SlippedCountThreshold))
@@ -73,15 +77,15 @@ public sealed class SlippedCountStatSystem : EntitySystem
 
             if (_config.GetCVar(MaidCVars.SlippedCountTopSlipper) && _slips.Count > 0)
             {
-                var (top, count) = _slips.MaxBy(pair => pair.Value);
+                var top = _slips.Values.MaxBy(data => data.Count);
                 line += "\n" + (top.Username != null
                     ? Loc.GetString("eorstats-slippedcount-topslipper-hasusername",
                         ("username", top.Username),
                         ("name", top.Name),
-                        ("slipcount", count))
+                        ("slipcount", top.Count))
                     : Loc.GetString("eorstats-slippedcount-topslipper-hasnousername",
                         ("name", top.Name),
-                        ("slipcount", count)));
+                        ("slipcount", top.Count)));
             }
         }
 

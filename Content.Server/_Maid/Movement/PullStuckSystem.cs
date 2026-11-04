@@ -107,8 +107,8 @@ public sealed class PullStuckSystem : EntitySystem
             return false;
         }
 
-        var pulledPos = _transform.GetWorldPosition(pulled);
-        var toPuller = _transform.GetWorldPosition(puller) - pulledPos;
+        var pulledAnchor = GetWorldAnchor(distanceJoint, pulled);
+        var toPuller = GetWorldAnchor(distanceJoint, puller) - pulledAnchor;
         var distance = toPuller.Length();
 
         // Held back far behind the joint limit by anything.
@@ -120,13 +120,15 @@ public sealed class PullStuckSystem : EntitySystem
             return false;
 
         var dir = toPuller / distance;
+        var pulledXform = _physics.GetPhysicsTransform(pulled);
         var contacts = _physics.GetContacts(pulled);
         while (contacts.MoveNext(out var contact))
         {
             if (!contact.IsTouching || !contact.Hard)
                 continue;
 
-            var other = contact.EntityA == pulled ? contact.EntityB : contact.EntityA;
+            var pulledIsA = contact.EntityA == pulled;
+            var other = pulledIsA ? contact.EntityB : contact.EntityA;
             if (other == puller || !_physicsQuery.TryComp(other, out var otherBody))
                 continue;
 
@@ -137,12 +139,42 @@ public sealed class PullStuckSystem : EntitySystem
                 continue;
             }
 
+            var otherXform = _physics.GetPhysicsTransform(other);
+            Vector2 normal;
+            if (pulledIsA)
+            {
+                contact.GetWorldManifold(pulledXform, otherXform, out normal);
+            }
+            else
+            {
+                contact.GetWorldManifold(otherXform, pulledXform, out normal);
+                normal = -normal;
+            }
+
+            // No contact points to take the normal from, fall back to where the obstacle is.
+            if (normal == Vector2.Zero)
+            {
+                normal = _transform.GetWorldPosition(other) - pulledAnchor;
+                if (normal.LengthSquared() < 0.0001f)
+                    return true;
+
+                normal = Vector2.Normalize(normal);
+            }
+
             // The obstacle is between the thing and the puller, not just brushed on the side.
-            var toOther = _transform.GetWorldPosition(other) - pulledPos;
-            if (toOther.LengthSquared() < 0.0001f || Vector2.Dot(Vector2.Normalize(toOther), dir) > BlockingCos)
+            if (Vector2.Dot(normal, dir) > BlockingCos)
                 return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// World position of the joint anchor on the given body.
+    /// </summary>
+    private Vector2 GetWorldAnchor(Joint joint, EntityUid uid)
+    {
+        var localAnchor = joint.BodyAUid == uid ? joint.LocalAnchorA : joint.LocalAnchorB;
+        return Vector2.Transform(localAnchor, _transform.GetWorldMatrix(uid));
     }
 }
