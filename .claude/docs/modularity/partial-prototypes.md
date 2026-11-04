@@ -2,6 +2,8 @@
 
 Engine feature of `PrototypeManager` (added in RT 289.0.0; `!CombineIndex` and several merge/hot-reload fixes in 289.0.1-289.0.2). It lets a later YAML file modify a prototype defined elsewhere instead of redefining it. **In this repo nothing registers partial paths**: there are no callers of `PartialDirectory`/`PartialFile` in Content, no `!Remove`/`!Clear`/`!PartialOnly`/`!Index` tags in `Resources`, and `RT_UPDATE/CONTROVERSIAL.md` records that no usage was found. The IPrototypeManager comment mentions a "PartialPrototypes" file shipped by upstream SS14; this fork has only `Resources/IgnoredPrototypes/`.
 
+Full behavioural spec (merge algorithm, tag positions, quirks): [partial-prototypes/spec.md](partial-prototypes/spec.md).
+
 ## Enabling
 - Partial treatment is per path, set from C#: `IPrototypeManager.PartialDirectory(ResPath dir, int index)` and `PartialFile(file, index)`. Paths are VFS paths without `Resources` (e.g. `/Prototypes/_Maid`). The call is not retroactive and must happen before the directories are loaded; Content's `Init` phase is early enough (the existing abstract-list reader in `Content.Shared/Entry/EntryPoint` runs there).
 - Inside a partial path, a prototype whose id already exists is merged into it; without a partial path the same situation throws `Duplicate ID`. A partial prototype whose id does not exist simply becomes a new prototype, unless its type node is `!PartialOnly <kind>`, in which case it is dropped.
