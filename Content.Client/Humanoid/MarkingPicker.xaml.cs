@@ -231,7 +231,10 @@ public sealed partial class MarkingPicker : Control
         var sortedMarkings = GetMarkings(_selectedMarkingCategory).Values.Where(m =>
             m.ID.ToLower().Contains(filter.ToLower()) ||
             GetMarkingName(m).ToLower().Contains(filter.ToLower())
-        ).OrderBy(p => Loc.GetString(GetMarkingName(p)));
+        // MAID BEGIN fix double localization
+        ).OrderBy(p => GetMarkingName(p));
+        // ).OrderBy(p => Loc.GetString(GetMarkingName(p)));
+        // MAID END fix double localization
 
         foreach (var marking in sortedMarkings)
         {

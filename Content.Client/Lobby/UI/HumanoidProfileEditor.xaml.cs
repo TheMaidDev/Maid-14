@@ -869,7 +869,10 @@ namespace Content.Client.Lobby.UI
 
             AntagList.AddChild(new Label { Text = Loc.GetString("humanoid-profile-editor-antag-roll-before-jobs") + '\n'}); // Goobstation
 
-            foreach (var antag in _prototypeManager.EnumeratePrototypes<AntagPrototype>().OrderBy(a => Loc.GetString(a.Name)))
+            // MAID BEGIN skip hidden antags
+            // foreach (var antag in _prototypeManager.EnumeratePrototypes<AntagPrototype>().OrderBy(a => Loc.GetString(a.Name)))
+            foreach (var antag in _prototypeManager.EnumeratePrototypes<AntagPrototype>().Where(a => a.SetPreference).OrderBy(a => Loc.GetString(a.Name)))
+            // MAID END skip hidden antags
             {
                 if (!antag.SetPreference)
                     continue;
