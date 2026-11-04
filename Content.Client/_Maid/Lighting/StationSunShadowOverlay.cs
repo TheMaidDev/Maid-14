@@ -32,7 +32,7 @@ public sealed class StationSunShadowOverlay : Overlay
     /// <summary>
     /// How many tiles behind a window the light reaches into the station.
     /// </summary>
-    private const int WindowLightDepth = 2;
+    private const int WindowLightDepth = 3;
 
     /// <summary>
     /// Looking against the light from a window, open space must be found within this many tiles ...
@@ -331,6 +331,18 @@ public sealed class StationSunShadowOverlay : Overlay
 
         // Light passes through windows, they only matter as a start of a beam.
         shadow.Blocked.ExceptWith(shadow.WindowSet);
+
+        // Grilles let light through: a tile that has only a grille on it counts as open space, not as station mass.
+        var metas = _entManager.EntityQueryEnumerator<MetaDataComponent, TransformComponent>();
+        while (metas.MoveNext(out var meta, out var xform))
+        {
+            if (xform.GridUid != uid || !xform.Anchored || meta.EntityPrototype?.ID.Contains("Grille") != true)
+                continue;
+
+            var tile = _mapSystem.TileIndicesFor(uid, grid, xform.Coordinates);
+            if (!shadow.Blocked.Contains(tile) && !shadow.WindowSet.Contains(tile))
+                shadow.Solid.Remove(tile);
+        }
     }
 
     /// <summary>
