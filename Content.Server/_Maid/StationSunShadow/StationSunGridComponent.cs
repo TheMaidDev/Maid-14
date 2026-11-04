@@ -26,4 +26,5 @@ public sealed partial class StationSunGridComponent : Component
 
     public Vector2 LastDirection;
     public double LastTheta;
+    public float LastAlpha = -1f;
 }

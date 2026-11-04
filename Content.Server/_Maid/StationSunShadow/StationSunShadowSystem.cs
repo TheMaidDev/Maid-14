@@ -93,11 +93,20 @@ public sealed class StationSunShadowSystem : EntitySystem
                           MathF.Abs(shadow.Direction.Y - state.LastDirection.Y) > 0.001f ||
                           Math.Abs(theta - state.LastTheta) > 0.001;
 
+            // Roof tiles (station interior, shadowed rooms) are drawn with the roof colour, so Alpha must go there.
+            var alpha = Math.Clamp(shadow.Alpha, 0f, 1f);
+            if (MathF.Abs(alpha - state.LastAlpha) > 0.001f && TryComp(uid, out RoofComponent? roofComp))
+            {
+                state.LastAlpha = alpha;
+                roofComp.Color = Color.Black.WithAlpha(alpha);
+                Dirty(uid, roofComp);
+            }
+
             if (!changed && now < state.NextUpdate)
                 continue;
 
             state.NextUpdate = now + UpdateDelay;
-            state.NextMinUpdate = now + TimeSpan.FromMilliseconds(250);
+            state.NextMinUpdate = now + TimeSpan.FromMilliseconds(50);
             state.LastDirection = shadow.Direction;
             state.LastTheta = theta;
 
