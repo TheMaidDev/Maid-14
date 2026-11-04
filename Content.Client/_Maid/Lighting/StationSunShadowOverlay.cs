@@ -25,7 +25,7 @@ public sealed class StationSunShadowOverlay : Overlay
     /// The shadow is stored per strip across the light direction (this wide, in tiles): for each strip the most
     /// upstream solid tile is remembered and everything downstream of it is in shadow, however far.
     /// </summary>
-    private const float ShadowBinWidth = 0.25f;
+    private const float ShadowBinWidth = 0.125f;
 
     /// <summary>
     /// Half width of the strip one solid tile shades, a bit over half a tile so diagonal neighbours overlap.
@@ -386,11 +386,13 @@ public sealed class StationSunShadowOverlay : Overlay
             return;
         }
 
-        qMin -= ShadowHalfWidth;
-        shadow.QMin = qMin;
+        // Strips are aligned to absolute positions across the light, not to the current blockers, so their edges move
+        // steadily with the light instead of jumping when a different blocker becomes the outermost one.
+        var baseBin = (int) MathF.Floor((qMin - ShadowHalfWidth) / ShadowBinWidth);
+        shadow.BinBase = baseBin;
 
         // Per strip a sorted list of the positions (along the light) of the blockers that cover it.
-        var bins = (int) MathF.Ceiling((qMax + ShadowHalfWidth - qMin) / ShadowBinWidth) + 2;
+        var bins = (int) MathF.Floor((qMax + ShadowHalfWidth) / ShadowBinWidth) - baseBin + 2;
         if (shadow.BinStart.Length != bins + 1)
             shadow.BinStart = new int[bins + 1];
         else
@@ -399,8 +401,8 @@ public sealed class StationSunShadowOverlay : Overlay
         foreach (var source in _sources)
         {
             var q = Vector2.Dot(source, perp);
-            var first = Math.Max(0, (int) MathF.Floor((q - ShadowHalfWidth - qMin) / ShadowBinWidth));
-            var last = Math.Min(bins - 1, (int) MathF.Floor((q + ShadowHalfWidth - qMin) / ShadowBinWidth));
+            var first = Math.Max(0, (int) MathF.Floor((q - ShadowHalfWidth) / ShadowBinWidth) - baseBin);
+            var last = Math.Min(bins - 1, (int) MathF.Floor((q + ShadowHalfWidth) / ShadowBinWidth) - baseBin);
 
             for (var i = first; i <= last; i++)
             {
@@ -426,8 +428,8 @@ public sealed class StationSunShadowOverlay : Overlay
         {
             var q = Vector2.Dot(source, perp);
             var p = Vector2.Dot(source, localDir);
-            var first = Math.Max(0, (int) MathF.Floor((q - ShadowHalfWidth - qMin) / ShadowBinWidth));
-            var last = Math.Min(bins - 1, (int) MathF.Floor((q + ShadowHalfWidth - qMin) / ShadowBinWidth));
+            var first = Math.Max(0, (int) MathF.Floor((q - ShadowHalfWidth) / ShadowBinWidth) - baseBin);
+            var last = Math.Min(bins - 1, (int) MathF.Floor((q + ShadowHalfWidth) / ShadowBinWidth) - baseBin);
 
             for (var i = first; i <= last; i++)
             {
@@ -458,17 +460,22 @@ public sealed class StationSunShadowOverlay : Overlay
     private static float ShadowStrength(GridShadow shadow, Vector2i tile)
     {
         var center = new Vector2(tile.X + 0.5f, tile.Y + 0.5f);
+        var enclosed = shadow.Enclosed.Contains(tile);
 
-        // Half a tile downstream of the blocker's centre at least.
-        var distance = DistanceBehindBlocker(shadow, center, 0.5f);
-        if (distance < 0f)
-            return 0f;
+        // Three samples across the tile, so the shadow's edge fades over a tile instead of flipping it at once.
+        var sum = 0f;
+        for (var k = -1; k <= 1; k++)
+        {
+            // Half a tile downstream of the blocker's centre at least.
+            var distance = DistanceBehindBlocker(shadow, center + shadow.Perp * (0.33f * k), 0.5f);
+            if (distance < 0f)
+                continue;
 
-        // Space enclosed by the station never gets light, however far it is from the blocker.
-        if (shadow.Enclosed.Contains(tile))
-            return 1f;
+            // Space enclosed by the station never gets light, however far it is from the blocker.
+            sum += enclosed ? 1f : Fade(distance);
+        }
 
-        return Fade(distance);
+        return sum / 3f;
     }
 
     private static float Fade(float distance)
@@ -491,7 +498,7 @@ public sealed class StationSunShadowOverlay : Overlay
         if (shadow.BinStart.Length == 0)
             return -1f;
 
-        var bin = (int) MathF.Floor((Vector2.Dot(point, shadow.Perp) - shadow.QMin) / ShadowBinWidth);
+        var bin = (int) MathF.Floor(Vector2.Dot(point, shadow.Perp) / ShadowBinWidth) - shadow.BinBase;
         if (bin < 0 || bin + 1 >= shadow.BinStart.Length)
             return -1f;
 
@@ -858,7 +865,7 @@ public sealed class StationSunShadowOverlay : Overlay
         public bool EnclosedValid;
         public int[] BinStart = Array.Empty<int>();
         public float[] BinData = Array.Empty<float>();
-        public float QMin;
+        public int BinBase;
         public Vector2 Dir;
         public Vector2 Perp;
         public Vector2 Direction;
