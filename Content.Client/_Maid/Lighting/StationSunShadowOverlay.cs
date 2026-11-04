@@ -103,6 +103,14 @@ public sealed class StationSunShadowOverlay : Overlay
     /// </summary>
     private const float LightFadeRate = 10f;
 
+    /// <summary>
+    /// How fast the cast shadow fades in and out per tile (per second), so its edge never jumps from tile to tile.
+    /// </summary>
+    private const float ShadowFadeRate = 6f;
+
+    private const int ShadowChunkSize = 16;
+    private static readonly TimeSpan ShadowChunkStale = TimeSpan.FromMilliseconds(500);
+
     private int _recomputes;
     private int _recomputesPerSecond;
     private int _rescansPerSecond;
@@ -168,7 +176,9 @@ public sealed class StationSunShadowOverlay : Overlay
             _rescans = 0;
         }
 
-        var fadeStep = 1f - MathF.Exp(-LightFadeRate * (float) _timing.FrameTime.TotalSeconds);
+        var frameSeconds = (float) _timing.FrameTime.TotalSeconds;
+        var fadeStep = 1f - MathF.Exp(-LightFadeRate * frameSeconds);
+        var shadowStep = 1f - MathF.Exp(-ShadowFadeRate * frameSeconds);
         foreach (var (_, _, shadowData, _) in _draw)
         {
             SmoothLight(shadowData, fadeStep);
@@ -231,6 +241,12 @@ public sealed class StationSunShadowOverlay : Overlay
                     if ((long) (maxX - minX) * (maxY - minY) > 400000)
                         continue;
 
+                    if (shadow.ShadowChunks.Count > 2048)
+                        shadow.ShadowChunks.Clear();
+
+                    ShadowChunk? chunk = null;
+                    var chunkKey = new Vector2i(int.MinValue, int.MinValue);
+
                     for (var x = minX; x <= maxX; x++)
                     {
                         for (var y = minY; y <= maxY; y++)
@@ -239,11 +255,39 @@ public sealed class StationSunShadowOverlay : Overlay
                             if (shadow.Solid.Contains(tile))
                                 continue;
 
-                            var localCenter = new Vector2((x + 0.5f) * size, (y + 0.5f) * size);
-                            var inside = localBounds.Contains(localCenter);
-                            var strength = ShadowStrength(shadow, tile);
+                            var targetStrength = ShadowStrength(shadow, tile);
+
+                            // Per tile memory of what was drawn last frame, the drawn shadow moves towards the computed
+                            // one a bit each frame. Chunks nobody looked at for a while start from the computed value.
+                            var key = new Vector2i(x >> 4, y >> 4);
+                            if (key != chunkKey || chunk == null)
+                            {
+                                chunkKey = key;
+                                if (!shadow.ShadowChunks.TryGetValue(key, out chunk))
+                                {
+                                    chunk = new ShadowChunk();
+                                    shadow.ShadowChunks[key] = chunk;
+                                }
+
+                                if (timeNow - chunk.Touched > ShadowChunkStale)
+                                    chunk.Reset();
+
+                                chunk.Touched = timeNow;
+                            }
+
+                            var index = (x & (ShadowChunkSize - 1)) + ((y & (ShadowChunkSize - 1)) * ShadowChunkSize);
+                            var previous = chunk.Values[index];
+                            if (float.IsNaN(previous))
+                                previous = targetStrength;
+
+                            var strength = previous + (targetStrength - previous) * shadowStep;
+                            chunk.Values[index] = strength;
+
                             if (strength < 0.01f)
                                 continue;
+
+                            var localCenter = new Vector2((x + 0.5f) * size, (y + 0.5f) * size);
+                            var inside = localBounds.Contains(localCenter);
 
                             worldHandle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size),
                                 Shade(ambient, inside ? strength : alpha * strength));
@@ -869,6 +913,28 @@ public sealed class StationSunShadowOverlay : Overlay
         return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit : null;
     }
 
+    /// <summary>
+    /// What was drawn last frame for a square of tiles, used to fade the shadow in time.
+    /// </summary>
+    private sealed class ShadowChunk
+    {
+        public readonly float[] Values = new float[ShadowChunkSize * ShadowChunkSize];
+        public TimeSpan Touched;
+
+        public ShadowChunk()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            for (var i = 0; i < Values.Length; i++)
+            {
+                Values[i] = float.NaN;
+            }
+        }
+    }
+
     private sealed class GridShadow
     {
         public readonly HashSet<Vector2i> Solid = new();
@@ -877,6 +943,7 @@ public sealed class StationSunShadowOverlay : Overlay
         public readonly List<Vector2i> Windows = new();
         public readonly Dictionary<Vector2i, float> Lit = new();
         public readonly Dictionary<Vector2i, float> Smooth = new();
+        public readonly Dictionary<Vector2i, ShadowChunk> ShadowChunks = new();
         public readonly HashSet<Vector2i> Enclosed = new();
         public int SolidHash;
         public bool EnclosedValid;
