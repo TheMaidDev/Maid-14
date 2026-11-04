@@ -81,6 +81,8 @@ public sealed class StationSunShadowOverlay : Overlay
 
     private readonly Dictionary<EntityUid, GridShadow> _cache = new();
     private int[] _cursor = Array.Empty<int>();
+    private bool[] _floodOutside = Array.Empty<bool>();
+    private int[] _floodQueue = Array.Empty<int>();
     private readonly List<Vector2> _sources = new();
     private readonly List<(EntityUid Uid, MapGridComponent Grid, GridShadow Shadow, float Alpha)> _draw = new();
 
@@ -387,6 +389,10 @@ public sealed class StationSunShadowOverlay : Overlay
         if (distance < 0f)
             return 0f;
 
+        // Space enclosed by the station never gets light, however far it is from the blocker.
+        if (shadow.Enclosed.Contains(tile))
+            return 1f;
+
         return Fade(distance);
     }
 
@@ -486,6 +492,101 @@ public sealed class StationSunShadowOverlay : Overlay
             if (!shadow.Blocked.Contains(tile) && !shadow.WindowSet.Contains(tile))
                 shadow.Solid.Remove(tile);
         }
+
+        ComputeEnclosed(shadow);
+    }
+
+    /// <summary>
+    /// Finds the empty space (and grilles, lattice) that the station's solid tiles enclose: it is not connected to the
+    /// space outside the station, so no sunlight reaches it however large it is. Skipped while the tiles are unchanged.
+    /// </summary>
+    private void ComputeEnclosed(GridShadow shadow)
+    {
+        var hash = shadow.Solid.Count;
+        var minX = int.MaxValue;
+        var minY = int.MaxValue;
+        var maxX = int.MinValue;
+        var maxY = int.MinValue;
+
+        foreach (var tile in shadow.Solid)
+        {
+            unchecked
+            {
+                hash ^= tile.X * 73856093 ^ tile.Y * 19349663;
+            }
+
+            minX = Math.Min(minX, tile.X);
+            minY = Math.Min(minY, tile.Y);
+            maxX = Math.Max(maxX, tile.X);
+            maxY = Math.Max(maxY, tile.Y);
+        }
+
+        if (shadow.EnclosedValid && hash == shadow.SolidHash)
+            return;
+
+        shadow.EnclosedValid = true;
+        shadow.SolidHash = hash;
+        shadow.Enclosed.Clear();
+
+        if (shadow.Solid.Count == 0)
+            return;
+
+        // One tile of margin around the solid tiles, the margin ring is outside space and connects everything outside.
+        minX--;
+        minY--;
+        maxX++;
+        maxY++;
+
+        var w = maxX - minX + 1;
+        var h = maxY - minY + 1;
+        if ((long) w * h > 6_000_000)
+            return;
+
+        var cells = w * h;
+        if (_floodOutside.Length < cells)
+        {
+            _floodOutside = new bool[cells];
+            _floodQueue = new int[cells];
+        }
+        else
+        {
+            Array.Clear(_floodOutside, 0, cells);
+        }
+
+        foreach (var tile in shadow.Solid)
+        {
+            _floodOutside[(tile.Y - minY) * w + (tile.X - minX)] = true;
+        }
+
+        // _floodOutside doubles as "visited or solid" while flooding.
+        var head = 0;
+        var tail = 0;
+        _floodQueue[tail++] = 0;
+        _floodOutside[0] = true;
+
+        while (head < tail)
+        {
+            var cell = _floodQueue[head++];
+            var x = cell % w;
+            var y = cell / w;
+
+            if (x > 0 && !_floodOutside[cell - 1]) { _floodOutside[cell - 1] = true; _floodQueue[tail++] = cell - 1; }
+            if (x < w - 1 && !_floodOutside[cell + 1]) { _floodOutside[cell + 1] = true; _floodQueue[tail++] = cell + 1; }
+            if (y > 0 && !_floodOutside[cell - w]) { _floodOutside[cell - w] = true; _floodQueue[tail++] = cell - w; }
+            if (y < h - 1 && !_floodOutside[cell + w]) { _floodOutside[cell + w] = true; _floodQueue[tail++] = cell + w; }
+        }
+
+        // Everything the flood never reached and that is not solid is enclosed.
+        for (var y = 0; y < h; y++)
+        {
+            for (var x = 0; x < w; x++)
+            {
+                if (_floodOutside[y * w + x])
+                    continue;
+
+                shadow.Enclosed.Add(new Vector2i(x + minX, y + minY));
+            }
+        }
     }
 
     /// <summary>
@@ -570,7 +671,13 @@ public sealed class StationSunShadowOverlay : Overlay
                     return 0f;
 
                 if (!shadow.Solid.Contains(tile))
+                {
+                    // Looking into a hole enclosed by the station: no light comes out of it.
+                    if (shadow.Enclosed.Contains(tile))
+                        return 0f;
+
                     reachedSpace = true;
+                }
                 else if (t > NearRange)
                     return 0f;
 
@@ -644,6 +751,9 @@ public sealed class StationSunShadowOverlay : Overlay
         public readonly HashSet<Vector2i> WindowSet = new();
         public readonly List<Vector2i> Windows = new();
         public readonly Dictionary<Vector2i, float> Lit = new();
+        public readonly HashSet<Vector2i> Enclosed = new();
+        public int SolidHash;
+        public bool EnclosedValid;
         public int[] BinStart = Array.Empty<int>();
         public float[] BinData = Array.Empty<float>();
         public float QMin;
