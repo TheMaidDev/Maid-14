@@ -27,6 +27,7 @@ public sealed class StationSunShadowOverlay : Overlay
     private static readonly TimeSpan RefreshDelay = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan MinDirectionalDelay = TimeSpan.FromMilliseconds(16);
     private static readonly ProtoId<TagPrototype> WindowTag = "Window";
+    private static readonly ProtoId<TagPrototype> WallTag = "Wall";
 
     /// <summary>
     /// How many tiles behind a window the light reaches into the station.
@@ -47,7 +48,7 @@ public sealed class StationSunShadowOverlay : Overlay
     /// A window's beam is split into this many parallel rays, each one tested for exposure on its own,
     /// so a tile is lit by a fraction and the light moves smoothly instead of tile by tile.
     /// </summary>
-    private const int BeamRays = 8;
+    private const int BeamRays = 24;
 
     private const float BeamStep = 0.125f;
 
@@ -154,17 +155,23 @@ public sealed class StationSunShadowOverlay : Overlay
                             continue;
 
                         worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size),
-                            Shade(ambient, alpha * dark));
+                            Shade(ambient, dark));
                     }
 
+                    // The cast shadow fades with Alpha, but space inside the station's own bounds (holes, cavities)
+                    // never gets light, so it stays fully dark.
                     var shadowColor = Shade(ambient, alpha);
+                    var cavityColor = Shade(ambient, 1f);
+                    var localBounds = grid.LocalAABB;
                     foreach (var tile in shadow.Tiles)
                     {
-                        var center = Vector2.Transform(new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size), gridMatrix);
+                        var localCenter = new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size);
+                        var center = Vector2.Transform(localCenter, gridMatrix);
                         if (!bounds.Contains(center))
                             continue;
 
-                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), shadowColor);
+                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size),
+                            localBounds.Contains(localCenter) ? cavityColor : shadowColor);
                     }
                 }
             }, null);
@@ -307,12 +314,19 @@ public sealed class StationSunShadowOverlay : Overlay
         var tagged = _entManager.EntityQueryEnumerator<TagComponent, TransformComponent>();
         while (tagged.MoveNext(out var tagUid, out _, out var xform))
         {
-            if (xform.GridUid != uid || !xform.Anchored || !_tag.HasTag(tagUid, WindowTag))
+            if (xform.GridUid != uid || !xform.Anchored)
                 continue;
 
             var tile = _mapSystem.TileIndicesFor(uid, grid, xform.Coordinates);
-            if (shadow.WindowSet.Add(tile))
+
+            if (_tag.HasTag(tagUid, WallTag))
+            {
+                shadow.Blocked.Add(tile);
+            }
+            else if (_tag.HasTag(tagUid, WindowTag) && shadow.WindowSet.Add(tile))
+            {
                 shadow.Windows.Add(tile);
+            }
         }
 
         // Light passes through windows, they only matter as a start of a beam.
