@@ -147,6 +147,6 @@ public sealed class StationSunShadowSystem : EntitySystem
 
     private static bool IsTransparent(string? prototype)
     {
-        return prototype != null && (prototype.Contains("Grille") || prototype.Contains("SolarPanel"));
+        return prototype != null && (prototype.Contains("Grille") || prototype.Contains("SolarPanel") || prototype.Contains("SolarTracker"));
     }
 }
