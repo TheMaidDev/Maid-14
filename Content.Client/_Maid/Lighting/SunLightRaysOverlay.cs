@@ -61,13 +61,30 @@ public sealed class SunLightRaysOverlay : Overlay
             var size = grid.Comp.TileSize;
 
             // Blue: tiles in the station's cast shadow. Green: windows. Yellow: sunlight through windows.
-            if (sunOverlay.TryGetDebugTiles(grid.Owner, out var shadowTiles, out var windows))
-            {
-                foreach (var tile in shadowTiles)
-                {
-                    handle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), Color.Blue.WithAlpha(0.25f));
-                }
+            var invGrid = _xform.GetInvWorldMatrix(grid.Owner);
+            var c0 = Vector2.Transform(bounds.BottomLeft, invGrid);
+            var c1 = Vector2.Transform(bounds.BottomRight, invGrid);
+            var c2 = Vector2.Transform(bounds.TopRight, invGrid);
+            var c3 = Vector2.Transform(bounds.TopLeft, invGrid);
+            var minX = (int) MathF.Floor(MathF.Min(MathF.Min(c0.X, c1.X), MathF.Min(c2.X, c3.X)) / size);
+            var maxX = (int) MathF.Ceiling(MathF.Max(MathF.Max(c0.X, c1.X), MathF.Max(c2.X, c3.X)) / size);
+            var minY = (int) MathF.Floor(MathF.Min(MathF.Min(c0.Y, c1.Y), MathF.Min(c2.Y, c3.Y)) / size);
+            var maxY = (int) MathF.Ceiling(MathF.Max(MathF.Max(c0.Y, c1.Y), MathF.Max(c2.Y, c3.Y)) / size);
 
+            if ((long) (maxX - minX) * (maxY - minY) <= 400000)
+            {
+                for (var x = minX; x <= maxX; x++)
+                {
+                    for (var y = minY; y <= maxY; y++)
+                    {
+                        if (sunOverlay.IsShadowed(grid.Owner, new Vector2i(x, y)))
+                            handle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size), Color.Blue.WithAlpha(0.25f));
+                    }
+                }
+            }
+
+            if (sunOverlay.GetWindows(grid.Owner) is { } windows)
+            {
                 foreach (var tile in windows)
                 {
                     handle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), Color.Lime.WithAlpha(0.35f));

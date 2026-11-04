@@ -12,7 +12,7 @@ namespace Content.Server._Maid.StationSunShadow;
 public sealed partial class StationSunShadowComponent : Component
 {
     /// <summary>
-    /// Direction the shadows are cast in (opposite to the light source). Its length is how far the station's shadow reaches, in tiles.
+    /// Direction the shadows are cast in (opposite to the light source). Only its direction matters, the station's shadow is not limited in length.
     /// </summary>
     [DataField]
     public Vector2 Direction = new(0f, -40f);

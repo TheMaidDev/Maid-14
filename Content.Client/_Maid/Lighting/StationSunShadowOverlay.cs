@@ -21,9 +21,16 @@ namespace Content.Client._Maid.Lighting;
 /// </summary>
 public sealed class StationSunShadowOverlay : Overlay
 {
-    private const float MaxShadowLength = 150f;
-    private const float SampleStep = 0.5f;
-    private const int MaxOtherGridTiles = 4000;
+    /// <summary>
+    /// The shadow is stored per strip across the light direction (this wide, in tiles): for each strip the most
+    /// upstream solid tile is remembered and everything downstream of it is in shadow, however far.
+    /// </summary>
+    private const float ShadowBinWidth = 0.5f;
+
+    /// <summary>
+    /// Half width of the strip one solid tile shades, a bit over half a tile so diagonal neighbours overlap.
+    /// </summary>
+    private const float ShadowHalfWidth = 0.55f;
     private static readonly TimeSpan RefreshDelay = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan MinDirectionalDelay = TimeSpan.FromMilliseconds(16);
     private static readonly ProtoId<TagPrototype> WindowTag = "Window";
@@ -62,7 +69,6 @@ public sealed class StationSunShadowOverlay : Overlay
     private readonly TagSystem _tag;
 
     private readonly Dictionary<EntityUid, GridShadow> _cache = new();
-    private readonly List<Vector2i> _ray = new();
     private readonly List<Vector2> _sources = new();
     private readonly List<(EntityUid Uid, MapGridComponent Grid, GridShadow Shadow, float Alpha)> _draw = new();
 
@@ -163,15 +169,32 @@ public sealed class StationSunShadowOverlay : Overlay
                     var shadowColor = Shade(ambient, alpha);
                     var cavityColor = Shade(ambient, 1f);
                     var localBounds = grid.LocalAABB;
-                    foreach (var tile in shadow.Tiles)
-                    {
-                        var localCenter = new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size);
-                        var center = Vector2.Transform(localCenter, gridMatrix);
-                        if (!bounds.Contains(center))
-                            continue;
+                    // Visible part of the grid in tile coordinates.
+                    var invGrid = _xform.GetInvWorldMatrix(uid);
+                    var c0 = Vector2.Transform(bounds.BottomLeft, invGrid);
+                    var c1 = Vector2.Transform(bounds.BottomRight, invGrid);
+                    var c2 = Vector2.Transform(bounds.TopRight, invGrid);
+                    var c3 = Vector2.Transform(bounds.TopLeft, invGrid);
+                    var minX = (int) MathF.Floor(MathF.Min(MathF.Min(c0.X, c1.X), MathF.Min(c2.X, c3.X)) / size);
+                    var maxX = (int) MathF.Ceiling(MathF.Max(MathF.Max(c0.X, c1.X), MathF.Max(c2.X, c3.X)) / size);
+                    var minY = (int) MathF.Floor(MathF.Min(MathF.Min(c0.Y, c1.Y), MathF.Min(c2.Y, c3.Y)) / size);
+                    var maxY = (int) MathF.Ceiling(MathF.Max(MathF.Max(c0.Y, c1.Y), MathF.Max(c2.Y, c3.Y)) / size);
 
-                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size),
-                            localBounds.Contains(localCenter) ? cavityColor : shadowColor);
+                    if ((long) (maxX - minX) * (maxY - minY) > 400000)
+                        continue;
+
+                    for (var x = minX; x <= maxX; x++)
+                    {
+                        for (var y = minY; y <= maxY; y++)
+                        {
+                            var tile = new Vector2i(x, y);
+                            if (shadow.Solid.Contains(tile) || !IsShadowed(shadow, tile))
+                                continue;
+
+                            var localCenter = new Vector2((x + 0.5f) * size, (y + 0.5f) * size);
+                            worldHandle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size),
+                                localBounds.Contains(localCenter) ? cavityColor : shadowColor);
+                        }
                     }
                 }
             }, null);
@@ -210,32 +233,32 @@ public sealed class StationSunShadowOverlay : Overlay
         shadow.NextDirectional = now + MinDirectionalDelay;
         shadow.Direction = worldDir;
         shadow.Theta = theta;
-        shadow.Tiles.Clear();
         shadow.Lit.Clear();
 
-        var length = MathF.Min(worldDir.Length(), MaxShadowLength);
-        if (length < 0.01f)
+        if (worldDir.Length() < 0.01f)
+        {
+            shadow.BinMin = Array.Empty<float>();
             return;
+        }
 
         // World-space light direction brought into the grid's local space.
         var localDir = new Angle(-theta).RotateVec(Vector2.Normalize(worldDir));
         var perp = new Vector2(-localDir.Y, localDir.X);
+        shadow.Dir = localDir;
+        shadow.Perp = perp;
 
         var exposed = ComputeLit(shadow, localDir);
 
-        // Points where shadow rays start, in the grid's local tile space.
+        // Points that block the sun, in the grid's local tile space: the grid's own solid tiles ...
         _sources.Clear();
-
-        // Only the silhouette matters: a ray from an inner tile leaves through a boundary tile anyway.
         foreach (var solid in shadow.Solid)
         {
-            if (IsBoundary(shadow.Solid, solid))
-                _sources.Add(new Vector2(solid.X + 0.5f, solid.Y + 0.5f));
+            _sources.Add(new Vector2(solid.X + 0.5f, solid.Y + 0.5f));
         }
 
         var ownSources = _sources.Count;
 
-        // Everything else on the map blocks the sun as well (docked shuttles, other parts of the station).
+        // ... and everything else on the map (docked shuttles, other parts of the station).
         var mapId = _entManager.GetComponent<TransformComponent>(uid).MapID;
         var invMatrix = _xform.GetInvWorldMatrix(uid);
         var size = grid.TileSize;
@@ -245,14 +268,12 @@ public sealed class StationSunShadowOverlay : Overlay
             if (otherUid == uid || otherXform.MapID != mapId || _entManager.HasComponent<MapComponent>(otherUid))
                 continue;
 
-            var otherMatrix = _xform.GetWorldMatrix(otherUid);
-            var toLocal = Matrix3x2.Multiply(otherMatrix, invMatrix);
+            var toLocal = Matrix3x2.Multiply(_xform.GetWorldMatrix(otherUid), invMatrix);
             var otherSize = otherGrid.TileSize;
-            var count = 0;
 
             foreach (var tileRef in _mapSystem.GetAllTiles(otherUid, otherGrid))
             {
-                if (_turf.IsSpace(tileRef) || count++ > MaxOtherGridTiles)
+                if (_turf.IsSpace(tileRef))
                     continue;
 
                 var center = new Vector2((tileRef.GridIndices.X + 0.5f) * otherSize, (tileRef.GridIndices.Y + 0.5f) * otherSize);
@@ -260,29 +281,64 @@ public sealed class StationSunShadowOverlay : Overlay
             }
         }
 
-        // Three parallel rays per source (centre and both edges) so no tile in the swept strip is skipped.
-        for (var n = 0; n < _sources.Count; n++)
+        // For every strip across the light remember the most upstream blocker.
+        var qMin = float.MaxValue;
+        var qMax = float.MinValue;
+        foreach (var source in _sources)
         {
-            var source = _sources[n];
+            var q = Vector2.Dot(source, perp);
+            qMin = MathF.Min(qMin, q);
+            qMax = MathF.Max(qMax, q);
+        }
 
-            for (var k = -1; k <= 1; k++)
+        if (_sources.Count == 0)
+        {
+            shadow.BinMin = Array.Empty<float>();
+            return;
+        }
+
+        qMin -= ShadowHalfWidth;
+        shadow.QMin = qMin;
+
+        var bins = (int) MathF.Ceiling((qMax + ShadowHalfWidth - qMin) / ShadowBinWidth) + 2;
+        if (shadow.BinMin.Length != bins)
+            shadow.BinMin = new float[bins];
+
+        Array.Fill(shadow.BinMin, float.MaxValue);
+
+        foreach (var source in _sources)
+        {
+            var q = Vector2.Dot(source, perp);
+            var p = Vector2.Dot(source, localDir);
+            var first = Math.Max(0, (int) MathF.Floor((q - ShadowHalfWidth - qMin) / ShadowBinWidth));
+            var last = Math.Min(bins - 1, (int) MathF.Floor((q + ShadowHalfWidth - qMin) / ShadowBinWidth));
+
+            for (var i = first; i <= last; i++)
             {
-                var origin = source + perp * (0.45f * k);
-
-                for (var t = 0f; t <= length; t += SampleStep)
-                {
-                    var point = origin + localDir * t;
-                    var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
-
-                    if (!shadow.Solid.Contains(tile))
-                        shadow.Tiles.Add(tile);
-                }
+                if (p < shadow.BinMin[i])
+                    shadow.BinMin[i] = p;
             }
         }
 
-        DebugInfo = $"Station sun: shadow length={length:0.0}, solid tiles={shadow.Solid.Count}, " +
-                    $"ray sources={ownSources}+{_sources.Count - ownSources} (other grids), shadow tiles={shadow.Tiles.Count}, " +
-                    $"windows={shadow.Windows.Count} (exposed {exposed}), lit tiles={shadow.Lit.Count}";
+        DebugInfo = $"Station sun: solid tiles={shadow.Solid.Count}, blockers={ownSources}+{_sources.Count - ownSources} (other grids), " +
+                    $"shadow strips={bins}, windows={shadow.Windows.Count} (exposed {exposed}), lit tiles={shadow.Lit.Count}";
+    }
+
+    /// <summary>
+    /// Whether the tile lies in the shadow of a blocker upstream of it (no distance limit).
+    /// </summary>
+    private static bool IsShadowed(GridShadow shadow, Vector2i tile)
+    {
+        if (shadow.BinMin.Length == 0)
+            return false;
+
+        var center = new Vector2(tile.X + 0.5f, tile.Y + 0.5f);
+        var bin = (int) MathF.Floor((Vector2.Dot(center, shadow.Perp) - shadow.QMin) / ShadowBinWidth);
+        if (bin < 0 || bin >= shadow.BinMin.Length)
+            return false;
+
+        // Half a tile downstream of the blocker's centre at least.
+        return Vector2.Dot(center, shadow.Dir) >= shadow.BinMin[bin] + 0.5f;
     }
 
     /// <summary>
@@ -441,26 +497,6 @@ public sealed class StationSunShadowOverlay : Overlay
     }
 
     /// <summary>
-    /// Fills <see cref="_ray"/> with the distinct tiles crossed by a ray from the centre of <paramref name="origin"/>
-    /// along <paramref name="dir"/> (normalized), up to <paramref name="length"/> tiles. The first entry is the origin.
-    /// </summary>
-    private void SampleTiles(Vector2i origin, Vector2 dir, float length)
-    {
-        _ray.Clear();
-        _ray.Add(origin);
-
-        var center = new Vector2(origin.X + 0.5f, origin.Y + 0.5f);
-        for (var t = 0.25f; t <= length; t += 0.25f)
-        {
-            var point = center + dir * t;
-            var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
-
-            if (tile != _ray[_ray.Count - 1])
-                _ray.Add(tile);
-        }
-    }
-
-    /// <summary>
     /// How much of the tile (0..1) is currently reached by sunlight through a window.
     /// </summary>
     public float GetLight(EntityUid grid, Vector2i tile)
@@ -477,44 +513,23 @@ public sealed class StationSunShadowOverlay : Overlay
             return "no data";
 
         return $"solid={shadow.Solid.Contains(tile)} blocked={shadow.Blocked.Contains(tile)} " +
-               $"window={shadow.WindowSet.Contains(tile)} inShadow={shadow.Tiles.Contains(tile)} " +
+               $"window={shadow.WindowSet.Contains(tile)} inShadow={IsShadowed(shadow, tile)} " +
                $"sunlight={shadow.Lit.GetValueOrDefault(tile):0.00}";
     }
 
-    /// <summary>
-    /// Tiles the cast shadow covers and the windows found on the grid, for the rays debug overlay.
-    /// </summary>
-    public bool TryGetDebugTiles(EntityUid grid, out IReadOnlyCollection<Vector2i> shadowTiles, out IReadOnlyCollection<Vector2i> windows)
+    public bool IsShadowed(EntityUid grid, Vector2i tile)
     {
-        if (_cache.TryGetValue(grid, out var shadow))
-        {
-            shadowTiles = shadow.Tiles;
-            windows = shadow.Windows;
-            return true;
-        }
+        return _cache.TryGetValue(grid, out var shadow) && !shadow.Solid.Contains(tile) && IsShadowed(shadow, tile);
+    }
 
-        shadowTiles = Array.Empty<Vector2i>();
-        windows = Array.Empty<Vector2i>();
-        return false;
+    public IReadOnlyCollection<Vector2i>? GetWindows(EntityUid grid)
+    {
+        return _cache.TryGetValue(grid, out var shadow) ? shadow.Windows : null;
     }
 
     public IReadOnlyDictionary<Vector2i, float>? GetLitTiles(EntityUid grid)
     {
         return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit : null;
-    }
-
-    private static bool IsBoundary(HashSet<Vector2i> solid, Vector2i tile)
-    {
-        for (var dx = -1; dx <= 1; dx++)
-        {
-            for (var dy = -1; dy <= 1; dy++)
-            {
-                if ((dx != 0 || dy != 0) && !solid.Contains(new Vector2i(tile.X + dx, tile.Y + dy)))
-                    return true;
-            }
-        }
-
-        return false;
     }
 
     private sealed class GridShadow
@@ -524,7 +539,10 @@ public sealed class StationSunShadowOverlay : Overlay
         public readonly HashSet<Vector2i> WindowSet = new();
         public readonly List<Vector2i> Windows = new();
         public readonly Dictionary<Vector2i, float> Lit = new();
-        public readonly HashSet<Vector2i> Tiles = new();
+        public float[] BinMin = Array.Empty<float>();
+        public float QMin;
+        public Vector2 Dir;
+        public Vector2 Perp;
         public Vector2 Direction;
         public double Theta;
         public TimeSpan NextRescan;
