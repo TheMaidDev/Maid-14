@@ -60,7 +60,7 @@ public sealed class SunLightRaysOverlay : Overlay
             handle.SetTransform(_xform.GetWorldMatrix(grid.Owner));
             var size = grid.Comp.TileSize;
 
-            // Blue: tiles in the station's cast shadow. Green: windows. Yellow: sunlight through windows.
+            // Blue: cast shadow. Magenta: space enclosed by the station. Green: windows. Yellow: sunlight through windows.
             var invGrid = _xform.GetInvWorldMatrix(grid.Owner);
             var c0 = Vector2.Transform(bounds.BottomLeft, invGrid);
             var c1 = Vector2.Transform(bounds.BottomRight, invGrid);
@@ -78,8 +78,13 @@ public sealed class SunLightRaysOverlay : Overlay
                     for (var y = minY; y <= maxY; y++)
                     {
                         var shade = sunOverlay.GetShadow(grid.Owner, new Vector2i(x, y));
-                        if (shade > 0.01f)
-                            handle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size), Color.Blue.WithAlpha(0.3f * shade));
+                        if (shade <= 0.01f)
+                            continue;
+
+                        // Magenta: space enclosed by the station (always dark). Blue: shadow cast in the open.
+                        var enclosed = sunOverlay.IsEnclosed(grid.Owner, new Vector2i(x, y));
+                        handle.DrawRect(new Box2(x * size, y * size, (x + 1) * size, (y + 1) * size),
+                            (enclosed ? Color.Magenta : Color.Blue).WithAlpha(0.3f * shade));
                     }
                 }
             }

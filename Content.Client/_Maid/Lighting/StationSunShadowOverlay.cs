@@ -731,7 +731,7 @@ public sealed class StationSunShadowOverlay : Overlay
             return "no data";
 
         return $"solid={shadow.Solid.Contains(tile)} blocked={shadow.Blocked.Contains(tile)} " +
-               $"window={shadow.WindowSet.Contains(tile)} shadow={GetShadow(shadow, tile):0.00} " +
+               $"window={shadow.WindowSet.Contains(tile)} shadow={GetShadow(shadow, tile):0.00} enclosed={shadow.Enclosed.Contains(tile)} " +
                $"sunlight={shadow.Lit.GetValueOrDefault(tile):0.00}";
     }
 
@@ -741,6 +741,14 @@ public sealed class StationSunShadowOverlay : Overlay
     public float GetShadow(EntityUid grid, Vector2i tile)
     {
         return _cache.TryGetValue(grid, out var shadow) ? GetShadow(shadow, tile) : 0f;
+    }
+
+    /// <summary>
+    /// Whether the tile is empty space (or grille, lattice) enclosed by the station's solid tiles.
+    /// </summary>
+    public bool IsEnclosed(EntityUid grid, Vector2i tile)
+    {
+        return _cache.TryGetValue(grid, out var shadow) && shadow.Enclosed.Contains(tile);
     }
 
     private static float GetShadow(GridShadow shadow, Vector2i tile)
