@@ -1,7 +1,7 @@
 using System.Numerics;
 using Content.Client.Resources;
 using Content.Shared.Light.Components;
-using Content.Shared.Light.EntitySystems;
+using Content.Shared._Maid.StationSunShadow;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
 using Robust.Client.Player;
@@ -21,10 +21,10 @@ public sealed class SunLightDebugOverlay : Overlay
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly IInputManager _inputManager = default!;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
 
     private readonly SharedMapSystem _mapSystem;
-    private readonly SharedRoofSystem _roof;
     private readonly SharedTransformSystem _xform;
     private readonly Font _font;
 
@@ -36,7 +36,6 @@ public sealed class SunLightDebugOverlay : Overlay
     {
         IoCManager.InjectDependencies(this);
         _mapSystem = _entManager.System<SharedMapSystem>();
-        _roof = _entManager.System<SharedRoofSystem>();
         _xform = _entManager.System<SharedTransformSystem>();
         _font = IoCManager.Resolve<IResourceCache>().GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", 12);
     }
@@ -89,15 +88,23 @@ public sealed class SunLightDebugOverlay : Overlay
         var rooved = false;
         var roofMode = "none";
 
-        if (_entManager.HasComponent<ImplicitRoofComponent>(gridUid))
+        if (_entManager.HasComponent<StationSunMarkerComponent>(gridUid) &&
+            _overlay.TryGetOverlay<StationSunShadowOverlay>(out var sunOverlay))
+        {
+            if (sunOverlay.IsLit(gridUid, index))
+            {
+                roofMode = "station: LIT through window";
+            }
+            else
+            {
+                rooved = true;
+                roofMode = "station: dark interior";
+            }
+        }
+        else if (_entManager.HasComponent<ImplicitRoofComponent>(gridUid))
         {
             rooved = true;
             roofMode = "implicit (whole grid)";
-        }
-        else if (_entManager.TryGetComponent(gridUid, out RoofComponent? roofComp))
-        {
-            rooved = _roof.IsRooved((gridUid, grid, roofComp), index);
-            roofMode = rooved ? "per-tile: roofed" : "per-tile: OPEN (sun reaches)";
         }
 
         var effective = rooved ? 0f : ambient;

@@ -26,20 +26,4 @@ public sealed partial class StationSunShadowComponent : Component
     /// </summary>
     [DataField]
     public Color SunColor = Color.FromHex("#B8B8C0");
-
-    /// <summary>
-    /// If true, sunlight passes through windows that face open space and lights this many tiles of the station behind them.
-    /// </summary>
-    [DataField]
-    public bool LightThroughWindows = true;
-
-    [DataField]
-    public int WindowLightDepth = 2;
-
-    /// <summary>
-    /// Unlit gaps up to this many tiles wide between two lit tiles (across the light direction) get filled,
-    /// so neighbouring window beams merge into one instead of looking like separate stripes.
-    /// </summary>
-    [DataField]
-    public int WindowLightGapFill = 0;
 }

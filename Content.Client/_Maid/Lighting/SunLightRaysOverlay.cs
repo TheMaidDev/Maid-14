@@ -1,6 +1,6 @@
 using System.Numerics;
+using Content.Shared._Maid.StationSunShadow;
 using Content.Shared.Light.Components;
-using Content.Shared.Light.EntitySystems;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Map.Components;
@@ -18,10 +18,9 @@ public sealed class SunLightRaysOverlay : Overlay
     private const float HeadLength = 0.5f;
 
     [Dependency] private readonly IEntityManager _entManager = default!;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
 
-    private readonly EntityLookupSystem _lookup;
     private readonly SharedMapSystem _mapSystem;
-    private readonly SharedRoofSystem _roof;
     private readonly SharedTransformSystem _xform;
 
     private List<Entity<MapGridComponent>> _grids = new();
@@ -31,9 +30,7 @@ public sealed class SunLightRaysOverlay : Overlay
     public SunLightRaysOverlay()
     {
         IoCManager.InjectDependencies(this);
-        _lookup = _entManager.System<EntityLookupSystem>();
         _mapSystem = _entManager.System<SharedMapSystem>();
-        _roof = _entManager.System<SharedRoofSystem>();
         _xform = _entManager.System<SharedTransformSystem>();
     }
 
@@ -52,24 +49,20 @@ public sealed class SunLightRaysOverlay : Overlay
             if (_entManager.TryGetComponent(grid.Owner, out SunShadowComponent? shadow) && shadow.Direction != Vector2.Zero)
                 lightDir = Vector2.Normalize(shadow.Direction);
 
-            // Tiles open to the sun on grids with per-tile roofs.
-            if (!_entManager.TryGetComponent(grid.Owner, out RoofComponent? roof) ||
-                _entManager.HasComponent<ImplicitRoofComponent>(grid.Owner))
+            // Tiles of station grids that sunlight reaches through windows.
+            if (!_entManager.HasComponent<StationSunMarkerComponent>(grid.Owner) ||
+                !_overlay.TryGetOverlay<StationSunShadowOverlay>(out var sunOverlay) ||
+                sunOverlay.GetLitTiles(grid.Owner) is not { } lit)
             {
                 continue;
             }
 
             handle.SetTransform(_xform.GetWorldMatrix(grid.Owner));
 
-            var roofEnt = (grid.Owner, grid.Comp, roof);
-            var tiles = _mapSystem.GetTilesEnumerator(grid.Owner, grid.Comp, bounds);
-
-            while (tiles.MoveNext(out var tileRef))
+            var size = grid.Comp.TileSize;
+            foreach (var tile in lit)
             {
-                if (_roof.IsRooved(roofEnt, tileRef.GridIndices))
-                    continue;
-
-                handle.DrawRect(_lookup.GetLocalBounds(tileRef, grid.Comp.TileSize), Color.Yellow.WithAlpha(0.25f));
+                handle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), Color.Yellow.WithAlpha(0.25f));
             }
         }
 

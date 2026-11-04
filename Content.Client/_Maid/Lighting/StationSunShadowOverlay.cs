@@ -3,16 +3,20 @@ using Content.Client.Light;
 using Content.Shared._Maid.StationSunShadow;
 using Content.Shared.Light.Components;
 using Content.Shared.Maps;
+using Content.Shared.Tag;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Client._Maid.Lighting;
 
 /// <summary>
-/// Casts the shadow of the whole station silhouette along the sun direction onto space tiles.
+/// Client-side star light for station grids: darkens the station interior except for tiles reached by sunlight
+/// through exposed windows, and casts the shadow of the whole station silhouette along the sun direction onto space.
 /// Drawn into the ambient light target next to <see cref="RoofOverlay"/>, so it removes sunlight but not lamp light.
+/// Everything is derived from data the client already has (tiles, occluders, window tags, grid rotation, SunShadow).
 /// </summary>
 public sealed class StationSunShadowOverlay : Overlay
 {
@@ -20,6 +24,23 @@ public sealed class StationSunShadowOverlay : Overlay
     private const float SampleStep = 0.5f;
     private const int MaxOtherGridTiles = 4000;
     private static readonly TimeSpan RefreshDelay = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan MinDirectionalDelay = TimeSpan.FromMilliseconds(30);
+    private static readonly ProtoId<TagPrototype> WindowTag = "Window";
+
+    /// <summary>
+    /// How many tiles behind a window the light reaches into the station.
+    /// </summary>
+    private const int WindowLightDepth = 2;
+
+    /// <summary>
+    /// Looking against the light from a window, open space must be found within this many tiles ...
+    /// </summary>
+    private const float NearRange = 6f;
+
+    /// <summary>
+    /// ... and nothing solid may block the way for this many tiles after that, otherwise the window sits in a cavity.
+    /// </summary>
+    private const float FarRange = 48f;
 
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -28,8 +49,10 @@ public sealed class StationSunShadowOverlay : Overlay
     private readonly SharedMapSystem _mapSystem;
     private readonly SharedTransformSystem _xform;
     private readonly TurfSystem _turf;
+    private readonly TagSystem _tag;
 
     private readonly Dictionary<EntityUid, GridShadow> _cache = new();
+    private readonly List<Vector2i> _ray = new();
     private readonly List<Vector2> _sources = new();
     private readonly List<(EntityUid Uid, MapGridComponent Grid, GridShadow Shadow, Color Color)> _draw = new();
 
@@ -46,6 +69,7 @@ public sealed class StationSunShadowOverlay : Overlay
         _mapSystem = _entManager.System<SharedMapSystem>();
         _xform = _entManager.System<SharedTransformSystem>();
         _turf = _entManager.System<TurfSystem>();
+        _tag = _entManager.System<TagSystem>();
 
         ZIndex = RoofOverlay.ContentZIndex;
     }
@@ -101,6 +125,20 @@ public sealed class StationSunShadowOverlay : Overlay
                     worldHandle.SetTransform(Matrix3x2.Multiply(gridMatrix, invMatrix));
 
                     var size = grid.TileSize;
+
+                    // Station interior is dark unless sunlight reaches the tile through a window.
+                    foreach (var tile in shadow.Solid)
+                    {
+                        if (shadow.Lit.Contains(tile))
+                            continue;
+
+                        var center = Vector2.Transform(new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size), gridMatrix);
+                        if (!bounds.Contains(center))
+                            continue;
+
+                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), color);
+                    }
+
                     foreach (var tile in shadow.Tiles)
                     {
                         var center = Vector2.Transform(new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size), gridMatrix);
@@ -116,25 +154,32 @@ public sealed class StationSunShadowOverlay : Overlay
     }
 
     /// <summary>
-    /// Recomputes which space tiles lie in the station's shadow. Throttled, but reacts at once to a changed
-    /// light direction or grid rotation.
+    /// The grid-dependent data (tiles, blockers, windows) is rescanned about once a second. Everything that depends on
+    /// the light direction is recomputed at once when the direction or the grid rotation changes (rate limited).
     /// </summary>
     private void Refresh(EntityUid uid, MapGridComponent grid, Vector2 worldDir, GridShadow shadow)
     {
         var theta = _xform.GetWorldRotation(uid).Theta;
         var now = _timing.CurTime;
 
+        var rescan = now >= shadow.NextRescan;
         var changed = Vector2.DistanceSquared(worldDir, shadow.Direction) > 0.000001f ||
                       Math.Abs(theta - shadow.Theta) > 0.001;
 
-        if (!changed && now < shadow.NextRefresh)
+        if (!rescan && (!changed || now < shadow.NextDirectional))
             return;
 
-        shadow.NextRefresh = now + RefreshDelay;
+        if (rescan)
+        {
+            shadow.NextRescan = now + RefreshDelay;
+            Rescan(uid, grid, shadow);
+        }
+
+        shadow.NextDirectional = now + MinDirectionalDelay;
         shadow.Direction = worldDir;
         shadow.Theta = theta;
         shadow.Tiles.Clear();
-        shadow.Solid.Clear();
+        shadow.Lit.Clear();
 
         var length = MathF.Min(worldDir.Length(), MaxShadowLength);
         if (length < 0.01f)
@@ -144,12 +189,7 @@ public sealed class StationSunShadowOverlay : Overlay
         var localDir = new Angle(-theta).RotateVec(Vector2.Normalize(worldDir));
         var perp = new Vector2(-localDir.Y, localDir.X);
 
-        // The whole station mass blocks the light, everything that is not space-like.
-        foreach (var tileRef in _mapSystem.GetAllTiles(uid, grid))
-        {
-            if (!_turf.IsSpace(tileRef))
-                shadow.Solid.Add(tileRef.GridIndices);
-        }
+        var exposed = ComputeLit(shadow, localDir);
 
         // Points where shadow rays start, in the grid's local tile space.
         _sources.Clear();
@@ -208,8 +248,155 @@ public sealed class StationSunShadowOverlay : Overlay
             }
         }
 
-        DebugInfo = $"Station shadow: length={length:0.0}, solid tiles={shadow.Solid.Count}, " +
-                    $"ray sources={ownSources}+{_sources.Count - ownSources} (other grids), shadow tiles={shadow.Tiles.Count}";
+        DebugInfo = $"Station sun: shadow length={length:0.0}, solid tiles={shadow.Solid.Count}, " +
+                    $"ray sources={ownSources}+{_sources.Count - ownSources} (other grids), shadow tiles={shadow.Tiles.Count}, " +
+                    $"windows={shadow.Windows.Count} (exposed {exposed}), lit tiles={shadow.Lit.Count}";
+    }
+
+    /// <summary>
+    /// Collects the solid (non-space) tiles, light blockers and windows of the grid.
+    /// </summary>
+    private void Rescan(EntityUid uid, MapGridComponent grid, GridShadow shadow)
+    {
+        shadow.Solid.Clear();
+        shadow.Blocked.Clear();
+        shadow.Windows.Clear();
+        shadow.WindowSet.Clear();
+
+        foreach (var tileRef in _mapSystem.GetAllTiles(uid, grid))
+        {
+            if (!_turf.IsSpace(tileRef))
+                shadow.Solid.Add(tileRef.GridIndices);
+        }
+
+        // Walls and closed doors have an enabled occluder.
+        var occluders = _entManager.EntityQueryEnumerator<OccluderComponent, TransformComponent>();
+        while (occluders.MoveNext(out _, out var occluder, out var xform))
+        {
+            if (!occluder.Enabled || xform.GridUid != uid || !xform.Anchored)
+                continue;
+
+            shadow.Blocked.Add(_mapSystem.TileIndicesFor(uid, grid, xform.Coordinates));
+        }
+
+        var tagged = _entManager.EntityQueryEnumerator<TagComponent, TransformComponent>();
+        while (tagged.MoveNext(out var tagUid, out _, out var xform))
+        {
+            if (xform.GridUid != uid || !xform.Anchored || !_tag.HasTag(tagUid, WindowTag))
+                continue;
+
+            var tile = _mapSystem.TileIndicesFor(uid, grid, xform.Coordinates);
+            if (shadow.WindowSet.Add(tile))
+                shadow.Windows.Add(tile);
+        }
+
+        // Light passes through windows, they only matter as a start of a beam.
+        shadow.Blocked.ExceptWith(shadow.WindowSet);
+    }
+
+    /// <summary>
+    /// Lights the tiles behind every window that faces open sky. Returns the number of exposed windows.
+    /// </summary>
+    private int ComputeLit(GridShadow shadow, Vector2 localDir)
+    {
+        var exposed = 0;
+
+        foreach (var origin in shadow.Windows)
+        {
+            if (!IsExposed(shadow, origin, -localDir))
+                continue;
+
+            exposed++;
+
+            SampleTiles(origin, localDir, WindowLightDepth);
+            for (var i = 0; i < _ray.Count; i++)
+            {
+                var tile = _ray[i];
+
+                if (!shadow.Solid.Contains(tile))
+                    break;
+
+                // The window tile itself is allowed, anything else solid stops the light.
+                if (i > 0 && shadow.Blocked.Contains(tile))
+                    break;
+
+                shadow.Lit.Add(tile);
+            }
+        }
+
+        return exposed;
+    }
+
+    /// <summary>
+    /// A window is exposed if, looking against the light, we reach open space soon and nothing solid is in the way
+    /// beyond it. Space tiles enclosed by the station (holes, cavities) fail the second check.
+    /// </summary>
+    private bool IsExposed(GridShadow shadow, Vector2i origin, Vector2 upstream)
+    {
+        SampleTiles(origin, upstream, NearRange + FarRange);
+
+        var reachedSpace = false;
+
+        for (var i = 1; i < _ray.Count; i++)
+        {
+            var tile = _ray[i];
+
+            if (!reachedSpace)
+            {
+                // Looking back through another window or a wall means we are inside a room.
+                if (shadow.WindowSet.Contains(tile) || shadow.Blocked.Contains(tile))
+                    return false;
+
+                if (!shadow.Solid.Contains(tile))
+                {
+                    reachedSpace = true;
+                }
+                else if (i > NearRange * 2)
+                {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if (shadow.Solid.Contains(tile) || shadow.Blocked.Contains(tile))
+                return false;
+        }
+
+        return reachedSpace;
+    }
+
+    /// <summary>
+    /// Fills <see cref="_ray"/> with the distinct tiles crossed by a ray from the centre of <paramref name="origin"/>
+    /// along <paramref name="dir"/> (normalized), up to <paramref name="length"/> tiles. The first entry is the origin.
+    /// </summary>
+    private void SampleTiles(Vector2i origin, Vector2 dir, float length)
+    {
+        _ray.Clear();
+        _ray.Add(origin);
+
+        var center = new Vector2(origin.X + 0.5f, origin.Y + 0.5f);
+        for (var t = 0.25f; t <= length; t += 0.25f)
+        {
+            var point = center + dir * t;
+            var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+
+            if (tile != _ray[_ray.Count - 1])
+                _ray.Add(tile);
+        }
+    }
+
+    /// <summary>
+    /// Whether the tile of a station grid is currently reached by sunlight through a window.
+    /// </summary>
+    public bool IsLit(EntityUid grid, Vector2i tile)
+    {
+        return _cache.TryGetValue(grid, out var shadow) && shadow.Lit.Contains(tile);
+    }
+
+    public IReadOnlyCollection<Vector2i>? GetLitTiles(EntityUid grid)
+    {
+        return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit : null;
     }
 
     private static bool IsBoundary(HashSet<Vector2i> solid, Vector2i tile)
@@ -229,9 +416,14 @@ public sealed class StationSunShadowOverlay : Overlay
     private sealed class GridShadow
     {
         public readonly HashSet<Vector2i> Solid = new();
+        public readonly HashSet<Vector2i> Blocked = new();
+        public readonly HashSet<Vector2i> WindowSet = new();
+        public readonly List<Vector2i> Windows = new();
+        public readonly HashSet<Vector2i> Lit = new();
         public readonly HashSet<Vector2i> Tiles = new();
         public Vector2 Direction;
         public double Theta;
-        public TimeSpan NextRefresh;
+        public TimeSpan NextRescan;
+        public TimeSpan NextDirectional;
     }
 }

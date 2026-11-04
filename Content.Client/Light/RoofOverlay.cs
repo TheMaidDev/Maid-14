@@ -7,6 +7,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Shared._Maid.StationSunShadow;
 using Content.Shared.Light.Components;
 using Content.Shared.Light.EntitySystems;
 using Content.Shared.Maps;
@@ -75,6 +76,15 @@ public sealed class RoofOverlay : Overlay
                 {
                     var grid = _grids[i];
 
+                    // MAID client sun light
+                    // Station grids are darkened by StationSunShadowOverlay, which lets the sun through windows.
+                    if (_entManager.HasComponent<StationSunMarkerComponent>(grid.Owner))
+                    {
+                        _grids.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+
                     if (!_entManager.TryGetComponent(grid.Owner, out ImplicitRoofComponent? roof))
                         continue;
 
@@ -113,9 +123,7 @@ public sealed class RoofOverlay : Overlay
 
                     worldHandle.SetTransform(matty);
 
-                    // MAID sun hole roof
-                    // Include empty tiles so space enclosed inside a station can be roofed (tile roof bits decide what is drawn).
-                    var tileEnumerator = _mapSystem.GetTilesEnumerator(grid.Owner, grid, bounds, ignoreEmpty: false);
+                    var tileEnumerator = _mapSystem.GetTilesEnumerator(grid.Owner, grid, bounds);
                     var roofEnt = (grid.Owner, grid.Comp, roof);
 
                     // Due to stencilling we essentially draw on unrooved tiles
