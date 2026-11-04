@@ -481,6 +481,23 @@ public sealed class StationSunShadowOverlay : Overlay
                $"sunlight={shadow.Lit.GetValueOrDefault(tile):0.00}";
     }
 
+    /// <summary>
+    /// Tiles the cast shadow covers and the windows found on the grid, for the rays debug overlay.
+    /// </summary>
+    public bool TryGetDebugTiles(EntityUid grid, out IReadOnlyCollection<Vector2i> shadowTiles, out IReadOnlyCollection<Vector2i> windows)
+    {
+        if (_cache.TryGetValue(grid, out var shadow))
+        {
+            shadowTiles = shadow.Tiles;
+            windows = shadow.Windows;
+            return true;
+        }
+
+        shadowTiles = Array.Empty<Vector2i>();
+        windows = Array.Empty<Vector2i>();
+        return false;
+    }
+
     public IReadOnlyDictionary<Vector2i, float>? GetLitTiles(EntityUid grid)
     {
         return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit : null;

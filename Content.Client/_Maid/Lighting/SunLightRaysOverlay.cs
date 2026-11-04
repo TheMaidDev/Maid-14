@@ -58,8 +58,22 @@ public sealed class SunLightRaysOverlay : Overlay
             }
 
             handle.SetTransform(_xform.GetWorldMatrix(grid.Owner));
-
             var size = grid.Comp.TileSize;
+
+            // Blue: tiles in the station's cast shadow. Green: windows. Yellow: sunlight through windows.
+            if (sunOverlay.TryGetDebugTiles(grid.Owner, out var shadowTiles, out var windows))
+            {
+                foreach (var tile in shadowTiles)
+                {
+                    handle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), Color.Blue.WithAlpha(0.25f));
+                }
+
+                foreach (var tile in windows)
+                {
+                    handle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), Color.Lime.WithAlpha(0.35f));
+                }
+            }
+
             foreach (var (tile, light) in lit)
             {
                 handle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), Color.Yellow.WithAlpha(0.4f * light));
