@@ -86,20 +86,15 @@ public sealed class SunLightDebugOverlay : Overlay
 
         var index = _mapSystem.TileIndicesFor(gridUid, grid, coords);
         var rooved = false;
+        var effectiveScale = 1f;
         var roofMode = "none";
 
         if (_entManager.HasComponent<StationSunMarkerComponent>(gridUid) &&
             _overlay.TryGetOverlay<StationSunShadowOverlay>(out var sunOverlay))
         {
-            if (sunOverlay.IsLit(gridUid, index))
-            {
-                roofMode = "station: LIT through window";
-            }
-            else
-            {
-                rooved = true;
-                roofMode = "station: dark interior";
-            }
+            var light = sunOverlay.GetLight(gridUid, index);
+            roofMode = $"station: sunlight through window {light:0.00}";
+            effectiveScale = light;
         }
         else if (_entManager.HasComponent<ImplicitRoofComponent>(gridUid))
         {
@@ -107,7 +102,7 @@ public sealed class SunLightDebugOverlay : Overlay
             roofMode = "implicit (whole grid)";
         }
 
-        var effective = rooved ? 0f : ambient;
+        var effective = rooved ? 0f : ambient * effectiveScale;
         _lines.Add($"{label} {index}: roof={roofMode}, ambient lum={effective:0.000}");
 
         if (_entManager.TryGetComponent(gridUid, out SunShadowComponent? shadow))

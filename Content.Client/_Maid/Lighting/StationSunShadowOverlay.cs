@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using Content.Client.Light;
 using Content.Shared._Maid.StationSunShadow;
@@ -24,7 +25,7 @@ public sealed class StationSunShadowOverlay : Overlay
     private const float SampleStep = 0.5f;
     private const int MaxOtherGridTiles = 4000;
     private static readonly TimeSpan RefreshDelay = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan MinDirectionalDelay = TimeSpan.FromMilliseconds(30);
+    private static readonly TimeSpan MinDirectionalDelay = TimeSpan.FromMilliseconds(16);
     private static readonly ProtoId<TagPrototype> WindowTag = "Window";
 
     /// <summary>
@@ -40,7 +41,15 @@ public sealed class StationSunShadowOverlay : Overlay
     /// <summary>
     /// ... and nothing solid may block the way for this many tiles after that, otherwise the window sits in a cavity.
     /// </summary>
-    private const float FarRange = 48f;
+    private const float FarRange = 32f;
+
+    /// <summary>
+    /// A window's beam is split into this many parallel rays, each one tested for exposure on its own,
+    /// so a tile is lit by a fraction and the light moves smoothly instead of tile by tile.
+    /// </summary>
+    private const int BeamRays = 8;
+
+    private const float BeamStep = 0.125f;
 
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -54,7 +63,7 @@ public sealed class StationSunShadowOverlay : Overlay
     private readonly Dictionary<EntityUid, GridShadow> _cache = new();
     private readonly List<Vector2i> _ray = new();
     private readonly List<Vector2> _sources = new();
-    private readonly List<(EntityUid Uid, MapGridComponent Grid, GridShadow Shadow, Color Color)> _draw = new();
+    private readonly List<(EntityUid Uid, MapGridComponent Grid, GridShadow Shadow, float Alpha)> _draw = new();
 
     /// <summary>
     /// Summary of the last shadow computation, shown by <c>sunlightdebug</c>.
@@ -98,11 +107,15 @@ public sealed class StationSunShadowOverlay : Overlay
             }
 
             Refresh(uid, grid, sun.Direction, shadow);
-            _draw.Add((uid, grid, shadow, Color.Black.WithAlpha(alpha)));
+            _draw.Add((uid, grid, shadow, alpha));
         }
 
         if (_draw.Count == 0)
             return;
+
+        // Shaded tiles are drawn opaque in a precomputed colour (ambient * (1 - strength)) rather than as translucent
+        // black, which is what the roof does too and does not depend on the target's alpha blending.
+        var ambient = _entManager.GetComponent<MapLightComponent>(args.MapUid).AmbientLightColor;
 
         var viewport = args.Viewport;
         var eye = viewport.Eye;
@@ -119,7 +132,7 @@ public sealed class StationSunShadowOverlay : Overlay
             {
                 var invMatrix = target.GetWorldToLocalMatrix(eye, scale);
 
-                foreach (var (uid, grid, shadow, color) in _draw)
+                foreach (var (uid, grid, shadow, alpha) in _draw)
                 {
                     var gridMatrix = _xform.GetWorldMatrix(uid);
                     worldHandle.SetTransform(Matrix3x2.Multiply(gridMatrix, invMatrix));
@@ -129,28 +142,40 @@ public sealed class StationSunShadowOverlay : Overlay
                     // Station interior is dark unless sunlight reaches the tile through a window.
                     foreach (var tile in shadow.Solid)
                     {
-                        if (shadow.Lit.Contains(tile))
+                        var dark = 1f;
+                        if (shadow.Lit.TryGetValue(tile, out var coverage))
+                            dark = 1f - coverage;
+
+                        if (dark < 0.01f)
                             continue;
 
                         var center = Vector2.Transform(new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size), gridMatrix);
                         if (!bounds.Contains(center))
                             continue;
 
-                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), color);
+                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size),
+                            Shade(ambient, alpha * dark));
                     }
 
+                    var shadowColor = Shade(ambient, alpha);
                     foreach (var tile in shadow.Tiles)
                     {
                         var center = Vector2.Transform(new Vector2((tile.X + 0.5f) * size, (tile.Y + 0.5f) * size), gridMatrix);
                         if (!bounds.Contains(center))
                             continue;
 
-                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), color);
+                        worldHandle.DrawRect(new Box2(tile.X * size, tile.Y * size, (tile.X + 1) * size, (tile.Y + 1) * size), shadowColor);
                     }
                 }
             }, null);
 
         worldHandle.SetTransform(Matrix3x2.Identity);
+    }
+
+    private static Color Shade(Color ambient, float strength)
+    {
+        var f = 1f - Math.Clamp(strength, 0f, 1f);
+        return new Color(ambient.R * f, ambient.G * f, ambient.B * f, 1f);
     }
 
     /// <summary>
@@ -295,51 +320,78 @@ public sealed class StationSunShadowOverlay : Overlay
     }
 
     /// <summary>
-    /// Lights the tiles behind every window that faces open sky. Returns the number of exposed windows.
+    /// Lights the tiles behind every window that faces open sky. Each window's beam is made of several parallel rays,
+    /// every tile receives the share of the beam that crosses it. Returns the number of exposed windows.
     /// </summary>
-    private int ComputeLit(GridShadow shadow, Vector2 localDir)
+    private int ComputeLit(GridShadow shadow, Vector2 dir)
     {
         var exposed = 0;
+        var perp = new Vector2(-dir.Y, dir.X);
+        var weight = BeamStep / BeamRays;
 
         foreach (var origin in shadow.Windows)
         {
-            if (!IsExposed(shadow, origin, -localDir))
-                continue;
+            var center = new Vector2(origin.X + 0.5f, origin.Y + 0.5f);
+            var any = false;
 
-            exposed++;
-
-            SampleTiles(origin, localDir, WindowLightDepth);
-            for (var i = 0; i < _ray.Count; i++)
+            for (var k = 0; k < BeamRays; k++)
             {
-                var tile = _ray[i];
+                var start = center + perp * ((k + 0.5f) / BeamRays - 0.5f);
 
-                if (!shadow.Solid.Contains(tile))
-                    break;
+                if (!IsExposed(shadow, origin, start, -dir))
+                    continue;
 
-                // The window tile itself is allowed, anything else solid stops the light.
-                if (i > 0 && shadow.Blocked.Contains(tile))
-                    break;
+                any = true;
 
-                shadow.Lit.Add(tile);
+                // From the window's outer face to WindowLightDepth tiles behind it.
+                for (var s = -0.5f + BeamStep / 2f; s < WindowLightDepth + 0.5f; s += BeamStep)
+                {
+                    var point = start + dir * s;
+                    var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+
+                    if (tile != origin)
+                    {
+                        // Outside the window tile before the window is reached (diagonal beams).
+                        if (s < 0f)
+                            continue;
+
+                        // Anything solid or open space stops the light.
+                        if (!shadow.Solid.Contains(tile) || shadow.Blocked.Contains(tile))
+                            break;
+                    }
+
+                    shadow.Lit[tile] = shadow.Lit.GetValueOrDefault(tile) + weight;
+                }
             }
+
+            if (any)
+                exposed++;
+        }
+
+        foreach (var tile in shadow.Lit.Keys.ToArray())
+        {
+            if (shadow.Lit[tile] > 1f)
+                shadow.Lit[tile] = 1f;
         }
 
         return exposed;
     }
 
     /// <summary>
-    /// A window is exposed if, looking against the light, we reach open space soon and nothing solid is in the way
+    /// A beam ray is exposed if, looking against the light, we reach open space soon and nothing solid is in the way
     /// beyond it. Space tiles enclosed by the station (holes, cavities) fail the second check.
     /// </summary>
-    private bool IsExposed(GridShadow shadow, Vector2i origin, Vector2 upstream)
+    private static bool IsExposed(GridShadow shadow, Vector2i origin, Vector2 start, Vector2 upstream)
     {
-        SampleTiles(origin, upstream, NearRange + FarRange);
-
         var reachedSpace = false;
 
-        for (var i = 1; i < _ray.Count; i++)
+        for (var t = 0.5f; t <= NearRange + FarRange; t += 0.5f)
         {
-            var tile = _ray[i];
+            var point = start + upstream * t;
+            var tile = new Vector2i((int) MathF.Floor(point.X), (int) MathF.Floor(point.Y));
+
+            if (tile == origin)
+                continue;
 
             if (!reachedSpace)
             {
@@ -348,13 +400,9 @@ public sealed class StationSunShadowOverlay : Overlay
                     return false;
 
                 if (!shadow.Solid.Contains(tile))
-                {
                     reachedSpace = true;
-                }
-                else if (i > NearRange * 2)
-                {
+                else if (t > NearRange)
                     return false;
-                }
 
                 continue;
             }
@@ -387,14 +435,14 @@ public sealed class StationSunShadowOverlay : Overlay
     }
 
     /// <summary>
-    /// Whether the tile of a station grid is currently reached by sunlight through a window.
+    /// How much of the tile (0..1) is currently reached by sunlight through a window.
     /// </summary>
-    public bool IsLit(EntityUid grid, Vector2i tile)
+    public float GetLight(EntityUid grid, Vector2i tile)
     {
-        return _cache.TryGetValue(grid, out var shadow) && shadow.Lit.Contains(tile);
+        return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit.GetValueOrDefault(tile) : 0f;
     }
 
-    public IReadOnlyCollection<Vector2i>? GetLitTiles(EntityUid grid)
+    public IReadOnlyDictionary<Vector2i, float>? GetLitTiles(EntityUid grid)
     {
         return _cache.TryGetValue(grid, out var shadow) ? shadow.Lit : null;
     }
@@ -419,7 +467,7 @@ public sealed class StationSunShadowOverlay : Overlay
         public readonly HashSet<Vector2i> Blocked = new();
         public readonly HashSet<Vector2i> WindowSet = new();
         public readonly List<Vector2i> Windows = new();
-        public readonly HashSet<Vector2i> Lit = new();
+        public readonly Dictionary<Vector2i, float> Lit = new();
         public readonly HashSet<Vector2i> Tiles = new();
         public Vector2 Direction;
         public double Theta;
