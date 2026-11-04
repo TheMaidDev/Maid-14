@@ -460,22 +460,35 @@ public sealed class StationSunShadowOverlay : Overlay
     private static float ShadowStrength(GridShadow shadow, Vector2i tile)
     {
         var center = new Vector2(tile.X + 0.5f, tile.Y + 0.5f);
+        var q = Vector2.Dot(center, shadow.Perp);
+        var p = Vector2.Dot(center, shadow.Dir);
+
+        // The strips under the tile, one sample each (a tile is 8 strips wide), so the value changes in small steps
+        // while the shadow's edge crosses the tile.
+        var first = (int) MathF.Floor((q - 0.5f) / ShadowBinWidth) - shadow.BinBase;
+        var last = (int) MathF.Floor((q + 0.4999f) / ShadowBinWidth) - shadow.BinBase;
+
+        // Most tiles are clearly in or out of the shadow, check the middle and both edges first.
+        var d0 = DistanceInBin(shadow, first, p, 0.5f);
+        var d1 = DistanceInBin(shadow, last, p, 0.5f);
+        var dm = DistanceInBin(shadow, (first + last) / 2, p, 0.5f);
+        if (d0 < 0f && d1 < 0f && dm < 0f)
+            return 0f;
+
+        // Space enclosed by the station never gets light, however far it is from the blocker.
         var enclosed = shadow.Enclosed.Contains(tile);
 
-        // Three samples across the tile, so the shadow's edge fades over a tile instead of flipping it at once.
         var sum = 0f;
-        for (var k = -1; k <= 1; k++)
+        for (var bin = first; bin <= last; bin++)
         {
-            // Half a tile downstream of the blocker's centre at least.
-            var distance = DistanceBehindBlocker(shadow, center + shadow.Perp * (0.33f * k), 0.5f);
+            var distance = DistanceInBin(shadow, bin, p, 0.5f);
             if (distance < 0f)
                 continue;
 
-            // Space enclosed by the station never gets light, however far it is from the blocker.
             sum += enclosed ? 1f : Fade(distance);
         }
 
-        return sum / 3f;
+        return sum / (last - first + 1);
     }
 
     private static float Fade(float distance)
@@ -495,11 +508,16 @@ public sealed class StationSunShadowOverlay : Overlay
     /// </summary>
     private static float DistanceBehindBlocker(GridShadow shadow, Vector2 point, float minGap)
     {
-        if (shadow.BinStart.Length == 0)
-            return -1f;
-
         var bin = (int) MathF.Floor(Vector2.Dot(point, shadow.Perp) / ShadowBinWidth) - shadow.BinBase;
-        if (bin < 0 || bin + 1 >= shadow.BinStart.Length)
+        return DistanceInBin(shadow, bin, Vector2.Dot(point, shadow.Dir), minGap);
+    }
+
+    /// <summary>
+    /// Same as <see cref="DistanceBehindBlocker"/> for a strip given by its index and a position along the light.
+    /// </summary>
+    private static float DistanceInBin(GridShadow shadow, int bin, float p, float minGap)
+    {
+        if (shadow.BinStart.Length == 0 || bin < 0 || bin + 1 >= shadow.BinStart.Length)
             return -1f;
 
         var start = shadow.BinStart[bin];
@@ -507,7 +525,6 @@ public sealed class StationSunShadowOverlay : Overlay
         if (length == 0)
             return -1f;
 
-        var p = Vector2.Dot(point, shadow.Dir);
         // Last blocker that is at least minGap upstream (the sandbox forbids Array.BinarySearch).
         var target = p - minGap;
         var lo = start;
