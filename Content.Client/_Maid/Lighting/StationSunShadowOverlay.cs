@@ -654,6 +654,24 @@ public sealed class StationSunShadowOverlay : Overlay
                 shadow.Solid.Remove(tile);
         }
 
+        // The server also tells which tiles only hold such things, including those whose entities are outside of our
+        // PVS range (their tiles are known to us, the entities are not).
+        if (_entManager.TryGetComponent(uid, out StationSunMarkerComponent? marker))
+        {
+            foreach (var (chunk, bits) in marker.Transparent)
+            {
+                for (var i = 0; i < 64; i++)
+                {
+                    if (((bits >> i) & 1UL) == 0)
+                        continue;
+
+                    var tile = new Vector2i((chunk.X << 3) + (i & 7), (chunk.Y << 3) + (i >> 3));
+                    if (!shadow.Blocked.Contains(tile) && !shadow.WindowSet.Contains(tile))
+                        shadow.Solid.Remove(tile);
+                }
+            }
+        }
+
         ComputeEnclosed(shadow);
     }
 
