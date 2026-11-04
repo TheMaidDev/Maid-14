@@ -1,4 +1,5 @@
 using Content.Server.Station.Systems;
+using Robust.Server.Physics;
 using Content.Shared._Maid.StationSunShadow;
 using Content.Shared.Light.Components;
 using Content.Shared.Tag;
@@ -31,6 +32,33 @@ public sealed class StationSunShadowSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<StationSunShadowComponent, StationGridAddedEvent>(OnGridAdded);
+        SubscribeLocalEvent<GridSplitEvent>(OnGridSplit);
+    }
+
+    /// <summary>
+    /// A station grid that is cut into pieces: the new pieces get the same sun setup, otherwise they are lit and
+    /// shaded like an ordinary shuttle (the whole grid roofed) and the light of the station falls apart.
+    /// </summary>
+    private void OnGridSplit(ref GridSplitEvent ev)
+    {
+        if (!HasComp<StationSunMarkerComponent>(ev.Grid))
+            return;
+
+        TryComp(ev.Grid, out SunShadowComponent? source);
+
+        foreach (var newGrid in ev.NewGrids)
+        {
+            EnsureComp<StationSunMarkerComponent>(newGrid);
+
+            var shadow = EnsureComp<SunShadowComponent>(newGrid);
+            if (source != null)
+            {
+                shadow.Direction = source.Direction;
+                shadow.Alpha = source.Alpha;
+            }
+
+            Dirty(newGrid, shadow);
+        }
     }
 
     private void OnGridAdded(EntityUid uid, StationSunShadowComponent comp, StationGridAddedEvent args)
