@@ -695,7 +695,7 @@ TravelingChefSpawner: VisitorChefSpawner
 SyndieDisasterVictimSpawner: SyndieVisitorSpawner
 
 # 2024-06-15
-ClothingOuterCoatInspector: ClothingOuterCoatJensen
+#ClothingOuterCoatInspector: ClothingOuterCoatJensen
 
 # 2024-06-23
 FloorTileItemReinforced: PartRodMetal1
