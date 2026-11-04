@@ -65,6 +65,8 @@ public abstract partial class SharedXenoArtifactSystem
     /// Finishes unlocking phase, removing related component, and sums up what nodes were triggered,
     /// that could be unlocked. Marks such nodes as unlocked, and pushes their node activation event.
     /// </summary>
+    // MAID BEGIN independent artifact segments
+    /*
     public void FinishUnlockingState(Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent)
     {
         string unlockAttemptResultMsg;
@@ -99,13 +101,52 @@ public abstract partial class SharedXenoArtifactSystem
         RaiseUnlockingFinished(ent, node);
         artifactComponent.NextUnlockTime = _timing.CurTime + artifactComponent.UnlockStateRefractory;
     }
+    */
+    public void FinishUnlockingState(Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent)
+    {
+        XenoArtifactComponent artifactComponent = ent;
+        XenoArtifactUnlockingComponent unlockingComponent = ent;
+        // Select every result before changing node state or activating any effects.
+        var nodes = GetNodesFromUnlockState(ent);
+        foreach (var node in nodes)
+        {
+            SetNodeUnlocked((ent, artifactComponent), node);
+        }
+
+        foreach (var node in nodes)
+        {
+            ActivateNode((ent, ent), node, null, null, Transform(ent).Coordinates, false);
+        }
+
+        var succeeded = nodes.Count != 0;
+        var unlockAttemptResultMsg = succeeded
+            ? "artifact-unlock-state-end-success"
+            : "artifact-unlock-state-end-failure";
+        var soundEffect = succeeded
+            ? unlockingComponent.UnlockActivationSuccessfulSound
+            : unlockingComponent.UnlockActivationFailedSound;
+
+        if (_net.IsServer)
+        {
+            _popup.PopupEntity(Loc.GetString(unlockAttemptResultMsg), ent);
+            _audio.PlayPvs(soundEffect, ent.Owner);
+        }
+
+        RemComp(ent, unlockingComponent);
+        RaiseUnlockingFinished(ent, nodes.Select(node => node.Owner).ToArray());
+        artifactComponent.NextUnlockTime = _timing.CurTime + artifactComponent.UnlockStateRefractory;
+    }
+    // MAID END independent artifact segments
 
     public void CancelUnlockingState(Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent)
     {
         RemComp(ent, ent.Comp1);
-        RaiseUnlockingFinished(ent, null);
+        // MAID independent artifact segments
+        RaiseUnlockingFinished(ent, Array.Empty<EntityUid>());
     }
 
+    // MAID BEGIN independent artifact segments
+    /*
     /// <summary>
     /// Gets first locked node that can be unlocked (it is locked and all predecessor are unlocked).
     /// </summary>
@@ -153,6 +194,53 @@ public abstract partial class SharedXenoArtifactSystem
 
         return node != null;
     }
+    */
+    /// <summary>
+    /// Selects at most one locked node per connected segment using only that segment's triggers.
+    /// Artifexium may replace one missing trigger in each segment, as in the original single-segment rule.
+    /// </summary>
+    public List<Entity<XenoArtifactNodeComponent>> GetNodesFromUnlockState(
+        Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent)
+    {
+        var nodes = new List<Entity<XenoArtifactNodeComponent>>();
+        foreach (var segment in GetSegments((ent, ent.Comp2)))
+        {
+            var segmentIndices = segment.Select(node => GetIndex((ent, ent.Comp2), node)).ToHashSet();
+            var triggeredIndices = ent.Comp1.TriggeredNodeIndexes.Where(segmentIndices.Contains).ToHashSet();
+            var potentialNodes = new ValueList<Entity<XenoArtifactNodeComponent>>();
+            foreach (var curNode in segment)
+            {
+                if (!curNode.Comp.Locked || !CanUnlockNode((curNode, curNode)))
+                    continue;
+
+                var requiredIndices = GetPredecessorNodes((ent, ent.Comp2), GetIndex((ent, ent.Comp2), curNode));
+                requiredIndices.Add(GetIndex((ent, ent.Comp2), curNode));
+
+                if (!ent.Comp1.ArtifexiumApplied)
+                {
+                    // Extra triggers still invalidate an attempt within the same segment.
+                    if (!requiredIndices.SetEquals(triggeredIndices))
+                        continue;
+
+                    nodes.Add(curNode);
+                    break;
+                }
+
+                // Preserve the existing wildcard rule within each segment.
+                if (!triggeredIndices.IsSubsetOf(requiredIndices)
+                    || requiredIndices.Count - 1 != triggeredIndices.Count)
+                    continue;
+
+                potentialNodes.Add(curNode);
+            }
+
+            if (potentialNodes.Count != 0)
+                nodes.Add(RobustRandom.Pick(potentialNodes));
+        }
+
+        return nodes;
+    }
+    // MAID END independent artifact segments
 
     private void OnUnlockingStarted(Entity<XenoArtifactUnlockingComponent> ent, ref MapInitEvent args)
     {
@@ -160,6 +248,8 @@ public abstract partial class SharedXenoArtifactSystem
         RaiseLocalEvent(ent.Owner, ref unlockingStartedEvent);
     }
 
+    // MAID BEGIN independent artifact segments
+    /*
     private void RaiseUnlockingFinished(
         Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent,
         Entity<XenoArtifactNodeComponent>? node
@@ -168,6 +258,16 @@ public abstract partial class SharedXenoArtifactSystem
         var unlockingFinishedEvent = new ArtifactUnlockingFinishedEvent(node);
         RaiseLocalEvent(ent.Owner, ref unlockingFinishedEvent);
     }
+    */
+    private void RaiseUnlockingFinished(
+        Entity<XenoArtifactUnlockingComponent, XenoArtifactComponent> ent,
+        IReadOnlyList<EntityUid> nodes
+    )
+    {
+        var unlockingFinishedEvent = new ArtifactUnlockingFinishedEvent(nodes);
+        RaiseLocalEvent(ent.Owner, ref unlockingFinishedEvent);
+    }
+    // MAID END independent artifact segments
 
 }
 
@@ -180,6 +280,13 @@ public record struct ArtifactUnlockingStartedEvent;
 /// <summary>
 /// Event for finishing artifact unlocking stage.
 /// </summary>
+// MAID BEGIN independent artifact segments
+/*
 /// <param name="UnlockedNode">Node which were unlocked. Null if stage was finished without new unlocks.</param>
 [ByRefEvent]
 public record struct ArtifactUnlockingFinishedEvent(EntityUid? UnlockedNode);
+*/
+/// <param name="UnlockedNodes">Nodes unlocked this window. Empty on failure or cancellation.</param>
+[ByRefEvent]
+public record struct ArtifactUnlockingFinishedEvent(IReadOnlyList<EntityUid> UnlockedNodes);
+// MAID END independent artifact segments
