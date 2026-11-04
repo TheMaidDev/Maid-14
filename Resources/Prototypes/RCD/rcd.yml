@@ -282,3 +282,15 @@
   collisionMask: Impassable
   rotation: User
   fx: EffectRCDConstruct0
+
+- type: rcd
+  id: SurveillanceCameraGeneral
+  category: Electrical
+  sprite: _Maid/Interface/Misc/cameracase.png
+  mode: ConstructObject
+  prototype: SurveillanceCameraGeneral
+  cost: 5
+  delay: 3
+  collisionMask: Impassable
+  rotation: User
+  fx: EffectRCDConstruct0
