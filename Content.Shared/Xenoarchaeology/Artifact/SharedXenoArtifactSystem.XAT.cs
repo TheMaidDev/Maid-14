@@ -79,11 +79,19 @@ public abstract partial class SharedXenoArtifactSystem
 
             var predecessorNodeIndices = GetPredecessorNodes((ent, ent), index);
             var successorNodeIndices = GetSuccessorNodes((ent, ent), index);
+            // MAID BEGIN independent artifact segments
+            /*
             if (unlockingComp.TriggeredNodeIndexes.Count == 0
                 || unlockingComp.TriggeredNodeIndexes.All(
                     x => predecessorNodeIndices.Contains(x) || successorNodeIndices.Contains(x)
                 )
                )
+            */
+            var segment = GetSegments(ent).First(nodes => nodes.Any(segmentNode => segmentNode.Owner == node.Value.Owner));
+            var segmentIndices = segment.Select(segmentNode => GetIndex(ent, segmentNode)).ToHashSet();
+            if (unlockingComp.TriggeredNodeIndexes.All(
+                    x => !segmentIndices.Contains(x) || predecessorNodeIndices.Contains(x) || successorNodeIndices.Contains(x)))
+            // MAID END independent artifact segments
                 // we add time on each new trigger, if it is not going to fail us
                 unlockingComp.EndTime += ent.Comp.UnlockStateIncrementPerNode;
         }
