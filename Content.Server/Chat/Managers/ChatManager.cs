@@ -183,6 +183,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
+using Content.Server._Maid.Discord; // MAID discord feed
 using Content.Server.Administration.Systems;
 using Content.Server.MoMMI;
 using Content.Server.Players.RateLimiting;
@@ -220,6 +221,7 @@ internal sealed partial class ChatManager : IChatManager
     [Dependency] private readonly IReplayRecordingManager _replay = default!;
     [Dependency] private readonly IServerNetManager _netManager = default!;
     [Dependency] private readonly IMoMMILink _mommiLink = default!;
+    [Dependency] private readonly IDiscordFeedManager _discordFeed = default!; // MAID discord feed
     [Dependency] private readonly IAdminManager _adminManager = default!;
     [Dependency] private readonly IAdminLogManager _adminLogger = default!;
     [Dependency] private readonly IServerPreferencesManager _preferencesManager = default!;
@@ -493,6 +495,7 @@ internal sealed partial class ChatManager : IChatManager
         }
 
         _adminLogger.Add(LogType.Chat, $"Admin chat from {player:Player}: {message}");
+        _discordFeed.Send(DiscordFeed.AdminChat, $"**{_discordFeed.Sanitize(player.Name)}**: {_discordFeed.Sanitize(message)}"); // MAID discord feed
     }
 
     #endregion

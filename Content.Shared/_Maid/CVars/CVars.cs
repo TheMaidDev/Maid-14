@@ -177,4 +177,21 @@ public sealed class MaidCVars
         CVarDef.Create("maid.admin.ahelp_volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     #endregion
+
+    #region Discord feeds
+
+    /// <summary>
+    ///     URL of the Discord webhook that receives admin chat messages. If left empty, disables the feed.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordAdminChatWebhook =
+        CVarDef.Create("discord.admin_chat_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    /// <summary>
+    ///     URL of the Discord webhook that receives notifications about players joining for the first time.
+    ///     If left empty, disables the feed.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordNewPlayerWebhook =
+        CVarDef.Create("discord.new_player_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    #endregion
 }
