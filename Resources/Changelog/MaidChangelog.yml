@@ -2050,3 +2050,9 @@ Entries:
       message: Фляга ГСБ возвращена на место
   id: 199
   time: '2026-11-04T09:04:29.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Tweak
+      message: энжен апдейт
+  id: 200
+  time: '2026-11-05T01:00:12.0000000+00:00'
