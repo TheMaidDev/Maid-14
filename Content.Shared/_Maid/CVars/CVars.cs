@@ -125,6 +125,28 @@ public sealed class MaidCVars
 
     #endregion
 
+    #region End of round stats
+
+    /// <summary>
+    ///     How many slips are needed to show the slip count and the top slipper in the round end summary.
+    /// </summary>
+    public static readonly CVarDef<int> SlippedCountThreshold =
+        CVarDef.Create("eorstats.slippedcount_threshold", 30, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Show a line in the round end summary when nobody slipped at all.
+    /// </summary>
+    public static readonly CVarDef<bool> SlippedCountDisplayNone =
+        CVarDef.Create("eorstats.slippedcount_displaynone", true, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Show who slipped the most in the round end summary.
+    /// </summary>
+    public static readonly CVarDef<bool> SlippedCountTopSlipper =
+        CVarDef.Create("eorstats.slippedcount_topslipper", true, CVar.SERVERONLY);
+
+    #endregion
+
     #region Client preferences
 
     /// <summary>

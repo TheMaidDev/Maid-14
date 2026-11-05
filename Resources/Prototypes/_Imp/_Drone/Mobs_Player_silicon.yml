@@ -259,7 +259,7 @@
     enabled: false
     radius: 3.5
     softness: 1
-    mask: /Textures/Effects/LightMasks/cone.png
+    lightMask: ConeSingle # MAID
     autoRot: true
   - type: ProtectedFromStepTriggers
   - type: DamageOnInteractProtection # Goobstation - Copied from borgs

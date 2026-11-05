@@ -1,0 +1,11 @@
+# For borg subtype sprites with a head lower than borgShort.
+- type: inventoryTemplate
+  id: borgLow
+  slots:
+  - name: head
+    slotTexture: head
+    slotFlags: HEAD
+    uiWindowPos: 1,0
+    strippingWindowPos: 0,0
+    displayName: Head
+    offset: 0.015625, -0.28125

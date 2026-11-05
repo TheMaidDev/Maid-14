@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Inventory; // MAID borg subtype hat offset
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
@@ -34,4 +35,13 @@ public sealed partial class BorgSubtypePrototype : IPrototype
     /// </summary>
     [DataField]
     public required ProtoId<BorgTypePrototype> ParentBorgType = "generic";
+
+    // MAID BEGIN borg subtype hat offset
+    /// <summary>
+    /// Inventory template to use instead of the parent type's one.
+    /// Subtype sprites have heads at different heights, the template's head slot offset keeps hats on the head.
+    /// </summary>
+    [DataField]
+    public ProtoId<InventoryTemplatePrototype>? InventoryTemplateId;
+    // MAID END borg subtype hat offset
 }
