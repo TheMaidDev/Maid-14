@@ -280,7 +280,7 @@ namespace Content.Server.Lathe
 
                 _materialStorage.TryChangeMaterialAmount(uid, mat, adjustedAmount * batchAmount); // MAID lathe batch queue
             }
-            component.Queue.Enqueue(new LatheQueueEntry(recipe.ID, batchAmount)); // MAID lathe batch queue
+            component.Queue.Enqueue(new LatheQueueEntry(recipe.ID, batchAmount, component.NextBatchId++)); // MAID lathe batch queue
 
             return true;
         }
@@ -314,6 +314,7 @@ namespace Content.Server.Lathe
                 recipeProto = entry.Recipe;
                 component.BatchRecipe = entry.Recipe;
                 component.BatchTotal = entry.Amount;
+                component.BatchId = entry.Id;
                 component.BatchRemaining = entry.Amount - 1;
             }
             var recipe = _proto.Index(recipeProto);
@@ -409,26 +410,30 @@ namespace Content.Server.Lathe
             // MAID BEGIN lathe batch queue
             var batchRemaining = 0;
             var batchTotal = 0;
+            var batchId = 0;
             if (producing != null)
             {
                 batchRemaining = component.BatchRemaining + 1;
                 batchTotal = component.BatchTotal;
+                batchId = component.BatchId;
             }
             else if (component.BatchRemaining > 0 && component.BatchRecipe is { } pending)
             {
                 producing = pending;
                 batchRemaining = component.BatchRemaining;
                 batchTotal = component.BatchTotal;
+                batchId = component.BatchId;
             }
             else if (component.Queue.TryPeek(out var next))
             {
                 producing = next.Recipe;
                 batchRemaining = next.Amount;
                 batchTotal = next.Amount;
+                batchId = next.Id;
             }
             // MAID END lathe batch queue
 
-            var state = new LatheUpdateState(GetAvailableRecipes(uid, component), component.Queue.ToArray(), producing, batchRemaining, batchTotal); // MAID lathe batch queue
+            var state = new LatheUpdateState(GetAvailableRecipes(uid, component), component.Queue.ToArray(), producing, batchRemaining, batchTotal, batchId); // MAID lathe batch queue
             _uiSys.SetUiState(uid, LatheUiKey.Key, state);
         }
 
@@ -552,65 +557,40 @@ namespace Content.Server.Lathe
                 }
             }
 
-            var index = args.Index;
+            // Batches are addressed by id: a stale or repeated click can only ever hit the batch the player chose.
             var cancelCurrent = false;
             var cancelBatchLeftover = false;
+            var queueIndex = -1;
 
-            if (index == LatheCancelQueueEntryMessage.Current)
+            if (args.BatchId == component.BatchId && component.CurrentRecipe != null && component.BatchRecipe is { } running)
             {
-                // The entry shown as "fabricating" is the running unit, or a paused batch, or the queue head when idle.
-                ProtoId<LatheRecipePrototype>? shown;
-                if (component.CurrentRecipe != null)
-                {
-                    cancelCurrent = true;
-                    shown = component.CurrentRecipe;
-                }
-                else if (component.BatchRemaining > 0 && component.BatchRecipe != null)
-                {
-                    cancelBatchLeftover = true;
-                    shown = component.BatchRecipe;
-                }
-                else
-                {
-                    index = 0;
-                    shown = component.Queue.TryPeek(out var head) ? (ProtoId<LatheRecipePrototype>?) head.Recipe : null;
-                }
-
-                // The client's view is stale if the shown recipe changed since it was sent.
-                if (shown != args.Recipe)
-                {
-                    UpdateUserInterfaceState(uid, component);
-                    return;
-                }
+                cancelCurrent = true;
+                AddRefund(running, 1 + component.BatchRemaining);
             }
-
-            if (cancelCurrent)
+            else if (args.BatchId == component.BatchId && component.BatchRemaining > 0 && component.BatchRecipe is { } paused)
             {
-                if (component.BatchRecipe is { } running)
-                    AddRefund(running, 1 + component.BatchRemaining);
-            }
-            else if (cancelBatchLeftover)
-            {
-                AddRefund(component.BatchRecipe!.Value, component.BatchRemaining);
+                cancelBatchLeftover = true;
+                AddRefund(paused, component.BatchRemaining);
             }
             else
             {
-                if (index < 0 || index >= component.Queue.Count)
+                var i = 0;
+                foreach (var queued in component.Queue)
+                {
+                    if (queued.Id == args.BatchId)
+                    {
+                        queueIndex = i;
+                        AddRefund(queued.Recipe, queued.Amount);
+                        break;
+                    }
+                    i++;
+                }
+
+                if (queueIndex < 0)
                 {
                     UpdateUserInterfaceState(uid, component);
                     return;
                 }
-
-                var target = component.Queue.ElementAt(index);
-                // Indices shift when the head is dequeued; only cancel what the player actually clicked.
-                if (args.Index != LatheCancelQueueEntryMessage.Current
-                    && (target.Recipe != args.Recipe || target.Amount != args.Amount))
-                {
-                    UpdateUserInterfaceState(uid, component);
-                    return;
-                }
-
-                AddRefund(target.Recipe, target.Amount);
             }
 
             if (!_materialStorage.TryChangeMaterialAmount(uid, refunds))
@@ -634,7 +614,7 @@ namespace Content.Server.Lathe
             }
             else
             {
-                var kept = component.Queue.Where((_, i) => i != index).ToArray();
+                var kept = component.Queue.Where(q => q.Id != args.BatchId).ToArray();
                 component.Queue.Clear();
                 foreach (var entry in kept)
                 {

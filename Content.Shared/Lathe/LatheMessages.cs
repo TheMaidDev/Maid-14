@@ -54,9 +54,14 @@ public sealed class LatheUpdateState : BoundUserInterfaceState
     /// Total size of the current batch.
     /// </summary>
     public int BatchTotal;
+
+    /// <summary>
+    /// Id of the batch shown as currently producing.
+    /// </summary>
+    public int BatchId;
     // MAID END lathe batch queue
 
-    public LatheUpdateState(List<ProtoId<LatheRecipePrototype>> recipes, LatheQueueEntry[] queue, ProtoId<LatheRecipePrototype>? currentlyProducing = null, int batchRemaining = 0, int batchTotal = 0) // MAID lathe batch queue
+    public LatheUpdateState(List<ProtoId<LatheRecipePrototype>> recipes, LatheQueueEntry[] queue, ProtoId<LatheRecipePrototype>? currentlyProducing = null, int batchRemaining = 0, int batchTotal = 0, int batchId = 0) // MAID lathe batch queue
     {
         Recipes = recipes;
         Queue = queue;
@@ -64,36 +69,23 @@ public sealed class LatheUpdateState : BoundUserInterfaceState
         // MAID BEGIN lathe batch queue
         BatchRemaining = batchRemaining;
         BatchTotal = batchTotal;
+        BatchId = batchId;
         // MAID END lathe batch queue
     }
 }
 
 // MAID BEGIN lathe cancel entry
 /// <summary>
-///     Sent to the server to cancel one queue entry, or the batch being printed (<see cref="Current"/>).
+///     Sent to the server to cancel one batch, queued or currently printing, addressed by its stable id.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class LatheCancelQueueEntryMessage : BoundUserInterfaceMessage
 {
-    public const int Current = -1;
+    public readonly int BatchId;
 
-    public readonly int Index;
-
-    /// <summary>
-    /// Recipe the client saw at <see cref="Index"/>; the server rejects the request if the entry changed meanwhile.
-    /// </summary>
-    public readonly ProtoId<LatheRecipePrototype> Recipe;
-
-    /// <summary>
-    /// Batch size the client saw at <see cref="Index"/>. Ignored for <see cref="Current"/>.
-    /// </summary>
-    public readonly int Amount;
-
-    public LatheCancelQueueEntryMessage(int index, ProtoId<LatheRecipePrototype> recipe, int amount = 0)
+    public LatheCancelQueueEntryMessage(int batchId)
     {
-        Index = index;
-        Recipe = recipe;
-        Amount = amount;
+        BatchId = batchId;
     }
 }
 // MAID END lathe cancel entry
@@ -111,10 +103,17 @@ public partial record struct LatheQueueEntry
     [DataField]
     public int Amount;
 
-    public LatheQueueEntry(ProtoId<LatheRecipePrototype> recipe, int amount)
+    /// <summary>
+    /// Unique (per lathe) batch id, used to address this entry from the UI.
+    /// </summary>
+    [DataField]
+    public int Id;
+
+    public LatheQueueEntry(ProtoId<LatheRecipePrototype> recipe, int amount, int id)
     {
         Recipe = recipe;
         Amount = amount;
+        Id = id;
     }
 }
 // MAID END lathe batch queue

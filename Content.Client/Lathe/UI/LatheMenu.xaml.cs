@@ -103,7 +103,7 @@ public sealed partial class LatheMenu : DefaultWindow
     public event Action<BaseButton.ButtonEventArgs>? OnServerListButtonPressed;
     public event Action<string, int>? RecipeQueueAction;
     public event Action<BaseButton.ButtonEventArgs>? OnResetQueueListButtonPressed; // Goobstation
-    public event Action<int, ProtoId<LatheRecipePrototype>, int>? OnCancelQueueEntry; // MAID lathe cancel entry
+    public event Action<int>? OnCancelQueueEntry; // MAID lathe cancel entry
     public event Action? OnClaimMiningPoints; // DeltaV
 
     public List<ProtoId<LatheRecipePrototype>> Recipes = new();
@@ -142,8 +142,8 @@ public sealed partial class LatheMenu : DefaultWindow
         ResetQueueList.OnPressed += a => OnResetQueueListButtonPressed?.Invoke(a); // Goobstation
         CancelCurrentButton.OnPressed += _ =>
         {
-            if (_currentRecipe is { } current)
-                OnCancelQueueEntry?.Invoke(LatheCancelQueueEntryMessage.Current, current, 0);
+            if (_currentRecipe != null)
+                OnCancelQueueEntry?.Invoke(_currentBatchId);
         }; // MAID lathe cancel entry
 
     }
@@ -417,9 +417,9 @@ public sealed partial class LatheMenu : DefaultWindow
             queuedRecipeLabel.ClipText = true;
             queuedRecipeLabel.VerticalAlignment = Control.VAlignment.Center;
             queuedRecipeBox.AddChild(queuedRecipeLabel);
-            var entryIndex = idx - 1;
+            var entryId = entry.Id;
             var cancelButton = new Button { Text = "X", ToolTip = Loc.GetString("lathe-menu-cancel-entry") };
-            cancelButton.OnPressed += _ => OnCancelQueueEntry?.Invoke(entryIndex, entry.Recipe, entry.Amount);
+            cancelButton.OnPressed += _ => OnCancelQueueEntry?.Invoke(entryId);
             queuedRecipeBox.AddChild(cancelButton);
             // MAID END lathe cancel entry
             QueueList.AddChild(queuedRecipeBox);
@@ -428,10 +428,12 @@ public sealed partial class LatheMenu : DefaultWindow
     }
 
     private ProtoId<LatheRecipePrototype>? _currentRecipe; // MAID lathe cancel entry
+    private int _currentBatchId; // MAID lathe cancel entry
 
-    public void SetQueueInfo(ProtoId<LatheRecipePrototype>? recipeProto, int batchRemaining = 0, int batchTotal = 0) // MAID lathe batch queue
+    public void SetQueueInfo(ProtoId<LatheRecipePrototype>? recipeProto, int batchRemaining = 0, int batchTotal = 0, int batchId = 0) // MAID lathe batch queue
     {
         _currentRecipe = recipeProto; // MAID lathe cancel entry
+        _currentBatchId = batchId; // MAID lathe cancel entry
         FabricatingContainer.Visible = recipeProto != null;
         if (recipeProto == null)
             return;

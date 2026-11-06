@@ -202,32 +202,38 @@ public sealed class LatheQueueTest
             Assert.That(lathe.TryStartProducing(uid, comp));
             Assert.That(comp.Queue.Count, Is.EqualTo(2));
 
+            var runningId = comp.BatchId;
+            var firstQueuedId = comp.Queue.Peek().Id;
+            var secondQueuedId = comp.Queue.ElementAt(1).Id;
+            Assert.That(new[] { runningId, firstQueuedId, secondQueuedId }.Distinct().Count(), Is.EqualTo(3));
+
             // Cancel the first queued entry: 3 units back, the other stays.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0, welder.ID, 3));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(firstQueuedId));
             Assert.That(comp.Queue.Count, Is.EqualTo(1));
             Assert.That(comp.Queue.Peek().Amount, Is.EqualTo(2));
             foreach (var (mat, amount) in welder.Materials)
                 Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 6));
 
-            // Out of range index is ignored.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(7, welder.ID, 2));
+            // A repeated click and an unknown id must not cancel anything else.
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(firstQueuedId));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(9999));
             Assert.That(comp.Queue.Count, Is.EqualTo(1));
-
-            // A stale view (entry changed since the client looked) must not cancel anything.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0, welder.ID, 3));
-            Assert.That(comp.Queue.Count, Is.EqualTo(1));
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(LatheCancelQueueEntryMessage.Current, "Crowbar"));
             Assert.That(comp.CurrentRecipe, Is.Not.Null);
             foreach (var (mat, amount) in welder.Materials)
                 Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 6));
 
             // Cancel the running batch: its 4 units come back and the next entry starts.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(LatheCancelQueueEntryMessage.Current, welder.ID));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(runningId));
             Assert.That(comp.Queue.Count, Is.EqualTo(0));
             Assert.That(comp.CurrentRecipe, Is.Not.Null);
             Assert.That(comp.BatchTotal, Is.EqualTo(2));
+            Assert.That(comp.BatchId, Is.EqualTo(secondQueuedId));
             foreach (var (mat, amount) in welder.Materials)
                 Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 2));
+
+            // The running batch's old id is stale now and must not touch the new one.
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(runningId));
+            Assert.That(comp.CurrentRecipe, Is.Not.Null);
             Assert.That(server.EntMan.HasComponent<LatheProducingComponent>(uid));
         });
 
@@ -256,7 +262,7 @@ public sealed class LatheQueueTest
             var start = recipe.Materials.ToDictionary(m => m.Key, m => storage.GetMaterialAmount(uid, m.Key));
 
             Assert.That(lathe.TryAddToQueue(uid, recipe, comp, 7));
-            server.EntMan.EventBus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0, recipe.ID, 7));
+            server.EntMan.EventBus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(comp.Queue.Peek().Id));
 
             foreach (var mat in recipe.Materials.Keys)
                 Assert.That(storage.GetMaterialAmount(uid, mat), Is.EqualTo(start[mat]));

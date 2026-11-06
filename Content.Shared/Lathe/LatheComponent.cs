@@ -103,6 +103,18 @@ namespace Content.Shared.Lathe
         /// </summary>
         [DataField, ViewVariables]
         public int BatchTotal;
+
+        /// <summary>
+        /// Id of the batch currently being printed (see <see cref="LatheQueueEntry.Id"/>).
+        /// </summary>
+        [DataField, ViewVariables]
+        public int BatchId;
+
+        /// <summary>
+        /// Next free batch id.
+        /// </summary>
+        [DataField, ViewVariables]
+        public int NextBatchId = 1;
         // MAID END lathe batch queue
 
         /// <summary>

@@ -71,7 +71,7 @@ namespace Content.Client.Lathe.UI
             };
             _menu.OnResetQueueListButtonPressed += _ => SendMessage(new LatheQueueResetMessage()); // Goobstation
 
-            _menu.OnCancelQueueEntry += (index, recipe, amount) => SendMessage(new LatheCancelQueueEntryMessage(index, recipe, amount)); // MAID lathe cancel entry
+            _menu.OnCancelQueueEntry += batchId => SendMessage(new LatheCancelQueueEntryMessage(batchId)); // MAID lathe cancel entry
 
             _menu.RecipeQueueAction += (recipe, amount) =>
             {
@@ -93,7 +93,7 @@ namespace Content.Client.Lathe.UI
                     _menu?.PopulateRecipes();
                     _menu?.UpdateCategories();
                     _menu?.PopulateQueueList(msg.Queue);
-                    _menu?.SetQueueInfo(msg.CurrentlyProducing, msg.BatchRemaining, msg.BatchTotal); // MAID lathe batch queue
+                    _menu?.SetQueueInfo(msg.CurrentlyProducing, msg.BatchRemaining, msg.BatchTotal, msg.BatchId); // MAID lathe batch queue
                     break;
             }
         }
