@@ -495,7 +495,7 @@ internal sealed partial class ChatManager : IChatManager
         }
 
         _adminLogger.Add(LogType.Chat, $"Admin chat from {player:Player}: {message}");
-        _discordFeed.Send(DiscordFeed.AdminChat, $"**{_discordFeed.Sanitize(player.Name)}**: {_discordFeed.Sanitize(message)}"); // MAID discord feed
+        _discordFeed.SendAdminChat(player, message); // MAID discord feed
     }
 
     #endregion

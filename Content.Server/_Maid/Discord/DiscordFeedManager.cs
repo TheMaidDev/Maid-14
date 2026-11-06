@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Content.Server.Administration.Managers;
 using Content.Server.Database;
 using Content.Server.Discord;
+using Content.Server.GameTicking;
 using Content.Shared._Maid.CVars;
 using Content.Shared.Players.PlayTimeTracking;
 using Robust.Server;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Enums;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 
@@ -23,6 +26,8 @@ public sealed class DiscordFeedManager : IDiscordFeedManager
     [Dependency] private readonly IPlayerManager _players = default!;
     [Dependency] private readonly IServerDbManager _db = default!;
     [Dependency] private readonly IBaseServer _server = default!;
+    [Dependency] private readonly IAdminManager _admin = default!;
+    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
 
     // Discord allows 2000 chars per message; keep a margin.
     private const int MaxLength = 1900;
@@ -124,6 +129,18 @@ public sealed class DiscordFeedManager : IDiscordFeedManager
 
             await Task.Delay(SendDelay);
         }
+    }
+
+    public void SendAdminChat(ICommonSession player, string message)
+    {
+        var rank = _admin.GetAdminData(player)?.Title;
+        if (string.IsNullOrWhiteSpace(rank))
+            rank = "Admin";
+
+        var round = _sysMan.TryGetEntitySystem<GameTicker>(out var ticker) ? ticker.RoundId : 0;
+
+        Send(DiscordFeed.AdminChat,
+            $"**{Sanitize(player.Name)}** ({Sanitize(rank)}) (раунд {round}): {Sanitize(message)}");
     }
 
     private async void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs e)

@@ -7,7 +7,7 @@ Selected in-game events are copied to separate Discord channels through plain we
 - Each feed has its own webhook CVar. An empty value disables the feed: nothing is queued and nothing is sent. The webhook id and token are resolved once when the CVar changes, not per message.
 - The sender pauses about 2 s between messages (below Discord's ~30 requests/min per webhook) and honours `429 Retry-After`. Messages are cut to 1900 characters.
 - Mentions are neutralised twice: the payload carries an empty `allowed_mentions`, and `Sanitize` escapes `@`, markdown and `http` in player-supplied text, so `@everyone` or links in admin chat or a nickname cannot ping or embed anything.
-- Admin chat: `ChatManager` calls `Send(AdminChat, ...)` right after the admin log entry (one `MAID` line). The message is only sent after the sender was verified to be an admin.
+- Admin chat: `ChatManager` calls `SendAdminChat(player, message)` right after the admin log entry (one `MAID` line). The message is only sent after the sender was verified to be an admin. It is formatted as `name (rank) (раунд N): text`, where rank is the admin's title ("Admin" if none) and N is the current round id.
 - New players: the manager itself listens to session status. On `Connected` it reads the player record; the record is created by the connection manager before that moment, so "first seen less than 2 minutes ago" means a new player. A set of already announced users stops a quick reconnect from announcing twice (cleared on server restart, which is harmless because the window has long passed).
 
 ## Second-account warning (new players)
