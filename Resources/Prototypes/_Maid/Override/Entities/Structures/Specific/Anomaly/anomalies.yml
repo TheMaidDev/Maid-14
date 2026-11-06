@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: BaseAnomaly
+  components:
+  - type: EmitSoundOnSpawn
+    sound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg

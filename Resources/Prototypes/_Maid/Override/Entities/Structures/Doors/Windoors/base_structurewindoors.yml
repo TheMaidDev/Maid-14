@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: BaseWindoor
+  components:
+  - type: Door
+    denySound:
+      path: /Audio/_Maid/Override/Machines/airlock_deny.ogg

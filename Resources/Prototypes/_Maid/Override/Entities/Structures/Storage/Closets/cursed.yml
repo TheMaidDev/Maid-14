@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: ClosetCursed
+  components:
+  - type: EntityStorage
+    closeSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg

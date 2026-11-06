@@ -1,0 +1,4 @@
+- type: !PartialOnly edible
+  id: Drink
+  useSound: !type:SoundPathSpecifier
+    path: /Audio/_Maid/Override/Items/drink.ogg

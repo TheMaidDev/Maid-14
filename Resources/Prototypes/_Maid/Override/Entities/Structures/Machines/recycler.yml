@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: Recycler
+  components:
+  - type: InteractionPopup
+    interactSuccessSound:
+      path: /Audio/_Maid/Override/Items/drill_hit.ogg

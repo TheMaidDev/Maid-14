@@ -1,0 +1,9 @@
+- type: !PartialOnly entity
+  id: XenoArtifactOmnitool
+  components:
+  - type: XAEApplyComponents
+    components:
+    - !CombineIndex:2 useSound: /Audio/_Maid/Override/Items/drill_use.ogg
+    - !CombineIndex:4 entries:
+      - !CombineIndex:0 useSound:
+          path: /Audio/_Maid/Override/Items/drill_use.ogg

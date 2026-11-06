@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: BaseMobSlimeXenobio
+  components:
+  - type: FootstepModifier
+    footstepSoundCollection:
+      path: /Audio/_Maid/Override/Effects/Footsteps/slime1.ogg

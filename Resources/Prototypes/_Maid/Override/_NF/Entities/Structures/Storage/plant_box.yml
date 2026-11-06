@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: PlantBox
+  components:
+  - type: Storage
+    storageOpenSound: /Audio/_Maid/Override/Effects/closetopen.ogg
+    storageCloseSound: /Audio/_Maid/Override/Effects/closetclose.ogg

@@ -1,0 +1,9 @@
+- type: !PartialOnly entity
+  id: UristHand
+  components:
+  - type: Tool
+    useSound: /Audio/_Maid/Override/Items/drill_use.ogg
+  - type: MultipleTool
+    entries:
+    - !CombineIndex:0 useSound:
+        path: /Audio/_Maid/Override/Items/drill_use.ogg

@@ -191,35 +191,14 @@ namespace Content.Shared.Entry
         // MAID BEGIN partial prototypes
         private void MarkPartialPrototypes()
         {
-            foreach (var path in _resMan.ContentFindFiles(new ResPath("/")))
-            {
-                var filename = path.Filename;
-
-                if (!filename.Contains(".partial.")) // less allocations
-                    continue;
-
-                var parts = filename.Split('.');
-
-                switch (parts)
-                {
-                    case [.., "partial", "yaml" or "yml"]:
-                        _prototypeManager.PartialFile(path, 0);
-                        break;
-
-                    case [.., "partial", var number, "yaml" or "yml"]:
-                    {
-                        if (!int.TryParse(number, out var index) || index < 0)
-                            throw new PrototypeLoadException($"Positive index after \"partial.\" expected, {number} found.");
-
-                        _prototypeManager.PartialFile(path, index);
-                        continue;
-                    }
-                }
-            }
+            Content.Shared._Maid.Prototypes.MaidPartialPrototypes.Mark(
+                _prototypeManager,
+                new ResPath("/Prototypes"),
+                _resMan.ContentFindFiles(new ResPath("/")));
         }
         // MAID END partial prototypes
 
-        // Goobstation - GoobMod Throws Start
+        // Goobstation - GoobMod Throws StartMaidPartialPrototypes
         private void VerifyModules()
         {
             var loadedAssemblies = _refMan.Assemblies

@@ -1,0 +1,7 @@
+- type: !PartialOnly soundCollection
+  id: ClownRecorder
+  files:
+  - !Index:0 /Audio/_Maid/Override/Items/Toys/sitcom_laugh.ogg
+  - !Remove /Audio/Items/Toys/sitcom_laugh.ogg
+  - !Index:1 /Audio/_Maid/Override/Items/Toys/sitcom_laugh2.ogg
+  - !Remove /Audio/Items/Toys/sitcom_laugh2.ogg

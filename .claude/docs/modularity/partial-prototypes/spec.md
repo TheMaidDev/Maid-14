@@ -74,11 +74,14 @@ Tags are exact for `!Remove`, `!Clear`, `!PartialOnly` (case-insensitive equalit
 ## 7. Validation (`ValidateDirectory`)
 Ordinary files are checked for duplicate ids and id characters. Partial files are queued per index, merged into the collected originals, and `type` is stripped again. A partial with no original is skipped; with `partialNoOriginalError: true` it is an error unless `!PartialOnly`. `Content.YAMLLinter` uses the default (`false`).
 
+Unlike loading (`DataNodeParser`, which calls `SetKeyTag`), validation parses files with `YamlStream` and converts them through the `MappingDataNode(YamlMappingNode)` constructor, which in the pinned RT records no key tags. Every rule above that reads a key tag (`!CombineIndex:N`, key-tag `!Remove`/`!Clear`) is therefore inert during validation: a `!CombineIndex` element falls through to "add at the end", and the appended fragment then fails validation (e.g. `ComponentRegistrySerializer` throws `KeyNotFoundException` for a missing `type`, polymorphic fields throw for a missing `!type:`). Node tags survive. Maid's linter workaround is in [../partial-prototypes.md](../partial-prototypes.md#validation).
+
 ## 8. Hot reload
 `LoadFile` / `LoadFromStream` re-run the merge with the partial flag. When `changed` is supplied and stored partials exist for an id, the stored original is restored and all other recorded partials are re-applied in their recorded order before the changed file's one.
 
 ## 9. Quirks and limits
-- Appending to an existing sequence walks the partial's list last-to-first and calls `Add`, so plain elements appear in **reverse order** after the existing ones (read from the code, worth a test before relying on order). A new key is stored as given.
+- Appending to an existing sequence walks the partial's list last-to-first and calls `Add`, so plain elements appear in **reverse order** after the existing ones (read from the code; RT's own partial tests compare with `Is.EquivalentTo`, so order is untested). A new key is stored as given.
+- Because of the last-to-first walk, replacing scalar element N is written as `- !Index:N new` followed by `- !Remove old`: the remove runs first, then the insert. With such pairs in ascending N, each index is rewritten while all lower indices still hold their original elements; duplicates of the same old value are handled because each removal takes the first equal element and all of them are replaced.
 - `!CombineIndex` on its own line and `!Index` with the tag on a key are not recognised; the element is appended instead.
 - Mapping elements outside `components` cannot be removed by tag; rewrite the list with `!Clear`.
 - `SequenceCombineIndex` removes `existing[i]` using the partial element's position, not the target index, when a combined element becomes empty (*quirk*).

@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: DiseaseBehaviorGunemia
+  components:
+  - type: Gun
+    soundGunshot:
+      path: /Audio/_Maid/Override/Voice/Human/male_cough_1.ogg

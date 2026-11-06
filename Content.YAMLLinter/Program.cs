@@ -99,7 +99,10 @@ namespace Content.YAMLLinter
             await instance.WaitPost(() =>
             {
                 var engineErrors = protoMan.ValidateDirectory(new ResPath("/EnginePrototypes"), out var engPrototypes);
-                yamlErrors = protoMan.ValidateDirectory(new ResPath("/Prototypes"), out var prototypes);
+                yamlErrors = _Maid.CombineIndexValidation.ValidatePrototypes(
+                    protoMan,
+                    instance.ResolveDependency<Robust.Shared.ContentPack.IResourceManager>(),
+                    out var prototypes);
 
                 // Merge engine & content prototypes
                 foreach (var (kind, instances) in engPrototypes)

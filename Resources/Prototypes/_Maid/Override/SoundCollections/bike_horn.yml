@@ -1,0 +1,5 @@
+- type: !PartialOnly soundCollection
+  id: DeskBell
+  files:
+  - !Index:0 /Audio/_Maid/Override/Items/desk_bell_ring.ogg
+  - !Remove /Audio/Items/desk_bell_ring.ogg

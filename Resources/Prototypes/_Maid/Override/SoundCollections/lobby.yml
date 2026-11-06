@@ -1,0 +1,5 @@
+- type: !PartialOnly soundCollection
+  id: LobbyMusic
+  files:
+  - !Index:13 /Audio/_Maid/Override/Lobby/atomicamnesiammx.ogg
+  - !Remove /Audio/Lobby/atomicamnesiammx.ogg
