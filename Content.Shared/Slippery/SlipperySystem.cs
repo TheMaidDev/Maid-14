@@ -162,7 +162,7 @@ public sealed class SlipperySystem : EntitySystem
             return;
 
         var ev = new SlipEvent(other);
-        RaiseLocalEvent(uid, ref ev);
+        RaiseLocalEvent(uid, ref ev, true); // MAID slip stats
         RaiseLocalEvent(other, new MoodEffectEvent("MobSlipped")); // Maid edit - mood
 
 

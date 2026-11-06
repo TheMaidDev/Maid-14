@@ -105,7 +105,7 @@
     color: "#e5af38"
     radius: 5
     energy: 2
-    mask: /Textures/Effects/LightMasks/cone.png
+    lightMask: ConeSingle # MAID
     autoRot: true
     netsync: false
 

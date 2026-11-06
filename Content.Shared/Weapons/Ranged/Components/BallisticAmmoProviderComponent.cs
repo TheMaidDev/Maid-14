@@ -93,7 +93,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Weapons.Ranged.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(fieldDeltas: true), Access(typeof(SharedGunSystem))]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true, fieldDeltas: true), Access(typeof(SharedGunSystem))] // MAID ammo counter on state
 public sealed partial class BallisticAmmoProviderComponent : Component
 {
     [DataField]

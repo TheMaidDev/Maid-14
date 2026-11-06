@@ -37,7 +37,8 @@
   - type: MachineBoard
     prototype: Constructor
     stackRequirements:
-      Manipulator: 5
+      Manipulator: 3 # MAID 5 -> 3
+      MatterBin: 2 # MAID
       Steel: 10
       Cable: 5
     tagRequirements:
@@ -54,7 +55,8 @@
   - type: MachineBoard
     prototype: StorageBin
     stackRequirements:
-      Manipulator: 4
+      MatterBin: 2 # MAID
+      Manipulator: 2 # MAID 4 -> 2
       Steel: 1
 
 - type: entity

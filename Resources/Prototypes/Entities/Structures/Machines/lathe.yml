@@ -535,6 +535,7 @@
     - UpgradeKits
     # Einstein Engines Packs
     - Translators
+    - AdvancedStockParts # MAID revert machine parts
   - type: EmagLatheRecipes
     emagDynamicPacks:
     - SecurityAmmo

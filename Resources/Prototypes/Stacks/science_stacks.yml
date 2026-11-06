@@ -12,6 +12,14 @@
   spawn: ArtifactFragment1
   maxCount: 30
 
+# MAID BEGIN
+- type: stack
+  id: Capacitor
+  name: stack-capacitor
+  icon: { sprite: /Textures/_Maid/Objects/Misc/stock_parts.rsi, state: capacitor } # MAID revert machine parts
+  spawn: CapacitorStockPart
+  maxCount: 10
+# MAID END
 
 - type: stack
   id: Manipulator
@@ -19,3 +27,12 @@
   icon: { sprite: /Textures/_Maid/Objects/Misc/stock_parts.rsi, state: micro_mani } #Maid
   spawn: MicroManipulatorStockPart
   maxCount: 10
+
+# MAID BEGIN
+- type: stack
+  id: MatterBin
+  name: stack-matter-bin
+  icon: { sprite: /Textures/_Maid/Objects/Misc/stock_parts.rsi, state: matter_bin } # MAID revert machine parts
+  spawn: MatterBinStockPart
+  maxCount: 10
+# MAID END

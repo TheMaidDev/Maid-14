@@ -21,7 +21,8 @@
   - type: MachineBoard
     prototype: EngineeringTechFab
     stackRequirements:
-      Manipulator: 4
+      MatterBin: 2 # MAID
+      Manipulator: 2 # MAID 4 -> 2
     tagRequirements:
       GlassBeaker:
         amount: 2
@@ -38,7 +39,8 @@
   - type: MachineBoard
     prototype: CargoTechFab
     stackRequirements:
-      Manipulator: 4
+      MatterBin: 2 # MAID
+      Manipulator: 2 # MAID 4 -> 2
     tagRequirements:
       GlassBeaker:
         amount: 2
@@ -55,7 +57,8 @@
   - type: MachineBoard
     prototype: ScienceTechFab
     stackRequirements:
-      Manipulator: 4
+      MatterBin: 2 # MAID
+      Manipulator: 2 # MAID 4 -> 2
     tagRequirements:
       GlassBeaker:
         amount: 2
@@ -72,7 +75,8 @@
   - type: MachineBoard
     prototype: ServiceTechFab
     stackRequirements:
-      Manipulator: 4
+      MatterBin: 2 # MAID
+      Manipulator: 2 # MAID 4 -> 2
     tagRequirements:
       GlassBeaker:
         amount: 2
@@ -105,7 +109,7 @@
     - type: MachineBoard
       prototype: TeslaCoil
       stackRequirements:
-        Manipulator: 5
+        Capacitor: 5 # MAID
         Steel: 10
         CableHV: 10
 
@@ -119,7 +123,7 @@
     - type: MachineBoard
       prototype: RadiationCollector
       stackRequirements:
-        Manipulator: 5
+        Capacitor: 5 # MAID
         Steel: 5
         CableHV: 10
         Plasma: 5

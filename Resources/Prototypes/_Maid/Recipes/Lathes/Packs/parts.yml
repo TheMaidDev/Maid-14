@@ -1,0 +1,10 @@
+# Higher rated machine parts, restored together with the parts themselves (revert of upstream #23752)
+- type: latheRecipePack
+  id: AdvancedStockParts
+  recipes:
+  - AdvancedCapacitorStockPart
+  - AdvancedMatterBinStockPart
+  - NanoManipulatorStockPart
+  - SuperCapacitorStockPart
+  - SuperMatterBinStockPart
+  - PicoManipulatorStockPart

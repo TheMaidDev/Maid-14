@@ -6,7 +6,30 @@
   components:
   - type: Sprite
     sprite: Objects/Weapons/Melee/crusher_dagger.rsi
-    state: icon
+    # MAID BEGIN crusher capsule and light
+    # state: icon
+    layers:
+    - state: icon
+    - state: icon-lit
+      map: [ "light" ]
+      shader: unshaded
+      visible: false
+  # Built-in light like the other crusher weapons, toggled the same way as a flashlight (action + verb)
+  - type: Appearance
+  - type: UnpoweredFlashlight
+  - type: PointLight
+    enabled: false
+    color: "#ffeead"
+    radius: 6
+    lightMask: ConeSingle
+    autoRot: true
+  - type: GenericVisualizer
+    visuals:
+      enum.UnpoweredFlashlightVisuals.LightOn:
+        light:
+          True: { visible: true }
+          False: { visible: false }
+  # MAID END crusher capsule and light
   - type: MeleeWeapon
     autoAttack: true
     animationRotation: -45 # WWDP

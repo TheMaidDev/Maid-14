@@ -17,6 +17,10 @@
   - Igniter
   - ModularReceiver
   - MicroManipulatorStockPart
+  # MAID BEGIN
+  - MatterBinStockPart
+  - CapacitorStockPart
+  # MAID END
   - ConveyorBeltAssembly
 
 - type: latheRecipePack

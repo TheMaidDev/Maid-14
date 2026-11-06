@@ -31,6 +31,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions; // MAID partial prototypes
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.IoC;
 using Content.Shared.Maps;
@@ -77,6 +78,7 @@ namespace Content.Shared.Entry
         public override void Init()
         {
             IgnorePrototypes();
+            MarkPartialPrototypes(); // MAID partial prototypes
         }
 
         public override void PostInit()
@@ -185,6 +187,37 @@ namespace Content.Shared.Entry
 
             return true;
         }
+
+        // MAID BEGIN partial prototypes
+        private void MarkPartialPrototypes()
+        {
+            foreach (var path in _resMan.ContentFindFiles(new ResPath("/")))
+            {
+                var filename = path.Filename;
+
+                if (!filename.Contains(".partial.")) // less allocations
+                    continue;
+
+                var parts = filename.Split('.');
+
+                switch (parts)
+                {
+                    case [.., "partial", "yaml" or "yml"]:
+                        _prototypeManager.PartialFile(path, 0);
+                        break;
+
+                    case [.., "partial", var number, "yaml" or "yml"]:
+                    {
+                        if (!int.TryParse(number, out var index) || index < 0)
+                            throw new PrototypeLoadException($"Positive index after \"partial.\" expected, {number} found.");
+
+                        _prototypeManager.PartialFile(path, index);
+                        continue;
+                    }
+                }
+            }
+        }
+        // MAID END partial prototypes
 
         // Goobstation - GoobMod Throws Start
         private void VerifyModules()

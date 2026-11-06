@@ -276,6 +276,7 @@ namespace Content.Server.Database
             ImmutableTypedHwid? hwId);
         Task<PlayerRecord?> GetPlayerRecordByUserName(string userName, CancellationToken cancel = default);
         Task<PlayerRecord?> GetPlayerRecordByUserId(NetUserId userId, CancellationToken cancel = default);
+        Task<List<HwidMatchedAccount>> GetAccountsByModernHwidsAsync(NetUserId userId, ImmutableArray<ImmutableArray<byte>> modernHwids, CancellationToken cancel = default); // MAID alt account notice
 
         Task<bool> SetLastRolledAntag(NetUserId userId, TimeSpan to); // Goobstation
         Task<TimeSpan> GetLastRolledAntag(NetUserId userId); // Goobstation
@@ -807,6 +808,14 @@ namespace Content.Server.Database
             DbReadOpsMetric.Inc();
             return RunDbCommand(() => _db.SetLastRolledAntag(userId, to));
         }
+
+        // MAID BEGIN alt account notice
+        public Task<List<HwidMatchedAccount>> GetAccountsByModernHwidsAsync(NetUserId userId, ImmutableArray<ImmutableArray<byte>> modernHwids, CancellationToken cancel)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetAccountsByModernHwidsAsync(userId, modernHwids, cancel));
+        }
+        // MAID END alt account notice
 
         public Task<int> AddConnectionLogAsync(
             NetUserId userId,

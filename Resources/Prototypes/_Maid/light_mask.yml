@@ -1,0 +1,38 @@
+# Vending machine sparkles, barely lights anything.
+- type: lightMask
+  id: Sparkle
+  maskPath: /Textures/Effects/LightMasks/sparklemask.png
+  lightCones: []
+
+- type: lightMask
+  id: ConeQuad
+  maskPath: /Textures/_RMC14/Effects/LightMasks/quad_cone.png
+  lightCones:
+  - direction: 0
+    innerWidth: 25
+    outerWidth: 40
+  - direction: 90
+    innerWidth: 25
+    outerWidth: 40
+  - direction: 180
+    innerWidth: 25
+    outerWidth: 40
+  - direction: 270
+    innerWidth: 25
+    outerWidth: 40
+
+- type: lightMask
+  id: WizardRay
+  maskPath: /Textures/_Goobstation/Wizard/Effects/LightMasks/ray.png
+  lightCones:
+  - direction: 0
+    innerWidth: 2
+    outerWidth: 5
+
+- type: lightMask
+  id: CosmicCult
+  maskPath: /Textures/_DV/CosmicCult/LightMasks/cosmic.png
+  lightCones:
+  - direction: 0
+    innerWidth: 45
+    outerWidth: 135

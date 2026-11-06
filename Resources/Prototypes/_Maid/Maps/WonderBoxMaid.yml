@@ -29,22 +29,26 @@
             Reporter: [ 3, 3 ]
             #engineering
             ChiefEngineer: [ 1, 1 ]
+            SeniorEngineer: [ 1, 1 ]
             StationEngineer: [ 10, 10 ]
             AtmosphericTechnician: [ 4, 4 ]
             TechnicalAssistant: [ 5, 5 ]
             #medical
             ChiefMedicalOfficer: [ 1, 1 ]
+            SeniorPhysician: [ 1, 1 ]
             MedicalDoctor: [ 5, 5 ]
             Paramedic: [ 4, 4 ]
             MedicalIntern: [ 4, 4 ]
             Chemist: [ 3, 3 ]
             #science
             ResearchDirector: [ 1, 1 ]
+            SeniorResearcher: [ 1, 1 ]
             Scientist: [ 8, 8 ]
             ResearchAssistant: [ 5, 5 ]
             #security
             HeadOfSecurity: [ 1, 1 ]
             SecurityOfficer: [ 6, 6 ]
+            SeniorOfficer: [ 1, 1 ]
             Warden: [ 1, 1 ]
             Brigmedic: [ 1, 1 ]
             Lawyer: [ 3, 3 ]
@@ -53,6 +57,7 @@
             #supply
             CargoTechnician: [ 6, 6 ]
             Quartermaster: [ 1, 1 ]
+            SeniorSalvageSpecialist: [ 1, 1 ]
             SalvageSpecialist: [ 6, 6 ]
             #civilian
             Passenger: [ -1, -1 ]
@@ -64,11 +69,3 @@
             #silicon
             StationAi: [ 1, 1 ]
             Borg: [ 2, 2 ]
-
-#            SeniorResearcher: [ 1, 1 ]
-#            SeniorOfficer: [ 1, 1 ]
-#            SeniorPhysician: [ 1, 1 ]
-#            SeniorEngineer: [ 1, 1 ]
-
-
-
