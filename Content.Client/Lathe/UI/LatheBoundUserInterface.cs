@@ -71,7 +71,7 @@ namespace Content.Client.Lathe.UI
             };
             _menu.OnResetQueueListButtonPressed += _ => SendMessage(new LatheQueueResetMessage()); // Goobstation
 
-            _menu.OnCancelQueueEntry += index => SendMessage(new LatheCancelQueueEntryMessage(index)); // MAID lathe cancel entry
+            _menu.OnCancelQueueEntry += (index, recipe, amount) => SendMessage(new LatheCancelQueueEntryMessage(index, recipe, amount)); // MAID lathe cancel entry
 
             _menu.RecipeQueueAction += (recipe, amount) =>
             {

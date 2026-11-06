@@ -26,6 +26,7 @@ using Content.Shared.Research.Prototypes;
 using NetSerializer;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Shared.Lathe;
 
@@ -78,9 +79,21 @@ public sealed class LatheCancelQueueEntryMessage : BoundUserInterfaceMessage
 
     public readonly int Index;
 
-    public LatheCancelQueueEntryMessage(int index)
+    /// <summary>
+    /// Recipe the client saw at <see cref="Index"/>; the server rejects the request if the entry changed meanwhile.
+    /// </summary>
+    public readonly ProtoId<LatheRecipePrototype> Recipe;
+
+    /// <summary>
+    /// Batch size the client saw at <see cref="Index"/>. Ignored for <see cref="Current"/>.
+    /// </summary>
+    public readonly int Amount;
+
+    public LatheCancelQueueEntryMessage(int index, ProtoId<LatheRecipePrototype> recipe, int amount = 0)
     {
         Index = index;
+        Recipe = recipe;
+        Amount = amount;
     }
 }
 // MAID END lathe cancel entry
@@ -89,8 +102,21 @@ public sealed class LatheCancelQueueEntryMessage : BoundUserInterfaceMessage
 /// <summary>
 /// One queue slot: a recipe printed <see cref="Amount"/> times in a row.
 /// </summary>
-[Serializable, NetSerializable]
-public readonly record struct LatheQueueEntry(ProtoId<LatheRecipePrototype> Recipe, int Amount);
+[DataDefinition, Serializable, NetSerializable]
+public partial record struct LatheQueueEntry
+{
+    [DataField]
+    public ProtoId<LatheRecipePrototype> Recipe;
+
+    [DataField]
+    public int Amount;
+
+    public LatheQueueEntry(ProtoId<LatheRecipePrototype> recipe, int amount)
+    {
+        Recipe = recipe;
+        Amount = amount;
+    }
+}
 // MAID END lathe batch queue
 
 /// <summary>

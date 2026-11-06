@@ -209,6 +209,11 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
         if (!Resolve(entity, ref entity.Comp))
             return false;
 
+        // MAID BEGIN lathe batch queue
+        if (!CanTakeVolume(entity, materials.Values.Sum(), entity.Comp))
+            return false;
+        // MAID END lathe batch queue
+
         foreach (var (material, amount) in materials)
         {
             if (!CanChangeMaterialAmount(entity, material, amount, entity.Comp))

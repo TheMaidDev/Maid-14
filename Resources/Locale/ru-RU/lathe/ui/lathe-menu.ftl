@@ -37,3 +37,4 @@ lathe-menu-queue-reset-material-overflow = Вы замечаете, что ав�
 lathe-menu-queue-entry-batch = { $index }. { $name } x{ $amount }
 lathe-menu-fabricating-batch = Осталось { $remaining } из { $total }
 lathe-menu-cancel-entry = Отменить
+lathe-menu-queue-full = Очередь заполнена (максимум записей: { $max }).

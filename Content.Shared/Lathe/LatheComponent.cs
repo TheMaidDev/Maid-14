@@ -83,25 +83,25 @@ namespace Content.Shared.Lathe
         [DataField]
         public Queue<ProtoId<LatheRecipePrototype>> Queue = new();
         */
-        [ViewVariables]
+        [DataField, ViewVariables]
         public Queue<LatheQueueEntry> Queue = new();
 
         /// <summary>
         /// Recipe of the batch currently being printed.
         /// </summary>
-        [ViewVariables]
+        [DataField, ViewVariables]
         public ProtoId<LatheRecipePrototype>? BatchRecipe;
 
         /// <summary>
         /// Units of the current batch that have not been started yet.
         /// </summary>
-        [ViewVariables]
+        [DataField, ViewVariables]
         public int BatchRemaining;
 
         /// <summary>
         /// Total size of the current batch.
         /// </summary>
-        [ViewVariables]
+        [DataField, ViewVariables]
         public int BatchTotal;
         // MAID END lathe batch queue
 

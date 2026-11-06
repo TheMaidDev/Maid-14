@@ -203,24 +203,63 @@ public sealed class LatheQueueTest
             Assert.That(comp.Queue.Count, Is.EqualTo(2));
 
             // Cancel the first queued entry: 3 units back, the other stays.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0, welder.ID, 3));
             Assert.That(comp.Queue.Count, Is.EqualTo(1));
             Assert.That(comp.Queue.Peek().Amount, Is.EqualTo(2));
             foreach (var (mat, amount) in welder.Materials)
                 Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 6));
 
             // Out of range index is ignored.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(7));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(7, welder.ID, 2));
             Assert.That(comp.Queue.Count, Is.EqualTo(1));
 
+            // A stale view (entry changed since the client looked) must not cancel anything.
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0, welder.ID, 3));
+            Assert.That(comp.Queue.Count, Is.EqualTo(1));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(LatheCancelQueueEntryMessage.Current, "Crowbar"));
+            Assert.That(comp.CurrentRecipe, Is.Not.Null);
+            foreach (var (mat, amount) in welder.Materials)
+                Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 6));
+
             // Cancel the running batch: its 4 units come back and the next entry starts.
-            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(LatheCancelQueueEntryMessage.Current));
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(LatheCancelQueueEntryMessage.Current, welder.ID));
             Assert.That(comp.Queue.Count, Is.EqualTo(0));
             Assert.That(comp.CurrentRecipe, Is.Not.Null);
             Assert.That(comp.BatchTotal, Is.EqualTo(2));
             foreach (var (mat, amount) in welder.Materials)
                 Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 2));
             Assert.That(server.EntMan.HasComponent<LatheProducingComponent>(uid));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task QueueAndCancelCannotCreateMaterial()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var lathe = server.System<LatheSystem>();
+        var storage = server.System<SharedMaterialStorageSystem>();
+
+        EntityUid uid = default;
+        await server.WaitPost(() => uid = server.EntMan.SpawnEntity("Autolathe", map.GridCoords));
+
+        await server.WaitAssertion(() =>
+        {
+            var comp = server.EntMan.GetComponent<LatheComponent>(uid);
+            comp.MaterialUseMultiplier = 0.75f;
+            var recipe = server.ProtoMan.Index<LatheRecipePrototype>("Welder");
+            foreach (var mat in recipe.Materials.Keys)
+                storage.TryChangeMaterialAmount(uid, mat, 1_000_000);
+            var start = recipe.Materials.ToDictionary(m => m.Key, m => storage.GetMaterialAmount(uid, m.Key));
+
+            Assert.That(lathe.TryAddToQueue(uid, recipe, comp, 7));
+            server.EntMan.EventBus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0, recipe.ID, 7));
+
+            foreach (var mat in recipe.Materials.Keys)
+                Assert.That(storage.GetMaterialAmount(uid, mat), Is.EqualTo(start[mat]));
         });
 
         await pair.CleanReturnAsync();
