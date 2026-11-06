@@ -6,6 +6,7 @@ using Content.Server.Popups;
 using Content.Server.Station.Systems;
 using Content.Server.StationEvents.Events;
 using Content.Server.Storage.EntitySystems;
+using Content.Shared.Chemistry.Reaction;
 using Content.Shared.GameTicking;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -105,6 +106,8 @@ public sealed class RandomItemArtifactsSystem : StationEventSystem<RandomItemArt
 
             var item = _random.Pick(containedEntities);
 
+            // Chemical stimuli only reach entities that can receive reagent reactions.
+            EnsureComp<ReactiveComponent>(item);
             EnsureComp<XenoArtifactComponent>(item);
             _popupSystem.PopupEntity(
                 Loc.GetString(
