@@ -1,6 +1,6 @@
 - type: latheRecipe
   id: ArtifactFragment1
   result: ArtifactFragment1
-  completetime: 0
+  completetime: 1 # MAID min recipe time (was 0)
   materials:
     RawArtifactFragment: 100

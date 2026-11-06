@@ -15,7 +15,7 @@
   applyMaterialDiscount: false
   categories:
   - Tiles
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
 
 - type: latheRecipe
   abstract: true
@@ -274,7 +274,7 @@
   id: FloorTileItemConcreteMono
   result: FloorTileItemConcreteMono
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -283,7 +283,7 @@
   id: FloorTileItemConcreteSmooth
   result: FloorTileItemConcreteSmooth
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -292,7 +292,7 @@
   id: FloorTileItemGrayConcrete
   result: FloorTileItemGrayConcrete
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -301,7 +301,7 @@
   id: FloorTileItemGrayConcreteMono
   result: FloorTileItemGrayConcreteMono
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -310,7 +310,7 @@
   id: FloorTileItemGrayConcreteSmooth
   result: FloorTileItemGrayConcreteSmooth
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -319,7 +319,7 @@
   id: FloorTileItemOldConcrete
   result: FloorTileItemOldConcrete
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -328,7 +328,7 @@
   id: FloorTileItemOldConcreteMono
   result: FloorTileItemOldConcreteMono
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25
@@ -337,7 +337,7 @@
   id: FloorTileItemOldConcreteSmooth
   result: FloorTileItemOldConcreteSmooth
   applyMaterialDiscount: false
-  completetime: 0.5
+  completetime: 1 # MAID min recipe time (was 0.5)
   materials:
     Steel: 25
     Plastic: 25

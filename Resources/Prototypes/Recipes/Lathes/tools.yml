@@ -168,7 +168,7 @@
   result: CableApcStack1
   categories:
   - Parts
-  completetime: 0.1
+  completetime: 1 # MAID min recipe time (was 0.1)
   materials:
     Steel: 30
 
