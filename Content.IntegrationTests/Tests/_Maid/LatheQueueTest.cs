@@ -1,6 +1,7 @@
 using System.Linq;
 using Content.Goobstation.Shared.Lathe;
 using Content.Server.Lathe;
+using Content.Server.Lathe.Components;
 using Content.Server.Power.Components;
 using Content.Shared.Lathe;
 using Content.Shared.Materials;
@@ -164,6 +165,62 @@ public sealed class LatheQueueTest
             // Only the unit currently being printed stays spent.
             foreach (var (mat, amount) in recipe.Materials)
                 Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task CancelEntryRefundsAndKeepsOthers()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var lathe = server.System<LatheSystem>();
+        var storage = server.System<SharedMaterialStorageSystem>();
+
+        EntityUid uid = default;
+        await server.WaitPost(() =>
+        {
+            uid = server.EntMan.SpawnEntity("Autolathe", map.GridCoords);
+            server.EntMan.GetComponent<ApcPowerReceiverComponent>(uid).NeedsPower = false;
+        });
+        await server.WaitRunTicks(5);
+
+        await server.WaitAssertion(() =>
+        {
+            var comp = server.EntMan.GetComponent<LatheComponent>(uid);
+            var welder = server.ProtoMan.Index<LatheRecipePrototype>("Welder");
+            foreach (var mat in welder.Materials.Keys)
+                storage.TryChangeMaterialAmount(uid, mat, 1_000_000);
+            var start = welder.Materials.ToDictionary(m => m.Key, m => storage.GetMaterialAmount(uid, m.Key));
+            var bus = server.EntMan.EventBus;
+
+            Assert.That(lathe.TryAddToQueue(uid, welder, comp, 4)); // running
+            Assert.That(lathe.TryAddToQueue(uid, welder, comp, 3)); // queue 0
+            Assert.That(lathe.TryAddToQueue(uid, welder, comp, 2)); // queue 1
+            Assert.That(lathe.TryStartProducing(uid, comp));
+            Assert.That(comp.Queue.Count, Is.EqualTo(2));
+
+            // Cancel the first queued entry: 3 units back, the other stays.
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(0));
+            Assert.That(comp.Queue.Count, Is.EqualTo(1));
+            Assert.That(comp.Queue.Peek().Amount, Is.EqualTo(2));
+            foreach (var (mat, amount) in welder.Materials)
+                Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 6));
+
+            // Out of range index is ignored.
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(7));
+            Assert.That(comp.Queue.Count, Is.EqualTo(1));
+
+            // Cancel the running batch: its 4 units come back and the next entry starts.
+            bus.RaiseLocalEvent(uid, new LatheCancelQueueEntryMessage(LatheCancelQueueEntryMessage.Current));
+            Assert.That(comp.Queue.Count, Is.EqualTo(0));
+            Assert.That(comp.CurrentRecipe, Is.Not.Null);
+            Assert.That(comp.BatchTotal, Is.EqualTo(2));
+            foreach (var (mat, amount) in welder.Materials)
+                Assert.That(start[mat] - storage.GetMaterialAmount(uid, mat), Is.EqualTo(amount * 2));
+            Assert.That(server.EntMan.HasComponent<LatheProducingComponent>(uid));
         });
 
         await pair.CleanReturnAsync();

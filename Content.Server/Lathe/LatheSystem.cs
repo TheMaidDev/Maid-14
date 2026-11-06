@@ -151,6 +151,7 @@ namespace Content.Server.Lathe
             SubscribeLocalEvent<LatheComponent, LatheQueueRecipeMessage>(OnLatheQueueRecipeMessage);
             SubscribeLocalEvent<LatheComponent, LatheSyncRequestMessage>(OnLatheSyncRequestMessage);
             SubscribeLocalEvent<LatheComponent, LatheQueueResetMessage>(OnLatheQueueResetMessage); // Goobstation
+            SubscribeLocalEvent<LatheComponent, LatheCancelQueueEntryMessage>(OnLatheCancelQueueEntryMessage); // MAID lathe cancel entry
 
             SubscribeLocalEvent<LatheComponent, BeforeActivatableUIOpenEvent>((u, c, _) => UpdateUserInterfaceState(u, c));
             SubscribeLocalEvent<LatheComponent, MaterialAmountChangedEvent>(OnMaterialAmountChanged);
@@ -530,6 +531,97 @@ namespace Content.Server.Lathe
             // Goobstation - Lathe message on recipes update - End
         }
 
+
+        // MAID BEGIN lathe cancel entry
+        private void OnLatheCancelQueueEntryMessage(EntityUid uid, LatheComponent component, LatheCancelQueueEntryMessage args)
+        {
+            var refunds = new Dictionary<string, int>();
+
+            void AddRefund(ProtoId<LatheRecipePrototype> id, int count)
+            {
+                var recipe = _proto.Index(id);
+                foreach (var (mat, amount) in recipe.Materials)
+                {
+                    var adjusted = AdjustMaterial(amount, recipe.ApplyMaterialDiscount, component.MaterialUseMultiplier);
+                    refunds[mat] = refunds.GetValueOrDefault(mat) + adjusted * count;
+                }
+            }
+
+            var index = args.Index;
+            var cancelCurrent = false;
+            var cancelBatchLeftover = false;
+
+            if (index == LatheCancelQueueEntryMessage.Current)
+            {
+                // The entry shown as "fabricating" is the running unit, or a paused batch, or the queue head when idle.
+                if (component.CurrentRecipe != null)
+                    cancelCurrent = true;
+                else if (component.BatchRemaining > 0 && component.BatchRecipe != null)
+                    cancelBatchLeftover = true;
+                else
+                    index = 0;
+            }
+
+            if (cancelCurrent)
+            {
+                if (component.BatchRecipe is { } running)
+                    AddRefund(running, 1 + component.BatchRemaining);
+            }
+            else if (cancelBatchLeftover)
+            {
+                AddRefund(component.BatchRecipe!.Value, component.BatchRemaining);
+            }
+            else
+            {
+                if (index < 0 || index >= component.Queue.Count)
+                {
+                    UpdateUserInterfaceState(uid, component);
+                    return;
+                }
+
+                AddRefund(component.Queue.ElementAt(index).Recipe, component.Queue.ElementAt(index).Amount);
+            }
+
+            if (!_materialStorage.CanChangeMaterialAmount(uid, refunds))
+            {
+                _popup.PopupEntity(Loc.GetString("lathe-queue-reset-material-overflow"), uid);
+                UpdateUserInterfaceState(uid, component);
+                return;
+            }
+
+            foreach (var (mat, amount) in refunds)
+            {
+                _materialStorage.TryChangeMaterialAmount(uid, mat, amount);
+            }
+
+            if (cancelCurrent)
+            {
+                component.BatchRemaining = 0;
+                component.CurrentRecipe = null;
+                RemComp<LatheProducingComponent>(uid);
+                UpdateRunningAppearance(uid, false);
+                TryStartProducing(uid, component);
+            }
+            else if (cancelBatchLeftover)
+            {
+                component.BatchRemaining = 0;
+            }
+            else
+            {
+                var kept = component.Queue.Where((_, i) => i != index).ToArray();
+                component.Queue.Clear();
+                foreach (var entry in kept)
+                {
+                    component.Queue.Enqueue(entry);
+                }
+            }
+
+            _adminLogger.Add(LogType.Action,
+                LogImpact.Low,
+                $"{ToPrettyString(args.Actor):player} cancelled a queue entry at {ToPrettyString(uid):lathe}");
+            UpdateUserInterfaceState(uid, component);
+        }
+        // MAID END lathe cancel entry
 
         // Goobstation - Lathe Queue Reset
         private void OnLatheQueueResetMessage(EntityUid uid, LatheComponent component, LatheQueueResetMessage args)

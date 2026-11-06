@@ -67,6 +67,24 @@ public sealed class LatheUpdateState : BoundUserInterfaceState
     }
 }
 
+// MAID BEGIN lathe cancel entry
+/// <summary>
+///     Sent to the server to cancel one queue entry, or the batch being printed (<see cref="Current"/>).
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class LatheCancelQueueEntryMessage : BoundUserInterfaceMessage
+{
+    public const int Current = -1;
+
+    public readonly int Index;
+
+    public LatheCancelQueueEntryMessage(int index)
+    {
+        Index = index;
+    }
+}
+// MAID END lathe cancel entry
+
 // MAID BEGIN lathe batch queue
 /// <summary>
 /// One queue slot: a recipe printed <see cref="Amount"/> times in a row.

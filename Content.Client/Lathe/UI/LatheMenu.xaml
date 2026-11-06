@@ -121,6 +121,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         <PanelContainer.PanelOverride>
                             <gfx:StyleBoxFlat BackgroundColor="#408040" />
                         </PanelContainer.PanelOverride>
+                        <!-- MAID BEGIN lathe batch queue
                         <Label
                             RectClipContent="False"
                             HorizontalAlignment="Left"
@@ -136,6 +137,28 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                             HorizontalAlignment="Left"
                             Margin="130 0 0 0">
                         </Label>
+                        -->
+                        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                            <Label
+                                Margin="5 0 5 0"
+                                VerticalAlignment="Center"
+                                Text="{Loc 'lathe-menu-fabricating-message'}" />
+                            <BoxContainer Name="FabricatingDisplayContainer"
+                                          VerticalAlignment="Center" />
+                            <BoxContainer Orientation="Vertical"
+                                          HorizontalExpand="True"
+                                          VerticalAlignment="Center"
+                                          Margin="5 0 0 0">
+                                <Label Name="NameLabel" ClipText="True" />
+                                <Label Name="BatchLabel" ClipText="True" Visible="False" />
+                            </BoxContainer>
+                            <Button Name="CancelCurrentButton"
+                                    Text="X"
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 5 0"
+                                    ToolTip="{Loc 'lathe-menu-cancel-entry'}" />
+                        </BoxContainer>
+                        <!-- MAID END lathe batch queue -->
                     </PanelContainer>
                 </BoxContainer>
                 <ScrollContainer VerticalExpand="True" HScrollEnabled="False">

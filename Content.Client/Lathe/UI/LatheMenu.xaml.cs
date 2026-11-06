@@ -103,6 +103,7 @@ public sealed partial class LatheMenu : DefaultWindow
     public event Action<BaseButton.ButtonEventArgs>? OnServerListButtonPressed;
     public event Action<string, int>? RecipeQueueAction;
     public event Action<BaseButton.ButtonEventArgs>? OnResetQueueListButtonPressed; // Goobstation
+    public event Action<int>? OnCancelQueueEntry; // MAID lathe cancel entry
     public event Action? OnClaimMiningPoints; // DeltaV
 
     public List<ProtoId<LatheRecipePrototype>> Recipes = new();
@@ -139,6 +140,7 @@ public sealed partial class LatheMenu : DefaultWindow
 
         ServerListButton.OnPressed += a => OnServerListButtonPressed?.Invoke(a);
         ResetQueueList.OnPressed += a => OnResetQueueListButtonPressed?.Invoke(a); // Goobstation
+        CancelCurrentButton.OnPressed += _ => OnCancelQueueEntry?.Invoke(LatheCancelQueueEntryMessage.Current); // MAID lathe cancel entry
 
     }
 
@@ -406,7 +408,16 @@ public sealed partial class LatheMenu : DefaultWindow
                 ? Loc.GetString("lathe-menu-queue-entry-batch", ("index", idx), ("name", _lathe.GetRecipeName(recipe)), ("amount", entry.Amount))
                 : $"{idx}. {_lathe.GetRecipeName(recipe)}";
             // MAID END lathe batch queue
+            // MAID BEGIN lathe cancel entry
+            queuedRecipeLabel.HorizontalExpand = true;
+            queuedRecipeLabel.ClipText = true;
+            queuedRecipeLabel.VerticalAlignment = Control.VAlignment.Center;
             queuedRecipeBox.AddChild(queuedRecipeLabel);
+            var entryIndex = idx - 1;
+            var cancelButton = new Button { Text = "X", ToolTip = Loc.GetString("lathe-menu-cancel-entry") };
+            cancelButton.OnPressed += _ => OnCancelQueueEntry?.Invoke(entryIndex);
+            queuedRecipeBox.AddChild(cancelButton);
+            // MAID END lathe cancel entry
             QueueList.AddChild(queuedRecipeBox);
             idx++;
         }
@@ -427,10 +438,9 @@ public sealed partial class LatheMenu : DefaultWindow
         /*
         NameLabel.Text = _lathe.GetRecipeName(recipe);
         */
-        NameLabel.Text = batchTotal > 1
-            ? Loc.GetString("lathe-menu-fabricating-batch",
-                ("name", _lathe.GetRecipeName(recipe)), ("remaining", batchRemaining), ("total", batchTotal))
-            : _lathe.GetRecipeName(recipe);
+        NameLabel.Text = _lathe.GetRecipeName(recipe);
+        BatchLabel.Visible = batchTotal > 1;
+        BatchLabel.Text = Loc.GetString("lathe-menu-fabricating-batch", ("remaining", batchRemaining), ("total", batchTotal));
         // MAID END lathe batch queue
     }
 
