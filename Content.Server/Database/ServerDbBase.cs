@@ -825,6 +825,52 @@ namespace Content.Server.Database
             return record == null ? null : MakePlayerRecord(record);
         }
 
+        // MAID BEGIN alt account notice
+        public async Task<List<HwidMatchedAccount>> GetAccountsByModernHwidsAsync(
+            NetUserId userId,
+            ImmutableArray<ImmutableArray<byte>> modernHwids,
+            CancellationToken cancel)
+        {
+            var result = new Dictionary<Guid, HwidMatchedAccount>();
+            if (modernHwids.IsDefaultOrEmpty)
+                return new List<HwidMatchedAccount>();
+
+            await using var db = await GetDb(cancel);
+
+            foreach (var hwid in modernHwids)
+            {
+                var bytes = hwid.ToArray();
+                var rows = await db.DbContext.ConnectionLog
+                    .Where(c => c.UserId != userId.UserId && c.HWId != null && c.HWId.Type == HwidType.Modern && c.HWId.Hwid == bytes)
+                    .GroupBy(c => c.UserId)
+                    .Select(g => new { UserId = g.Key, LastSeen = g.Max(c => c.Time) })
+                    .Take(20)
+                    .ToListAsync(cancel);
+
+                foreach (var row in rows)
+                {
+                    var seen = new DateTimeOffset(NormalizeDatabaseTime(row.LastSeen));
+                    if (!result.TryGetValue(row.UserId, out var existing) || existing.LastSeen < seen)
+                        result[row.UserId] = new HwidMatchedAccount(new NetUserId(row.UserId), string.Empty, seen);
+                }
+            }
+
+            // Names come from the player table; accounts without a record keep an empty name.
+            var ids = result.Keys.ToList();
+            var names = await db.DbContext.Player
+                .Where(p => ids.Contains(p.UserId))
+                .Select(p => new { p.UserId, p.LastSeenUserName })
+                .ToListAsync(cancel);
+
+            foreach (var name in names)
+            {
+                result[name.UserId] = result[name.UserId] with { UserName = name.LastSeenUserName };
+            }
+
+            return result.Values.OrderByDescending(a => a.LastSeen).ToList();
+        }
+        // MAID END alt account notice
+
         protected async Task<bool> PlayerRecordExists(DbGuard db, NetUserId userId)
         {
             return await db.DbContext.Player.AnyAsync(p => p.UserId == userId);

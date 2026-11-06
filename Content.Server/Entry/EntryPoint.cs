@@ -137,6 +137,7 @@ using Content.Server.Acz;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
+using Content.Server._Maid.Discord; // MAID discord feed
 using Content.Server.Afk;
 using Content.Server.Chat.Managers;
 using Content.Server.Connection;
@@ -251,6 +252,7 @@ namespace Content.Server.Entry
                 _updateManager.Initialize();
                 _playTimeTracking.Initialize();
                 _watchlistWebhookManager.Initialize();
+                IoCManager.Resolve<IDiscordFeedManager>().Initialize(); // MAID discord feed
                 IoCManager.Resolve<JobWhitelistManager>().Initialize();
                 IoCManager.Resolve<PlayerRateLimitManager>().Initialize();
                 _lastAntagManager = IoCManager.Resolve<LastRolledAntagManager>(); // Goobstation
