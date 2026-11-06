@@ -10,6 +10,12 @@ Selected in-game events are copied to separate Discord channels through plain we
 - Admin chat: `ChatManager` calls `Send(AdminChat, ...)` right after the admin log entry (one `MAID` line). The message is only sent after the sender was verified to be an admin.
 - New players: the manager itself listens to session status. On `Connected` it reads the player record; the record is created by the connection manager before that moment, so "first seen less than 2 minutes ago" means a new player. A set of already announced users stops a quick reconnect from announcing twice (cleared on server restart, which is harmless because the window has long passed).
 
+## Second-account warning (new players)
+There is no dedicated alt detector in the game code; the signal comes from the Wizden auth server. During login the engine asks the auth server (`hasJoined`) and gets back, besides the account, a set of modern HWIDs for the connection and a trust score (0.5 neutral, 1 fully trusted). The engine documents that a match between any HWID of two connections means the auth server believes it is the same user. This only works for authenticated (non-local) connections, with `net.hwid` on (default) and the default auth server; with an unauthenticated or local connection the HWID list is empty and the warning never fires.
+- Every connection (accepted or denied) is written to the connection log together with the first HWID. The warning compares the HWIDs of the new connection with the logged ones of other accounts (database query by exact modern-HWID match, any of the connection's HWIDs may match).
+- The warning is appended to the same message when the account matches at least one other account and its overall playtime is under `discord.new_player_alt_playtime_minutes` (default 30, 0 disables). It lists up to five matched accounts, the playtime and the trust score.
+- Limitation: only the first HWID of each past connection is stored, so a match through a different HWID of the same set is missed until the account reconnects.
+
 ## Adding a feed
 Add a value to `DiscordFeed`, a webhook CVar, one `Register(...)` call in `Initialize`, then call `Send` from the event source.
 
@@ -28,6 +34,7 @@ CVars (both `SERVERONLY | CONFIDENTIAL`, so they are never shown to clients or p
 |---|---|
 | `discord.admin_chat_webhook` | admin chat |
 | `discord.new_player_webhook` | first-time players |
+| `discord.new_player_alt_playtime_minutes` | playtime limit for the second-account warning (not a secret) |
 
 Pick one way, the URL goes only on the server host, never into the repository:
 

@@ -193,5 +193,12 @@ public sealed class MaidCVars
     public static readonly CVarDef<string> DiscordNewPlayerWebhook =
         CVarDef.Create("discord.new_player_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
 
+    /// <summary>
+    ///     The new player notification gets an extra warning when the account shares a HWID (according to the auth server)
+    ///     with other accounts and has played fewer than this many minutes. 0 disables the warning.
+    /// </summary>
+    public static readonly CVarDef<int> DiscordNewPlayerAltPlaytimeMinutes =
+        CVarDef.Create("discord.new_player_alt_playtime_minutes", 30, CVar.SERVERONLY);
+
     #endregion
 }

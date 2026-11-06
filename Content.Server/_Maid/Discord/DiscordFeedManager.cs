@@ -1,10 +1,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Content.Server.Database;
 using Content.Server.Discord;
 using Content.Shared._Maid.CVars;
+using Content.Shared.Players.PlayTimeTracking;
 using Robust.Server;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
@@ -143,13 +145,54 @@ public sealed class DiscordFeedManager : IDiscordFeedManager
             if (!_announced.TryAdd(e.Session.UserId, 0))
                 return;
 
-            Send(DiscordFeed.NewPlayer,
-                $"🆕 **{Sanitize(e.Session.Name)}** впервые зашёл на сервер **{Sanitize(_server.ServerName)}**");
+            var message =
+                $"🆕 **{Sanitize(e.Session.Name)}** впервые зашёл на сервер **{Sanitize(_server.ServerName)}**";
+
+            var altNotice = await GetAltNotice(e.Session);
+            if (altNotice != null)
+                message += "\n" + altNotice;
+
+            Send(DiscordFeed.NewPlayer, message);
         }
         catch (Exception ex)
         {
             _sawmill.Error($"Error while processing new player notification:\n{ex}");
         }
+    }
+
+    /// <summary>
+    ///     Builds the "possible second account" warning, or null if there is nothing to report.
+    ///     The data comes from the auth server: it returns a set of modern HWIDs for the connection, and the
+    ///     engine documents that a match between two connections means the auth server considers them the same user.
+    /// </summary>
+    private async Task<string?> GetAltNotice(ICommonSession session)
+    {
+        var maxMinutes = _cfg.GetCVar(MaidCVars.DiscordNewPlayerAltPlaytimeMinutes);
+        if (maxMinutes <= 0)
+            return null;
+
+        // No modern HWIDs for unauthenticated/local connections, nothing to compare.
+        var userData = session.Channel.UserData;
+        if (userData.ModernHWIds.IsDefaultOrEmpty)
+            return null;
+
+        // Playtime of this account; for a really new account this is zero, the check keeps the rule explicit.
+        var playTimes = await _db.GetPlayTimes(session.UserId.UserId);
+        var overall = playTimes.Find(p => p.Tracker == PlayTimeTrackingShared.TrackerOverall)?.TimeSpent ?? TimeSpan.Zero;
+        if (overall >= TimeSpan.FromMinutes(maxMinutes))
+            return null;
+
+        var matches = await _db.GetAccountsByModernHwidsAsync(session.UserId, userData.ModernHWIds);
+        if (matches.Count == 0)
+            return null;
+
+        var names = matches
+            .Take(5)
+            .Select(m => string.IsNullOrEmpty(m.UserName) ? m.UserId.ToString() : Sanitize(m.UserName));
+        var more = matches.Count > 5 ? $" и ещё {matches.Count - 5}" : string.Empty;
+
+        return $"⚠️ Возможный второй аккаунт: HWID совпадает с {string.Join(", ", names)}{more}. " +
+               $"Наиграно {(int) overall.TotalMinutes} мин (порог {maxMinutes}), trust auth-сервера {userData.Trust:0.00}.";
     }
 
     public string Sanitize(string text)
