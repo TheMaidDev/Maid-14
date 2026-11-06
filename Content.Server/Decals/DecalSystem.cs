@@ -125,6 +125,8 @@ namespace Content.Server.Decals
             if (!TryComp(ev.Grid, out DecalGridComponent? newComp))
                 return;
 
+            // MAID BEGIN Fix decals on grid split
+            /*
             // Transfer decals over to the new grid.
             var enumerator = _mapSystem.GetAllTilesEnumerator(ev.Grid, Comp<MapGridComponent>(ev.Grid));
 
@@ -168,6 +170,75 @@ namespace Content.Server.Decals
                 if (toRemove.List?.Count > 0)
                     DirtyChunk(ev.OldGrid, chunkIndices, oldChunk);
             }
+            */
+            // The engine moves the origin of the split grid, so tile indices on the new grid are shifted
+            // relative to the old one. Recover that shift from the transforms.
+            var newXform = Transform(ev.Grid);
+            var oldXform = Transform(ev.OldGrid);
+            var newOrigin = _transform.GetWorldPosition(newXform);
+            var localOrigin = Vector2.Transform(newOrigin, _transform.GetInvWorldMatrix(oldXform));
+            var tileOffset = new Vector2i((int) MathF.Round(localOrigin.X), (int) MathF.Round(localOrigin.Y));
+            var offset = (Vector2) tileOffset;
+
+            // Transfer decals over to the new grid.
+            var enumerator = _mapSystem.GetAllTilesEnumerator(ev.Grid, Comp<MapGridComponent>(ev.Grid));
+
+            var oldChunkCollection = oldComp.ChunkCollection.ChunkCollection;
+            var chunkCollection = newComp.ChunkCollection.ChunkCollection;
+            var dirtyNew = new HashSet<Vector2i>();
+            var dirtyOld = new HashSet<Vector2i>();
+
+            while (enumerator.MoveNext(out var tile))
+            {
+                var tilePos = (Vector2) tile.Value.GridIndices;
+                var oldTilePos = tilePos + offset;
+                var oldChunkIndices = GetChunkIndices(oldTilePos);
+
+                if (!oldChunkCollection.TryGetValue(oldChunkIndices, out var oldChunk))
+                    continue;
+
+                var bounds = new Box2(oldTilePos - _boundsMinExpansion, oldTilePos + _boundsMaxExpansion);
+                var toRemove = new RemQueue<uint>();
+
+                foreach (var (oldDecalId, decal) in oldChunk.Decals)
+                {
+                    if (!bounds.Contains(decal.Coordinates))
+                        continue;
+
+                    var newDecal = decal.WithCoordinates(decal.Coordinates - offset);
+                    var newChunkIndices = GetChunkIndices(newDecal.Coordinates);
+                    var newDecalId = newComp.ChunkCollection.NextDecalId++;
+                    var newChunk = chunkCollection.GetOrNew(newChunkIndices);
+                    newChunk.Decals[newDecalId] = newDecal;
+                    newComp.DecalIndex[newDecalId] = newChunkIndices;
+                    dirtyNew.Add(newChunkIndices);
+                    toRemove.Add(oldDecalId);
+                }
+
+                foreach (var oldDecalId in toRemove)
+                {
+                    oldChunk.Decals.Remove(oldDecalId);
+                    oldComp.DecalIndex.Remove(oldDecalId);
+                }
+
+                if (toRemove.List?.Count > 0)
+                    dirtyOld.Add(oldChunkIndices);
+            }
+
+            foreach (var indices in dirtyNew)
+            {
+                DirtyChunk(ev.Grid, indices, chunkCollection[indices]);
+            }
+
+            foreach (var indices in dirtyOld)
+            {
+                var chunk = oldChunkCollection[indices];
+                DirtyChunk(ev.OldGrid, indices, chunk);
+
+                if (chunk.Decals.Count == 0)
+                    oldChunkCollection.Remove(indices);
+            }
+            // MAID END Fix decals on grid split
         }
 
         public override void Shutdown()
