@@ -103,6 +103,7 @@ public sealed partial class LatheMenu : DefaultWindow
     public event Action<BaseButton.ButtonEventArgs>? OnServerListButtonPressed;
     public event Action<string, int>? RecipeQueueAction;
     public event Action<BaseButton.ButtonEventArgs>? OnResetQueueListButtonPressed; // Goobstation
+    public event Action<int>? OnCancelQueueEntry; // MAID lathe cancel entry
     public event Action? OnClaimMiningPoints; // DeltaV
 
     public List<ProtoId<LatheRecipePrototype>> Recipes = new();
@@ -139,6 +140,11 @@ public sealed partial class LatheMenu : DefaultWindow
 
         ServerListButton.OnPressed += a => OnServerListButtonPressed?.Invoke(a);
         ResetQueueList.OnPressed += a => OnResetQueueListButtonPressed?.Invoke(a); // Goobstation
+        CancelCurrentButton.OnPressed += _ =>
+        {
+            if (_currentRecipe != null)
+                OnCancelQueueEntry?.Invoke(_currentBatchId);
+        }; // MAID lathe cancel entry
 
     }
 
@@ -270,6 +276,7 @@ public sealed partial class LatheMenu : DefaultWindow
 
         if (!int.TryParse(AmountLineEdit.Text, out var quantity) || quantity <= 0)
             quantity = 1;
+        quantity = Math.Min(quantity, SharedLatheSystem.MaxBatchAmount); // MAID lathe batch queue
 
         RecipeCount.Text = Loc.GetString("lathe-menu-recipe-count", ("count", recipesToShow.Count));
 
@@ -286,6 +293,7 @@ public sealed partial class LatheMenu : DefaultWindow
             {
                 if (!int.TryParse(AmountLineEdit.Text, out var amount) || amount <= 0)
                     amount = 1;
+                amount = Math.Min(amount, SharedLatheSystem.MaxBatchAmount); // MAID lathe batch queue
                 RecipeQueueAction?.Invoke(s, amount);
             };
             RecipeList.AddChild(control);
@@ -382,29 +390,50 @@ public sealed partial class LatheMenu : DefaultWindow
     /// Populates the build queue list with all queued items
     /// </summary>
     /// <param name="queue"></param>
-    public void PopulateQueueList(IReadOnlyCollection<ProtoId<LatheRecipePrototype>> queue)
+    public void PopulateQueueList(IReadOnlyCollection<LatheQueueEntry> queue) // MAID lathe batch queue
     {
         QueueList.DisposeAllChildren();
 
         var idx = 1;
-        foreach (var recipeProto in queue)
+        foreach (var entry in queue) // MAID lathe batch queue
         {
-            var recipe = _prototypeManager.Index(recipeProto);
+            var recipe = _prototypeManager.Index(entry.Recipe); // MAID lathe batch queue
             var queuedRecipeBox = new BoxContainer();
             queuedRecipeBox.Orientation = BoxContainer.LayoutOrientation.Horizontal;
 
             queuedRecipeBox.AddChild(GetRecipeDisplayControl(recipe));
 
             var queuedRecipeLabel = new Label();
+            // MAID BEGIN lathe batch queue
+            /*
             queuedRecipeLabel.Text = $"{idx}. {_lathe.GetRecipeName(recipe)}";
+            */
+            queuedRecipeLabel.Text = entry.Amount > 1
+                ? Loc.GetString("lathe-menu-queue-entry-batch", ("index", idx), ("name", _lathe.GetRecipeName(recipe)), ("amount", entry.Amount))
+                : $"{idx}. {_lathe.GetRecipeName(recipe)}";
+            // MAID END lathe batch queue
+            // MAID BEGIN lathe cancel entry
+            queuedRecipeLabel.HorizontalExpand = true;
+            queuedRecipeLabel.ClipText = true;
+            queuedRecipeLabel.VerticalAlignment = Control.VAlignment.Center;
             queuedRecipeBox.AddChild(queuedRecipeLabel);
+            var entryId = entry.Id;
+            var cancelButton = new Button { Text = "X", ToolTip = Loc.GetString("lathe-menu-cancel-entry") };
+            cancelButton.OnPressed += _ => OnCancelQueueEntry?.Invoke(entryId);
+            queuedRecipeBox.AddChild(cancelButton);
+            // MAID END lathe cancel entry
             QueueList.AddChild(queuedRecipeBox);
             idx++;
         }
     }
 
-    public void SetQueueInfo(ProtoId<LatheRecipePrototype>? recipeProto)
+    private ProtoId<LatheRecipePrototype>? _currentRecipe; // MAID lathe cancel entry
+    private int _currentBatchId; // MAID lathe cancel entry
+
+    public void SetQueueInfo(ProtoId<LatheRecipePrototype>? recipeProto, int batchRemaining = 0, int batchTotal = 0, int batchId = 0) // MAID lathe batch queue
     {
+        _currentRecipe = recipeProto; // MAID lathe cancel entry
+        _currentBatchId = batchId; // MAID lathe cancel entry
         FabricatingContainer.Visible = recipeProto != null;
         if (recipeProto == null)
             return;
@@ -414,7 +443,14 @@ public sealed partial class LatheMenu : DefaultWindow
         FabricatingDisplayContainer.Children.Clear();
         FabricatingDisplayContainer.AddChild(GetRecipeDisplayControl(recipe));
 
+        // MAID BEGIN lathe batch queue
+        /*
         NameLabel.Text = _lathe.GetRecipeName(recipe);
+        */
+        NameLabel.Text = _lathe.GetRecipeName(recipe);
+        BatchLabel.Visible = batchTotal > 1;
+        BatchLabel.Text = Loc.GetString("lathe-menu-fabricating-batch", ("remaining", batchRemaining), ("total", batchTotal));
+        // MAID END lathe batch queue
     }
 
     public Control GetRecipeDisplayControl(LatheRecipePrototype recipe)

@@ -78,8 +78,44 @@ namespace Content.Shared.Lathe
         /// <summary>
         /// The lathe's construction queue
         /// </summary>
+        // MAID BEGIN lathe batch queue
+        /*
         [DataField]
         public Queue<ProtoId<LatheRecipePrototype>> Queue = new();
+        */
+        [DataField, ViewVariables]
+        public Queue<LatheQueueEntry> Queue = new();
+
+        /// <summary>
+        /// Recipe of the batch currently being printed.
+        /// </summary>
+        [DataField, ViewVariables]
+        public ProtoId<LatheRecipePrototype>? BatchRecipe;
+
+        /// <summary>
+        /// Units of the current batch that have not been started yet.
+        /// </summary>
+        [DataField, ViewVariables]
+        public int BatchRemaining;
+
+        /// <summary>
+        /// Total size of the current batch.
+        /// </summary>
+        [DataField, ViewVariables]
+        public int BatchTotal;
+
+        /// <summary>
+        /// Id of the batch currently being printed (see <see cref="LatheQueueEntry.Id"/>).
+        /// </summary>
+        [DataField, ViewVariables]
+        public int BatchId;
+
+        /// <summary>
+        /// Next free batch id.
+        /// </summary>
+        [DataField, ViewVariables]
+        public int NextBatchId = 1;
+        // MAID END lathe batch queue
 
         /// <summary>
         /// The sound that plays when the lathe is producing an item, if any
