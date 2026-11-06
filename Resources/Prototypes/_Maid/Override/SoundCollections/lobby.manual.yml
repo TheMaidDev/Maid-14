@@ -1,0 +1,4 @@
+- type: !PartialOnly soundCollection
+  id: LobbyMusic
+  files:
+  - /Audio/_Maid/Override/Lobby/1.ogg

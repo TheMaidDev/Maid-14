@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: DrinkGlassBase
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/drinkglass_pickup.ogg

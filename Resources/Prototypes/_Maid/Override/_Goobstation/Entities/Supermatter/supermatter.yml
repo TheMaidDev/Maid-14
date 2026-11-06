@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: Supermatter
+  components:
+  - type: AmbientSound
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Supermatter/calm.ogg

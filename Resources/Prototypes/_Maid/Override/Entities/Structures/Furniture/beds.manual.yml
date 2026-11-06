@@ -1,0 +1,17 @@
+- type: !PartialOnly entity
+  id: Bed
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: DogBed
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg

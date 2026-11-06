@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: CaptainSabre
+  components:
+  - type: MeleeWeapon
+    soundHit:
+      path: /Audio/_Maid/Override/White/Items/hit/sabre_hit2.ogg

@@ -1,4 +1,16 @@
 - type: !PartialOnly entity
+  id: Wrench
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/wrench_pickup.ogg
+- type: !PartialOnly entity
+  id: Multitool
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/multitool_pickup.ogg
+- type: !PartialOnly entity
   id: PowerDrill
   components:
   - type: Tool

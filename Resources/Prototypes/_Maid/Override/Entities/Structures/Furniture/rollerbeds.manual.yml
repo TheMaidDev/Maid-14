@@ -1,0 +1,35 @@
+- type: !PartialOnly entity
+  id: RollerBed
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: RollerBedSpawnFolded
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: CheapRollerBedSpawnFolded
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: EmergencyRollerBedSpawnFolded
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg

@@ -1,0 +1,12 @@
+- type: !PartialOnly entity
+  id: ClothingBeltBase
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/toolbelt_pickup.ogg
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/toolbelt_drop.ogg
+  - type: EmitSoundOnLand
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/toolbelt_drop.ogg
