@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: MobWeldbot
+  components:
+  - type: Weldbot
+    weldSound:
+      path: /Audio/_Maid/Override/Items/welder2.ogg

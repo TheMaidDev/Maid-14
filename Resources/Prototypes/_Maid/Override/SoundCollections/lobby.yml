@@ -3,3 +3,4 @@
   files:
   - !Index:13 /Audio/_Maid/Override/Lobby/atomicamnesiammx.ogg
   - !Remove /Audio/Lobby/atomicamnesiammx.ogg
+  - /Audio/_Maid/Override/Lobby/1.ogg

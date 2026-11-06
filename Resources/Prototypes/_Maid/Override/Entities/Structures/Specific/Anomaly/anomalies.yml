@@ -4,3 +4,20 @@
   - type: EmitSoundOnSpawn
     sound:
       path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+- type: !PartialOnly entity
+  id: AnomalyBluespace
+  components:
+  - type: BluespaceAnomaly
+    teleportSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+  - type: Portal
+    arrivalSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+    departureSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg
+- type: !PartialOnly entity
+  id: AnomalyLiquid
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

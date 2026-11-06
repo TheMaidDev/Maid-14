@@ -1,0 +1,118 @@
+- type: !PartialOnly entity
+  id: DrinkJuiceLimeCartonXL
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkJuiceOrangeCartonXL
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkCreamCartonXL
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkSugarJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkLemonLimeJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkMeadJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkIceJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkCoconutWaterJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkCoffeeJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkTeaJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkGreenTeaJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkIcedTeaJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkDrGibbJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkRootBeerJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkWaterMelonJuiceJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkEnergyDrinkJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: CustomDrinkJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

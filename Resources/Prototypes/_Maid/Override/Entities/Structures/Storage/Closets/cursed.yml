@@ -4,3 +4,8 @@
   - type: EntityStorage
     closeSound:
       path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+  - type: CursedEntityStorage
+    cursedSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg
+      params:
+        variation: 0.125

@@ -1,0 +1,34 @@
+- type: !PartialOnly entity
+  id: DrinkShaker
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkShotGlass
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkJar
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: DrinkJarWhat
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: BartenderMixer
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

@@ -1,0 +1,8 @@
+- type: !PartialOnly entity
+  id: Turnstile
+  components:
+  - type: Turnstile
+    denySound:
+      path: /Audio/_Maid/Override/Machines/airlock_deny.ogg
+      params:
+        volume: -7

@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: ForensicScanner
+  components:
+  - type: ForensicScanner
+    soundNoMatch:
+      path: /Audio/_Maid/Override/Machines/airlock_deny.ogg

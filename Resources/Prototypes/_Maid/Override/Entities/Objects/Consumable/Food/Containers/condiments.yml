@@ -1,0 +1,20 @@
+- type: !PartialOnly entity
+  id: BaseFoodCondimentPacket
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: BaseFoodCondimentBottle
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: BaseFoodShaker
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

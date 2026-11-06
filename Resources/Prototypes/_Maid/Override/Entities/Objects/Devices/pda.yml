@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: AdminPDA
+  components:
+  - type: HealthAnalyzer
+    scanningEndSound:
+      path: /Audio/_Maid/Override/Items/Medical/healthscanner.ogg

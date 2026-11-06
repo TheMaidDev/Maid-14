@@ -1,4 +1,0 @@
-- type: !PartialOnly soundCollection
-  id: MetalBreak
-  files: !Clear
-  - /Audio/_Maid/Override/Effects/metalbreak.ogg

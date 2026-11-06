@@ -4,3 +4,45 @@
   - type: EmitSoundOnPickup
     sound:
       path: /Audio/_Maid/Override/_Goobstation/Items/handling/drinkglass_pickup.ogg
+- type: !PartialOnly entity
+  id: DrinkTomatoJuice
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+- type: !PartialOnly entity
+  id: DrinkWaterJug
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+- type: !PartialOnly entity
+  id: DrinkShakeBlue
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+- type: !PartialOnly entity
+  id: DrinkShakeEmpty
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+- type: !PartialOnly entity
+  id: DrinkShakeMeat
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+- type: !PartialOnly entity
+  id: DrinkShakeRobo
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+- type: !PartialOnly entity
+  id: DrinkShakeWhite
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

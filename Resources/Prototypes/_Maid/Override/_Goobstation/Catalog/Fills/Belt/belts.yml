@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: ClothingBeltHolsterFilledChaplain
+  components:
+  - type: DivineIntervention
+    denialSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
