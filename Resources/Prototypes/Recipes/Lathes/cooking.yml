@@ -37,7 +37,7 @@
 - type: latheRecipe
   abstract: true
   id: BaseGlasswareRecipe
-  completetime: 0.8
+  completetime: 1 # MAID min recipe time (was 0.8)
   materials:
     Glass: 100
 
@@ -62,7 +62,7 @@
   parent: DrinkMug
   id: DrinkShotGlass
   result: DrinkShotGlass
-  completetime: 0.4
+  completetime: 1 # MAID min recipe time (was 0.4)
 
 - type: latheRecipe
   parent: DrinkMug
@@ -84,7 +84,7 @@
 - type: latheRecipe
   id: FoodPlateSmall
   result: FoodPlateSmall
-  completetime: 0.4
+  completetime: 1 # MAID min recipe time (was 0.4)
   materials:
     Glass: 50
 
@@ -110,7 +110,7 @@
 - type: latheRecipe
   id: FoodPlateTin
   result: FoodPlateTin
-  completetime: 0.4
+  completetime: 1 # MAID min recipe time (was 0.4)
   materials:
     Steel: 100
 
@@ -124,6 +124,6 @@
 - type: latheRecipe
   id: FoodKebabSkewer
   result: FoodKebabSkewer
-  completetime: 0.4
+  completetime: 1 # MAID min recipe time (was 0.4)
   materials:
     Steel: 100

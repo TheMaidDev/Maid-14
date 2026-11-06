@@ -244,10 +244,20 @@ namespace Content.Server.Lathe
             return ev.Recipes.ToList();
         }
 
+        // MAID BEGIN lathe queue limit
+        public const int MaxQueueSize = 20;
+        public static readonly TimeSpan MinProductionTime = TimeSpan.FromSeconds(1);
+        // MAID END lathe queue limit
+
         public bool TryAddToQueue(EntityUid uid, LatheRecipePrototype recipe, LatheComponent? component = null)
         {
             if (!Resolve(uid, ref component))
                 return false;
+
+            // MAID BEGIN lathe queue limit
+            if (component.Queue.Count >= MaxQueueSize)
+                return false;
+            // MAID END lathe queue limit
 
             if (!CanProduce(uid, recipe, 1, component))
                 return false;
@@ -276,6 +286,10 @@ namespace Content.Server.Lathe
             var recipe = _proto.Index(recipeProto);
 
             var time = _reagentSpeed.ApplySpeed(uid, recipe.CompleteTime) * component.TimeMultiplier;
+            // MAID BEGIN lathe min production time
+            if (time < MinProductionTime)
+                time = MinProductionTime;
+            // MAID END lathe min production time
 
             var lathe = EnsureComp<LatheProducingComponent>(uid);
             lathe.StartTime = _timing.CurTime;
