@@ -26,7 +26,7 @@ public sealed class MenuButton : ContainerButton
     public const string StyleClassRedTopButton = "topButtonLabel";
 
     //Maid edit start
-    private static readonly Color ColorNormal = Color.FromHex("#5a5a5a");
+    private static readonly Color ColorNormal = Color.FromHex("#6a6a6a");
     private static readonly Color ColorRedNormal = Color.FromHex("#640000");
     private static readonly Color ColorHovered = Color.FromHex("#646464");
     private static readonly Color ColorRedHovered = Color.FromHex("#960000");
