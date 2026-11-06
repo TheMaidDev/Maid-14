@@ -1,0 +1,13 @@
+- type: !PartialOnly soundCollection
+  id: GlassBreak
+  files:
+  - !Index:0 /Audio/_Maid/Override/Effects/glass_break1.ogg
+  - !Remove /Audio/Effects/glass_break1.ogg
+  - !Index:1 /Audio/_Maid/Override/Effects/glass_break2.ogg
+  - !Remove /Audio/Effects/glass_break2.ogg
+  - !Index:2 /Audio/_Maid/Override/Effects/glass_break3.ogg
+  - !Remove /Audio/Effects/glass_break3.ogg
+- type: !PartialOnly soundCollection
+  id: MetalBreak
+  files:
+  - /Audio/_Maid/Override/Effects/metalbreak.ogg

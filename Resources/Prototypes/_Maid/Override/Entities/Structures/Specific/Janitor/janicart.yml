@@ -1,0 +1,13 @@
+- type: !PartialOnly entity
+  id: MopBucket
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: JanitorialTrolley
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: CryogenicSleepUnit
+  components:
+  - type: Cryostorage
+    removeSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg

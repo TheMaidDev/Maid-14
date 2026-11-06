@@ -1,0 +1,8 @@
+- type: !PartialOnly entity
+  id: ProjectileTeleBolt
+  components:
+  - type: RandomTeleport
+    arrivalSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+    departureSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg

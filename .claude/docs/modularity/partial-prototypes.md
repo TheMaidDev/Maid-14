@@ -1,11 +1,13 @@
 # Partial prototypes, abstract files, variants
 
-Engine feature of `PrototypeManager` (added in RT 289.0.0; `!CombineIndex` and several merge/hot-reload fixes in 289.0.1-289.0.2). It lets a later YAML file modify a prototype defined elsewhere instead of redefining it. **In this repo nothing registers partial paths**: there are no callers of `PartialDirectory`/`PartialFile` in Content, no `!Remove`/`!Clear`/`!PartialOnly`/`!Index` tags in `Resources`, and `RT_UPDATE/CONTROVERSIAL.md` records that no usage was found. The IPrototypeManager comment mentions a "PartialPrototypes" file shipped by upstream SS14; this fork has only `Resources/IgnoredPrototypes/`.
+Engine feature of `PrototypeManager` (added in RT 289.0.0; `!CombineIndex` and several merge/hot-reload fixes in 289.0.1-289.0.2). It lets a later YAML file modify a prototype defined elsewhere instead of redefining it.
 
 Full behavioural spec (merge algorithm, tag positions, quirks): [partial-prototypes/spec.md](partial-prototypes/spec.md).
 
 ## Enabling
-- Partial treatment is per path, set from C#: `IPrototypeManager.PartialDirectory(ResPath dir, int index)` and `PartialFile(file, index)`. Paths are VFS paths without `Resources` (e.g. `/Prototypes/_Maid`). The call is not retroactive and must happen before the directories are loaded; Content's `Init` phase is early enough (the existing abstract-list reader in `Content.Shared/Entry/EntryPoint` runs there).
+- Partial treatment is per path, set from C#: `IPrototypeManager.PartialDirectory(ResPath dir, int index)` and `PartialFile(file, index)`. Paths are VFS paths without `Resources` (e.g. `/Prototypes/_Maid`). The call is not retroactive and must happen before the directories are loaded; Content's `Init` phase is early enough.
+- Maid registration: `Content.Shared` `EntryPoint.Init` calls `MarkPartialPrototypes`, which delegates to `MaidPartialPrototypes.Mark` (`Content.Shared/_Maid/Prototypes`). It registers every directory in `MaidPartialPrototypes.PartialDirectories` (relative to `/Prototypes`; currently `_Maid/Override`) at index 0, and every content file named `*.partial.yml` (index 0) or `*.partial.N.yml` (index N; a non-number or negative N throws `PrototypeLoadException`). `MaidPartialPrototypes.IsPartial` answers the same question for a single path.
+- `/Prototypes/_Maid/Override` mirrors the upstream file layout: a partial for a prototype from `/Prototypes/<path>.yml` lives in `/Prototypes/_Maid/Override/<path>.yml`, every entry typed `!PartialOnly`. The out-of-repo `asset-override` tool (Bun/TypeScript) generates these entries to repoint upstream prototypes at old-build assets copied to `<kind dir>/_Maid/Override/<same path>`, merging into override files that already exist.
 - Inside a partial path, a prototype whose id already exists is merged into it; without a partial path the same situation throws `Duplicate ID`. A partial prototype whose id does not exist simply becomes a new prototype, unless its type node is `!PartialOnly <kind>`, in which case it is dropped.
 - Works for every prototype kind, not only entities.
 
@@ -26,15 +28,13 @@ Full behavioural spec (merge algorithm, tag positions, quirks): [partial-prototy
 - Per-step trace is available with the PrototypeManager sawmill at verbose level.
 
 ## Validation
-- `ValidateDirectory(path, partialNoOriginalError)` (used by `Content.YAMLLinter` with the default `false`) understands partials. With `true` it errors on a non-`!PartialOnly` partial with no original; useful if partials and plain definitions are not meant to mix.
+- `ValidateDirectory(path, partialNoOriginalError)` understands partials. With `true` it errors on a non-`!PartialOnly` partial with no original; useful if partials and plain definitions are not meant to mix.
+- It loses key tags (spec §7), so a `!CombineIndex` element is appended during validation and fails as an incomplete entry or crashes a validator. `Content.YAMLLinter` therefore does not validate `/Prototypes` directly: `CombineIndexValidation.ValidatePrototypes` (`Content.YAMLLinter/_Maid`) copies all `/Prototypes` `.yml` files into a `MemoryContentRoot` mounted at `/_MaidLinter`, removes `!CombineIndex` elements from partial files in the copy (YamlDotNet's node model keeps key tags), registers the copy's partials through `MaidPartialPrototypes.Mark`, validates it, and maps error paths back to `/Prototypes`. The removed elements are still exercised by the linter's client/server startup, which loads prototypes with the correct parser and fails on logged errors.
 
-## Abstract file list (the mechanism this repo does use)
+## Abstract file list
 - `Resources/IgnoredPrototypes/*.yml`: each file is a YAML list of VFS paths. `Content.Shared`'s `Init` reads every file there; an entry without extension becomes `AbstractDirectory`, otherwise `AbstractFile`. Every prototype in those files/directories gets `abstract: true` forced. Inheritance still works, instances and spawn menu entries disappear, other prototypes or code that reference the id by `ProtoId`/`EntProtoId` still need cleaning. The shipped file contains only comments.
 - Use for turning off upstream content without deleting upstream files (keeps merges with upstream clean).
 - Separate from this, `RegisterIgnore("kind")` calls in the server/client entry points make the loader skip whole prototype kinds that the other side has no class for.
 
 ## Variants
 - `id: !type:CreateVariants` (and the same tag on nested values) with a `values:` list makes the engine expand one entry into several prototypes, one per value, and can be combined with `!PartialOnly` to patch several prototypes with one entry (e.g. clearing `conditions` for three vendor listings).
-
-## Fit for Maid
-- Maid rules say edits to upstream files outside `_Maid` are marked with `# MAID` comments. A registered partial directory such as `/Prototypes/_Maid` would allow upstream-prototype changes entirely inside `_Maid` without touching upstream YAML, at the cost that the change is no longer visible next to the original and that errors surface only after merging. Not adopted; adopting means one `PartialDirectory` call in Content's shared entry point (marked `// MAID`) and moving the existing overrides.

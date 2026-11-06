@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: ComputerMassMedia
+  components:
+  - type: NewsWriter
+    noAccessSound:
+      path: /Audio/_Maid/Override/Machines/airlock_deny.ogg

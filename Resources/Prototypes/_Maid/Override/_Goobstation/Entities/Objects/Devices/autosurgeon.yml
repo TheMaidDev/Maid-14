@@ -1,0 +1,8 @@
+- type: !PartialOnly entity
+  id: BaseAutosurgeon
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg

@@ -1,0 +1,8 @@
+- type: !PartialOnly entity
+  id: FoodBluespaceTomato
+  components:
+  - type: SwapTeleportOnThrow
+    targetSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg
+    originSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg

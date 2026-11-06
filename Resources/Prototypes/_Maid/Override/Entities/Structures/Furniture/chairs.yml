@@ -1,0 +1,33 @@
+- type: !PartialOnly entity
+  id: SeatBase
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: RollingOfficeChairBase
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: ChairCursed
+  components:
+  - type: Strap
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg
+
+- type: !PartialOnly entity
+  id: ChairFoldingSpawnFolded
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg
+    unbuckleSound:
+      path: /Audio/_Maid/Override/Effects/unbuckle.ogg

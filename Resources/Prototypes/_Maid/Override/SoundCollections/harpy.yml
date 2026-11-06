@@ -1,0 +1,12 @@
+- type: !PartialOnly soundCollection
+  id: HarpyRings
+  files:
+  - !Index:0 /Audio/_Maid/Override/Items/desk_bell_ring.ogg
+  - !Remove /Audio/Items/desk_bell_ring.ogg
+- type: !PartialOnly soundCollection
+  id: HarpyBeeps
+  files:
+  - !Index:9 /Audio/_Maid/Override/Items/Medical/healthscanner.ogg
+  - !Remove /Audio/Items/Medical/healthscanner.ogg
+  - !Index:24 /Audio/_Maid/Override/Machines/airlock_deny.ogg
+  - !Remove /Audio/Machines/airlock_deny.ogg

@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: BoxCardboard
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/cardboardbox_pickup.ogg

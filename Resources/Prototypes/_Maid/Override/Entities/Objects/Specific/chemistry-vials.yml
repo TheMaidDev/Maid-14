@@ -1,0 +1,13 @@
+- type: !PartialOnly entity
+  id: BaseChemistryEmptyVial
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg
+
+- type: !PartialOnly entity
+  id: BorgVial
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

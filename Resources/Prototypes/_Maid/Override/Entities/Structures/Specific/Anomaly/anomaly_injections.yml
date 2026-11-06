@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: AnomalyInjectionBluespace
+  components:
+  - type: BluespaceAnomaly
+    teleportSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg

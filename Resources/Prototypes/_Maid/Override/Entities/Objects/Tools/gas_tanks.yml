@@ -1,0 +1,10 @@
+- type: !PartialOnly entity
+  id: GasTankBase
+  components:
+  - type: GasTank
+    ruptureSound:
+      path: /Audio/Effects/spray.ogg
+    connectSound:
+      path: /Audio/Effects/internals.ogg
+      params:
+        volume: 5

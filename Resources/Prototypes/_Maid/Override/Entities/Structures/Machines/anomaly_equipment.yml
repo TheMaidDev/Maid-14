@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: MachineAnomalyVessel
+  components:
+  - type: AnomalyVessel
+    beepSound:
+      path: /Audio/_Maid/Override/Machines/vessel_warning.ogg

@@ -2,7 +2,7 @@
 
 How Maid-14 stacks layers (engine, upstream content, fork layers, Maid) and which mechanisms let a layer add or alter things without editing the layer below. Two mechanisms are large enough for their own files:
 - [modularity/content-modules.md](modularity/content-modules.md): Content assemblies as separate projects/solution entries, how the engine finds and starts them, packaging, tests, the ModulePack check, and what a new module project needs.
-- [modularity/partial-prototypes.md](modularity/partial-prototypes.md): merging YAML into already-defined prototypes (`!Remove`, `!Clear`, `!Index`, `!PartialOnly`), the abstract-file list, variants, and the fact that partials are not wired up in this repo yet.
+- [modularity/partial-prototypes.md](modularity/partial-prototypes.md): merging YAML into already-defined prototypes (`!Remove`, `!Clear`, `!Index`, `!PartialOnly`), the abstract-file list, variants, how Maid registers partials (`/Prototypes/_Maid/Override`, `*.partial.yml`) and the YAML-linter workaround for `!CombineIndex`.
 
 ## The layers
 - **RobustToolbox** (submodule, never edited): `Robust.Shared`, `Robust.Server`, `Robust.Client`. Games depend on it only through `RobustToolbox/Imports/*.props` (`Shared.props`, `Client.props`, `Server.props`, `Lidgren.props`, ...); direct project references to RT are not allowed since RT 269.
@@ -16,7 +16,7 @@ How Maid-14 stacks layers (engine, upstream content, fork layers, Maid) and whic
 | New code in its own DLL | Content module project (`Content.<Name>.{Shared,Client,Server}`) | auto-loaded from the output folder by name prefix `Content.`; see content-modules doc |
 | Fork-owned files | `_<Fork>` folders | convention only; the engine treats every file in `Resources/Prototypes` and `Resources/Locale/<lang>` recursively, so folder names carry no semantics |
 | Add a prototype | new YAML file, unique id | duplicate id across files is a load error unless the directory was registered as partial |
-| Change one field of an existing prototype | partial prototype (not enabled) or `parent:` + new id, or an edit with a `# MAID` marker | see partial-prototypes doc |
+| Change one field of an existing prototype | partial prototype in `/Prototypes/_Maid/Override` or a `*.partial.yml` file, or `parent:` + new id, or an edit with a `# MAID` marker | see partial-prototypes doc |
 | Remove an upstream prototype without deleting files | `Resources/IgnoredPrototypes/*.yml` | marks prototypes abstract; inheritance survives, usages must be removed |
 | Many near-identical prototypes | `id: !type:CreateVariants` + `values` | engine feature, expands one YAML entry into several prototypes |
 | Config variables | `[CVarDefs]` class in any module | the server loads CVars from every loaded module assembly; Maid's live in `Content.Shared/_Maid/CVars` |

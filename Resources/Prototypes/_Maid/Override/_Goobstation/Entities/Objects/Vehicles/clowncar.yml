@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: VehicleClowncarBase
+  components:
+  - type: Strap
+    buckleSound:
+      path: /Audio/_Maid/Override/Effects/buckle.ogg

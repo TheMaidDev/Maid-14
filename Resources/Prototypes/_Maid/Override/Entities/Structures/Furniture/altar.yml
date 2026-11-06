@@ -1,0 +1,50 @@
+- type: !PartialOnly entity
+  id: AltarNanotrasen
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarChaos
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarDruid
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarToolbox
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarSpaceChristian
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarTechnology
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarConvertMaint
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarConvertBlue
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarHeaven
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AltarFangs
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg

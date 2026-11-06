@@ -1,0 +1,5 @@
+- type: !PartialOnly entity
+  id: AltarClock
+  components:
+  - type: AltarSource
+    soundPath: /Audio/_Maid/Override/Effects/hallelujah.ogg

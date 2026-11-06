@@ -1,0 +1,12 @@
+- type: !PartialOnly entity
+  id: BasePaper
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/paper_pickup.ogg
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/paper_drop.ogg
+  - type: EmitSoundOnCollide
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/paper_drop.ogg

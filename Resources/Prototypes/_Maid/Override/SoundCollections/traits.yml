@@ -1,0 +1,13 @@
+- type: !PartialOnly soundCollection
+  id: Paracusia
+  files:
+  - !Index:7 /Audio/_Maid/Override/Effects/glass_break1.ogg
+  - !Remove /Audio/Effects/glass_break1.ogg
+  - !Index:8 /Audio/_Maid/Override/Effects/glass_break2.ogg
+  - !Remove /Audio/Effects/glass_break2.ogg
+  - !Index:9 /Audio/_Maid/Override/Effects/glass_break3.ogg
+  - !Remove /Audio/Effects/glass_break3.ogg
+  - !Index:30 /Audio/_Maid/Override/Machines/airlock_deny.ogg
+  - !Remove /Audio/Machines/airlock_deny.ogg
+  - !Index:59 /Audio/_Maid/Override/Voice/Talk/lizard.ogg
+  - !Remove /Audio/Voice/Talk/lizard.ogg

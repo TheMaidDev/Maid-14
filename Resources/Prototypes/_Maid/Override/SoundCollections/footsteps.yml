@@ -1,0 +1,4 @@
+- type: !PartialOnly soundCollection
+  id: FootstepTile
+  files:
+  - /Audio/_Maid/Override/Effects/Footsteps/tile4.ogg
