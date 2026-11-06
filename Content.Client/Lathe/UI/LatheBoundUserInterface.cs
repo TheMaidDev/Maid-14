@@ -91,7 +91,7 @@ namespace Content.Client.Lathe.UI
                     _menu?.PopulateRecipes();
                     _menu?.UpdateCategories();
                     _menu?.PopulateQueueList(msg.Queue);
-                    _menu?.SetQueueInfo(msg.CurrentlyProducing);
+                    _menu?.SetQueueInfo(msg.CurrentlyProducing, msg.BatchRemaining, msg.BatchTotal); // MAID lathe batch queue
                     break;
             }
         }

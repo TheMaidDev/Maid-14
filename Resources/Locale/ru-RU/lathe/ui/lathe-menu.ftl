@@ -34,3 +34,5 @@ lathe-menu-materials-title = Материалы
 lathe-menu-queue-title = Очередь производства
 lathe-menu-queue-reset-title = Сбросить очередь
 lathe-menu-queue-reset-material-overflow = Вы замечаете, что автолат полон.
+lathe-menu-queue-entry-batch = { $index }. { $name } x{ $amount }
+lathe-menu-fabricating-batch = { $name } (осталось { $remaining } из { $total })

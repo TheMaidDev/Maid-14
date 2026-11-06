@@ -245,11 +245,10 @@ namespace Content.Server.Lathe
         }
 
         // MAID BEGIN lathe queue limit
-        public const int MaxQueueSize = 20;
         public static readonly TimeSpan MinProductionTime = TimeSpan.FromSeconds(1);
         // MAID END lathe queue limit
 
-        public bool TryAddToQueue(EntityUid uid, LatheRecipePrototype recipe, LatheComponent? component = null)
+        public bool TryAddToQueue(EntityUid uid, LatheRecipePrototype recipe, LatheComponent? component = null, int batchAmount = 1) // MAID lathe batch queue
         {
             if (!Resolve(uid, ref component))
                 return false;
@@ -259,7 +258,12 @@ namespace Content.Server.Lathe
                 return false;
             // MAID END lathe queue limit
 
-            if (!CanProduce(uid, recipe, 1, component))
+            // MAID BEGIN lathe batch queue
+            if (batchAmount < 1 || batchAmount > MaxBatchAmount)
+                return false;
+            // MAID END lathe batch queue
+
+            if (!CanProduce(uid, recipe, batchAmount, component)) // MAID lathe batch queue
                 return false;
 
             foreach (var (mat, amount) in recipe.Materials)
@@ -268,9 +272,9 @@ namespace Content.Server.Lathe
                     ? (int) (-amount * component.MaterialUseMultiplier)
                     : -amount;
 
-                _materialStorage.TryChangeMaterialAmount(uid, mat, adjustedAmount);
+                _materialStorage.TryChangeMaterialAmount(uid, mat, adjustedAmount * batchAmount); // MAID lathe batch queue
             }
-            component.Queue.Enqueue(recipe);
+            component.Queue.Enqueue(new LatheQueueEntry(recipe.ID, batchAmount)); // MAID lathe batch queue
 
             return true;
         }
@@ -279,11 +283,35 @@ namespace Content.Server.Lathe
         {
             if (!Resolve(uid, ref component))
                 return false;
+            // MAID BEGIN lathe batch queue
+            /*
             if (component.CurrentRecipe != null || component.Queue.Count <= 0 || !this.IsPowered(uid, EntityManager))
                 return false;
 
             var recipeProto = component.Queue.Dequeue();
             var recipe = _proto.Index(recipeProto);
+            */
+            if (component.CurrentRecipe != null
+                || (component.Queue.Count <= 0 && component.BatchRemaining <= 0)
+                || !this.IsPowered(uid, EntityManager))
+                return false;
+
+            ProtoId<LatheRecipePrototype> recipeProto;
+            if (component.BatchRemaining > 0 && component.BatchRecipe is { } batchRecipe)
+            {
+                recipeProto = batchRecipe;
+                component.BatchRemaining--;
+            }
+            else
+            {
+                var entry = component.Queue.Dequeue();
+                recipeProto = entry.Recipe;
+                component.BatchRecipe = entry.Recipe;
+                component.BatchTotal = entry.Amount;
+                component.BatchRemaining = entry.Amount - 1;
+            }
+            var recipe = _proto.Index(recipeProto);
+            // MAID END lathe batch queue
 
             var time = _reagentSpeed.ApplySpeed(uid, recipe.CompleteTime) * component.TimeMultiplier;
             // MAID BEGIN lathe min production time
@@ -372,10 +400,29 @@ namespace Content.Server.Lathe
                 return;
 
             var producing = component.CurrentRecipe;
-            if (producing == null && component.Queue.TryPeek(out var next))
-                producing = next;
+            // MAID BEGIN lathe batch queue
+            var batchRemaining = 0;
+            var batchTotal = 0;
+            if (producing != null)
+            {
+                batchRemaining = component.BatchRemaining + 1;
+                batchTotal = component.BatchTotal;
+            }
+            else if (component.BatchRemaining > 0 && component.BatchRecipe is { } pending)
+            {
+                producing = pending;
+                batchRemaining = component.BatchRemaining;
+                batchTotal = component.BatchTotal;
+            }
+            else if (component.Queue.TryPeek(out var next))
+            {
+                producing = next.Recipe;
+                batchRemaining = next.Amount;
+                batchTotal = next.Amount;
+            }
+            // MAID END lathe batch queue
 
-            var state = new LatheUpdateState(GetAvailableRecipes(uid, component), component.Queue.ToArray(), producing);
+            var state = new LatheUpdateState(GetAvailableRecipes(uid, component), component.Queue.ToArray(), producing, batchRemaining, batchTotal); // MAID lathe batch queue
             _uiSys.SetUiState(uid, LatheUiKey.Key, state);
         }
 
@@ -487,8 +534,10 @@ namespace Content.Server.Lathe
         // Goobstation - Lathe Queue Reset
         private void OnLatheQueueResetMessage(EntityUid uid, LatheComponent component, LatheQueueResetMessage args)
         {
-            if (component.Queue.Count > 0)
+            if (component.Queue.Count > 0 || component.BatchRemaining > 0) // MAID lathe batch queue
             {
+                // MAID BEGIN lathe batch queue
+                /*
                 var allMaterials = component.Queue.SelectMany(q => _proto.Index(q).Materials);
                 var totalMaterials = new Dictionary<string, int>();
 
@@ -498,6 +547,25 @@ namespace Content.Server.Lathe
                         totalMaterials[mat] = 0;
                     totalMaterials[mat] += amount;
                 }
+                */
+                var totalMaterials = new Dictionary<string, int>();
+
+                void Refund(ProtoId<LatheRecipePrototype> id, int count)
+                {
+                    foreach (var (mat, amount) in _proto.Index(id).Materials)
+                    {
+                        totalMaterials[mat] = totalMaterials.GetValueOrDefault(mat) + amount * count;
+                    }
+                }
+
+                foreach (var queued in component.Queue)
+                {
+                    Refund(queued.Recipe, queued.Amount);
+                }
+
+                if (component.BatchRecipe is { } batchRecipe && component.BatchRemaining > 0)
+                    Refund(batchRecipe, component.BatchRemaining);
+                // MAID END lathe batch queue
 
                 if(_materialStorage.CanChangeMaterialAmount(uid, totalMaterials))
                 {
@@ -506,6 +574,7 @@ namespace Content.Server.Lathe
                         _materialStorage.TryChangeMaterialAmount(uid, mat, amount);
                     }
                     component.Queue.Clear();
+                    component.BatchRemaining = 0; // MAID lathe batch queue
                 } else {
                     _popup.PopupEntity(Loc.GetString("lathe-queue-reset-material-overflow"), uid);
                 }
@@ -530,6 +599,8 @@ namespace Content.Server.Lathe
         {
             if (_proto.TryIndex(args.ID, out LatheRecipePrototype? recipe))
             {
+                // MAID BEGIN lathe batch queue
+                /*
                 var count = 0;
                 for (var i = 0; i < args.Quantity; i++)
                 {
@@ -538,6 +609,12 @@ namespace Content.Server.Lathe
                     else
                         break;
                 }
+                */
+                var count = 0;
+                var quantity = Math.Clamp(args.Quantity, 1, MaxBatchAmount);
+                if (TryAddToQueue(uid, recipe, component, quantity))
+                    count = quantity;
+                // MAID END lathe batch queue
                 if (count > 0)
                 {
                     _adminLogger.Add(LogType.Action,

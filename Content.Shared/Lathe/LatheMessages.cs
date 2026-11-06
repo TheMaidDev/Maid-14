@@ -34,17 +34,46 @@ public sealed class LatheUpdateState : BoundUserInterfaceState
 {
     public List<ProtoId<LatheRecipePrototype>> Recipes;
 
+    // MAID BEGIN lathe batch queue
+    /*
     public ProtoId<LatheRecipePrototype>[] Queue;
+    */
+    public LatheQueueEntry[] Queue;
+    // MAID END lathe batch queue
 
     public ProtoId<LatheRecipePrototype>? CurrentlyProducing;
 
-    public LatheUpdateState(List<ProtoId<LatheRecipePrototype>> recipes, ProtoId<LatheRecipePrototype>[] queue, ProtoId<LatheRecipePrototype>? currentlyProducing = null)
+    // MAID BEGIN lathe batch queue
+    /// <summary>
+    /// Units of the current batch still to be printed, including the one in progress.
+    /// </summary>
+    public int BatchRemaining;
+
+    /// <summary>
+    /// Total size of the current batch.
+    /// </summary>
+    public int BatchTotal;
+    // MAID END lathe batch queue
+
+    public LatheUpdateState(List<ProtoId<LatheRecipePrototype>> recipes, LatheQueueEntry[] queue, ProtoId<LatheRecipePrototype>? currentlyProducing = null, int batchRemaining = 0, int batchTotal = 0) // MAID lathe batch queue
     {
         Recipes = recipes;
         Queue = queue;
         CurrentlyProducing = currentlyProducing;
+        // MAID BEGIN lathe batch queue
+        BatchRemaining = batchRemaining;
+        BatchTotal = batchTotal;
+        // MAID END lathe batch queue
     }
 }
+
+// MAID BEGIN lathe batch queue
+/// <summary>
+/// One queue slot: a recipe printed <see cref="Amount"/> times in a row.
+/// </summary>
+[Serializable, NetSerializable]
+public readonly record struct LatheQueueEntry(ProtoId<LatheRecipePrototype> Recipe, int Amount);
+// MAID END lathe batch queue
 
 /// <summary>
 ///     Sent to the server to sync material storage and the recipe queue.

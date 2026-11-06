@@ -44,3 +44,5 @@ lathe-menu-materials-title = Materials
 lathe-menu-queue-title = Build Queue
 lathe-menu-queue-reset-title = Reset Queue
 lathe-menu-queue-reset-material-overflow = You notice that the autolathe is full.
+lathe-menu-queue-entry-batch = { $index }. { $name } x{ $amount }
+lathe-menu-fabricating-batch = { $name } (remaining { $remaining } of { $total })
