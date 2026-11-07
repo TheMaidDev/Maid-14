@@ -507,6 +507,9 @@ public abstract class SharedAutodocSystem : EntitySystem
         }
         catch (AutodocError e)
         {
+            // MAID BEGIN autodoc: do not retry an impossible surgery forever
+            ent.Comp2.CurrentSurgery = null;
+            // MAID END autodoc: do not retry an impossible surgery forever
             var error = Loc.GetString("autodoc-error-" + e.Message);
             var program = ent.Comp1.Programs[ent.Comp2.CurrentProgram];
             if (program.SkipFailed)
