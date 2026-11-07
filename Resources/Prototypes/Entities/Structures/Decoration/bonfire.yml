@@ -68,6 +68,9 @@
   - type: AmbientSound
     enabled: false
   - type: Campfire
+    fuelBlacklist:
+      components:
+      - Shovel
   - type: PlaceableSurface
     placeCentered: true
   - type: Appearance

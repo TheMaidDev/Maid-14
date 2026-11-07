@@ -1,4 +1,6 @@
 using Content.Shared.Materials;
+using Content.Shared.Tag;
+using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
@@ -62,6 +64,24 @@ public sealed partial class CampfireComponent : Component
     /// </summary>
     [DataField]
     public float MaxItemTemperature = 520f;
+
+    /// <summary>
+    /// Burn time in seconds for items tagged with the key that have no material composition at all
+    /// (banana peels, wrappers and other junk). Junk made of other materials, such as glass or metal,
+    /// does not burn.
+    /// </summary>
+    [DataField]
+    public Dictionary<ProtoId<TagPrototype>, float> FuelTags = new()
+    {
+        ["Trash"] = 10f,
+    };
+
+    /// <summary>
+    /// Items matching this are never accepted as fuel, even when made of a fuel material.
+    /// Living creatures are never fuel either.
+    /// </summary>
+    [DataField]
+    public EntityWhitelist? FuelBlacklist;
 
     /// <summary>
     /// Watts of heat put into the air of the fire's tile, by fuel stage: the fuel range is split into

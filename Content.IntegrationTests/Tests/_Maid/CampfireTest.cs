@@ -253,4 +253,37 @@ public sealed class CampfireTest
 
         await pair.CleanReturnAsync();
     }
+
+    [Test]
+    public async Task FuelRules()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            var fire = server.EntMan.SpawnEntity("Bonfire", map.GridCoords);
+            var user = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            var comp = server.EntMan.GetComponent<CampfireComponent>(fire);
+
+            bool Burns(string proto)
+            {
+                var before = comp.Fuel;
+                var item = server.EntMan.SpawnEntity(proto, map.GridCoords);
+                Use(server, user, item, fire);
+                var gone = server.EntMan.Deleted(item) || server.EntMan.IsQueuedForDeletion(item);
+                Assert.That(comp.Fuel > before, Is.EqualTo(gone), $"{proto}: fuel and consumption must agree");
+                return gone;
+            }
+
+            Assert.That(Burns("MaterialWoodPlank1"), Is.True);
+            Assert.That(Burns("TrashBananaPeel"), Is.True, "junk with the Trash tag burns");
+            Assert.That(Burns("Shovel"), Is.False, "shovels are not fuel");
+            Assert.That(Burns("LightBulb"), Is.False, "glass junk does not burn");
+            Assert.That(Burns("MobMouse"), Is.False, "creatures are not fuel");
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

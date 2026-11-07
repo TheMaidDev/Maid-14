@@ -8,11 +8,14 @@ using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Light.Components;
 using Content.Shared.Materials;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
 using Content.Shared.Stacks;
+using Content.Shared.Tag;
 using Content.Shared.Temperature;
 using Content.Shared.Temperature.Components;
 using Content.Shared.Verbs;
+using Content.Shared.Whitelist;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Maid.Campfire;
@@ -27,6 +30,8 @@ public sealed class CampfireSystem : SharedCampfireSystem
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly TemperatureSystem _temperature = default!;
 
     private readonly HashSet<Entity<TemperatureComponent>> _cooking = new();
@@ -116,18 +121,32 @@ public sealed class CampfireSystem : SharedCampfireSystem
 
     /// <summary>
     /// Burn time granted by one unit of <paramref name="item"/> (a single piece of a stack, or the whole item).
+    /// Items made of fuel materials burn by their material amounts; items with no material composition
+    /// at all burn only if they carry one of the junk tags.
     /// </summary>
     private bool TryGetFuelValue(Entity<CampfireComponent> campfire, EntityUid item, out float seconds)
     {
         seconds = 0f;
+        var comp = campfire.Comp;
 
-        if (!TryComp<PhysicalCompositionComponent>(item, out var composition))
+        if (HasComp<MobStateComponent>(item) || _whitelist.IsBlacklistPass(comp.FuelBlacklist, item))
             return false;
 
-        foreach (var (material, amount) in composition.MaterialComposition)
+        if (TryComp<PhysicalCompositionComponent>(item, out var composition) && composition.MaterialComposition.Count > 0)
         {
-            if (campfire.Comp.FuelPerMaterial.TryGetValue(material, out var perUnit))
-                seconds += perUnit * amount;
+            foreach (var (material, amount) in composition.MaterialComposition)
+            {
+                if (comp.FuelPerMaterial.TryGetValue(material, out var perUnit))
+                    seconds += perUnit * amount;
+            }
+
+            return seconds > 0f;
+        }
+
+        foreach (var (tag, perItem) in comp.FuelTags)
+        {
+            if (perItem > seconds && _tag.HasTag(item, tag))
+                seconds = perItem;
         }
 
         return seconds > 0f;
