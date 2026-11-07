@@ -246,7 +246,7 @@ namespace Content.Server.Lathe
         }
 
         // MAID BEGIN lathe queue limit
-        public static readonly TimeSpan MinProductionTime = TimeSpan.FromSeconds(1);
+        public static readonly TimeSpan MinProductionTime = TimeSpan.FromSeconds(0.1);
         // MAID END lathe queue limit
 
         public bool TryAddToQueue(EntityUid uid, LatheRecipePrototype recipe, LatheComponent? component = null, int batchAmount = 1) // MAID lathe batch queue
