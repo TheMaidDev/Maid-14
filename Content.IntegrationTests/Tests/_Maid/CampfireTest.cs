@@ -15,6 +15,7 @@ using Content.Shared.Temperature.Components;
 using Content.Shared._Maid.Campfire;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
 using Robust.Shared.Timing;
 using Robust.UnitTesting;
@@ -42,6 +43,28 @@ public sealed class CampfireTest
             moles[(int) Gas.Nitrogen] = 82.10312f;
             server.System<AtmosphereSystem>().SetMapAtmosphere(mapUid, false, new GasMixture(moles, Atmospherics.T20C));
         });
+    }
+
+    /// <summary>A sealed one-tile room: the fire spot in the middle, walls on all eight neighbours.</summary>
+    private static async Task BuildSealedRoom(RobustIntegrationTest.ServerIntegrationInstance server, Entity<MapGridComponent> grid)
+    {
+        await server.WaitPost(() =>
+        {
+            var maps = server.System<SharedMapSystem>();
+            var plating = new Tile(server.ResolveDependency<ITileDefinitionManager>()["Plating"].TileId);
+            for (var x = -1; x <= 1; x++)
+            {
+                for (var y = -1; y <= 1; y++)
+                {
+                    maps.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), plating);
+                    if (x != 0 || y != 0)
+                        server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, x + 0.5f, y + 0.5f));
+                }
+            }
+
+            server.EntMan.EnsureComponent<GridAtmosphereComponent>(grid);
+        });
+        await server.WaitRunTicks(5);
     }
 
     private static void Use(RobustIntegrationTest.ServerIntegrationInstance server, EntityUid user, EntityUid used, EntityUid target)
@@ -202,23 +225,7 @@ public sealed class CampfireTest
         EntityUid fire = default;
         EntityUid user = default;
 
-        // A sealed one-tile room: the fire in the middle, walls on all eight neighbours.
-        await server.WaitPost(() =>
-        {
-            var maps = server.System<SharedMapSystem>();
-            var plating = new Tile(server.ResolveDependency<ITileDefinitionManager>()["Plating"].TileId);
-            for (var x = -1; x <= 1; x++)
-            {
-                for (var y = -1; y <= 1; y++)
-                {
-                    maps.SetTile(map.Grid.Owner, map.Grid.Comp, new Vector2i(x, y), plating);
-                    if (x != 0 || y != 0)
-                        server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(map.Grid, x + 0.5f, y + 0.5f));
-                }
-            }
-
-            server.EntMan.EnsureComponent<GridAtmosphereComponent>(map.Grid);
-        });
+        await BuildSealedRoom(server, map.Grid);
         await server.WaitRunTicks(5);
 
         await server.WaitAssertion(() =>
@@ -595,6 +602,43 @@ public sealed class CampfireTest
         await server.WaitRunTicks(30);
 
         await server.WaitAssertion(() => Assert.That(IsLit(server, fire), Is.False, "vapor collision should reach the fire"));
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task PuttingOutWithWaterReleasesSteam()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        var atmos = server.System<AtmosphereSystem>();
+        await BuildSealedRoom(server, map.Grid);
+
+        await server.WaitAssertion(() =>
+        {
+            var spot = new EntityCoordinates(map.Grid, 0.5f, 0.5f);
+            var (fire, user) = LightFire(server, spot, 15);
+            var air = atmos.GetTileMixture(fire)!;
+            Assert.That(air.Immutable, Is.False);
+            air.Clear();
+            air.AdjustMoles(Gas.Oxygen, 21.824779f);
+            air.AdjustMoles(Gas.Nitrogen, 82.10312f);
+            air.Temperature = Atmospherics.T20C;
+            Assert.That(air.GetMoles(Gas.WaterVapor), Is.EqualTo(0f));
+
+            Assert.That(IsLit(server, fire), Is.True);
+
+            server.System<ReactiveSystem>().ReactionEntity(fire, ReactionMethod.Touch, new ReagentQuantity("Water", 50), null);
+            Assert.That(IsLit(server, fire), Is.False);
+            Assert.That(air.GetMoles(Gas.WaterVapor), Is.EqualTo(16f).Within(0.01f), "a large fire gives a lot of steam");
+
+            // A smaller fire gives less.
+            var (fire2, _) = LightFire(server, spot, 2);
+            var before = air.GetMoles(Gas.WaterVapor);
+            server.System<ReactiveSystem>().ReactionEntity(fire2, ReactionMethod.Touch, new ReagentQuantity("Water", 50), null);
+            Assert.That(air.GetMoles(Gas.WaterVapor) - before, Is.EqualTo(4f).Within(0.01f), "a small fire gives little steam");
+        });
 
         await pair.CleanReturnAsync();
     }

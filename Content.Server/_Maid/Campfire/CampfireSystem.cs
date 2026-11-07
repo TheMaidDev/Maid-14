@@ -23,6 +23,7 @@ using Content.Shared.Temperature;
 using Content.Shared.Temperature.Components;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
@@ -31,6 +32,7 @@ namespace Content.Server._Maid.Campfire;
 public sealed class CampfireSystem : SharedCampfireSystem
 {
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly FlammableSystem _flammable = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -236,8 +238,34 @@ public sealed class CampfireSystem : SharedCampfireSystem
 
     private void Douse(Entity<CampfireComponent> ent)
     {
+        var stage = GetStage(ent.Comp);
         SetLit(ent, false);
         _popup.PopupEntity(Loc.GetString("campfire-doused", ("fire", ent)), ent, PopupType.Medium);
+        _audio.PlayPvs(ent.Comp.ExtinguishSound, ent);
+        ReleaseSteam(ent, stage);
+    }
+
+    /// <summary>
+    /// Hot water vapor puffs into the air of the tile when a fire is put out with a liquid; the bigger the fire,
+    /// the more of it. Nothing happens on tiles without real air.
+    /// </summary>
+    private void ReleaseSteam(Entity<CampfireComponent> ent, int stage)
+    {
+        var comp = ent.Comp;
+        if (comp.SteamMoles.Count == 0)
+            return;
+
+        var moles = comp.SteamMoles[Math.Clamp(stage, 0, comp.SteamMoles.Count - 1)];
+        if (moles <= 0f)
+            return;
+
+        var mixture = _atmosphere.GetTileMixture((ent.Owner, Transform(ent)), excite: true);
+        if (mixture == null || mixture.Immutable)
+            return;
+
+        var steam = new GasMixture(new float[Atmospherics.AdjustedNumberOfGases], comp.SteamTemperature);
+        steam.AdjustMoles(Gas.WaterVapor, moles);
+        _atmosphere.Merge(mixture, steam);
     }
 
     /// <summary>

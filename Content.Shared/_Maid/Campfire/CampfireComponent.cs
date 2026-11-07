@@ -1,6 +1,7 @@
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Materials;
 using Content.Shared.Tag;
+using Robust.Shared.Audio;
 using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -184,6 +185,25 @@ public sealed partial class CampfireComponent : Component
 
     [ViewVariables]
     public TimeSpan LastSprayHit;
+
+    /// <summary>
+    /// Moles of water vapor released into the air of the fire's tile when it is put out with a liquid,
+    /// by fuel stage like <see cref="AirHeatPowers"/> (the bigger the fire, the more steam).
+    /// </summary>
+    [DataField]
+    public List<float> SteamMoles = new() { 4f, 8f, 16f };
+
+    /// <summary>
+    /// Temperature of the released steam (kelvin).
+    /// </summary>
+    [DataField]
+    public float SteamTemperature = 373.15f;
+
+    /// <summary>
+    /// Played when the fire is put out with a liquid.
+    /// </summary>
+    [DataField]
+    public SoundSpecifier ExtinguishSound = new SoundPathSpecifier("/Audio/Effects/sizzle.ogg");
 
     /// <summary>
     /// Seconds between burn and heat ticks.
