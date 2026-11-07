@@ -23,10 +23,15 @@
     state: pinpointer-science
   - type: Pinpointer
     updateTargetName: true
-    canRetarget: true
-    retargetingWhitelist: # Goob edit: pinpointer whitelist
+#MAID BEGIN
+#    canRetarget: true
+#    retargetingWhitelist: # Goob edit: pinpointer whitelist
+#      components:
+#      - Anomaly
+    whitelist:
       components:
       - Anomaly
+#MAID END
 
 - type: entity
   name: artifact pinpointer
@@ -44,11 +49,13 @@
       visible: false
   - type: Icon
     state: pinpointer-science
-  - type: Pinpointer 
+  - type: Pinpointer
     targetName: artifact
-    # whitelist: # Goob edit: pinpointer whitelist #Maid вырезано - крашит локалку
-    #   components: #Maid вырезано - крашит локалку
-    #   - Artifact #Maid вырезано - крашит локалку
+#MAID BEGIN
+    whitelist:
+      components:
+      - XenoArtifact
+#MAID END
 
 - type: entity
   name: borg pinpointer
