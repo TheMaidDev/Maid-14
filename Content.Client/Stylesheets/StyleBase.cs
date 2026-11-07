@@ -64,10 +64,12 @@ namespace Content.Client.Stylesheets
         // Goobstation - ZH text support
         protected StyleBase(IResourceCache resCache)
         {
+            // Maid-Tweak-start
             var notoSans12 = resCache.GetFont
             (
                 new []
                 {
+                    "/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Light.ttf",
                     "/Fonts/NotoSans/NotoSans-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
@@ -79,6 +81,7 @@ namespace Content.Client.Stylesheets
             (
                 new []
                 {
+                    "/Fonts/_Maid/IBMPlexMono/IBMPlexMono-LightItalic.ttf", // Maid-Tweak-end
                     "/Fonts/NotoSans/NotoSans-Italic.ttf",
                     "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
