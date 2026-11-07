@@ -28,7 +28,7 @@
           completed:
             - !type:GivePrototype
               prototype: SheetSteel1
-              amount: 1 # MAID
+              amount: 2
             - !type:DeleteEntity {}
           steps:
             - tool: Welding
@@ -81,7 +81,7 @@
           completed:
             - !type:GivePrototype
               prototype: SheetSteel1
-              amount: 1 # MAID
+              amount: 2
             - !type:GivePrototype # goobstation - lens to camera
               prototype: SheetGlass1
               amount: 1
