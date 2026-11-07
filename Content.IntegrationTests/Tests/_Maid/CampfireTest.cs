@@ -7,6 +7,7 @@ using Content.Shared.Temperature.Components;
 using Content.Shared.Interaction;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
+using Robust.Shared.Maths;
 using Robust.UnitTesting;
 
 namespace Content.IntegrationTests.Tests._Maid;
@@ -22,6 +23,17 @@ public sealed class CampfireTest
   - type: AlwaysHot
 ";
 
+    private static async Task AddAir(RobustIntegrationTest.ServerIntegrationInstance server, EntityUid mapUid)
+    {
+        await server.WaitPost(() =>
+        {
+            var moles = new float[Atmospherics.AdjustedNumberOfGases];
+            moles[(int) Gas.Oxygen] = 21.824779f;
+            moles[(int) Gas.Nitrogen] = 82.10312f;
+            server.System<AtmosphereSystem>().SetMapAtmosphere(mapUid, false, new GasMixture(moles, Atmospherics.T20C));
+        });
+    }
+
     private static void Use(RobustIntegrationTest.ServerIntegrationInstance server, EntityUid user, EntityUid used, EntityUid target)
     {
         var ev = new InteractUsingEvent(user, used, target, new EntityCoordinates(target, 0, 0));
@@ -34,6 +46,7 @@ public sealed class CampfireTest
         await using var pair = await PoolManager.GetServerClient();
         var server = pair.Server;
         var map = await pair.CreateTestMap();
+        await AddAir(server, map.MapUid);
 
         EntityUid fire = default;
         EntityUid user = default;
@@ -179,17 +192,29 @@ public sealed class CampfireTest
         EntityUid fire = default;
         EntityUid user = default;
 
+        // A sealed one-tile room: the fire in the middle, walls on all eight neighbours.
         await server.WaitPost(() =>
         {
-            server.EntMan.AddComponent<GridAtmosphereComponent>(map.Grid);
-            server.EntMan.System<AtmosphereSystem>();
+            var maps = server.System<SharedMapSystem>();
+            var plating = new Tile(server.ResolveDependency<ITileDefinitionManager>()["Plating"].TileId);
+            for (var x = -1; x <= 1; x++)
+            {
+                for (var y = -1; y <= 1; y++)
+                {
+                    maps.SetTile(map.Grid.Owner, map.Grid.Comp, new Vector2i(x, y), plating);
+                    if (x != 0 || y != 0)
+                        server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(map.Grid, x + 0.5f, y + 0.5f));
+                }
+            }
+
+            server.EntMan.EnsureComponent<GridAtmosphereComponent>(map.Grid);
         });
         await server.WaitRunTicks(5);
 
         await server.WaitAssertion(() =>
         {
-            fire = server.EntMan.SpawnEntity("Bonfire", map.GridCoords);
-            user = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            fire = server.EntMan.SpawnEntity("Bonfire", new EntityCoordinates(map.Grid, 0.5f, 0.5f));
+            user = server.EntMan.SpawnEntity("MobHuman", new EntityCoordinates(map.Grid, 0.5f, 0.5f));
             var air = atmos.GetTileMixture(fire);
             Assert.That(air, Is.Not.Null);
             Assert.That(air!.Immutable, Is.False, "test grid should have real air");
@@ -212,8 +237,7 @@ public sealed class CampfireTest
             var air = atmos.GetTileMixture(fire)!;
             Assert.That(comp.Lit, Is.True);
             Assert.That(air.Temperature, Is.GreaterThan(Atmospherics.T20C + 1f));
-            // Atmos may have spread some heat to neighbours, never past the ceiling.
-            Assert.That(air.Temperature, Is.LessThanOrEqualTo(comp.AirHeatMaxTemperature + 10f));
+            Assert.That(air.Temperature, Is.LessThanOrEqualTo(comp.AirHeatMaxTemperature + 1f));
         });
 
         // Long after the ceiling is reached the tile stays near it instead of running away.
@@ -223,7 +247,9 @@ public sealed class CampfireTest
         {
             var comp = server.EntMan.GetComponent<CampfireComponent>(fire);
             var air = atmos.GetTileMixture(fire)!;
-            Assert.That(air.Temperature, Is.LessThanOrEqualTo(comp.AirHeatMaxTemperature + 10f));
+            Assert.That(comp.Lit, Is.True);
+            Assert.That(air.Temperature, Is.LessThanOrEqualTo(comp.AirHeatMaxTemperature + 1f));
+            Assert.That(air.Temperature, Is.GreaterThan(comp.AirHeatMaxTemperature - 5f));
         });
 
         await pair.CleanReturnAsync();
@@ -287,6 +313,68 @@ public sealed class CampfireTest
             Assert.That(Burns("Shovel"), Is.False, "shovels are not fuel");
             Assert.That(Burns("MobMouse"), Is.False, "creatures are not fuel");
         });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task CampfireGoesOutWithoutOxygen()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap(); // space: no air at all
+
+        EntityUid fire = default;
+
+        await server.WaitAssertion(() =>
+        {
+            fire = server.EntMan.SpawnEntity("Bonfire", map.GridCoords);
+            var user = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            for (var i = 0; i < 5; i++)
+                Use(server, user, server.EntMan.SpawnEntity("MaterialWoodPlank1", map.GridCoords), fire);
+            Use(server, user, server.EntMan.SpawnEntity("TestCampfireHotItem", map.GridCoords), fire);
+            Assert.That(server.EntMan.GetComponent<CampfireComponent>(fire).Lit, Is.True);
+        });
+
+        // Still burning within the 3 second grace period...
+        await server.WaitRunTicks(30 * 2);
+        await server.WaitAssertion(() =>
+            Assert.That(server.EntMan.GetComponent<CampfireComponent>(fire).Lit, Is.True));
+
+        // ...and out shortly after, with fuel left over.
+        await server.WaitRunTicks(30 * 4);
+        await server.WaitAssertion(() =>
+        {
+            var comp = server.EntMan.GetComponent<CampfireComponent>(fire);
+            Assert.That(comp.Lit, Is.False);
+            Assert.That(comp.Fuel, Is.GreaterThan(0f));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task CampfireKeepsBurningInAir()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+        await AddAir(server, map.MapUid);
+
+        EntityUid fire = default;
+
+        await server.WaitAssertion(() =>
+        {
+            fire = server.EntMan.SpawnEntity("Bonfire", map.GridCoords);
+            var user = server.EntMan.SpawnEntity("MobHuman", map.GridCoords);
+            for (var i = 0; i < 5; i++)
+                Use(server, user, server.EntMan.SpawnEntity("MaterialWoodPlank1", map.GridCoords), fire);
+            Use(server, user, server.EntMan.SpawnEntity("TestCampfireHotItem", map.GridCoords), fire);
+        });
+
+        await server.WaitRunTicks(30 * 20);
+        await server.WaitAssertion(() =>
+            Assert.That(server.EntMan.GetComponent<CampfireComponent>(fire).Lit, Is.True));
 
         await pair.CleanReturnAsync();
     }

@@ -3,6 +3,7 @@ using Content.Server.Stack;
 using Content.Server.Temperature.Components;
 using Content.Server.Temperature.Systems;
 using Content.Shared._Maid.Campfire;
+using Content.Shared.Atmos;
 using Content.Shared.Audio;
 using Content.Shared.Interaction;
 using Content.Shared.Item;
@@ -158,6 +159,7 @@ public sealed class CampfireSystem : SharedCampfireSystem
             return;
 
         ent.Comp.Lit = lit;
+        ent.Comp.OxygenlessTime = 0f;
         ent.Comp.NextUpdate = _timing.CurTime + TimeSpan.FromSeconds(ent.Comp.UpdateInterval);
         Dirty(ent);
         ApplyLitState(ent);
@@ -206,6 +208,22 @@ public sealed class CampfireSystem : SharedCampfireSystem
             var ent = (uid, comp);
             var dt = comp.UpdateInterval;
             comp.NextUpdate = curTime + TimeSpan.FromSeconds(dt);
+
+            // No air, no fire.
+            if (HasOxygen((uid, xform), comp))
+            {
+                comp.OxygenlessTime = 0f;
+            }
+            else
+            {
+                comp.OxygenlessTime += dt;
+                if (comp.OxygenlessTime > comp.MaxOxygenlessTime)
+                {
+                    SetLit(ent, false);
+                    _popup.PopupEntity(Loc.GetString("campfire-suffocated", ("fire", uid)), uid, PopupType.Small);
+                    continue;
+                }
+            }
 
             comp.Fuel = Math.Max(0f, comp.Fuel - dt);
             UpdateFuelLevel(ent);
@@ -265,5 +283,11 @@ public sealed class CampfireSystem : SharedCampfireSystem
         // Thin air has next to no heat capacity, so never push it past the ceiling in a single step.
         var headroom = (comp.AirHeatMaxTemperature - mixture.Temperature) * _atmosphere.GetHeatCapacity(mixture, true);
         _atmosphere.AddHeat(mixture, Math.Min(power * dt, headroom));
+    }
+
+    private bool HasOxygen(Entity<TransformComponent> ent, CampfireComponent comp)
+    {
+        var mixture = _atmosphere.GetTileMixture((ent.Owner, ent.Comp));
+        return mixture != null && mixture.GetMoles(Gas.Oxygen) >= comp.MinOxygenMoles;
     }
 }

@@ -12,3 +12,4 @@ campfire-full = { CAPITALIZE(THE($fire)) } can't hold any more fuel.
 campfire-add-fuel = { CAPITALIZE(THE($user)) } feeds { THE($item) } to the fire.
 campfire-burned-out = { CAPITALIZE(THE($fire)) } burns out.
 campfire-verb-extinguish = Put out the fire
+campfire-suffocated = { CAPITALIZE(THE($fire)) } goes out without air.

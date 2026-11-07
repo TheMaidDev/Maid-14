@@ -3,7 +3,7 @@
 Only the plain bonfire (`Bonfire`) is a fuelled fire, not a permanent heat source: it starts unlit and empty, has to be fed and lit by hand, and only while burning heats items lying on it, so existing temperature-based recipes cook food over it. The other bonfires (`LegionnaireBonfire`, `RMCCampfire`) share the abstract `BonfireBase` with it but keep the old behaviour: always hot, always burning, nothing cooks on them. Prototypes cannot drop inherited components, which is why the shared parts moved to the base and only `Bonfire` adds the system. Code lives in the `_Maid` folders of Shared and Server (`Campfire`).
 
 ## Pieces
-- `CampfireComponent` holds remaining burn time, a cap on it, the materials that count as fuel with burn seconds per material unit, heat power per item, a temperature ceiling for heated items, the pickup radius, the item limit, the tick interval, the air heating powers (one per fuel stage) and the air temperature ceiling. The lit flag and a coarse remaining-time level (empty plus five fifths of the fuel cap) are networked; exact fuel stays server-side.
+- `CampfireComponent` holds remaining burn time, a cap on it, the materials that count as fuel with burn seconds per material unit, heat power per item, a temperature ceiling for heated items, the pickup radius, the item limit, the tick interval, the air heating powers (one per fuel stage), the air temperature ceiling, and the oxygen threshold and grace time. The lit flag and a coarse remaining-time level (empty plus five fifths of the fuel cap) are networked; exact fuel stays server-side.
 - The prototype also carries `PlaceableSurface` (items placed on it land in the centre) and a `GenericVisualizer` that shows the fire layer only while lit. The old `AlwaysHot` is gone from the bonfire; the system answers the "is hot" query itself while lit, so a burning fire still lights cigarettes and torches. Light and ambient fire sound start disabled and follow the lit state.
 
 ## Flow
@@ -12,6 +12,7 @@ Only the plain bonfire (`Bonfire`) is a fuelled fire, not a permanent heat sourc
 - Once per interval a lit fire burns fuel and heats loose items (item component plus temperature component) within the radius, up to the item limit, by adding heat energy until they reach the ceiling. Cooking itself is not new: construction graph steps with a minimum temperature fire on temperature change, using internal temperature when present. Running out of fuel puts the fire out. An alternative verb puts a lit fire out by hand.
 - Examine shows the lit state and the remaining burn time as a range (13-15, 10-12, 7-10, 4-7, 1-3 minutes), one range per fifth of the fuel cap. The texts assume the default 15-minute cap.
 - The same tick also warms the air of the fire's tile. Power follows the fuel stage (the fuel range is split into three equal parts: 300, 400, 600 W, fullest stage strongest); atmos spreads the heat to neighbouring tiles. Heating stops at the ceiling (about 40 °C) and each step is limited to the headroom below it, because thin air has almost no heat capacity and would otherwise jump by thousands of kelvin. Immutable mixtures (space, map atmosphere) are skipped. Heat goes in on the scaled atmos heat capacity, so rooms warm several times faster than physical air would.
+- A lit fire needs air: each tick it checks the oxygen in its tile (below one mole counts as none; space and other airless tiles always do). After more than three seconds without oxygen it goes out with a popup, keeping its remaining fuel; the counter resets as soon as oxygen is back. Lighting it in vacuum works, it just dies a few seconds later.
 - Mobs are never heated; only items.
 
 ## Tuning notes
@@ -19,4 +20,4 @@ Only the plain bonfire (`Bonfire`) is a fuelled fire, not a permanent heat sourc
 - Not covered: putting the fire out with water/extinguishers, burning mobs or items thrown in, fuel-dependent heat strength.
 
 ## Tests
-- `CampfireTest` (integration, `_Maid`): feeding, lighting, cooking raw meat, burning out, an unlit fire not cooking, the examine level for each amount of fuel, and the air warming up to its ceiling.
+- `CampfireTest` (integration, `_Maid`): feeding, lighting, cooking raw meat, burning out, an unlit fire not cooking, the examine level for each amount of fuel, the fuel rules, the air warming up to its ceiling in a sealed room, and going out without oxygen (and not in air). Tests that need a lit fire put air on the map, since the default test map is space.

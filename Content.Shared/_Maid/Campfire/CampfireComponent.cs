@@ -108,6 +108,25 @@ public sealed partial class CampfireComponent : Component
     public int MaxCookedItems = 4;
 
     /// <summary>
+    /// A lit fire goes out after standing in air with less oxygen than this (moles) for longer than
+    /// <see cref="MaxOxygenlessTime"/>. Space and other airless tiles have none.
+    /// </summary>
+    [DataField]
+    public float MinOxygenMoles = 1f;
+
+    /// <summary>
+    /// Seconds a lit fire may burn without oxygen before it goes out.
+    /// </summary>
+    [DataField]
+    public float MaxOxygenlessTime = 3f;
+
+    /// <summary>
+    /// How long the fire has been without oxygen so far, in seconds.
+    /// </summary>
+    [ViewVariables]
+    public float OxygenlessTime;
+
+    /// <summary>
     /// Seconds between burn and heat ticks.
     /// </summary>
     [DataField]
