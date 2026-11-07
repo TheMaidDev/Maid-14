@@ -122,7 +122,7 @@ public sealed class CampfireSystem : SharedCampfireSystem
     /// <summary>
     /// Burn time granted by one unit of <paramref name="item"/> (a single piece of a stack, or the whole item).
     /// Items made of fuel materials burn by their material amounts; items with no material composition
-    /// at all burn only if they carry one of the junk tags.
+    /// at all burn only if they carry one of the fuel tags.
     /// </summary>
     private bool TryGetFuelValue(Entity<CampfireComponent> campfire, EntityUid item, out float seconds)
     {

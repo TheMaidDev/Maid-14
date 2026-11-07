@@ -71,6 +71,8 @@
     fuelBlacklist:
       components:
       - Shovel
+      tags:
+      - Trash
   - type: PlaceableSurface
     placeCentered: true
   - type: Appearance

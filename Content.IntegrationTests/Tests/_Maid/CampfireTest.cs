@@ -278,9 +278,13 @@ public sealed class CampfireTest
             }
 
             Assert.That(Burns("MaterialWoodPlank1"), Is.True);
-            Assert.That(Burns("TrashBananaPeel"), Is.True, "junk with the Trash tag burns");
+            Assert.That(Burns("Paper"), Is.True, "items with the Paper tag burn");
+            Assert.That(Burns("BookSpaceLaw"), Is.True, "books carry the Paper tag");
+            Assert.That(Burns("SheetPaper1"), Is.True, "paper material burns");
+            Assert.That(Burns("PaperScrap"), Is.False, "anything tagged Trash is not fuel, even paper");
+            Assert.That(Burns("TrashBananaPeel"), Is.False, "trash is not fuel");
+            Assert.That(Burns("FoodPacketLollypopTrash"), Is.False, "trash is not fuel even when made of paper");
             Assert.That(Burns("Shovel"), Is.False, "shovels are not fuel");
-            Assert.That(Burns("LightBulb"), Is.False, "glass junk does not burn");
             Assert.That(Burns("MobMouse"), Is.False, "creatures are not fuel");
         });
 

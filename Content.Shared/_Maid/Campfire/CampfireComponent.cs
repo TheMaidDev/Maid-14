@@ -67,17 +67,16 @@ public sealed partial class CampfireComponent : Component
 
     /// <summary>
     /// Burn time in seconds for items tagged with the key that have no material composition at all
-    /// (banana peels, wrappers and other junk). Junk made of other materials, such as glass or metal,
-    /// does not burn.
+    /// (paper, books and the like).
     /// </summary>
     [DataField]
     public Dictionary<ProtoId<TagPrototype>, float> FuelTags = new()
     {
-        ["Trash"] = 10f,
+        ["Paper"] = 20f,
     };
 
     /// <summary>
-    /// Items matching this are never accepted as fuel, even when made of a fuel material.
+    /// Items matching this are never accepted as fuel, even when made of a fuel material or tagged as fuel.
     /// Living creatures are never fuel either.
     /// </summary>
     [DataField]
