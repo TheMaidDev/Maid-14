@@ -22,9 +22,11 @@ public abstract class SharedCampfireSystem : EntitySystem
 
         var fuel = ent.Comp.FuelLevel switch
         {
-            CampfireFuelLevel.Low => "campfire-examine-fuel-low",
-            CampfireFuelLevel.Medium => "campfire-examine-fuel-medium",
-            CampfireFuelLevel.High => "campfire-examine-fuel-high",
+            CampfireFuelLevel.Embers => "campfire-examine-time-embers",
+            CampfireFuelLevel.Low => "campfire-examine-time-low",
+            CampfireFuelLevel.Medium => "campfire-examine-time-medium",
+            CampfireFuelLevel.High => "campfire-examine-time-high",
+            CampfireFuelLevel.Full => "campfire-examine-time-full",
             _ => "campfire-examine-fuel-empty",
         };
         args.PushMarkup(Loc.GetString(fuel));

@@ -1,3 +1,4 @@
+using Content.Server.Atmos.EntitySystems;
 using Content.Server.Stack;
 using Content.Server.Temperature.Components;
 using Content.Server.Temperature.Systems;
@@ -18,6 +19,7 @@ namespace Content.Server._Maid.Campfire;
 
 public sealed class CampfireSystem : SharedCampfireSystem
 {
+    [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedAmbientSoundSystem _ambient = default!;
@@ -154,11 +156,15 @@ public sealed class CampfireSystem : SharedCampfireSystem
         var ratio = ent.Comp.MaxFuel > 0f ? ent.Comp.Fuel / ent.Comp.MaxFuel : 0f;
         var level = ent.Comp.Fuel <= 0f
             ? CampfireFuelLevel.Empty
-            : ratio < 0.33f
-                ? CampfireFuelLevel.Low
-                : ratio < 0.66f
-                    ? CampfireFuelLevel.Medium
-                    : CampfireFuelLevel.High;
+            : ratio >= 0.8f
+                ? CampfireFuelLevel.Full
+                : ratio >= 0.6f
+                    ? CampfireFuelLevel.High
+                    : ratio >= 0.4f
+                        ? CampfireFuelLevel.Medium
+                        : ratio >= 0.2f
+                            ? CampfireFuelLevel.Low
+                            : CampfireFuelLevel.Embers;
 
         if (ent.Comp.FuelLevel == level)
             return;
@@ -186,6 +192,7 @@ public sealed class CampfireSystem : SharedCampfireSystem
             UpdateFuelLevel(ent);
 
             HeatItems(comp, xform, dt);
+            HeatAir((uid, xform), comp, dt);
 
             if (comp.Fuel <= 0f)
             {
@@ -215,5 +222,29 @@ public sealed class CampfireSystem : SharedCampfireSystem
 
             _temperature.ChangeHeat(item, comp.HeatPower * dt, temperature: item.Comp);
         }
+    }
+
+    /// <summary>
+    /// Warms the air of the fire's tile; the atmos system then spreads it to the neighbours.
+    /// The power depends on how much fuel is left, and the fire stops adding heat past a ceiling.
+    /// </summary>
+    private void HeatAir(Entity<TransformComponent> ent, CampfireComponent comp, float dt)
+    {
+        var stages = comp.AirHeatPowers.Count;
+        if (stages == 0 || comp.MaxFuel <= 0f)
+            return;
+
+        var stage = Math.Clamp((int) (comp.Fuel / comp.MaxFuel * stages), 0, stages - 1);
+        var power = comp.AirHeatPowers[stage];
+        if (power <= 0f)
+            return;
+
+        var mixture = _atmosphere.GetTileMixture((ent.Owner, ent.Comp), excite: true);
+        if (mixture == null || mixture.Immutable || mixture.Temperature >= comp.AirHeatMaxTemperature)
+            return;
+
+        // Thin air has next to no heat capacity, so never push it past the ceiling in a single step.
+        var headroom = (comp.AirHeatMaxTemperature - mixture.Temperature) * _atmosphere.GetHeatCapacity(mixture, true);
+        _atmosphere.AddHeat(mixture, Math.Min(power * dt, headroom));
     }
 }

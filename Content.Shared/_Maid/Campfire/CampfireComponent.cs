@@ -21,7 +21,8 @@ public sealed partial class CampfireComponent : Component
     public bool Lit;
 
     /// <summary>
-    /// Coarse fuel level, used for examine text and visuals.
+    /// Coarse remaining burn time, shown on examine. The five non-empty levels are the fifths of
+    /// <see cref="MaxFuel"/>, which the examine texts (written for 15 minutes) assume.
     /// </summary>
     [DataField, AutoNetworkedField]
     public CampfireFuelLevel FuelLevel;
@@ -63,6 +64,19 @@ public sealed partial class CampfireComponent : Component
     public float MaxItemTemperature = 520f;
 
     /// <summary>
+    /// Watts of heat put into the air of the fire's tile, by fuel stage: the fuel range is split into
+    /// as many equal parts as there are entries, from nearly empty to full.
+    /// </summary>
+    [DataField]
+    public List<float> AirHeatPowers = new() { 300f, 400f, 600f };
+
+    /// <summary>
+    /// The fire stops heating the air of its tile once it is this warm (kelvin).
+    /// </summary>
+    [DataField]
+    public float AirHeatMaxTemperature = 313.15f;
+
+    /// <summary>
     /// How far from the fire's center an item still counts as lying on it.
     /// </summary>
     [DataField]
@@ -88,9 +102,11 @@ public sealed partial class CampfireComponent : Component
 public enum CampfireFuelLevel : byte
 {
     Empty,
-    Low,
-    Medium,
-    High,
+    Embers, // 1-3 minutes
+    Low, // 4-7 minutes
+    Medium, // 7-10 minutes
+    High, // 10-12 minutes
+    Full, // 13-15 minutes
 }
 
 [Serializable, NetSerializable]

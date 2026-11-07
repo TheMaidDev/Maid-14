@@ -1,9 +1,11 @@
 campfire-examine-lit = The fire is burning.
 campfire-examine-unlit = The fire is not lit.
 campfire-examine-fuel-empty = There is no fuel in it.
-campfire-examine-fuel-low = There is very little fuel left.
-campfire-examine-fuel-medium = There is some fuel left.
-campfire-examine-fuel-high = It is piled high with fuel.
+campfire-examine-time-embers = About 1-3 minutes left.
+campfire-examine-time-low = About 4-7 minutes left.
+campfire-examine-time-medium = About 7-10 minutes left.
+campfire-examine-time-high = About 10-12 minutes left.
+campfire-examine-time-full = About 13-15 minutes left.
 campfire-no-fuel = There is nothing to burn, add some wood or cloth first.
 campfire-ignite = { CAPITALIZE(THE($user)) } lights { THE($fire) }.
 campfire-full = { CAPITALIZE(THE($fire)) } can't hold any more fuel.

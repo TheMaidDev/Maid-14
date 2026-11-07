@@ -1,9 +1,11 @@
 campfire-examine-lit = Огонь горит.
 campfire-examine-unlit = Огонь не разожжён.
 campfire-examine-fuel-empty = Топлива нет.
-campfire-examine-fuel-low = Топлива осталось совсем мало.
-campfire-examine-fuel-medium = Топлива осталось немного.
-campfire-examine-fuel-high = Топлива навалено много.
+campfire-examine-time-embers = Осталось приблизительно 1-3 минуты.
+campfire-examine-time-low = Осталось приблизительно 4-7 минут.
+campfire-examine-time-medium = Осталось приблизительно 7-10 минут.
+campfire-examine-time-high = Осталось приблизительно 10-12 минут.
+campfire-examine-time-full = Осталось приблизительно 13-15 минут.
 campfire-no-fuel = Гореть нечему, сначала подбросьте досок или ткани.
 campfire-ignite = { CAPITALIZE(THE($user)) } разжигает { THE($fire) }.
 campfire-full = В { THE($fire) } больше не поместится топлива.
