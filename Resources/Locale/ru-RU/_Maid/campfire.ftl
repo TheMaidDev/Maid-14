@@ -1,0 +1,12 @@
+campfire-examine-lit = Огонь горит.
+campfire-examine-unlit = Огонь не разожжён.
+campfire-examine-fuel-empty = Топлива нет.
+campfire-examine-fuel-low = Топлива осталось совсем мало.
+campfire-examine-fuel-medium = Топлива осталось немного.
+campfire-examine-fuel-high = Топлива навалено много.
+campfire-no-fuel = Гореть нечему, сначала подбросьте досок или ткани.
+campfire-ignite = { CAPITALIZE(THE($user)) } разжигает { THE($fire) }.
+campfire-full = В { THE($fire) } больше не поместится топлива.
+campfire-add-fuel = { CAPITALIZE(THE($user)) } подбрасывает { THE($item) } в огонь.
+campfire-burned-out = { CAPITALIZE(THE($fire)) } прогорает.
+campfire-verb-extinguish = Потушить огонь

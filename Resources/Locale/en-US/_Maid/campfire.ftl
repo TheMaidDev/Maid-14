@@ -1,0 +1,12 @@
+campfire-examine-lit = The fire is burning.
+campfire-examine-unlit = The fire is not lit.
+campfire-examine-fuel-empty = There is no fuel in it.
+campfire-examine-fuel-low = There is very little fuel left.
+campfire-examine-fuel-medium = There is some fuel left.
+campfire-examine-fuel-high = It is piled high with fuel.
+campfire-no-fuel = There is nothing to burn, add some wood or cloth first.
+campfire-ignite = { CAPITALIZE(THE($user)) } lights { THE($fire) }.
+campfire-full = { CAPITALIZE(THE($fire)) } can't hold any more fuel.
+campfire-add-fuel = { CAPITALIZE(THE($user)) } feeds { THE($item) } to the fire.
+campfire-burned-out = { CAPITALIZE(THE($fire)) } burns out.
+campfire-verb-extinguish = Put out the fire

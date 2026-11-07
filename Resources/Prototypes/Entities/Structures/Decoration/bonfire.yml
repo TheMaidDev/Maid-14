@@ -25,7 +25,10 @@
     layers:
       - state: bonfire
       - state: burning
+        map: [ "burning" ] # MAID campfire cooking
+        visible: false # MAID campfire cooking
   - type: PointLight
+    enabled: false # MAID campfire cooking
     radius: 5
     energy: 3
     color: "#FFC90C"
@@ -41,11 +44,24 @@
         - !type:DoActsBehavior
           acts: [ "Destruction" ]
   - type: AmbientSound
+    enabled: false # MAID campfire cooking
     volume: -5
     range: 5
     sound:
       path: /Audio/Ambience/Objects/fireplace.ogg
-  - type: AlwaysHot
+  # MAID BEGIN campfire cooking
+  # - type: AlwaysHot
+  - type: Campfire
+  - type: PlaceableSurface
+    placeCentered: true
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.CampfireVisuals.Lit:
+        burning:
+          True: { visible: true }
+          False: { visible: false }
+  # MAID END campfire cooking
   - type: Construction # Frontier
     graph: FiresGraph # Frontier
     node: BonfireNode # Frontier
@@ -58,6 +74,9 @@
   components:
   - type: Sprite
     layers:
+      - state: bonfire_extinguished # MAID campfire cooking
       - state: legionnaire_bonfire
+        map: [ "burning" ] # MAID campfire cooking
+        visible: false # MAID campfire cooking
   - type: PointLight
     color: "#FF5601"

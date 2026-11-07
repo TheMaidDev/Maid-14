@@ -10,3 +10,5 @@
     layers:
       - state: campfire
       - state: burning
+        map: [ "burning" ] # MAID campfire cooking
+        visible: false # MAID campfire cooking
