@@ -484,6 +484,21 @@ public sealed class CampfireTest
             Assert.That(IsLit(server, fire), Is.False, "50 units douse even a large fire");
             Assert.That(Water(), Is.EqualTo(FixedPoint2.Zero), "50 units were used");
 
+            // Any other reagent with an extinguishing effect works too (a juice), flammable ones do not (beer).
+            var (fire4, user4) = LightFire(server, map.GridCoords, 15);
+            var juice = server.EntMan.SpawnEntity("Bucket", map.GridCoords);
+            Assert.That(solutions.TryGetDrainableSolution(juice, out var juiceSoln, out _), Is.True);
+            solutions.TryAddReagent(juiceSoln!.Value, "JuiceOrange", 50);
+            Use(server, user4, juice, fire4);
+            Assert.That(IsLit(server, fire4), Is.False, "juice douses the fire");
+
+            var (fire5, user5) = LightFire(server, map.GridCoords, 15);
+            var beer = server.EntMan.SpawnEntity("Bucket", map.GridCoords);
+            Assert.That(solutions.TryGetDrainableSolution(beer, out var beerSoln, out _), Is.True);
+            solutions.TryAddReagent(beerSoln!.Value, "Beer", 50);
+            Use(server, user5, beer, fire5);
+            Assert.That(IsLit(server, fire5), Is.True, "beer does not douse the fire");
+
             // An empty bucket is no water source: it is just put down.
             var (fire2, user2) = LightFire(server, map.GridCoords, 15);
             Use(server, user2, server.EntMan.SpawnEntity("Bucket", map.GridCoords), fire2);
