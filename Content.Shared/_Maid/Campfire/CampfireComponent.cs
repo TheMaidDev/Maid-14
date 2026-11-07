@@ -1,3 +1,4 @@
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Materials;
 using Content.Shared.Tag;
 using Content.Shared.Whitelist;
@@ -125,6 +126,64 @@ public sealed partial class CampfireComponent : Component
     /// </summary>
     [ViewVariables]
     public float OxygenlessTime;
+
+    /// <summary>
+    /// Reagents that put the fire out when poured, splashed or sprayed on it.
+    /// </summary>
+    [DataField]
+    public HashSet<ProtoId<ReagentPrototype>> ExtinguishReagents = new() { "Water" };
+
+    /// <summary>
+    /// Units of an extinguishing reagent needed to douse the fire in one go, from a container or a splash.
+    /// Smaller amounts from a container are refused, smaller amounts from a splash or spray count as spray hits.
+    /// </summary>
+    [DataField]
+    public float DouseAmount = 50f;
+
+    /// <summary>
+    /// Seconds it takes to stamp the fire out, by fuel stage (the first is the smallest fire).
+    /// Fires at a stage without an entry are too big to stamp out and set the stamping person alight instead.
+    /// </summary>
+    [DataField]
+    public List<float> StompDelays = new() { 5f, 10f };
+
+    /// <summary>
+    /// Fire stacks given to someone who tries to stamp out a fire that is too big.
+    /// </summary>
+    [DataField]
+    public float StompBurnFireStacks = 2f;
+
+    /// <summary>
+    /// A fire at the last fuel stage needs this many sprays (from an extinguisher) to be put out;
+    /// the exact number between the two is picked at random. Smaller fires go out on the first spray.
+    /// </summary>
+    [DataField]
+    public int MinSpraysForLargeFire = 2;
+
+    /// <inheritdoc cref="MinSpraysForLargeFire"/>
+    [DataField]
+    public int MaxSpraysForLargeFire = 3;
+
+    /// <summary>
+    /// Spray particles arriving within this many seconds of the last counted one belong to the same spray.
+    /// </summary>
+    [DataField]
+    public float SpraySpacing = 1.5f;
+
+    /// <summary>
+    /// Sprays are forgotten after this many seconds without a new one.
+    /// </summary>
+    [DataField]
+    public float SprayMemory = 10f;
+
+    [ViewVariables]
+    public int SprayHits;
+
+    [ViewVariables]
+    public int SpraysRequired;
+
+    [ViewVariables]
+    public TimeSpan LastSprayHit;
 
     /// <summary>
     /// Seconds between burn and heat ticks.

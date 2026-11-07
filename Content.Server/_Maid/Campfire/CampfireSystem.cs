@@ -1,9 +1,15 @@
 using Content.Server.Atmos.EntitySystems;
+using Content.Server.Fluids.Components;
 using Content.Server.Stack;
 using Content.Server.Temperature.Components;
 using Content.Server.Temperature.Systems;
 using Content.Shared._Maid.Campfire;
 using Content.Shared.Atmos;
+using Content.Shared.Chemistry;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Chemistry.Reagent;
+using Content.Shared.DoAfter;
+using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Audio;
 using Content.Shared.Interaction;
 using Content.Shared.Item;
@@ -17,6 +23,7 @@ using Content.Shared.Temperature;
 using Content.Shared.Temperature.Components;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Maid.Campfire;
@@ -24,6 +31,10 @@ namespace Content.Server._Maid.Campfire;
 public sealed class CampfireSystem : SharedCampfireSystem
 {
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly FlammableSystem _flammable = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedAmbientSoundSystem _ambient = default!;
@@ -44,6 +55,8 @@ public sealed class CampfireSystem : SharedCampfireSystem
         SubscribeLocalEvent<CampfireComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CampfireComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<CampfireComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
+        SubscribeLocalEvent<CampfireComponent, CampfireStompDoAfterEvent>(OnStompDoAfter);
+        SubscribeLocalEvent<CampfireComponent, ReactionEntityEvent>(OnReaction);
     }
 
     private void OnMapInit(Entity<CampfireComponent> ent, ref MapInitEvent args)
@@ -83,6 +96,13 @@ public sealed class CampfireSystem : SharedCampfireSystem
             }
         }
 
+        // Water from a bucket or glass puts a lit fire out.
+        if (comp.Lit && TryPour(ent, args.User, args.Used))
+        {
+            args.Handled = true;
+            return;
+        }
+
         if (!TryGetFuelValue(ent, args.Used, out var seconds))
             return; // not fuel: fall through so the item can be placed on the fire
 
@@ -113,11 +133,157 @@ public sealed class CampfireSystem : SharedCampfireSystem
             return;
 
         var uid = ent.Owner;
+        var user = args.User;
         args.Verbs.Add(new AlternativeVerb
         {
-            Text = Loc.GetString("campfire-verb-extinguish"),
-            Act = () => SetLit((uid, ent.Comp), false),
+            Text = Loc.GetString("campfire-verb-stomp"),
+            Act = () => StartStomp((uid, ent.Comp), user),
         });
+    }
+
+    /// <summary>
+    /// Stamping out: small and medium fires take a few seconds, a big one just sets the person alight.
+    /// </summary>
+    public void StartStomp(Entity<CampfireComponent> ent, EntityUid user)
+    {
+        if (!ent.Comp.Lit)
+            return;
+
+        var stage = GetStage(ent.Comp);
+        if (stage >= ent.Comp.StompDelays.Count)
+        {
+            BurnStomper(ent, user);
+            return;
+        }
+
+        var args = new DoAfterArgs(EntityManager, user, ent.Comp.StompDelays[stage], new CampfireStompDoAfterEvent(), ent, target: ent)
+        {
+            BreakOnMove = true,
+            BreakOnDamage = true,
+            NeedHand = false,
+        };
+
+        if (_doAfter.TryStartDoAfter(args))
+            _popup.PopupEntity(Loc.GetString("campfire-stomp-start", ("user", user), ("fire", ent)), ent, PopupType.Small);
+    }
+
+    private void OnStompDoAfter(Entity<CampfireComponent> ent, ref CampfireStompDoAfterEvent args)
+    {
+        if (args.Cancelled || args.Handled || !ent.Comp.Lit)
+            return;
+
+        args.Handled = true;
+
+        // The fire may have grown meanwhile (someone added fuel).
+        if (GetStage(ent.Comp) >= ent.Comp.StompDelays.Count)
+        {
+            BurnStomper(ent, args.User);
+            return;
+        }
+
+        SetLit(ent, false);
+        _popup.PopupEntity(Loc.GetString("campfire-stomped", ("user", args.User), ("fire", ent)), ent, PopupType.Small);
+    }
+
+    private void BurnStomper(Entity<CampfireComponent> ent, EntityUid user)
+    {
+        _flammable.AdjustFireStacks(user, ent.Comp.StompBurnFireStacks, ignite: true);
+        _popup.PopupEntity(Loc.GetString("campfire-stomp-burned", ("user", user), ("fire", ent)), user, user, PopupType.LargeCaution);
+    }
+
+    /// <summary>
+    /// Pours the extinguishing reagent of a container onto the fire. Returns true when the item was a container
+    /// with such a reagent (the interaction is then used up, even if there was not enough of it).
+    /// </summary>
+    private bool TryPour(Entity<CampfireComponent> ent, EntityUid user, EntityUid used)
+    {
+        // Extinguishers and spray bottles are sprayed, not poured.
+        if (HasComp<SprayComponent>(used))
+            return false;
+
+        if (!_solutions.TryGetDrainableSolution(used, out var soln, out var solution))
+            return false;
+
+        var amount = FixedPoint2.New(ent.Comp.DouseAmount);
+        var available = FixedPoint2.Zero;
+        foreach (var reagent in ent.Comp.ExtinguishReagents)
+            available += solution.GetReagentQuantity(new ReagentId(reagent, null));
+
+        if (available <= FixedPoint2.Zero)
+            return false;
+
+        if (available < amount)
+        {
+            _popup.PopupEntity(Loc.GetString("campfire-not-enough-water", ("amount", ent.Comp.DouseAmount)),
+                ent,
+                user,
+                PopupType.MediumCaution);
+            return true;
+        }
+
+        var left = amount;
+        foreach (var reagent in ent.Comp.ExtinguishReagents)
+        {
+            if (left <= FixedPoint2.Zero)
+                break;
+
+            left -= _solutions.RemoveReagent(soln.Value, new ReagentId(reagent, null), left);
+        }
+
+        Douse(ent);
+        return true;
+    }
+
+    private void Douse(Entity<CampfireComponent> ent)
+    {
+        SetLit(ent, false);
+        _popup.PopupEntity(Loc.GetString("campfire-doused", ("fire", ent)), ent, PopupType.Medium);
+    }
+
+    /// <summary>
+    /// Water landing on the fire: a big splash douses it at once, smaller amounts (extinguisher and
+    /// spray particles) count as sprays.
+    /// </summary>
+    private void OnReaction(Entity<CampfireComponent> ent, ref ReactionEntityEvent args)
+    {
+        var comp = ent.Comp;
+        if (!comp.Lit || args.Method != ReactionMethod.Touch || !comp.ExtinguishReagents.Contains(args.Reagent.ID))
+            return;
+
+        if ((float) args.ReagentQuantity.Quantity >= comp.DouseAmount)
+        {
+            Douse(ent);
+            return;
+        }
+
+        var now = _timing.CurTime;
+        if (comp.SprayHits > 0 && now - comp.LastSprayHit > TimeSpan.FromSeconds(comp.SprayMemory))
+            comp.SprayHits = 0;
+
+        // Several particles of one spray land one after another: count them once.
+        if (comp.SprayHits > 0 && now - comp.LastSprayHit < TimeSpan.FromSeconds(comp.SpraySpacing))
+            return;
+
+        comp.LastSprayHit = now;
+        comp.SprayHits++;
+
+        if (GetStage(comp) < comp.StompDelays.Count)
+        {
+            Douse(ent); // small and medium fires go out at once
+            return;
+        }
+
+        if (comp.SprayHits == 1)
+            comp.SpraysRequired = _random.Next(comp.MinSpraysForLargeFire, comp.MaxSpraysForLargeFire + 1);
+
+        if (comp.SprayHits >= comp.SpraysRequired)
+        {
+            comp.SprayHits = 0;
+            Douse(ent);
+            return;
+        }
+
+        _popup.PopupEntity(Loc.GetString("campfire-sprayed", ("fire", ent)), ent, PopupType.Small);
     }
 
     /// <summary>
@@ -267,12 +433,10 @@ public sealed class CampfireSystem : SharedCampfireSystem
     /// </summary>
     private void HeatAir(Entity<TransformComponent> ent, CampfireComponent comp, float dt)
     {
-        var stages = comp.AirHeatPowers.Count;
-        if (stages == 0 || comp.MaxFuel <= 0f)
+        if (comp.AirHeatPowers.Count == 0 || comp.MaxFuel <= 0f)
             return;
 
-        var stage = Math.Clamp((int) (comp.Fuel / comp.MaxFuel * stages), 0, stages - 1);
-        var power = comp.AirHeatPowers[stage];
+        var power = comp.AirHeatPowers[GetStage(comp)];
         if (power <= 0f)
             return;
 

@@ -77,6 +77,7 @@
       - Trash
   - type: PlaceableSurface
     placeCentered: true
+  - type: Reactive
   - type: Appearance
   - type: GenericVisualizer
     visuals:
