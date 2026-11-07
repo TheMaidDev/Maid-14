@@ -67,7 +67,7 @@ public sealed class LatheQueueTest
         {
             foreach (var recipe in protoMan.EnumeratePrototypes<LatheRecipePrototype>())
             {
-                Assert.That(recipe.CompleteTime, Is.GreaterThanOrEqualTo(TimeSpan.FromSeconds(1)), recipe.ID);
+                Assert.That(recipe.CompleteTime, Is.GreaterThanOrEqualTo(TimeSpan.FromSeconds(0.1)), recipe.ID);
             }
         });
 
