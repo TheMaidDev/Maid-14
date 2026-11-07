@@ -31,8 +31,6 @@
     whitelist:
       components:
       - Anomaly
-  - type: UseDelay
-    delay: 1
 #MAID END
 
 - type: entity
@@ -57,8 +55,6 @@
     whitelist:
       components:
       - XenoArtifact
-  - type: UseDelay
-    delay: 1
 #MAID END
 
 - type: entity
