@@ -13,8 +13,12 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# MAID BEGIN bonfire cooking
+# Shared parts of all bonfires. Only Bonfire gets the fuel/cooking system, the other
+# bonfires keep the old always-burning behaviour (AlwaysHot is added to each of them).
 - type: entity
-  id: Bonfire
+  id: BonfireBase
+  abstract: true
   parent: BaseStructure
   name: bonfire
   description: What can be better than a late evening under the sky with guitar and friends?
@@ -45,14 +49,115 @@
     range: 5
     sound:
       path: /Audio/Ambience/Objects/fireplace.ogg
-  - type: AlwaysHot
   - type: Construction # Frontier
     graph: FiresGraph # Frontier
     node: BonfireNode # Frontier
 
 - type: entity
+  id: Bonfire
+  parent: BonfireBase
+  components:
+  - type: Sprite
+    layers:
+      - state: bonfire
+      - state: burning
+        map: [ "burning" ]
+        visible: false
+  - type: PointLight
+    enabled: false
+  - type: AmbientSound
+    enabled: false
+  - type: Campfire
+    extinguishReagents:
+    - CafeLatte
+    - ChangelingSting
+    - CoconutWater
+    - Coffee
+    - Cola
+    - CreamOfCoconut
+    - DrGibb
+    - DryRamen
+    - EldritchEssence
+    - EnergyDrink
+    - FourteenLoko
+    - Fresium
+    - GrapeSoda
+    - GreenTea
+    - Grenadine
+    - Hercuri
+    - Holywater
+    - HotCocoa
+    - HotRamen
+    - IceCream
+    - IcedCoffee
+    - IcedGreenTea
+    - IcedTea
+    - JuiceApple
+    - JuiceBanana
+    - JuiceBerry
+    - JuiceBerryPoison
+    - JuiceBluePumpkin
+    - JuiceBungo
+    - JuiceCarrot
+    - JuiceCherry
+    - JuiceGrape
+    - JuiceLemon
+    - JuiceLime
+    - JuiceMango
+    - JuiceOrange
+    - JuicePineapple
+    - JuicePotato
+    - JuiceTomato
+    - JuiceWatermelon
+    - KiraSpecial
+    - LemonLime
+    - LemonLimeCranberry
+    - Lemonade
+    - Mopwata
+    - Mugwort
+    - NuclearCola
+    - Pilk
+    - Posca
+    - PwrGame
+    - Rewriter
+    - RootBeer
+    - RootBeerFloat
+    - RoyRogers
+    - ShamblersJuice
+    - ShirleyTemple
+    - SodaWater
+    - SolDry
+    - SoyLatte
+    - SpaceMountainWind
+    - SpaceUp
+    - Starkist
+    - Tea
+    - TonicWater
+    - Tortuga
+    - TripleCitrus
+    - Water
+    fuelBlacklist:
+      components:
+      - Shovel
+      - DevilContract
+      - RevivalContract
+      tags:
+      - Trash
+  - type: PlaceableSurface
+    placeCentered: true
+  - type: Reactive
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.CampfireVisuals.Lit:
+        burning:
+          True: { visible: true }
+          False: { visible: false }
+# MAID END bonfire cooking
+
+- type: entity
   id: LegionnaireBonfire
-  parent: Bonfire
+  parent: BonfireBase # MAID bonfire cooking
   name: legionnaire bonfire
   description: There, in the land of lava and ash, place to to cook marshmallow and potato.
   components:
@@ -61,3 +166,4 @@
       - state: legionnaire_bonfire
   - type: PointLight
     color: "#FF5601"
+  - type: AlwaysHot # MAID bonfire cooking
