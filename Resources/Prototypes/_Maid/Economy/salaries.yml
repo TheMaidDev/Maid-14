@@ -15,16 +15,19 @@
     CommandMaid: 300
     # Security
     Warden: 500
+    SeniorOfficer: 500
     Detective: 400
     SecurityOfficer: 300
     Brigmedic: 250
     SecurityCadet: 200
     SecurityClown: 200
     # Engineering
+    SeniorEngineer: 500
     AtmosphericTechnician: 400
     StationEngineer: 300
     TechnicalAssistant: 200
     # Medical
+    SeniorPhysician: 500
     Chemist: 400
     Paramedic: 400
     MedicalDoctor: 300
@@ -32,10 +35,12 @@
     Psychologist: 200
     MedicalIntern: 200
     # Science
+    SeniorResearcher: 500
     Scientist: 300
     Roboticist: 300
     ResearchAssistant: 200
     # Cargo
+    SeniorSalvageSpecialist: 500
     SalvageSpecialist: 300
     ShaftMiner: 300
     CargoTechnician: 200
