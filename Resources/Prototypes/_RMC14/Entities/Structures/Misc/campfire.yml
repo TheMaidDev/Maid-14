@@ -1,6 +1,6 @@
 - type: entity
   id: RMCCampfire
-  parent: Bonfire
+  parent: BonfireBase # MAID bonfire cooking
   name: campfire
   description: A useful tool to turn fellow marines into lifelong friends. Pull up a chair!
   components:
@@ -10,5 +10,4 @@
     layers:
       - state: campfire
       - state: burning
-        map: [ "burning" ] # MAID campfire cooking
-        visible: false # MAID campfire cooking
+  - type: AlwaysHot # MAID bonfire cooking

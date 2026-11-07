@@ -1,6 +1,6 @@
 # Campfire cooking
 
-A bonfire (`Bonfire` and its children `LegionnaireBonfire`, `RMCCampfire`) is a fuelled fire, not a permanent heat source: it starts unlit and empty, has to be fed and lit by hand, and only while burning heats items lying on it, so existing temperature-based recipes cook food over it. Code lives in the `_Maid` folders of Shared and Server (`Campfire`).
+Only the plain bonfire (`Bonfire`) is a fuelled fire, not a permanent heat source: it starts unlit and empty, has to be fed and lit by hand, and only while burning heats items lying on it, so existing temperature-based recipes cook food over it. The other bonfires (`LegionnaireBonfire`, `RMCCampfire`) share the abstract `BonfireBase` with it but keep the old behaviour: always hot, always burning, nothing cooks on them. Prototypes cannot drop inherited components, which is why the shared parts moved to the base and only `Bonfire` adds the system. Code lives in the `_Maid` folders of Shared and Server (`Campfire`).
 
 ## Pieces
 - `CampfireComponent` holds remaining burn time, a cap on it, the materials that count as fuel with burn seconds per material unit, heat power per item, a temperature ceiling for heated items, the pickup radius, the item limit, the tick interval, the air heating powers (one per fuel stage) and the air temperature ceiling. The lit flag and a coarse remaining-time level (empty plus five fifths of the fuel cap) are networked; exact fuel stays server-side.

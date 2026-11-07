@@ -3,6 +3,7 @@ using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared._Maid.Campfire;
 using Content.Shared.Atmos;
+using Content.Shared.Temperature.Components;
 using Content.Shared.Interaction;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -223,6 +224,31 @@ public sealed class CampfireTest
             var comp = server.EntMan.GetComponent<CampfireComponent>(fire);
             var air = atmos.GetTileMixture(fire)!;
             Assert.That(air.Temperature, Is.LessThanOrEqualTo(comp.AirHeatMaxTemperature + 10f));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task OnlyPlainBonfireUsesCampfireSystem()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+
+        await server.WaitAssertion(() =>
+        {
+            var bonfire = server.EntMan.SpawnEntity("Bonfire", map.GridCoords);
+            Assert.That(server.EntMan.HasComponent<CampfireComponent>(bonfire), Is.True);
+            Assert.That(server.EntMan.HasComponent<AlwaysHotComponent>(bonfire), Is.False);
+
+            // Other bonfires keep their old always-burning behaviour and cannot cook.
+            foreach (var id in new[] { "LegionnaireBonfire", "RMCCampfire" })
+            {
+                var other = server.EntMan.SpawnEntity(id, map.GridCoords);
+                Assert.That(server.EntMan.HasComponent<CampfireComponent>(other), Is.False, id);
+                Assert.That(server.EntMan.HasComponent<AlwaysHotComponent>(other), Is.True, id);
+            }
         });
 
         await pair.CleanReturnAsync();
