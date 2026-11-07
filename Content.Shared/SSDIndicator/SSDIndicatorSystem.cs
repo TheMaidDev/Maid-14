@@ -6,6 +6,8 @@
 
 using Content.Shared.Bed.Sleep;
 using Content.Shared.CCVar;
+using Content.Shared.Mind; // MAID fix AI SSD
+using Content.Shared.Mind.Components; // MAID fix AI SSD
 using Content.Shared.StatusEffectNew;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
@@ -24,6 +26,7 @@ public sealed class SSDIndicatorSystem : EntitySystem
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly SleepingSystem _sleeping = default!; // MAID SSD wake on reconnect
 
     private bool _icSsdSleep;
     private float _icSsdSleepTime;
@@ -46,7 +49,14 @@ public sealed class SSDIndicatorSystem : EntitySystem
         if (_icSsdSleep)
         {
             component.FallAsleepTime = TimeSpan.Zero;
-            _statusEffects.TryRemoveStatusEffect(uid, StatusEffectSSDSleeping);
+            // MAID BEGIN SSD wake on reconnect
+            /* _statusEffects.TryRemoveStatusEffect(uid, StatusEffectSSDSleeping); */
+            if (_statusEffects.TryRemoveStatusEffect(uid, StatusEffectSSDSleeping)
+                && TryComp<SleepingComponent>(uid, out var sleeping))
+            {
+                _sleeping.TryWaking((uid, sleeping), force: true);
+            }
+            // MAID END SSD wake on reconnect
         }
 
         Dirty(uid, component);
@@ -68,6 +78,15 @@ public sealed class SSDIndicatorSystem : EntitySystem
     // Prevents mapped mobs to go to sleep immediately
     private void OnMapInit(EntityUid uid, SSDIndicatorComponent component, MapInitEvent args)
     {
+        // MAID BEGIN fix AI SSD
+        if (!HasPlayerMind(uid))
+        {
+            component.IsSSD = false;
+            Dirty(uid, component);
+            return;
+        }
+        // MAID END fix AI SSD
+
         if (!_icSsdSleep || !component.IsSSD)
             return;
 
@@ -75,6 +94,16 @@ public sealed class SSDIndicatorSystem : EntitySystem
         component.NextUpdate = _timing.CurTime + component.UpdateInterval;
         Dirty(uid, component);
     }
+
+    // MAID BEGIN fix AI SSD
+    private bool HasPlayerMind(EntityUid uid)
+    {
+        return TryComp<MindContainerComponent>(uid, out var container)
+            && container.Mind is { } mind
+            && TryComp<MindComponent>(mind, out var mindComp)
+            && mindComp.UserId != null;
+    }
+    // MAID END fix AI SSD
 
     public override void Update(float frameTime)
     {
@@ -88,6 +117,11 @@ public sealed class SSDIndicatorSystem : EntitySystem
 
         while (query.MoveNext(out var uid, out var ssd))
         {
+            // MAID BEGIN fix AI SSD
+            if (!HasPlayerMind(uid))
+                continue;
+            // MAID END fix AI SSD
+
             // Forces the entity to sleep when the time has come
             if (!ssd.IsSSD
                 || ssd.NextUpdate > curTime
