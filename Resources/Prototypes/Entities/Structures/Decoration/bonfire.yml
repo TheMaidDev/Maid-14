@@ -71,6 +71,8 @@
     fuelBlacklist:
       components:
       - Shovel
+      - DevilContract
+      - RevivalContract
       tags:
       - Trash
   - type: PlaceableSurface
