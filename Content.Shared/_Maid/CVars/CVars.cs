@@ -200,6 +200,16 @@ public sealed class MaidCVars
 
     #endregion
 
+    #region Salvage expeditions
+
+    /// <summary>
+    ///     Cooldown before new expeditions are offered after a failed mission.
+    /// </summary>
+    public static readonly CVarDef<float> SalvageExpeditionFailedCooldown =
+        CVarDef.Create("salvage.expedition_failed_cooldown", 900f, CVar.REPLICATED);
+
+    #endregion
+
     #region Discord feeds
 
     /// <summary>

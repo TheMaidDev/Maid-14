@@ -9,6 +9,7 @@
 
 using System.Linq;
 using Content.Client.Stylesheets;
+using Content.Shared._Maid.CVars; // MAID salvage-expeditions
 using Content.Shared.CCVar;
 using Content.Shared.Procedural;
 using Content.Shared.Salvage.Expeditions;
@@ -18,6 +19,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing; // MAID salvage-expeditions
 
 namespace Content.Client.Salvage.UI;
 
@@ -30,6 +32,7 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
     [Dependency] private readonly IConfigurationManager _cfgManager = default!;
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!; // MAID salvage-expeditions
 
     public SalvageExpeditionConsoleBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -52,6 +55,10 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
 
         _window.Progression = null;
         _window.Cooldown = TimeSpan.FromSeconds(_cfgManager.GetCVar(CCVars.SalvageExpeditionCooldown));
+        // MAID BEGIN salvage-expeditions
+        if (current.NextOffer - _timing.CurTime > _window.Cooldown)
+            _window.Cooldown = TimeSpan.FromSeconds(_cfgManager.GetCVar(MaidCVars.SalvageExpeditionFailedCooldown));
+        // MAID END salvage-expeditions
         _window.NextOffer = current.NextOffer;
         _window.Claimed = current.Claimed;
         _window.ClearOptions();
@@ -62,11 +69,19 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
             var missionParams = current.Missions[i];
 
             var offering = new OfferingWindowOption();
+            // MAID BEGIN salvage-expeditions
+            /*
             offering.Title = Loc.GetString($"salvage-expedition-type");
 
             var difficultyId = "Moderate";
             var difficultyProto = _protoManager.Index<SalvageDifficultyPrototype>(difficultyId);
             // TODO: Selectable difficulty soon.
+            */
+            offering.Title = Loc.GetString($"salvage-expedition-type-{missionParams.MissionType}");
+
+            if (!_protoManager.TryIndex<SalvageDifficultyPrototype>(missionParams.Difficulty, out var difficultyProto))
+                continue;
+            // MAID END salvage-expeditions
             var mission = salvage.GetMission(difficultyProto, missionParams.Seed);
 
             // Difficulty
@@ -80,7 +95,12 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
 
             offering.AddContent(new Label
             {
+                // MAID BEGIN salvage-expeditions
+                /*
                 Text = Loc.GetString("salvage-expedition-difficulty-Moderate"),
+                */
+                Text = Loc.GetString($"salvage-expedition-difficulty-{difficultyProto.ID}"),
+                // MAID END salvage-expeditions
                 FontColorOverride = difficultyColor,
                 HorizontalAlignment = Control.HAlignment.Left,
                 Margin = new Thickness(0f, 0f, 0f, 5f),
@@ -99,6 +119,22 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
                 HorizontalAlignment = Control.HAlignment.Left,
                 Margin = new Thickness(0f, 0f, 0f, 5f),
             });
+
+            // MAID BEGIN salvage-expeditions
+            // Objective
+            offering.AddContent(new Label
+            {
+                Text = Loc.GetString("salvage-expedition-window-details")
+            });
+
+            offering.AddContent(new Label
+            {
+                Text = salvage.GetMissionDescription(missionParams.MissionType, difficultyProto, mission.Faction),
+                FontColorOverride = StyleNano.NanoGold,
+                HorizontalAlignment = Control.HAlignment.Left,
+                Margin = new Thickness(0f, 0f, 0f, 5f),
+            });
+            // MAID END salvage-expeditions
 
             // Details
             offering.AddContent(new Label
@@ -178,6 +214,33 @@ public sealed class SalvageExpeditionConsoleBoundUserInterface : BoundUserInterf
                 HorizontalAlignment = Control.HAlignment.Left,
                 Margin = new Thickness(0f, 0f, 0f, 5f),
             });
+
+            // MAID BEGIN salvage-expeditions
+            // Rewards
+            if (mission.Rewards.Count > 0)
+            {
+                offering.AddContent(new Label
+                {
+                    Text = Loc.GetString("salvage-expedition-window-rewards")
+                });
+
+                var rewards = new Dictionary<string, int>();
+
+                foreach (var reward in mission.Rewards)
+                {
+                    var name = salvage.GetRewardName(reward);
+                    rewards[name] = rewards.GetValueOrDefault(name) + 1;
+                }
+
+                offering.AddContent(new Label
+                {
+                    Text = string.Join("\n", rewards.Select(o => "- " + o.Key + (o.Value > 1 ? $" x{o.Value}" : ""))).TrimEnd(),
+                    FontColorOverride = StyleNano.ConcerningOrangeFore,
+                    HorizontalAlignment = Control.HAlignment.Left,
+                    Margin = new Thickness(0f, 0f, 0f, 5f),
+                });
+            }
+            // MAID END salvage-expeditions
 
             offering.ClaimPressed += args =>
             {

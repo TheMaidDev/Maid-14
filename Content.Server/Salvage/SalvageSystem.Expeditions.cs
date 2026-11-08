@@ -154,8 +154,13 @@ public sealed partial class SalvageSystem
     private void FinishExpedition(Entity<SalvageExpeditionDataComponent> expedition, EntityUid uid)
     {
         var component = expedition.Comp;
+        // MAID BEGIN salvage-expeditions
+        /*
         component.NextOffer = _timing.CurTime + TimeSpan.FromSeconds(_cooldown);
         Announce(uid, Loc.GetString("salvage-expedition-completed"));
+        */
+        FinishMission(expedition, uid);
+        // MAID END salvage-expeditions
         component.ActiveMission = 0;
         component.Cooldown = true;
         UpdateConsoles(expedition);
@@ -163,6 +168,8 @@ public sealed partial class SalvageSystem
 
     private void GenerateMissions(SalvageExpeditionDataComponent component)
     {
+        // MAID BEGIN salvage-expeditions
+        /*
         component.Missions.Clear();
 
         for (var i = 0; i < MissionLimit; i++)
@@ -176,6 +183,9 @@ public sealed partial class SalvageSystem
 
             component.Missions[component.NextIndex++] = mission;
         }
+        */
+        GenerateMissionsWithObjectives(component);
+        // MAID END salvage-expeditions
     }
 
     private SalvageExpeditionConsoleState GetState(SalvageExpeditionDataComponent component)
