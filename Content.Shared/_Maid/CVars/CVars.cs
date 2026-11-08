@@ -177,4 +177,27 @@ public sealed class MaidCVars
         CVarDef.Create("maid.admin.ahelp_volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     #endregion
+
+    #region STT
+
+    /// <summary>
+    /// Whether the client accepts recognized speech from the external STT companion.
+    /// </summary>
+    public static readonly CVarDef<bool> SttEnabled =
+        CVarDef.Create("stt.enabled", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    /// If true, recognized text is only put into the chat input for the player to review and send manually.
+    /// If false, it is sent to chat immediately.
+    /// </summary>
+    public static readonly CVarDef<bool> SttConfirm =
+        CVarDef.Create("stt.confirm", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    /// Maximum length of a single recognized message that is accepted from the companion.
+    /// </summary>
+    public static readonly CVarDef<int> SttMaxLength =
+        CVarDef.Create("stt.max_length", 300, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    #endregion
 }
