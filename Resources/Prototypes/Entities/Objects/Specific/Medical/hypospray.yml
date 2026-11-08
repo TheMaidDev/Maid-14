@@ -312,7 +312,7 @@
         reagents:
         - ReagentId: Epinephrine # Goobstation = 5, Maid = 12
           Quantity: 12
-        # - ReagentId: Atropine # Goobstation = 5 
+        # - ReagentId: Atropine # Goobstation = 5
         #   Quantity: 5
         - ReagentId: TranexamicAcid # Goobstation = 5, Maid = 3
           Quantity: 3
@@ -324,7 +324,7 @@
   - type: MeleeWeapon
     animation: WeaponArcPunch
     soundHit:
-      path: /Audio/Weapons/syringe.ogg
+      path: /Audio/Items/hypospray.ogg
     damage:
       groups:
         Brute: 3
