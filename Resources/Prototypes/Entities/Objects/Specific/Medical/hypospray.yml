@@ -308,19 +308,27 @@
   - type: SolutionContainerManager
     solutions:
       pen:
-        maxVol: 15 # Goobstation
+        maxVol: 15
         reagents:
-        - ReagentId: Epinephrine # Goobstation
-          Quantity: 5
-        - ReagentId: Atropine # Goobstation
-          Quantity: 5
-        - ReagentId: TranexamicAcid # Goobstation
-          Quantity: 5
+        - ReagentId: Epinephrine # Goobstation = 5, Maid = 12
+          Quantity: 12
+        # - ReagentId: Atropine # Goobstation = 5 
+        #   Quantity: 5
+        - ReagentId: TranexamicAcid # Goobstation = 5, Maid = 3
+          Quantity: 3
   - type: Tag
     tags:
     - Medipen
     - EmergencyMedipen
     - Trash
+  - type: MeleeWeapon
+    animation: WeaponArcPunch
+    soundHit:
+      path: /Audio/Weapons/syringe.ogg
+    damage:
+      groups:
+        Brute: 3
+    canHeavyAttack: false
 
 - type: entity
   name: poison auto-injector
