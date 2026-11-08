@@ -100,8 +100,8 @@ public abstract partial class SharedSalvageSystem
         var exactDuration = MathHelper.Lerp(time.MinDuration, time.MaxDuration, rand.NextFloat());
         exactDuration = MathF.Round(exactDuration / 15f) * 15f;
 
-        if (time.Description != string.Empty)
-            mods.Add(Loc.GetString(time.Description));
+        if (time.Description is { } desc)
+            mods.Add(Loc.GetString(desc));
 
         return TimeSpan.FromSeconds(exactDuration);
     }

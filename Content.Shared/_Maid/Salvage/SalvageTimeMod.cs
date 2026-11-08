@@ -11,7 +11,10 @@ public sealed partial class SalvageTimeMod : IPrototype, ISalvageMod
 {
     [IdDataField] public string ID { get; private set; } = default!;
 
-    [DataField("desc")] public LocId Description { get; private set; } = string.Empty;
+    [DataField("desc")]
+    public LocId? Description { get; private set; }
+
+    LocId ISalvageMod.Description => Description ?? string.Empty;
 
     /// <summary>
     /// Cost for difficulty modifiers.
