@@ -6,7 +6,7 @@ Local speech recognition for the in-game chat. See `.claude/docs/systems/stt.md`
     pip install -r requirements.txt
     python stt_companion.py --language ru
 
-Options: `--data-dir` (game user data dir; default is the standard SS14 location), `--hotkey` (default `f9`, global toggle), `--model` (faster-whisper model, default `small`), `--fake` (test without mic/model).
+Options: `--data-dir` (game user data dir; default is the standard SS14 location), `--hotkey` (default `f9`, global toggle), `--model` (faster-whisper model, default `small`), `--fake` (test without mic/model), `--wav FILE` (recognize a 16-bit wav once and exit).
 
 Press the hotkey to start recording and again to stop; the recognized text appears in the game chat input.
 You can also bind `stt_record` in-game to a key (`stt_record` toggles, `stt_record true|false` sets).

@@ -99,6 +99,21 @@ class Companion:
         tmp.replace(self.inbox / name)
         print(f"[stt] sent: {text}")
 
+    def transcribe_wav(self, path: Path):
+        """Runs a wav file through the same recognition path as microphone audio (for testing)."""
+        import wave
+        import numpy as np
+        with wave.open(str(path), "rb") as w:
+            rate, channels, width = w.getframerate(), w.getnchannels(), w.getsampwidth()
+            if width != 2:
+                raise SystemExit("only 16-bit wav is supported")
+            data = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16)
+        audio = data.reshape(-1, channels).mean(axis=1).astype("float32") / 32768.0
+        if rate != SAMPLE_RATE:
+            x = np.linspace(0, len(audio) - 1, int(len(audio) * SAMPLE_RATE / rate))
+            audio = np.interp(x, np.arange(len(audio)), audio).astype("float32")
+        self._recognize([audio.reshape(-1, 1)])
+
     # --- control file ----------------------------------------------------
     def watch_control(self):
         last = None
@@ -122,11 +137,16 @@ def main():
     ap.add_argument("--hotkey", default="f9", help="global toggle key, empty to disable")
     ap.add_argument("--model", default="small", help="faster-whisper model name")
     ap.add_argument("--language", default=None, help="language code, e.g. ru (auto-detect if omitted)")
+    ap.add_argument("--wav", type=Path, help="recognize this 16-bit wav file once and exit (testing)")
     ap.add_argument("--fake", action="store_true", help="no microphone/model, sends a test phrase on toggle")
     args = ap.parse_args()
 
     comp = Companion(args.data_dir, args.model, args.language, args.fake)
     print(f"[stt] inbox: {comp.inbox}")
+
+    if args.wav:
+        comp.transcribe_wav(args.wav)
+        return
 
     if args.hotkey:
         from pynput import keyboard
