@@ -36,10 +36,8 @@ public sealed partial class SpawnSalvageMissionJob
             return;
         }
 
-        var objective = _entManager.AddComponent<SalvageExpeditionObjectiveComponent>(grid);
-        objective.MissionType = type;
-
         var count = type == SalvageMissionType.Destruction ? Math.Max(1, difficulty.StructureCount) : 1;
+        var targets = new List<EntityUid>(count);
 
         for (var i = 0; i < count; i++)
         {
@@ -49,14 +47,18 @@ public sealed partial class SpawnSalvageMissionJob
                 continue;
 
             _entManager.EnsureComponent<SalvageExpeditionTargetComponent>(uid.Value);
-            objective.Targets.Add(uid.Value);
+            targets.Add(uid.Value);
         }
 
-        if (objective.Targets.Count == 0)
+        if (targets.Count == 0)
         {
             _sawmill.Warning($"Failed to spawn any {proto} for the mission with seed {_missionParams.Seed}");
-            _entManager.RemoveComponent<SalvageExpeditionObjectiveComponent>(grid);
+            return;
         }
+
+        var objective = _entManager.AddComponent<SalvageExpeditionObjectiveComponent>(grid);
+        objective.MissionType = type;
+        objective.Targets.AddRange(targets);
     }
 
     private bool TrySpawnInRandomRoom(
