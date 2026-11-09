@@ -240,6 +240,7 @@
         - IPC # do i have to explain this one
         - Cyborg # why the fuck is this a thing?
         - Shadowling # yeah.
+        - Vulpkanin # burn it
         # add more here
         conditions:
         - !type:ReagentThreshold
