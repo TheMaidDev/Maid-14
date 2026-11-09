@@ -36,6 +36,19 @@
 
 - type: entity
   parent: [ClothingNeckBase, BaseCommandContraband]
+  id: ClothingNeckMantleInspector
+  name: inspector's mantle
+  description: Dark mantle that highlights your intimidating figure. These are the shoulders!
+  components:
+    - type: Sprite
+      sprite: Clothing/Neck/mantles/inspectormantle.rsi
+    - type: Clothing
+      sprite: Clothing/Neck/mantles/inspectormantle.rsi
+    - type: TypingIndicatorClothing
+      proto: lawyer
+
+- type: entity
+  parent: [ClothingNeckBase, BaseCommandContraband]
   id: ClothingNeckMantleCMO
   name: chief medical officer's mantle
   description: For a CMO that has been in enough medbays to know that more PPE means less central command dry cleaning visits when the shift is over.
