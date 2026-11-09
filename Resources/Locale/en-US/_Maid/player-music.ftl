@@ -1,0 +1,36 @@
+ent-MaidBoombox = boombox
+    .desc = A portable cassette player. Insert a cassette to record your own songs or play the recorded ones.
+ent-MaidWalkman = walkman
+    .desc = A mini cassette player that clips onto your belt. Quiet, only people nearby can hear it.
+ent-MaidBlankCassette = cassette
+    .desc = A cassette tape for the boombox or walkman. Holds up to three songs.
+
+maid-music-ui-title = Boombox
+maid-music-ui-stop = Stop
+maid-music-ui-repeat = Repeat
+maid-music-ui-record-header = Record a song onto the cassette
+maid-music-ui-name-placeholder = Song name
+maid-music-ui-choose = Choose file (.ogg)
+maid-music-ui-record = Record
+maid-music-ui-no-cassette = No cassette inserted.
+maid-music-ui-cassette-slots = Songs on the cassette: { $used } of { $max }
+maid-music-ui-track = { $num }. { $name }
+maid-music-ui-track-playing = > { $num }. { $name }
+maid-music-ui-now-playing = Now playing: { $name }
+maid-music-ui-stopped = Stopped.
+maid-music-ui-file-ready = File selected ({ $size } MB).
+maid-music-ui-too-big = The file is too big. Maximum is { $max } MB.
+maid-music-ui-sent = Sent for recording.
+
+maid-music-too-far = Too far away.
+maid-music-no-cassette = There must be a cassette in the boombox.
+maid-music-cassette-full = There is no room left on the cassette.
+maid-music-too-big = The file is too big. Maximum is { $max } MB.
+maid-music-not-ogg = An .ogg (Vorbis) file is required.
+maid-music-bad-name = Enter a song name.
+maid-music-cooldown = Wait a bit before recording again.
+maid-music-quota = You have recorded the maximum number of songs this round.
+maid-music-storage-full = The song storage is full.
+maid-music-recorded = Recorded: { $name }
+maid-music-recorded-stereo = Recorded: { $name }. Stereo audio has no direction, use a mono file for 3D sound.
+maid-music-song-lost = The recording on this cassette is damaged.

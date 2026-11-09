@@ -1,0 +1,103 @@
+- type: entity
+  parent: BaseItem
+  id: MaidBoombox
+  name: boombox
+  description: A portable cassette player. Put a blank cassette in it to record your own song.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Devices/player_music/boombox.rsi
+    layers:
+    - state: boombox
+    - state: boombox_working_overlay
+      map: [ "enum.PlayerMusicVisualLayers.Overlay" ]
+      visible: false
+  - type: Item
+    size: Ginormous
+    sprite: _Maid/Objects/Devices/player_music/boombox.rsi
+    heldPrefix: boombox
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PlayerMusicVisuals.Playing:
+        enum.PlayerMusicVisualLayers.Overlay:
+          True: { visible: true }
+          False: { visible: false }
+  - type: PlayerMusicBoombox
+  - type: ItemSlots
+    slots:
+      cassette_slot:
+        priority: 4
+        whitelist:
+          components:
+          - PlayerMusicCassette
+  - type: ContainerContainer
+    containers:
+      cassette_slot: !type:ContainerSlot
+  - type: ActivatableUI
+    key: enum.PlayerMusicUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.PlayerMusicUiKey.Key:
+        type: PlayerMusicBoundUserInterface
+
+- type: entity
+  parent: BaseItem
+  id: MaidBlankCassette
+  name: blank cassette
+  description: A cassette tape for the boombox. Can hold one song.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Devices/player_music/cassette.rsi
+    state: tape
+  - type: Item
+    size: Tiny
+  - type: PlayerMusicCassette
+  - type: Label
+
+- type: entity
+  parent: BaseItem
+  id: MaidWalkman
+  name: walkman
+  description: A mini cassette player that clips onto your belt. Quiet, only people nearby can hear it.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Devices/player_music/walkman.rsi
+    layers:
+    - state: walkman
+    - state: walkman_working_overlay
+      map: [ "enum.PlayerMusicVisualLayers.Overlay" ]
+      visible: false
+  - type: Item
+    size: Small
+    sprite: _Maid/Objects/Devices/player_music/walkman.rsi
+    heldPrefix: walkman
+  - type: Clothing
+    slots: [ belt ]
+    sprite: _Maid/Objects/Devices/player_music/walkman.rsi
+    quickEquip: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PlayerMusicVisuals.Playing:
+        enum.PlayerMusicVisualLayers.Overlay:
+          True: { visible: true }
+          False: { visible: false }
+  - type: PlayerMusicBoombox
+    maxDistance: 6
+    volume: -6
+  - type: ItemSlots
+    slots:
+      cassette_slot:
+        priority: 4
+        whitelist:
+          components:
+          - PlayerMusicCassette
+  - type: ContainerContainer
+    containers:
+      cassette_slot: !type:ContainerSlot
+  - type: ActivatableUI
+    key: enum.PlayerMusicUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.PlayerMusicUiKey.Key:
+        type: PlayerMusicBoundUserInterface
