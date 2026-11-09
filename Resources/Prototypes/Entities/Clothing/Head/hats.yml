@@ -798,6 +798,7 @@
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
+    layers: [ HeadTop ]
 
 - type: entity
   parent: ClothingHeadBase
@@ -817,6 +818,7 @@
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
+    layers: [ HeadTop ]
 
 - type: entity
   parent: ClothingHeadBase
@@ -836,6 +838,7 @@
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
+    layers: [ HeadTop ]
 
 - type: entity
   parent: ClothingHeadBase
