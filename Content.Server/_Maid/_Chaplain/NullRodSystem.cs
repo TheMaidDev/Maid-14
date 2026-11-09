@@ -23,6 +23,9 @@ public sealed class NullRodSystem : EntitySystem
         if (args.SelectedWeapon == string.Empty)
             return;
 
+        if (!ent.Comp.Weapons.Contains(args.SelectedWeapon))
+            return;
+
         var hasHoly = HasComp<HolyComponent>(entity);
         var hasGhost = HasComp<GhostComponent>(entity);
         if (!hasHoly && !hasGhost)
