@@ -40,6 +40,7 @@ using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared.Storage.Components;
 using Content.Shared.Verbs;
+using Content.Shared.Inventory;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Serialization;
@@ -153,9 +154,20 @@ public sealed class FoldableSystem : EntitySystem
         if (_container.IsEntityInContainer(uid) && !fold.CanFoldInsideContainer)
             return false;
 
-        if (!TryComp(uid, out PhysicsComponent? body) ||
-            !_anchorable.TileFree(Transform(uid).Coordinates, body))
-            return false;
+        // === ИЗМЕНЕНИЕ ===
+        bool isWorn = false;
+        if (TryComp<TransformComponent>(uid, out var xform) && HasComp<InventoryComponent>(xform.ParentUid))
+        {
+            isWorn = true;
+        }
+
+        if (!isWorn)
+        {
+            if (!TryComp(uid, out PhysicsComponent? body) ||
+                !_anchorable.TileFree(Transform(uid).Coordinates, body))
+                return false;
+        }
+        // =============================================
 
         var ev = new FoldAttemptEvent(fold);
         RaiseLocalEvent(uid, ref ev);
