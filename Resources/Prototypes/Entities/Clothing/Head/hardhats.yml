@@ -122,7 +122,7 @@
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers: [ HeadTop ]
+    layers: { HeadTop: HEAD }
 
 - type: entity
   parent: ClothingHeadHatHardhatBase
