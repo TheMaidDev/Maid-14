@@ -88,7 +88,7 @@ public sealed class DocumentPrinterSystem : EntitySystem
         if (!AvailableSections(ent).Any(s => s.Documents.Contains(args.Document)))
             return;
 
-        SpawnAtPosition(args.Document, Transform(ent).Coordinates);
+        ent.Comp.PendingDocument = args.Document;
         _audio.PlayPvs(ent.Comp.PrintSound, ent);
 
         ent.Comp.Printing = true;
@@ -107,6 +107,12 @@ public sealed class DocumentPrinterSystem : EntitySystem
                 continue;
 
             comp.Printing = false;
+            if (comp.PendingDocument is { } document)
+            {
+                SpawnAtPosition(document, Transform(uid).Coordinates);
+                comp.PendingDocument = null;
+            }
+
             _appearance.SetData(uid, DocumentPrinterVisuals.Printing, false);
         }
     }

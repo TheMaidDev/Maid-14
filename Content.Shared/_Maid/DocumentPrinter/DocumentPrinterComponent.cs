@@ -23,7 +23,12 @@ public sealed partial class DocumentPrinterComponent : Component
     public SoundSpecifier PrintSound = new SoundCollectionSpecifier("PrinterPrint");
 
     [DataField]
-    public TimeSpan PrintDelay = TimeSpan.FromSeconds(2);
+    public TimeSpan PrintDelay = TimeSpan.FromSeconds(3.6);
+
+    /// <summary>
+    /// Document waiting for the print animation to finish.
+    /// </summary>
+    public EntProtoId? PendingDocument;
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField]
     public TimeSpan NextPrintTime;
