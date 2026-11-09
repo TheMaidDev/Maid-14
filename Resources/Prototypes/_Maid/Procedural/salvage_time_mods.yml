@@ -1,0 +1,11 @@
+- type: salvageTimeMod
+  id: StandardTime
+  minDuration: 570
+  maxDuration: 630
+
+- type: salvageTimeMod
+  id: RushTime
+  desc: salvage-time-mod-rush
+  cost: 1
+  minDuration: 420
+  maxDuration: 465
