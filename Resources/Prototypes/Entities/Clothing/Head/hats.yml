@@ -790,11 +790,14 @@
     - Recyclable
     - HamsterWearable
     - WhitelistChameleon
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop : HEAD
-      HeadSide : HEAD
 
 - type: entity
   parent: ClothingHeadBase
@@ -806,11 +809,14 @@
     sprite: Clothing/Head/Hats/surgcap_green.rsi
   - type: Clothing
     sprite: Clothing/Head/Hats/surgcap_green.rsi
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop : HEAD
-      HeadSide : HEAD
 
 - type: entity
   parent: ClothingHeadBase
@@ -822,11 +828,14 @@
     sprite: Clothing/Head/Hats/surgcap_purple.rsi
   - type: Clothing
     sprite: Clothing/Head/Hats/surgcap_purple.rsi
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop : HEAD
-      HeadSide : HEAD
 
 - type: entity
   parent: ClothingHeadBase
