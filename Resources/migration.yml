@@ -1187,3 +1187,8 @@ SoapGold: SoapDeluxe
 FaceHuggerToys: null
 # Old ChemDispenser Circuitboard
 ChemDispenserMachineCircuitboard: EnergyChemDispenserMachineCircuitboard
+ComputerCargoOrdersEngineering: DocPrinterEngineering # MAID document printer
+ComputerCargoOrdersMedical: DocPrinterMedical # MAID document printer
+ComputerCargoOrdersScience: DocPrinterScience # MAID document printer
+ComputerCargoOrdersSecurity: DocPrinterSecurity # MAID document printer
+ComputerCargoOrdersService: DocPrinter # MAID document printer

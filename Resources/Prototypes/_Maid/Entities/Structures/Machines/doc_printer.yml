@@ -1,0 +1,606 @@
+# Document printer (ported from the old build) with a department cargo order tab.
+- type: entity
+  id: DocPrinter
+  parent: BaseMachinePowered
+  name: document form printer
+  description: Prints blank forms for all kinds of documents and department cargo order slips. Bluespace technology in the service of bureaucracy!
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    drawdepth: SmallObjects
+    layers:
+    - state: icon
+      map: [ "enum.DocumentPrinterVisualLayers.Base" ]
+    - state: unlit
+      shader: unshaded
+      map: [ "enum.PowerDeviceVisualLayers.Powered" ]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.DocumentPrinterVisuals.Printing:
+        enum.DocumentPrinterVisualLayers.Base:
+          True: { state: printing }
+          False: { state: icon }
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.25,0.25,0.25"
+        density: 25
+        mask:
+        - TabletopMachineMask
+        layer:
+        - TabletopMachineLayer
+  - type: Transform
+    anchored: true
+  - type: Pullable
+  - type: StaticPrice
+    price: 800
+  - type: ActivatableUI
+    key: enum.DocumentPrinterUiKey.Key
+  - type: ActivatableUIRequiresPower
+  - type: UserInterface
+    interfaces:
+      enum.DocumentPrinterUiKey.Key:
+        type: DocumentPrinterBoundUserInterface
+  - type: DocumentPrinter
+    sections:
+    - name: doc-printer-section-centcomm
+      documents:
+      - BoxFolderGreenBAN
+      - PaperRequestTargetStation
+      - PaperReportCC
+      - PaperCompletedStation
+      - PaperFailedStation
+      - PaperRequestCentComm
+      - PaperRequestERT
+      - PaperRequestRXBZZ
+      - PaperRequestExecution
+      - PaperRequestMagistrat
+    - name: doc-printer-section-command
+      documents:
+      - BoxFolderBlueBAN
+      - PaperDomotionComm
+      - PaperDismissalReq
+      - PaperRequestHeadCouncil
+      - PaperHeadCouncilEnd
+    - name: doc-printer-section-security
+      documents:
+      - BoxFolderRedBAN
+      - PaperOrderSec
+      - PaperDonos
+      - PaperLic
+      - PaperTimeRequestWeapon
+      - PaperRequestExecutionSec
+      - PaperOrderWeapon
+      - PaperRequestGuard
+    - name: doc-printer-section-engineering
+      documents:
+      - BoxFolderRYellowBAN
+      - PaperRequestBuild
+      - PaperRequestMaterial
+      - PaperReportElect
+      - PaperReportAtmos
+    - name: doc-printer-section-medical
+      documents:
+      - BoxFolderWhiteBAN
+      - PaperRequestNarco
+      - PaperRequestExecutionMed
+      - PaperWaiverOfClaims
+      - PaperDurka
+    - name: doc-printer-section-science
+      documents:
+      - BoxFolderPurpleBAN
+      - PaperRequestReasonable
+      - PaperRequestLaw
+      - PaperBrain
+    - name: doc-printer-section-cargo
+      documents:
+      - BoxFolderYellowBAN
+      - PaperCargoOrder
+    - name: doc-printer-section-service
+      documents:
+      - BoxFolderGreyBAN
+      - PaperRequestUpID
+      - PaperRequestWork
+      - PaperRequestTrash
+      - PaperEndTrash
+      - PaperRequestCourt
+      - PaperDismissalSer
+      - PaperPromotion
+      - PaperRequestBotan
+    emagSections:
+    - name: doc-printer-section-syndicate
+      documents:
+      - BoxFolderBlackBAN
+      - PaperSyndicat
+  - type: OnEmaggedHandler
+  - type: CargoOrderConsole
+    account: Service
+    announcementChannel: Service
+    mode: PrintSlip
+
+- type: entity
+  id: DocPrinterEngineering
+  parent: DocPrinter
+  components:
+  - type: CargoOrderConsole
+    account: Engineering
+    announcementChannel: Engineering
+    mode: PrintSlip
+
+- type: entity
+  id: DocPrinterMedical
+  parent: DocPrinter
+  components:
+  - type: CargoOrderConsole
+    account: Medical
+    announcementChannel: Medical
+    mode: PrintSlip
+
+- type: entity
+  id: DocPrinterScience
+  parent: DocPrinter
+  components:
+  - type: CargoOrderConsole
+    account: Science
+    announcementChannel: Science
+    mode: PrintSlip
+
+- type: entity
+  id: DocPrinterSecurity
+  parent: DocPrinter
+  components:
+  - type: CargoOrderConsole
+    account: Security
+    announcementChannel: Security
+    mode: PrintSlip
+
+# Papers and folders the printer produces
+- type: entity
+  parent: Paper
+  id: PaperRequestTargetStation
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-request
+
+- type: entity
+  parent: Paper
+  id: PaperReportCC
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-report
+
+- type: entity
+  parent: Paper
+  id: PaperCompletedStation
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-completed
+
+- type: entity
+  parent: Paper
+  id: PaperFailedStation
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-failed
+
+- type: entity
+  parent: Paper
+  id: PaperRequestCentComm
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-request-CentComm
+
+- type: entity
+  parent: Paper
+  id: PaperRequestERT
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-request-ERT
+
+- type: entity
+  parent: Paper
+  id: PaperRequestRXBZZ
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-request-RXBZZ
+
+- type: entity
+  parent: Paper
+  id: PaperRequestExecution
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-request-high-order-compaint
+
+- type: entity
+  parent: Paper
+  id: PaperRequestMagistrat
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-text-request-magistrat
+
+#  PaperCommand
+
+- type: entity
+  parent: Paper
+  id: PaperDomotionComm
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-comm-text-crew-mem-domotion
+
+- type: entity
+  parent: Paper
+  id: PaperDismissalReq
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-comm-text-crew-mem-dismissal
+
+- type: entity
+  parent: Paper
+  id: PaperRequestHeadCouncil
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-comm-text-request-council
+
+- type: entity
+  parent: Paper
+  id: PaperHeadCouncilEnd
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-comm-text-council-end
+
+#  PaperSecurity
+
+- type: entity
+  parent: Paper
+  id: PaperOrderSec
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-order
+
+- type: entity
+  parent: Paper
+  id: PaperDonos
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-complaint
+
+- type: entity
+  parent: Paper
+  id: PaperLic
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-lic
+
+- type: entity
+  parent: Paper
+  id: PaperTimeRequestWeapon
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-request-weapon
+
+- type: entity
+  parent: Paper
+  id: PaperRequestExecutionSec
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-request-execution
+
+- type: entity
+  parent: Paper
+  id: PaperOrderWeapon
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-request-cargo-weapon
+
+- type: entity
+  parent: Paper
+  id: PaperRequestGuard
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sec-text-request-guard
+
+#  PaperEng
+
+- type: entity
+  parent: Paper
+  id: PaperRequestBuild
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-eng-text-request-build
+
+- type: entity
+  parent: Paper
+  id: PaperRequestMaterial
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-eng-text-request-material
+
+- type: entity
+  parent: Paper
+  id: PaperReportElect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-eng-text-report-elect
+
+- type: entity
+  parent: Paper
+  id: PaperReportAtmos
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-eng-text-report-atmos
+
+#  PaperMed
+
+- type: entity
+  parent: Paper
+  id: PaperRequestNarco
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-med-text-request-perm-narc
+
+- type: entity
+  parent: Paper
+  id: PaperRequestExecutionMed
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-med-text-request-execution
+
+- type: entity
+  parent: Paper
+  id: PaperWaiverOfClaims
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-med-text-waiver-claims
+
+- type: entity
+  parent: Paper
+  id: PaperDurka
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-med-text-durka
+
+#  PaperSci
+
+- type: entity
+  parent: Paper
+  id: PaperRequestReasonable
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sci-text-reasonable
+
+- type: entity
+  parent: Paper
+  id: PaperRequestLaw
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sci-text-request-law
+
+- type: entity
+  parent: Paper
+  id: PaperBrain
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-sci-text-brain
+
+#  PaperCargo
+
+- type: entity
+  parent: Paper
+  id: PaperCargoOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-car-text-order
+
+#  PaperService
+
+- type: entity
+  parent: Paper
+  id: PaperRequestUpID
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-up-IDcard
+
+- type: entity
+  parent: Paper
+  id: PaperRequestWork
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-work
+
+- type: entity
+  parent: Paper
+  id: PaperRequestTrash
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-trash
+
+- type: entity
+  parent: Paper
+  id: PaperEndTrash
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-trash-end
+
+- type: entity
+  parent: Paper
+  id: PaperRequestCourt
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-court
+
+- type: entity
+  parent: Paper
+  id: PaperDismissalSer
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-dismissal
+
+- type: entity
+  parent: Paper
+  id: PaperPromotion
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-promotion
+
+- type: entity
+  parent: Paper
+  id: PaperRequestBotan
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-ser-text-request-botan
+
+#  PaperSyndicat
+
+- type: entity
+  parent: Paper
+  id: PaperSyndicat
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Paper
+    content: paper-syn-text-ha-ha
+
+# BoxFolder
+
+- type: entity
+  id: BoxFolderRedBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Red
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-sec
+
+- type: entity
+  id: BoxFolderBlueBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Blue
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-com
+
+- type: entity
+  id: BoxFolderYellowBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Yellow
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-car
+
+- type: entity
+  id: BoxFolderWhiteBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: White
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-med
+
+- type: entity
+  id: BoxFolderGreyBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Grey
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-ser
+
+- type: entity
+  id: BoxFolderGreenBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Green
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-CC
+
+- type: entity
+  id: BoxFolderRYellowBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: RYellow
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-eng
+
+- type: entity
+  id: BoxFolderPurpleBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Purple
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-sci
+
+- type: entity
+  id: BoxFolderBlackBAN
+  parent: BoxFolderBase
+  categories: [ HideSpawnMenu ]
+  suffix: Black
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Machines/doc_printer.rsi
+    layers:
+    - state: folder-syn

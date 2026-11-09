@@ -1,0 +1,31 @@
+# Department request computers only print order slips, which are inserted into the main cargo console.
+
+- type: !PartialOnly entity
+  id: ComputerCargoOrdersEngineering
+  components:
+  - type: CargoOrderConsole
+    mode: PrintSlip
+
+- type: !PartialOnly entity
+  id: ComputerCargoOrdersMedical
+  components:
+  - type: CargoOrderConsole
+    mode: PrintSlip
+
+- type: !PartialOnly entity
+  id: ComputerCargoOrdersScience
+  components:
+  - type: CargoOrderConsole
+    mode: PrintSlip
+
+- type: !PartialOnly entity
+  id: ComputerCargoOrdersSecurity
+  components:
+  - type: CargoOrderConsole
+    mode: PrintSlip
+
+- type: !PartialOnly entity
+  id: ComputerCargoOrdersService
+  components:
+  - type: CargoOrderConsole
+    mode: PrintSlip

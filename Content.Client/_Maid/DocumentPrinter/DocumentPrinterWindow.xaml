@@ -1,0 +1,39 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+               Title="{Loc 'doc-printer-window-title'}"
+               MinSize="480 520"
+               SetSize="480 520">
+    <TabContainer Name="Tabs" VerticalExpand="True">
+        <!-- Documents -->
+        <BoxContainer Orientation="Vertical" Margin="4">
+            <LineEdit Name="DocumentSearch"
+                      PlaceHolder="{Loc 'doc-printer-search'}" />
+            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                <BoxContainer Name="Documents" Orientation="Vertical" />
+            </ScrollContainer>
+        </BoxContainer>
+
+        <!-- Cargo order -->
+        <BoxContainer Orientation="Vertical" Margin="4">
+            <BoxContainer Orientation="Horizontal">
+                <LineEdit Name="Requester"
+                          PlaceHolder="{Loc 'doc-printer-cargo-requester'}"
+                          HorizontalExpand="True" />
+                <LineEdit Name="Reason"
+                          PlaceHolder="{Loc 'doc-printer-cargo-reason'}"
+                          HorizontalExpand="True" />
+            </BoxContainer>
+            <BoxContainer Orientation="Horizontal">
+                <Label Text="{Loc 'doc-printer-cargo-amount'}"
+                       StyleClasses="LabelKeyText" />
+                <SpinBox Name="Amount"
+                         HorizontalExpand="True"
+                         Value="1" />
+            </BoxContainer>
+            <LineEdit Name="ProductSearch"
+                      PlaceHolder="{Loc 'doc-printer-search'}" />
+            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                <BoxContainer Name="Products" Orientation="Vertical" />
+            </ScrollContainer>
+        </BoxContainer>
+    </TabContainer>
+</DefaultWindow>
