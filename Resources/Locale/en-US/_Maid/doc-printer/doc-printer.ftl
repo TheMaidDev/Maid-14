@@ -1,0 +1,17 @@
+doc-printer-window-title = Document printer
+doc-printer-tab-documents = Documents
+doc-printer-tab-cargo = Cargo order
+doc-printer-search = Search...
+doc-printer-cargo-requester = Requester
+doc-printer-cargo-reason = Reason
+doc-printer-cargo-amount = Amount
+doc-printer-cargo-print = Print slip
+doc-printer-section-centcomm = Central Command
+doc-printer-section-command = Command
+doc-printer-section-security = Security
+doc-printer-section-engineering = Engineering
+doc-printer-section-medical = Medical
+doc-printer-section-science = Science
+doc-printer-section-cargo = Cargo
+doc-printer-section-service = Service
+doc-printer-section-syndicate = J@4D*S

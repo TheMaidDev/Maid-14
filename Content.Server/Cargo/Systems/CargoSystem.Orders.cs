@@ -318,7 +318,7 @@ namespace Content.Server.Cargo.Systems
             }
 
             var cost = order.Price * order.OrderQuantity;
-            var accountBalance = GetBalanceFromAccount((station.Value, bank), order.Account);
+            var accountBalance = GetBalanceFromAccount((station.Value, bank), bank.PrimaryAccount); // MAID fix department balance
 
             // Not enough balance
             if (cost > accountBalance)

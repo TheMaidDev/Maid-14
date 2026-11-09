@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Made by Valentyi",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "icon"
+    },
+    {
+      "name": "unlit",
+      "delays": [
+        [
+          0.6,
+          0.7,
+          0.6,
+          0.7
+        ]
+      ]
+    },
+    {
+      "name": "folder-base"
+    },
+    {
+      "name": "idle"
+    },
+    {
+      "name": "folder-CC"
+    },
+    {
+      "name": "folder-overlay-paper"
+    },
+    {
+      "name": "folder-med"
+    },
+    {
+      "name": "folder-sec"
+    },
+    {
+      "name": "folder-eng"
+    },
+    {
+      "name": "folder-sci"
+    },
+    {
+      "name": "folder-car"
+    },
+    {
+      "name": "folder-syn"
+    },
+    {
+      "name": "folder-com"
+    },
+    {
+      "name": "folder-ser"
+    },
+    {
+      "name": "inserting",
+      "delays": [
+        [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ]
+      ]
+    },
+    {
+      "name": "printing",
+      "delays": [
+        [
+          0.4,
+          0.4,
+          0.4,
+          0.4,
+          0.4,
+          0.4,
+          0.4,
+          0.4,
+          0.4
+        ]
+      ]
+    }
+  ]
+}
