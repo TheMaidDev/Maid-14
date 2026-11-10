@@ -1,0 +1,43 @@
+ent-MaidBoombox = бумбокс
+    .desc = Портативный кассетный проигрыватель. Вставьте кассету, чтобы записать на неё свои песни или включить записанные.
+ent-MaidWalkman = плеер
+    .desc = Мини-проигрыватель кассет, крепится на пояс. Тихий, слышно только тем, кто рядом.
+ent-MaidBlankCassette = кассета
+    .desc = Кассета для бумбокса или плеера. Вмещает до трёх песен.
+
+maid-music-ui-title = Бумбокс
+maid-music-ui-stop = Стоп
+maid-music-ui-repeat = Повтор
+maid-music-ui-record-header = Записать песню на кассету
+maid-music-ui-name-placeholder = Название песни
+maid-music-ui-choose = Выбрать файл (.ogg)
+maid-music-ui-record = Записать
+maid-music-ui-no-cassette = Кассета не вставлена.
+maid-music-ui-cassette-slots = Песен на кассете: { $used } из { $max }
+maid-music-ui-track = { $num }. { $name }
+maid-music-ui-track-playing = > { $num }. { $name }
+maid-music-ui-now-playing = Играет: { $name }
+maid-music-ui-stopped = Остановлено.
+maid-music-ui-file-ready = Файл выбран ({ $size } МБ).
+maid-music-ui-too-big = Файл слишком большой. Максимум { $max } МБ.
+maid-music-ui-sent = Отправлено на запись.
+maid-music-ui-bad-file = Файл повреждён или это не .ogg (Vorbis).
+maid-music-ui-too-long = Песня слишком длинная. Максимум { $max } с.
+maid-music-ui-too-heavy = Песня слишком тяжёлая для воспроизведения. Выберите файл покороче или с меньшей частотой.
+
+maid-music-too-far = Слишком далеко.
+maid-music-no-cassette = Нужна кассета в бумбоксе.
+maid-music-cassette-full = На кассете больше нет места.
+maid-music-too-big = Файл слишком большой. Максимум { $max } МБ.
+maid-music-not-ogg = Нужен целый файл .ogg (Vorbis), этот повреждён или обрезан.
+maid-music-too-long = Песня слишком длинная. Максимум { $max } с.
+maid-music-too-heavy = Песня слишком тяжёлая для воспроизведения. Выберите файл покороче или с меньшей частотой.
+maid-music-bad-name = Укажите название песни.
+maid-music-cooldown = Подождите немного перед следующей записью.
+maid-music-quota = Вы уже записали максимум песен за раунд.
+maid-music-storage-full = Хранилище песен заполнено.
+maid-music-recorded = Записано: { $name }
+maid-music-recorded-stereo = Записано: { $name }. Стерео-звук слышен без направления, для объёмного звука нужен моно-файл.
+maid-music-song-lost = Запись на кассете повреждена.
+
+ui-options-boombox-volume = Громкость бумбоксов:
