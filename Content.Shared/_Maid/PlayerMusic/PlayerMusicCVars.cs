@@ -12,7 +12,20 @@ public sealed class PlayerMusicCVars
     /// Max size of one uploaded song in bytes.
     /// </summary>
     public static readonly CVarDef<int> MaxSongBytes =
-        CVarDef.Create("maidmusic.max_song_bytes", 5_000_000, CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("maidmusic.max_song_bytes", 3_500_000, CVar.SERVER | CVar.REPLICATED);
+
+    /// <summary>
+    /// Max length of one song in seconds.
+    /// </summary>
+    public static readonly CVarDef<int> MaxSongSeconds =
+        CVarDef.Create("maidmusic.max_song_seconds", 240, CVar.SERVER | CVar.REPLICATED);
+
+    /// <summary>
+    /// Max size of one song after decoding (the engine keeps all of it in memory while it is cached).
+    /// Limits the memory used on clients regardless of sample rate and channel count.
+    /// </summary>
+    public static readonly CVarDef<int> MaxDecodedBytes =
+        CVarDef.Create("maidmusic.max_decoded_bytes", 48_000_000, CVar.SERVER | CVar.REPLICATED);
 
     /// <summary>
     /// How many different songs one player can record per round.
@@ -37,4 +50,10 @@ public sealed class PlayerMusicCVars
     /// </summary>
     public static readonly CVarDef<float> ListenRange =
         CVarDef.Create("maidmusic.listen_range", 30f, CVar.SERVERONLY);
+
+    /// <summary>
+    /// Player's own volume setting for boomboxes and walkmans (1 = 100%).
+    /// </summary>
+    public static readonly CVarDef<float> Volume =
+        CVarDef.Create("maidmusic.volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
 }

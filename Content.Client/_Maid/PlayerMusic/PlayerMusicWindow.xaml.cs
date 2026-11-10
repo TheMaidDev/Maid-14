@@ -111,9 +111,39 @@ public sealed partial class PlayerMusicWindow : FancyWindow
             return;
         }
 
-        _pending = memory.ToArray();
+        var bytes = memory.ToArray();
+
+        // Same checks as on the server, so a bad file is not even sent
+        if (!PlayerMusicOgg.TryAnalyze(bytes, out var info))
+        {
+            RejectFile("maid-music-ui-bad-file");
+            return;
+        }
+
+        var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
+        if (info.Seconds > maxSeconds)
+        {
+            RejectFile("maid-music-ui-too-long", ("max", maxSeconds));
+            return;
+        }
+
+        if (info.DecodedBytes > _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes))
+        {
+            RejectFile("maid-music-ui-too-heavy");
+            return;
+        }
+
+        _pending = bytes;
         FileLabel.Text = Loc.GetString("maid-music-ui-file-ready", ("size", FormatMb(_pending.Length)));
         StatusLabel.Text = string.Empty;
+        UpdateUploadButton();
+    }
+
+    private void RejectFile(string locKey, params (string, object)[] args)
+    {
+        _pending = null;
+        FileLabel.Text = string.Empty;
+        StatusLabel.Text = Loc.GetString(locKey, args);
         UpdateUploadButton();
     }
 

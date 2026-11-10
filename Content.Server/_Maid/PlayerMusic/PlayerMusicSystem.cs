@@ -9,6 +9,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
+using Robust.Shared.Enums;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
@@ -34,20 +35,46 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private const int MaxNameLength = 40;
 
-    private sealed record StoredSong(string Id, string Name, byte[] Data, NetUserId Owner);
+    private static readonly TimeSpan UploadTimeout = TimeSpan.FromSeconds(15);
+    private const int ChunksPerTick = 4;
+
+    private sealed record StoredSong(string Id, string Name, byte[] Data, NetUserId Owner, TimeSpan Duration);
+
+    private sealed class PendingUpload(EntityUid boombox, string name, int total, TimeSpan now)
+    {
+        public readonly EntityUid Boombox = boombox;
+        public readonly string Name = name;
+        public readonly byte[] Buffer = new byte[total];
+        public int Received;
+        public int NextIndex;
+        public TimeSpan LastActivity = now;
+    }
+
+    private sealed class Transfer(ICommonSession session, StoredSong song)
+    {
+        public readonly ICommonSession Session = session;
+        public readonly StoredSong Song = song;
+        public int Offset;
+        public int Index;
+    }
 
     private readonly Dictionary<string, StoredSong> _songs = new();
     private readonly Dictionary<NetUserId, HashSet<string>> _owned = new();
     private readonly Dictionary<NetUserId, TimeSpan> _lastUpload = new();
     private readonly Dictionary<NetUserId, TimeSpan> _lastRequest = new();
+    private readonly Dictionary<NetUserId, PendingUpload> _pending = new();
+    private readonly Dictionary<NetUserId, Transfer> _transfers = new();
+    private TimeSpan _nextCheck;
     private long _totalBytes;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeNetworkEvent<PlayerMusicUploadEvent>(OnUpload);
+        SubscribeNetworkEvent<PlayerMusicUploadStartEvent>(OnUploadStart);
+        SubscribeNetworkEvent<PlayerMusicUploadChunkEvent>(OnUploadChunk);
         SubscribeNetworkEvent<PlayerMusicRequestFileEvent>(OnRequestFile);
+        SubscribeNetworkEvent<PlayerMusicCancelFileEvent>(OnCancelFile);
 
         SubscribeLocalEvent<PlayerMusicBoomboxComponent, PlayerMusicPlayMessage>(OnPlay);
         SubscribeLocalEvent<PlayerMusicBoomboxComponent, PlayerMusicStopMessage>(OnStop);
@@ -64,7 +91,49 @@ public sealed class PlayerMusicSystem : EntitySystem
         _owned.Clear();
         _lastUpload.Clear();
         _lastRequest.Clear();
+        _pending.Clear();
+        _transfers.Clear();
         _totalBytes = 0;
+    }
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        SendChunks();
+
+        var now = _timing.CurTime;
+        if (now < _nextCheck)
+            return;
+
+        _nextCheck = now + TimeSpan.FromSeconds(0.5);
+
+        // Interrupted uploads must not hold memory forever
+        List<NetUserId>? stale = null;
+        foreach (var (user, upload) in _pending)
+        {
+            if (now - upload.LastActivity > UploadTimeout)
+                (stale ??= new()).Add(user);
+        }
+
+        if (stale != null)
+        {
+            foreach (var user in stale)
+            {
+                _pending.Remove(user);
+            }
+        }
+
+        // A song that is not repeated stops by itself when it ends
+        var query = EntityQueryEnumerator<PlayerMusicBoomboxComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            if (comp.StartedAt is not { } started || comp.Repeat || comp.SongId == null)
+                continue;
+
+            if (!_songs.TryGetValue(comp.SongId, out var song) || now - started >= song.Duration + TimeSpan.FromSeconds(0.3))
+                StopPlaying((uid, comp));
+        }
     }
 
     #region Boombox controls
@@ -102,6 +171,22 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnRepeat(Entity<PlayerMusicBoomboxComponent> ent, ref PlayerMusicRepeatMessage args)
     {
+        if (ent.Comp.Repeat == args.Repeat)
+            return;
+
+        // Repeat was turned off while looping: keep the position inside the current loop,
+        // so the song finishes normally instead of jumping around.
+        if (!args.Repeat &&
+            ent.Comp.StartedAt is { } started &&
+            ent.Comp.SongId is { } songId &&
+            _songs.TryGetValue(songId, out var song) &&
+            song.Duration > TimeSpan.Zero)
+        {
+            var now = _timing.CurTime;
+            var position = TimeSpan.FromTicks(Math.Max(0, (now - started).Ticks) % song.Duration.Ticks);
+            ent.Comp.StartedAt = now - position;
+        }
+
         ent.Comp.Repeat = args.Repeat;
         Dirty(ent);
     }
@@ -171,51 +256,69 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     #region Upload
 
-    private void OnUpload(PlayerMusicUploadEvent ev, EntitySessionEventArgs args)
+    /// <summary>
+    /// Checks that the player may record on the boombox right now. Shows the reason if not.
+    /// </summary>
+    private bool CanRecord(
+        ICommonSession session,
+        EntityUid boomboxUid,
+        out EntityUid user,
+        out Entity<PlayerMusicCassetteComponent> cassette)
     {
-        if (!_cfg.GetCVar(PlayerMusicCVars.Enabled))
-            return;
+        cassette = default;
+        user = default;
 
-        var session = args.SenderSession;
-        if (session.AttachedEntity is not { } user)
-            return;
+        if (!_cfg.GetCVar(PlayerMusicCVars.Enabled) || session.AttachedEntity is not { } attached)
+            return false;
 
-        var boomboxUid = GetEntity(ev.Boombox);
-        if (!TryComp(boomboxUid, out PlayerMusicBoomboxComponent? boomboxComp))
-            return;
+        user = attached;
 
-        var boombox = new Entity<PlayerMusicBoomboxComponent>(boomboxUid, boomboxComp);
+        if (!HasComp<PlayerMusicBoomboxComponent>(boomboxUid))
+            return false;
 
         if (!_interaction.InRangeUnobstructed(user, boomboxUid))
         {
             Deny(boomboxUid, user, "maid-music-too-far");
-            return;
+            return false;
         }
 
-        if (!TryGetCassette(boomboxUid, out var cassette))
+        if (!TryGetCassette(boomboxUid, out cassette))
         {
             Deny(boomboxUid, user, "maid-music-no-cassette");
-            return;
+            return false;
         }
 
         if (cassette.Comp.Tracks.Count >= cassette.Comp.MaxTracks)
         {
             Deny(boomboxUid, user, "maid-music-cassette-full");
-            return;
+            return false;
         }
 
-        var data = ev.Data;
+        var cooldown = TimeSpan.FromSeconds(_cfg.GetCVar(PlayerMusicCVars.UploadCooldown));
+        if (_lastUpload.TryGetValue(session.UserId, out var last) && _timing.CurTime - last < cooldown)
+        {
+            Deny(boomboxUid, user, "maid-music-cooldown");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void OnUploadStart(PlayerMusicUploadStartEvent ev, EntitySessionEventArgs args)
+    {
+        var session = args.SenderSession;
+
+        // A new start always cancels the previous unfinished upload
+        _pending.Remove(session.UserId);
+
+        var boomboxUid = GetEntity(ev.Boombox);
+        if (!CanRecord(session, boomboxUid, out var user, out _))
+            return;
+
         var maxBytes = _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes);
-        if (data.Length == 0 || data.Length > maxBytes)
+        if (ev.TotalBytes <= 0 || ev.TotalBytes > maxBytes)
         {
             Deny(boomboxUid, user, "maid-music-too-big", ("max", FormatMb(maxBytes)));
-            return;
-        }
-
-        var channels = GetVorbisChannels(data);
-        if (channels is < 1 or > 2)
-        {
-            Deny(boomboxUid, user, "maid-music-not-ogg");
             return;
         }
 
@@ -226,15 +329,76 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
-        var now = _timing.CurTime;
-        var userId = session.UserId;
-        var cooldown = TimeSpan.FromSeconds(_cfg.GetCVar(PlayerMusicCVars.UploadCooldown));
-        if (_lastUpload.TryGetValue(userId, out var last) && now - last < cooldown)
+        _pending[session.UserId] = new PendingUpload(boomboxUid, name, ev.TotalBytes, _timing.CurTime);
+    }
+
+    private void OnUploadChunk(PlayerMusicUploadChunkEvent ev, EntitySessionEventArgs args)
+    {
+        var session = args.SenderSession;
+        if (!_pending.TryGetValue(session.UserId, out var upload))
+            return;
+
+        var length = ev.Data.Length;
+
+        // Any inconsistency drops the whole upload, partial data never stays in memory
+        if (ev.Index != upload.NextIndex ||
+            length == 0 ||
+            length > PlayerMusicLimits.ChunkBytes ||
+            upload.Received + length > upload.Buffer.Length)
         {
-            Deny(boomboxUid, user, "maid-music-cooldown");
+            _pending.Remove(session.UserId);
             return;
         }
 
+        Array.Copy(ev.Data, 0, upload.Buffer, upload.Received, length);
+        upload.Received += length;
+        upload.NextIndex++;
+        upload.LastActivity = _timing.CurTime;
+
+        if (upload.Received < upload.Buffer.Length)
+            return;
+
+        _pending.Remove(session.UserId);
+        FinishUpload(session, upload);
+    }
+
+    private void FinishUpload(ICommonSession session, PendingUpload upload)
+    {
+        var boomboxUid = upload.Boombox;
+        if (!TryComp(boomboxUid, out PlayerMusicBoomboxComponent? boomboxComp))
+            return;
+
+        var boombox = new Entity<PlayerMusicBoomboxComponent>(boomboxUid, boomboxComp);
+
+        // The world could have changed while the chunks were on their way
+        if (!CanRecord(session, boomboxUid, out var user, out var cassette))
+            return;
+
+        var data = upload.Buffer;
+        var name = upload.Name;
+
+        // Whole file is checked here: structure, end of stream, sample rate, channels and length
+        if (!PlayerMusicOgg.TryAnalyze(data, out var info))
+        {
+            Deny(boomboxUid, user, "maid-music-not-ogg");
+            return;
+        }
+
+        var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
+        if (info.Seconds > maxSeconds)
+        {
+            Deny(boomboxUid, user, "maid-music-too-long", ("max", maxSeconds));
+            return;
+        }
+
+        // Memory used after decoding does not depend on the file size, only on length, rate and channels
+        if (info.DecodedBytes > _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes))
+        {
+            Deny(boomboxUid, user, "maid-music-too-heavy");
+            return;
+        }
+
+        var userId = session.UserId;
         var id = Convert.ToHexString(SHA256.HashData(data))[..32];
 
         if (!_songs.ContainsKey(id))
@@ -252,21 +416,22 @@ public sealed class PlayerMusicSystem : EntitySystem
                 return;
             }
 
-            _songs[id] = new StoredSong(id, name, data, userId);
+            _songs[id] = new StoredSong(id, name, data, userId, TimeSpan.FromSeconds(info.Seconds));
             _totalBytes += data.Length;
             owned.Add(id);
         }
 
-        _lastUpload[userId] = now;
+        _lastUpload[userId] = _timing.CurTime;
 
         cassette.Comp.Tracks.Add(new PlayerMusicTrack(id, name));
         Dirty(cassette);
         UpdateCassetteInfo(boombox);
 
+        var seconds = (int) info.Seconds;
         _adminLog.Add(LogType.Action, LogImpact.Low,
-            $"{ToPrettyString(user):player} recorded song '{name}' ({data.Length} bytes, id {id}) onto a cassette in {ToPrettyString(boomboxUid)}");
+            $"{ToPrettyString(user):player} recorded song '{name}' ({data.Length} bytes, {seconds} s, id {id}) onto a cassette in {ToPrettyString(boomboxUid)}");
 
-        var message = channels == 2 ? "maid-music-recorded-stereo" : "maid-music-recorded";
+        var message = info.Channels == 2 ? "maid-music-recorded-stereo" : "maid-music-recorded";
         _popup.PopupEntity(Loc.GetString(message, ("name", name)), boomboxUid, user);
     }
 
@@ -278,34 +443,6 @@ public sealed class PlayerMusicSystem : EntitySystem
     private static string FormatMb(int bytes)
     {
         return (bytes / 1_000_000f).ToString("0.##");
-    }
-
-    /// <summary>
-    /// Reads the channel count from the Ogg Vorbis identification header.
-    /// Returns 0 if the data is not an Ogg Vorbis file (the engine can only play Vorbis).
-    /// </summary>
-    private static int GetVorbisChannels(byte[] d)
-    {
-        if (d.Length < 64 ||
-            d[0] != (byte) 'O' || d[1] != (byte) 'g' || d[2] != (byte) 'g' || d[3] != (byte) 'S')
-        {
-            return 0;
-        }
-
-        // Ogg page header is 27 bytes, followed by the segment table
-        var start = 27 + d[26];
-        if (start + 12 > d.Length)
-            return 0;
-
-        if (d[start] != 1 ||
-            d[start + 1] != (byte) 'v' || d[start + 2] != (byte) 'o' || d[start + 3] != (byte) 'r' ||
-            d[start + 4] != (byte) 'b' || d[start + 5] != (byte) 'i' || d[start + 6] != (byte) 's')
-        {
-            return 0;
-        }
-
-        // 7 bytes "\x01vorbis", 4 bytes version, 1 byte channel count
-        return d[start + 11];
     }
 
     private static string SanitizeName(string name)
@@ -335,6 +472,11 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (session.AttachedEntity is not { } user)
             return;
 
+        // The song is already on its way to this player
+        if (_transfers.ContainsKey(session.UserId))
+            return;
+
+        // Dropped requests are fine: the client asks again after a few seconds
         var now = _timing.CurTime;
         if (_lastRequest.TryGetValue(session.UserId, out var last) && now - last < TimeSpan.FromSeconds(1))
             return;
@@ -356,8 +498,63 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (!_xform.InRange(Transform(user).Coordinates, Transform(boombox).Coordinates, range))
             return;
 
-        // recordReplay: false, so replays don't get filled with audio files
-        RaiseNetworkEvent(new PlayerMusicFileEvent(song.Id, song.Data), Filter.SinglePlayer(session), false);
+        _transfers[session.UserId] = new Transfer(session, song);
+        RaiseNetworkEvent(new PlayerMusicFileStartEvent(song.Id, song.Data.Length), Filter.SinglePlayer(session), false);
+    }
+
+    private void OnCancelFile(PlayerMusicCancelFileEvent ev, EntitySessionEventArgs args)
+    {
+        // The player walked away, the rest of the song would only waste traffic
+        if (_transfers.TryGetValue(args.SenderSession.UserId, out var transfer) && transfer.Song.Id == ev.SongId)
+            _transfers.Remove(args.SenderSession.UserId);
+    }
+
+    /// <summary>
+    /// Songs go out in small pieces, a few per tick, so one download never floods the connection.
+    /// </summary>
+    private void SendChunks()
+    {
+        if (_transfers.Count == 0)
+            return;
+
+        List<NetUserId>? done = null;
+
+        foreach (var (user, transfer) in _transfers)
+        {
+            if (transfer.Session.Status != SessionStatus.InGame)
+            {
+                (done ??= new()).Add(user);
+                continue;
+            }
+
+            var data = transfer.Song.Data;
+
+            for (var i = 0; i < ChunksPerTick && transfer.Offset < data.Length; i++)
+            {
+                var length = Math.Min(PlayerMusicLimits.ChunkBytes, data.Length - transfer.Offset);
+                var chunk = new byte[length];
+                Array.Copy(data, transfer.Offset, chunk, 0, length);
+
+                // recordReplay: false, so replays don't get filled with audio files
+                RaiseNetworkEvent(
+                    new PlayerMusicFileChunkEvent(transfer.Song.Id, transfer.Index++, chunk),
+                    Filter.SinglePlayer(transfer.Session),
+                    false);
+
+                transfer.Offset += length;
+            }
+
+            if (transfer.Offset >= data.Length)
+                (done ??= new()).Add(user);
+        }
+
+        if (done == null)
+            return;
+
+        foreach (var user in done)
+        {
+            _transfers.Remove(user);
+        }
     }
 
     #endregion
