@@ -64,22 +64,22 @@
       timeBetweenIncidents: 300, 600
       durationOfIncident: 10, 30
 
-- type: trait
-  id: Unrevivable
-  name: trait-unrevivable-name
-  description: trait-unrevivable-desc
-  category: Disabilities
-  components:
-    - type: Unrevivable
-      cloneable: true
+# - type: trait # Toggled off by Maid
+#   id: Unrevivable
+#   name: trait-unrevivable-name
+#   description: trait-unrevivable-desc
+#   category: Disabilities
+#   components:
+#     - type: Unrevivable
+#       cloneable: true
 
-- type: trait
-  id: Monochromacy
-  name: trait-monochromacy-name
-  description: trait-monochromacy-desc
-  category: Disabilities
-  components:
-  - type: BlackAndWhiteOverlay
+# - type: trait # Toggled off by Maid
+#   id: Monochromacy
+#   name: trait-monochromacy-name
+#   description: trait-monochromacy-desc
+#   category: Disabilities
+#   components:
+#   - type: BlackAndWhiteOverlay
 
 - type: trait
   id: Muted
@@ -105,10 +105,10 @@
       sounds:
         collection: Paracusia
 
-- type: trait
-  id: PainNumbness
-  name: trait-painnumbness-name
-  description: trait-painnumbness-desc
-  category: Disabilities
-  components:
-  - type: PainNumbness
+# - type: trait # Toggled off by Maid
+#   id: PainNumbness
+#   name: trait-painnumbness-name
+#   description: trait-painnumbness-desc
+#   category: Disabilities
+#   components:
+#   - type: PainNumbness
