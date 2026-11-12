@@ -109,7 +109,7 @@
   components:
   - type: Sprite
     layers:
-    - state: boxwide
+    - state: box
     - state: swab
   - type: BallisticAmmoProvider
     whitelist:
