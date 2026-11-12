@@ -39,7 +39,14 @@ namespace Content.Shared.Construction.Steps
 
         public override ConstructionGuideEntry GenerateGuideEntry()
         {
+            // MAID BEGIN fix localization spam
+            /*
             var stepName = Loc.GetString(Name);
+            */
+            // Nameless steps carry an empty LocId; GetString("") warned during
+            // server-side guide generation. DoExamine already guards the same way.
+            var stepName = string.IsNullOrEmpty(Name) ? string.Empty : Loc.GetString(Name);
+            // MAID END fix localization spam
             return new ConstructionGuideEntry
             {
                 Localization = "construction-presenter-arbitrary-step",

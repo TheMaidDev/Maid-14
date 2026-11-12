@@ -199,8 +199,18 @@ namespace Content.Shared.Localizations
         private static ILocValue FormatLoc(LocArgs args)
         {
             var id = ((LocValueString)args.Args[0]).Value;
+            var options = args.Options.Select(x => (x.Key, x.Value.Value!)).ToArray();
 
+            // MAID BEGIN fix double localization
+            /*
             return new LocValueString(Loc.GetString(id, args.Options.Select(x => (x.Key, x.Value.Value!)).ToArray()));
+            */
+            // Some callers (construction guide steps) pass already-resolved text into LOC(),
+            // which made GetString log an Unknown messageId warning for every guide entry.
+            // Probe first: real keys still resolve (with the same ru->en fallback), resolved
+            // text and empty strings pass through unchanged.
+            return new LocValueString(Loc.TryGetString(id, out var message, options) ? message : id);
+            // MAID END fix double localization
         }
 
         private static ILocValue FormatToString(CultureInfo culture, LocArgs args)

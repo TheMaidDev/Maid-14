@@ -439,9 +439,20 @@ namespace Content.Client.Construction.UI
 
             foreach (var entry in guide.Entries)
             {
+                // MAID BEGIN fix localization spam
+                /*
                 var text = entry.Arguments != null
                     ? Loc.GetString(entry.Localization, entry.Arguments)
                     : Loc.GetString(entry.Localization);
+                */
+                // Server-side guide padding separators carry an empty Localization;
+                // GetString("") warned once per rendered guide. Blank stays blank.
+                var text = string.IsNullOrEmpty(entry.Localization)
+                    ? string.Empty
+                    : entry.Arguments != null
+                        ? Loc.GetString(entry.Localization, entry.Arguments)
+                        : Loc.GetString(entry.Localization);
+                // MAID END fix localization spam
 
                 if (entry.EntryNumber is { } number)
                 {
