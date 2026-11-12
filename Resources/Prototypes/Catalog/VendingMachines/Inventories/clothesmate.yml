@@ -148,6 +148,13 @@
     ClothingHandsGlovesColorGreen: 2
     ClothingHandsGlovesColorOrange: 2
     ClothingHandsGlovesColorPurple: 2
+    ClothingNeckScarfStripedLightBlue: 6
+    ClothingNeckScarfStripedBlue: 6
+    ClothingNeckScarfStripedRed: 6
+    ClothingNeckScarfStripedOrange: 6
+    ClothingNeckScarfStripedBrown: 6
+    ClothingNeckScarfStripedPurple: 6
+    ClothingNeckScarfStripedBlack: 6
     ClothingUniformJumpskirtDressOpenShoulder: 1 # Goobstation
     ClothingShoesSandals: 1 # Goobstation
 #    ClothingOuterCoatBomberPunkRed: 3 # NF #Maid
