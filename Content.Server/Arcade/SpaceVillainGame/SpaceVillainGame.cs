@@ -250,7 +250,8 @@ public sealed partial class SpaceVillainGame
                 UpdateUi(
                     uid,
                     Loc.GetString("space-villain-game-player-loses-message"),
-                    Loc.GetString("space-villain-game-enemy-dies-with-player-message ", ("enemyName", _villainName)),
+                    // MAID fix localization: key had a trailing space
+                    Loc.GetString("space-villain-game-enemy-dies-with-player-message", ("enemyName", _villainName)),
                     true
                 );
                 _audioSystem.PlayPvs(arcade.GameOverSound, uid, AudioParams.Default.WithVolume(-4f));

@@ -1,0 +1,11 @@
+cmd-setmind-target-has-no-mind-message = У цели нет разума.
+cmd-setmind-target-has-no-content-data-message = У цели нет данных игрока.
+voice-mask-voice-popup-success = Голос изменён.
+whitelist-not-whitelisted = Вы не добавлены в вайтлист.
+list-view-window-default-title = Список
+item-cougher-mask = { CAPITALIZE($mask) } не даёт вам кашлять!
+mining-voucher-vendor-unpowered = { CAPITALIZE($vendor) } обесточен!
+cleanse-deconvert-attempt-notcorrupted = { CAPITALIZE($target) } не заражён!
+xenomorphs-acid-not-enough-plasma = Недостаточно плазмы!
+cmd-lavalandmap-need-prototype = Введите ID прототипа Лаваланда первым аргументом
+cmd-lavalandmap-wrong-prototype = Неверный прототип Лаваланда!

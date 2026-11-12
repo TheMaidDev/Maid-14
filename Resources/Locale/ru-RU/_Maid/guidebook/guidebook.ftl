@@ -1,0 +1,11 @@
+guide-entry-antag-revealing-conditions = Условия раскрытия антагонистов
+guide-entry-bingle = Бингл
+guide-entry-corporate-agents = Корпоративные агенты
+guide-entry-xenobiology = Ксенобиология
+guide-entry-slasher = Слэшер
+guide-entry-devil = Дьявол
+guide-entry-devil-clauses = Пункты договора дьявола
+guide-entry-changelings = Генокрады
+guide-entry-changeling-abilities = Способности генокрада
+guide-entry-slaughter-demon = Демон бойни
+guide-entry-rules-c0 = О0

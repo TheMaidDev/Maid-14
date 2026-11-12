@@ -50,20 +50,21 @@ public sealed class LavalandMappingCommand : IConsoleCommand
         switch (args.Length)
         {
             case 0:
-                shell.WriteLine(Loc.GetString("Enter Lavaland prototype ID as a first argument"));
+                // MAID fix localization: raw strings replaced with loc keys
+                shell.WriteLine(Loc.GetString("cmd-lavalandmap-need-prototype"));
                 shell.WriteLine(Help);
                 return;
             case 1:
                 if (!_proto.TryIndex(args[0], out lavalandProto))
                 {
-                    shell.WriteLine(Loc.GetString("Wrong lavaland prototype!"));
+                    shell.WriteLine(Loc.GetString("cmd-lavalandmap-wrong-prototype"));
                     return;
                 }
                 break;
             case 2:
                 if (!_proto.TryIndex(args[0], out lavalandProto))
                 {
-                    shell.WriteLine(Loc.GetString("Wrong lavaland prototype!"));
+                    shell.WriteLine(Loc.GetString("cmd-lavalandmap-wrong-prototype"));
                     return;
                 }
 

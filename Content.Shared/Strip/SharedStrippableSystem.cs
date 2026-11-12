@@ -249,7 +249,8 @@ public abstract class SharedStrippableSystem : EntitySystem
 
         if (_inventorySystem.TryGetSlotEntity(target, slot, out _))
         {
-            _popupSystem.PopupCursor(Loc.GetString("strippable-component-item-slot-occupied", ("owner", targetIdentity)));
+            // MAID fix localization: use the existing -message key
+            _popupSystem.PopupCursor(Loc.GetString("strippable-component-item-slot-occupied-message", ("owner", targetIdentity)));
             return false;
         }
 

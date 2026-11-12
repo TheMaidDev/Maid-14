@@ -107,12 +107,19 @@ public sealed partial class PowerMonitoringWindow
         if (entry.MetaData.Value.SpritePath != string.Empty && entry.MetaData.Value.SpriteState != string.Empty)
             button.TextureRect.Texture = _spriteSystem.Frame0(new SpriteSpecifier.Rsi(new ResPath(entry.MetaData.Value.SpritePath), entry.MetaData.Value.SpriteState));
 
+        // MAID BEGIN fix double localization
+        /*
         // Update name
         var name = Loc.GetString(entry.MetaData.Value.EntityName);
+        */
+        // Update name (EntityName is already localized)
+        var name = entry.MetaData.Value.EntityName;
+        // MAID END fix double localization
         button.NameLocalized.Text = name;
 
         // Update tool tip
-        button.ToolTip = Loc.GetString(name);
+        // MAID fix double localization: name is a display string, not a key
+        button.ToolTip = name;
 
         // Update power value
         // Don't use SI prefixes, just give the number in W, so that it is readily apparent which consumer is using a lot of power.

@@ -1,4 +1,5 @@
 - type: guideEntry
   id: Xenobiology
-  name: "Xenobiology"
+  # MAID fix guidebook localization
+  name: guide-entry-xenobiology
   text: "/ServerInfo/_Goobstation/Guidebook/Science/Xenobiology.xml"

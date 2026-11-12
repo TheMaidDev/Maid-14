@@ -148,9 +148,16 @@ namespace Content.Client.Kitchen.UI
             {
                 foreach (var (reagent, quantity) in reagents)
                 {
+                    // MAID BEGIN fix double localization
+                    /*
                     var reagentName = _prototypeManager.TryIndex(reagent.Prototype, out ReagentPrototype? proto)
                         ? Loc.GetString($"{quantity} {proto.LocalizedName}")
                         : "???";
+                    */
+                    var reagentName = _prototypeManager.TryIndex(reagent.Prototype, out ReagentPrototype? proto)
+                        ? $"{quantity} {proto.LocalizedName}" // LocalizedName is already localized
+                        : "???";
+                    // MAID END fix double localization
                     BeakerContentBox.BoxContents.AddItem(reagentName);
                 }
             }

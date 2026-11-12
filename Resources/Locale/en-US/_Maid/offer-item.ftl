@@ -1,0 +1,11 @@
+offer-item-cancel = You changed your mind about offering anything
+offer-item-empty-hand = You have nothing in your hand to offer!
+offer-item-select-target = Click on the person you want to offer {$item}
+offer-item-try-give = You offer {$item} to {$target}
+offer-item-try-give-target = {$user} offers you {$item}
+offer-item-full-hand = Your hand is full
+offer-item-give = You gave {$item} to {$target}
+offer-item-give-other = {$user} offers {$item} to {$target}
+offer-item-give-target = {$user} gave you {$item}
+offer-item-no-give = You stop offering {$item} to {$target}
+offer-item-no-give-target = {$user} stops offering you {$item}

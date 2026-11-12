@@ -21,7 +21,8 @@ public sealed class AddActionCommand : LocalizedEntityCommands
     {
         if (args.Length != 2)
         {
-            shell.WriteError(Loc.GetString(Loc.GetString("cmd-addaction-invalid-args")));
+            // MAID fix double localization
+            shell.WriteError(Loc.GetString("cmd-addaction-invalid-args"));
             return;
         }
 

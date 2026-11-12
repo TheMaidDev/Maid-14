@@ -73,7 +73,8 @@ public sealed class ToggleNukeCommand : LocalizedCommands
     {
         if (args.Length == 1)
         {
-            return CompletionResult.FromHint(Loc.GetString(Loc.GetString("cmd-nukearm-1-help")));
+            // MAID fix double localization
+            return CompletionResult.FromHint(Loc.GetString("cmd-nukearm-1-help"));
         }
 
         if (args.Length == 2)

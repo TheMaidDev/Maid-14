@@ -1,0 +1,8 @@
+marking-LizardTailAquaticAnimated = Lizard Tail (Aquatic, Animated)
+marking-LizardTailDTigerAnimated = Lizard Tail (Dark Tiger Stripes, Animated)
+marking-LizardTailLTigerAnimated = Lizard Tail (Light Tiger Stripes, Animated)
+marking-LizardTailLargeAnimated = Lizard Tail (Large, Animated)
+marking-LizardTailSmoothAnimated = Lizard Tail (Smooth, Animated)
+marking-LizardTailSpikesAnimated = Lizard Tail (Spiky, Animated)
+marking-TailDroppedAnimated = Dropped Tail (Animated)
+marking-SnakeLargeTailAnimated = Lizard, large snake tail (Animated)

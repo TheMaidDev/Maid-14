@@ -161,7 +161,8 @@ public sealed partial class DungeonSystem
         }
 
         _maps.SetTiles(mapUid, grid, tiles);
-        shell.WriteLine(Loc.GetString("cmd-dungen_pack_vis"));
+        // MAID fix localization: use the existing -success key
+        shell.WriteLine(Loc.GetString("cmd-dungen_pack_vis-success"));
     }
 
     [AdminCommand(AdminFlags.Mapping)]
@@ -202,7 +203,8 @@ public sealed partial class DungeonSystem
         }
 
         _maps.SetTiles(mapUid, grid, tiles);
-        shell.WriteLine(Loc.GetString("cmd-dungen_pack_vis"));
+        // MAID fix localization: use the existing -success key
+        shell.WriteLine(Loc.GetString("cmd-dungen_pack_vis-success"));
     }
 
     private CompletionResult PresetCallback(IConsoleShell shell, string[] args)

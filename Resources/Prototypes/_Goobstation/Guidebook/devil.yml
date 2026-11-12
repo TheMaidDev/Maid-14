@@ -1,11 +1,13 @@
 - type: guideEntry
   id: Devil
-  name: "Devil"
+  # MAID fix guidebook localization
+  name: guide-entry-devil
   text: "/ServerInfo/_Goobstation/Guidebook/Antagonist/Devil.xml"
   children:
   - DevilClauses
 
 - type: guideEntry
   id: DevilClauses
-  name: "Devil Clauses"
+  # MAID fix guidebook localization
+  name: guide-entry-devil-clauses
   text: "/ServerInfo/_Goobstation/Guidebook/Antagonist/DevilClauses.xml"

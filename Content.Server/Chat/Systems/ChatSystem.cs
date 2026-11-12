@@ -1270,9 +1270,16 @@ public sealed partial class ChatSystem : SharedChatSystem
         colorOverride ??= language.SpeechOverride.Color;
         if (colorOverride != null)
             color = Color.InterpolateBetween(color, colorOverride.Value, colorOverride.Value.A);
+        // MAID BEGIN fix double localization
+        /*
         var languageDisplay = language.IsVisibleLanguage
             ? Loc.GetString("chat-manager-language-prefix", ("language", language.ChatName))
             : "";
+        */
+        // The language prefix key is intentionally removed from locale files (not wanted),
+        // so pass an empty display instead of a lookup that always fails.
+        var languageDisplay = "";
+        // MAID END fix double localization
 
         // goob start - loudspeakers
 

@@ -1,4 +1,5 @@
 - type: guideEntry
   id: SlaughterDemon
-  name: "Slaughter Demon"
+  # MAID fix guidebook localization
+  name: guide-entry-slaughter-demon
   text: "/ServerInfo/_Goobstation/Guidebook/Antagonist/SlaughterDemon.xml"

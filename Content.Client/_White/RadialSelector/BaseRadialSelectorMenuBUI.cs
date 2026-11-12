@@ -49,13 +49,15 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
         {
             if (entry.Category != null)
             {
-                var button = CreateButton(entry.Category.Name, _spriteSystem.Frame0(entry.Category.Icon));
+                // MAID fix double localization: category name is a loc key, CreateButton expects display text
+                var button = CreateButton(Loc.GetString(entry.Category.Name), _spriteSystem.Frame0(entry.Category.Icon));
                 button.TargetLayer = entry.Category.Name;
                 CreateMenu(entry.Category.Entries, menu, entry.Category.Name);
                 container.AddChild(button);
             }
             else if (entry.Prototype != null)
             {
+                // MAID fix double localization: GetName returns already localized prototype name
                 var name = GetName(entry.Prototype);
                 var icon = GetTextures(entry);
                 var button = CreateButton(name, icon);
@@ -108,11 +110,12 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
         return result;
     }
 
+    // MAID fix double localization: name arrives already localized
     private RadialMenuTextureButton CreateButton(string name, Texture icon)
     {
         var button = new RadialMenuTextureButton
         {
-            ToolTip = Loc.GetString(name),
+            ToolTip = name,
             StyleClasses = { "RadialMenuButton" },
             SetSize = ItemSize
         };
@@ -130,11 +133,12 @@ public abstract class BasedRadialSelectorMenuBUI : BoundUserInterface
         return button;
     }
 
+    // MAID fix double localization: name arrives already localized
     private RadialMenuTextureButton CreateButton(string name, List<Texture> icons)
     {
         var button = new RadialMenuTextureButton
         {
-            ToolTip = Loc.GetString(name),
+            ToolTip = name,
             StyleClasses = { "RadialMenuButton" },
             SetSize = ItemSize
         };

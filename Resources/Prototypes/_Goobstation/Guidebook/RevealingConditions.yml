@@ -5,6 +5,7 @@
 
 - type: guideEntry
   id: Conditions
-  name: "Antag Revealing Conditions"
+  # MAID fix guidebook localization
+  name: guide-entry-antag-revealing-conditions
   priority: 60
   text: "/ServerInfo/_Goobstation/Guidebook/Antagonist/MetaReveal.xml"

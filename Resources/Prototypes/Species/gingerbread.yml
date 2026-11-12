@@ -8,7 +8,8 @@
 
 - type: species
   id: Gingerbread
-  name: Gingerbread
+  # MAID fix species localization
+  name: species-name-gingerbread
   roundStart: false
   prototype: MobGingerbread
   # WD EDIT START

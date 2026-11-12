@@ -277,9 +277,16 @@ public sealed class RadioSystem : EntitySystem
         if (language.SpeechOverride.Color is { } colorOverride)
             languageColor = Color.InterpolateBetween(Color.White, colorOverride, colorOverride.A); // Changed first param to Color.White so it shows color correctly.
 
+        // MAID BEGIN fix double localization
+        /*
         var languageDisplay = language.IsVisibleLanguage
             ? Loc.GetString("chat-manager-language-prefix", ("language", language.ChatName))
             : "";
+        */
+        // The language prefix key is intentionally removed from locale files (not wanted),
+        // so pass an empty display instead of a lookup that always fails.
+        var languageDisplay = "";
+        // MAID END fix double localization
 
         // goob start - loudspeakers
 
