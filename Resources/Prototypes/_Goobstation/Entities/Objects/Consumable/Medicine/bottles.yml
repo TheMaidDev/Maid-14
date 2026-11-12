@@ -304,7 +304,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-dexalinplus
+    currentLabel: reagent-name-dexalin-plus # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:
@@ -364,7 +364,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-tranexamicacid
+    currentLabel: reagent-name-tranexamic-acid # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:
@@ -439,7 +439,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-ambuzolplus
+    currentLabel: reagent-name-ambuzol-plus # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:
@@ -484,7 +484,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-heartbreakertoxin
+    currentLabel: reagent-name-heartbreaker-toxin # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:
@@ -544,7 +544,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-mindbreakertoxin
+    currentLabel: reagent-name-mindbreaker-toxin # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:
@@ -559,7 +559,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-spacedrugs
+    currentLabel: reagent-name-space-drugs # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:
@@ -844,7 +844,7 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: Label
-    currentLabel: reagent-name-potassiumiodide
+    currentLabel: reagent-name-potassium-iodide # MAID fix localization
   - type: SolutionContainerManager
     solutions:
       drink:

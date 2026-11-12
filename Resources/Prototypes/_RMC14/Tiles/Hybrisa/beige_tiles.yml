@@ -7,52 +7,59 @@
 - type: tile
   parent: RMCFloorHybrisaBeigeBase
   id: RMCFloorHybrisaBeige
-  name: beige metal tile
+  name: tiles-hybrisa-beige # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilebeige.png
 
 - type: tile
   parent: RMCFloorHybrisaBeige
   id: RMCFloorHybrisaBeigeCheck
+  name: tiles-hybrisa-beige-check # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilebeigecheck.png
 
 - type: tile
   parent: RMCFloorHybrisaBeige
   id: RMCFloorHybrisaBeigeCheckAlt
+  name: tiles-hybrisa-beige-check-alt # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilebeigecheckalt.png
 
 - type: tile
   parent: RMCFloorHybrisaBeige
   id: RMCFloorHybrisaBeigeLight
+  name: tiles-hybrisa-beige-light # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilelightbeige.png
 
 - type: tile
   parent: RMCFloorHybrisaBeige
   id: RMCFloorHybrisaBeigeBig
+  name: tiles-hybrisa-beige-big # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/beige_bigtile.png
 
 - type: tile
   parent: RMCFloorHybrisaBeige
   id: RMCFloorHybrisaBeigeBigLight
+  name: tiles-hybrisa-beige-big-light # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/lightbeige_bigtile.png
 
 - type: tile
   parent: RMCFloorHybrisaBeige
   id: RMCFloorHybrisaBeigeSupermart
+  name: tiles-hybrisa-beige-supermart # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/supermartfloor2.png
 
 - type: tile
   parent: RMCFloorHybrisaBeigeBase
   id: RMCFloorHybrisaBeigeCarpet
-  name: beige carpet
+  name: tiles-hybrisa-beige-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetbeige.png
 
 - type: tile
   parent: RMCFloorHybrisaBeigeCarpet
   id: RMCFloorHybrisaBeigeCarpetDeco
+  name: tiles-hybrisa-beige-carpet-deco # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetbeige_deco.png
 
 - type: tile
   parent: RMCFloorHybrisaBeigeCarpet
   id: RMCFloorHybrisaBrownPatternCarpet
-  name: brown metal tile
+  name: tiles-hybrisa-brown-pattern-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetpatternbrown.png

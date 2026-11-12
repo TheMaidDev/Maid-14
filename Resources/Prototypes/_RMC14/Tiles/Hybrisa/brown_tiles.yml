@@ -7,65 +7,77 @@
 - type: tile
   parent: RMCFloorHybrisaBrownBase
   id: RMCFloorHybrisaBrown
-  name: brown metal tile
+  name: tiles-hybrisa-brown # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloorfull1.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown1
+  name: tiles-hybrisa-brown1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_1.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown2
+  name: tiles-hybrisa-brown2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_2.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown3
+  name: tiles-hybrisa-brown3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_3.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown4
+  name: tiles-hybrisa-brown4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_4.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown5
+  name: tiles-hybrisa-brown5 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_5.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown6
+  name: tiles-hybrisa-brown6 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_6.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown7
+  name: tiles-hybrisa-brown7 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_7.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrown8
+  name: tiles-hybrisa-brown8 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloor_8.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrownCorner1
+  name: tiles-hybrisa-brown-corner1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloorcorner_1.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrownCorner2
+  name: tiles-hybrisa-brown-corner2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloorcorner_2.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrownCorner3
+  name: tiles-hybrisa-brown-corner3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloorcorner_3.png
 
 - type: tile
   parent: RMCFloorHybrisaBrown
   id: RMCFloorHybrisaBrownCorner4
+  name: tiles-hybrisa-brown-corner4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/zbrownfloorcorner_4.png

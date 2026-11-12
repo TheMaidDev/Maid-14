@@ -7,66 +7,77 @@
 - type: tile
   parent: RMCFloorHybrisaGreenBase
   id: RMCFloorHybrisaGreenMetal
-  name: green metal tile
+  name: tiles-hybrisa-green-metal # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetalfull.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenTile
+  name: tiles-hybrisa-green-tile # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilegreen.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal1
+  name: tiles-hybrisa-green-metal1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal1.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal2
+  name: tiles-hybrisa-green-metal2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal2.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal3
+  name: tiles-hybrisa-green-metal3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal3.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal4
+  name: tiles-hybrisa-green-metal4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal4.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal5
+  name: tiles-hybrisa-green-metal5 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal5.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal6
+  name: tiles-hybrisa-green-metal6 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal6.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal7
+  name: tiles-hybrisa-green-metal7 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal7.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenMetal
   id: RMCFloorHybrisaGreenMetal8
+  name: tiles-hybrisa-green-metal8 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greenmetal8.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenBase
   id: RMCFloorHybrisaGreenCarpet
-  name: green carpet
+  name: tiles-hybrisa-green-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetgreen.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenCarpet
   id: RMCFloorHybrisaGreenCarpetDeco
+  name: tiles-hybrisa-green-carpet-deco # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetgreen_deco.png
 
 - type: tile
   parent: RMCFloorHybrisaGreenCarpet
   id: RMCFloorHybrisaGreenDingy
+  name: tiles-hybrisa-green-dingy # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/grimy.png

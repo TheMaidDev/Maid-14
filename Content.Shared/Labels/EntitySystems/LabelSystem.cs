@@ -36,8 +36,16 @@ public sealed partial class LabelSystem : EntitySystem
     {
         if (!string.IsNullOrEmpty(ent.Comp.CurrentLabel))
         {
+            // MAID BEGIN fix localization spam
+            /*
             ent.Comp.CurrentLabel = Loc.GetString(ent.Comp.CurrentLabel);
+            */
+            // Labels may be raw text (e.g. "Ibuprofen 10u"); only resolve when the
+            // value is a fluent key and keep the raw text otherwise.
+            if (Loc.TryGetString(ent.Comp.CurrentLabel, out var localized))
+                ent.Comp.CurrentLabel = localized;
             Dirty(ent);
+            // MAID END fix localization spam
         }
 
         _nameModifier.RefreshNameModifiers(ent.Owner);

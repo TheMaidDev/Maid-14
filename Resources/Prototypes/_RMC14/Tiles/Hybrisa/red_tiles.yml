@@ -7,36 +7,41 @@
 - type: tile
   parent: RMCFloorHybrisaRedBase
   id: RMCFloorHybrisaRedMetal
-  name: red metal tile
+  name: tiles-hybrisa-red-metal # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilered.png
 
 - type: tile
   parent: RMCFloorHybrisaRedMetal
   id: RMCFloorHybrisaRedMetalCuppaJoe
+  name: tiles-hybrisa-red-metal-cuppa-joe # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/cuppafloor.png
 
 - type: tile
   parent: RMCFloorHybrisaRedBase
   id: RMCFloorHybrisaRedCarpet
-  name: red carpet
+  name: tiles-hybrisa-red-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetred.png
 
 - type: tile
   parent: RMCFloorHybrisaRedCarpet
   id: RMCFloorHybrisaRedCarpetDeco
+  name: tiles-hybrisa-red-carpet-deco # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetred_deco.png
 
 - type: tile
   parent: RMCFloorHybrisaRedCarpet
   id: RMCFloorHybrisaRedCarpetFaded
+  name: tiles-hybrisa-red-carpet-faded # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetfadedred.png
 
 - type: tile
   parent: RMCFloorHybrisaRedCarpet
   id: RMCFloorHybrisaRedCarpetOrange
+  name: tiles-hybrisa-red-carpet-orange # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetorangered.png
 
 - type: tile
   parent: RMCFloorHybrisaRedCarpet
   id: RMCFloorHybrisaRedCarpetPink
+  name: tiles-hybrisa-red-carpet-pink # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpet_deco_pink.png

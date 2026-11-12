@@ -7,146 +7,173 @@
 - type: tile
   parent: RMCFloorHybrisaBlueBase
   id: RMCFloorHybrisaBlueFull
-  name: blue metal tile
+  name: tiles-hybrisa-blue-full # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetalfull.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueTile
+  name: tiles-hybrisa-blue-tile # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tileblue.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueTileCheck
+  name: tiles-hybrisa-blue-tile-check # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilebluecheck.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueSupermart
+  name: tiles-hybrisa-blue-supermart # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/supermartfloor1.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueSouth
+  name: tiles-hybrisa-blue-south # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_1.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueNorth
+  name: tiles-hybrisa-blue-north # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_2.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueEast
+  name: tiles-hybrisa-blue-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_3.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueWest
+  name: tiles-hybrisa-blue-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_4.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueSouthEast
+  name: tiles-hybrisa-blue-south-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_5.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueSouthWest
+  name: tiles-hybrisa-blue-south-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_6.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueNorthEast
+  name: tiles-hybrisa-blue-north-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_7.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueNorthWest
+  name: tiles-hybrisa-blue-north-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetal_8.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueCornerSouthEast
+  name: tiles-hybrisa-blue-corner-south-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetalcorner_1.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueCornerNorthEast
+  name: tiles-hybrisa-blue-corner-north-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetalcorner_2.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueCornerNorthWest
+  name: tiles-hybrisa-blue-corner-north-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetalcorner_3.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueCornerSouthWest
+  name: tiles-hybrisa-blue-corner-south-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/bluemetalcorner_4.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueBase
   id: RMCFloorHybrisaBlueCarpet
-  name: blue carpet
+  name: tiles-hybrisa-blue-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetblue.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueCarpet
   id: RMCFloorHybrisaBlueDarkerCarpet
+  name: tiles-hybrisa-blue-darker-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetdarkerblue.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueCarpet
   id: RMCFloorHybrisaBlueCarpetDeco
+  name: tiles-hybrisa-blue-carpet-deco # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetblue_deco.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueCarpet
   id: RMCFloorHybrisaBluePatternCarpet
+  name: tiles-hybrisa-blue-pattern-carpet # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/carpetpatternblue.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueCarpet
   id: RMCFloorHybrisaBlueSpacePort1
+  name: tiles-hybrisa-blue-space-port1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/spaceport1.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueCarpet
   id: RMCFloorHybrisaBlueSpacePort2
+  name: tiles-hybrisa-blue-space-port2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/spaceport2.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropship1
+  name: tiles-hybrisa-blue-dropship1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloor1.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropship2
+  name: tiles-hybrisa-blue-dropship2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloor2.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropship3
+  name: tiles-hybrisa-blue-dropship3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloor3.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropship4
+  name: tiles-hybrisa-blue-dropship4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloor4.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropshipCorner1
+  name: tiles-hybrisa-blue-dropship-corner1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloorcorner1.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropshipCorner2
+  name: tiles-hybrisa-blue-dropship-corner2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloorcorner2.png
 
 - type: tile
   parent: RMCFloorHybrisaBlueFull
   id: RMCFloorHybrisaBlueDropshipFull
+  name: tiles-hybrisa-blue-dropship-full # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/dropshipfloorfull.png

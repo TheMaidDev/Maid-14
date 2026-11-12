@@ -3,7 +3,7 @@
 - type: tile
   parent: CMPlanetBase
   id: RMCPlanetHybrisaDirt
-  name: dirt
+  name: tiles-hybrisa-dirt # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/hybrisa_0.png
   variants: 8
   placementVariants:
@@ -19,12 +19,13 @@
 - type: tile
   parent: RMCPlanetHybrisaDirt
   id: RMCPlanetHybrisaShale
-  name: shale
+  name: tiles-hybrisa-shale # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/hybrisa_1.png
 
 - type: tile
   parent: RMCPlanetHybrisaShale
   id: RMCPlanetHybrisaShale2
+  name: tiles-hybrisa-shale2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/hybrisa_2.png
   edgeSpritePriority: 0
   edgeSprites:
@@ -40,23 +41,24 @@
 - type: tile
   parent: RMCPlanetHybrisaShale2
   id: RMCPlanetHybrisaShale3
+  name: tiles-hybrisa-shale3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/hybrisa_3.png
 
 - type: tile
   parent: CMPlanetBase
   id: RMCPlanetHybrisaUndergroundWeedable
-  name: floor
+  name: tiles-hybrisa-underground-weedable # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/underground.png
 
 - type: tile
   parent: RMCPlanetHybrisaUndergroundWeedable
   id: RMCPlanetHybrisaUnderground
-  name: unweedable floor
+  name: tiles-hybrisa-underground # MAID fix localization
 
 - type: tile
   parent: RMCPlanetHybrisaDirt
   id: RMCPlanetHybrisaDirtPlating
-  name: unweedable dirt
+  name: tiles-hybrisa-dirt-plating # MAID fix localization
 
 # Metal
 
@@ -69,103 +71,115 @@
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaCementFlat
-  name: cement
+  name: tiles-hybrisa-cement-flat # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/cementflat.png
 
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaRampNorth
-  name: ramp
+  name: tiles-hybrisa-ramp-north # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/rampsmaller_north.png
 
 - type: tile
   parent: RMCFloorHybrisaRampNorth
   id: RMCFloorHybrisaRampEast
+  name: tiles-hybrisa-ramp-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/rampsmaller_east.png
 
 - type: tile
   parent: RMCFloorHybrisaRampNorth
   id: RMCFloorHybrisaRampSouth
+  name: tiles-hybrisa-ramp-south # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/rampsmaller_south.png
 
 - type: tile
   parent: RMCFloorHybrisaRampNorth
   id: RMCFloorHybrisaRampWest
+  name: tiles-hybrisa-ramp-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/rampsmaller_west.png
 
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaStripeRedNorth
-  name: red stripe
+  name: tiles-hybrisa-stripe-red-north # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/stripe_red_north.png
 
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaStripeRedSouth
-  name: red stripe
+  name: tiles-hybrisa-stripe-red-south # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/stripe_red_south.png
 
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaStripeRedEast
-  name: red stripe
+  name: tiles-hybrisa-stripe-red-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/stripe_red_east.png
 
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaStripeRedWest
-  name: red stripe
+  name: tiles-hybrisa-stripe-red-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/stripe_red_west.png
 
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaNSPAEmblem
-  name: metal floor
+  name: tiles-hybrisa-nspa-emblem # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/NSPAemblem.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaNSPAEmblem64A
+  name: tiles-hybrisa-nspa-emblem64-a # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/NSPA_emblem_concrete_2x2_a.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaNSPAEmblem64B
+  name: tiles-hybrisa-nspa-emblem64-b # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/NSPA_emblem_concrete_2x2_b.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaNSPAEmblem64C
+  name: tiles-hybrisa-nspa-emblem64-c # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/NSPA_emblem_concrete_2x2_c.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaNSPAEmblem64D
+  name: tiles-hybrisa-nspa-emblem64-d # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/NSPA_emblem_concrete_2x2_d.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaMarshallEmblem
+  name: tiles-hybrisa-marshall-emblem # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/marshallsemblem.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaMarshallEmblem64A
+  name: tiles-hybrisa-marshall-emblem64-a # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/marshallsemblem_concrete_2x2_a.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaMarshallEmblem64B
+  name: tiles-hybrisa-marshall-emblem64-b # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/marshallsemblem_concrete_2x2_b.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaMarshallEmblem64C
+  name: tiles-hybrisa-marshall-emblem64-c # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/marshallsemblem_concrete_2x2_c.png
 
 - type: tile
   parent: RMCFloorHybrisaNSPAEmblem
   id: RMCFloorHybrisaMarshallEmblem64D
+  name: tiles-hybrisa-marshall-emblem64-d # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/marshallsemblem_concrete_2x2_d.png
 
 # Road
@@ -173,129 +187,151 @@
 - type: tile
   parent: CMPlanetBase
   id: RMCPlanetHybrisaAsphalt
-  name: asphalt
+  name: tiles-hybrisa-asphalt # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/asphalt_old.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltLines3
+  name: tiles-hybrisa-asphalt-lines3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/asphalt_old_roadlines3.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltLines4
+  name: tiles-hybrisa-asphalt-lines4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/asphalt_old_roadlines4.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltLinesRed
+  name: tiles-hybrisa-asphalt-lines-red # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/warning_red_floor.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltLinesYellow
+  name: tiles-hybrisa-asphalt-lines-yellow # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/warning_yellow_floor.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltSidewalkNorth
+  name: tiles-hybrisa-asphalt-sidewalk-north # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcenter_1.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltSidewalkSouth
+  name: tiles-hybrisa-asphalt-sidewalk-south # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcenter_2.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltSidewalkWest
+  name: tiles-hybrisa-asphalt-sidewalk-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcenter_3.png
 
 - type: tile
   parent: RMCPlanetHybrisaAsphalt
   id: RMCPlanetHybrisaAsphaltSidewalkEast
+  name: tiles-hybrisa-asphalt-sidewalk-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcenter_4.png
 
 - type: tile
   parent: CMPlanetBase
   id: RMCPlanetHybrisaCement
-  name: cement
+  name: tiles-hybrisa-cement # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/cement1.png
 
 - type: tile
   parent: RMCPlanetHybrisaCement
   id: RMCPlanetHybrisaCement2
+  name: tiles-hybrisa-cement2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/cement2.png
 
 - type: tile
   parent: RMCPlanetHybrisaCement
   id: RMCPlanetHybrisaCement3
+  name: tiles-hybrisa-cement3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/cement3.png
 
 - type: tile
   parent: CMPlanetBase
   id: RMCPlanetHybrisaSidewalk
-  name: sidewalk
+  name: tiles-hybrisa-sidewalk # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkfull.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkSouth
+  name: tiles-hybrisa-sidewalk-south # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_1.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkNorth
+  name: tiles-hybrisa-sidewalk-north # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_2.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkEast
+  name: tiles-hybrisa-sidewalk-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_3.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkWest
+  name: tiles-hybrisa-sidewalk-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_4.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkSouthEast
+  name: tiles-hybrisa-sidewalk-south-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_5.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkSouthWest
+  name: tiles-hybrisa-sidewalk-south-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_6.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkNorthEast
+  name: tiles-hybrisa-sidewalk-north-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_7.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkNorthWest
+  name: tiles-hybrisa-sidewalk-north-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalk_8.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkCornerNorthEast
+  name: tiles-hybrisa-sidewalk-corner-north-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcorner_1.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkCornerNorthWest
+  name: tiles-hybrisa-sidewalk-corner-north-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcorner_2.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkCornerSouthEast
+  name: tiles-hybrisa-sidewalk-corner-south-east # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcorner_3.png
 
 - type: tile
   parent: RMCPlanetHybrisaSidewalk
   id: RMCPlanetHybrisaSidewalkCornerSouthWest
+  name: tiles-hybrisa-sidewalk-corner-south-west # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/sidewalkcorner_4.png
 
 # Engineer
@@ -303,22 +339,25 @@
 - type: tile
   parent: RMCFloorHybrisaBasicBase
   id: RMCFloorHybrisaEngineerShip
-  name: strange metal floor
+  name: tiles-hybrisa-engineer-ship # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/floor.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPlating
+  name: tiles-hybrisa-engineer-ship-plating # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/plating.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShip1
+  name: tiles-hybrisa-engineer-ship1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/engineer_metalfloor_1.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShip2
+  name: tiles-hybrisa-engineer-ship2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/engineer_metalfloor_2.png
   variants: 4
   placementVariants:
@@ -330,6 +369,7 @@
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShip3
+  name: tiles-hybrisa-engineer-ship3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/engineer_metalfloor_3.png
   variants: 4
   placementVariants:
@@ -341,134 +381,161 @@
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShip4
+  name: tiles-hybrisa-engineer-ship4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/engineer_metalfloor_4.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShip5
+  name: tiles-hybrisa-engineer-ship5 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/engineer_floor_5.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull1
+  name: tiles-hybrisa-engineer-ship-outer-hull1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_1.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull2
+  name: tiles-hybrisa-engineer-ship-outer-hull2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_2.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull3
+  name: tiles-hybrisa-engineer-ship-outer-hull3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_3.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull4
+  name: tiles-hybrisa-engineer-ship-outer-hull4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_4.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull5
+  name: tiles-hybrisa-engineer-ship-outer-hull5 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_5.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull6
+  name: tiles-hybrisa-engineer-ship-outer-hull6 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_6.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull7
+  name: tiles-hybrisa-engineer-ship-outer-hull7 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_7.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipOuterHull8
+  name: tiles-hybrisa-engineer-ship-outer-hull8 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/outerhull_8.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarN1
+  name: tiles-hybrisa-engineer-ship-pillar-n-1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillar1.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarN2
+  name: tiles-hybrisa-engineer-ship-pillar-n-2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillar2.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarN3
+  name: tiles-hybrisa-engineer-ship-pillar-n-3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillar3.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarN4
+  name: tiles-hybrisa-engineer-ship-pillar-n-4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillar4.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarS1
+  name: tiles-hybrisa-engineer-ship-pillar-s-1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarsouth1.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarS2
+  name: tiles-hybrisa-engineer-ship-pillar-s-2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarsouth2.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarS3
+  name: tiles-hybrisa-engineer-ship-pillar-s-3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarsouth3.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarS4
+  name: tiles-hybrisa-engineer-ship-pillar-s-4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarsouth4.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarE1
+  name: tiles-hybrisa-engineer-ship-pillar-e-1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillareast1.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarE2
+  name: tiles-hybrisa-engineer-ship-pillar-e-2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillareast2.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarE3
+  name: tiles-hybrisa-engineer-ship-pillar-e-3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillareast3.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarE4
+  name: tiles-hybrisa-engineer-ship-pillar-e-4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillareast4.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarW1
+  name: tiles-hybrisa-engineer-ship-pillar-w-1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarwest1.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarW2
+  name: tiles-hybrisa-engineer-ship-pillar-w-2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarwest2.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarW3
+  name: tiles-hybrisa-engineer-ship-pillar-w-3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarwest3.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipPillarW4
+  name: tiles-hybrisa-engineer-ship-pillar-w-4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/eng_pillarwest4.png
 
 - type: tile
   parent: RMCFloorHybrisaEngineerShip
   id: RMCFloorHybrisaEngineerShipLight
+  name: tiles-hybrisa-engineer-ship-light # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/engineerlight.png

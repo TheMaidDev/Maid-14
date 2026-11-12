@@ -11,19 +11,23 @@
 - type: tile
   parent: RMCFloorHybrisaWoodBase
   id: RMCFloorHybrisaWood
+  name: tiles-hybrisa-wood # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/darkerwood.png
 
 - type: tile
   parent: RMCFloorHybrisaWoodBase
   id: RMCFloorHybrisaWoodGrey
+  name: tiles-hybrisa-wood-grey # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/greywood.png
 
 - type: tile
   parent: RMCFloorHybrisaWoodBase
   id: RMCFloorHybrisaWoodRed
+  name: tiles-hybrisa-wood-red # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/redwood.png
 
 - type: tile
   parent: RMCFloorHybrisaWoodBase
   id: RMCFloorHybrisaWoodBlack
+  name: tiles-hybrisa-wood-black # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/blackwood.png

@@ -7,15 +7,17 @@
 - type: tile
   parent: RMCFloorHybrisaWhiteBase
   id: RMCFloorHybrisaWhite
-  name: white metal tile
+  name: tiles-hybrisa-white # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilewhite.png
 
 - type: tile
   parent: RMCFloorHybrisaWhite
   id: RMCFloorHybrisaWhiteCheck
+  name: tiles-hybrisa-white-check # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/tilewhitecheck.png
 
 - type: tile
   parent: RMCFloorHybrisaWhite
   id: RMCFloorHybrisaWhiteFull
+  name: tiles-hybrisa-white-full # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/metalwhitefull.png

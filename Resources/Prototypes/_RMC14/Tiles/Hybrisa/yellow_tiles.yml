@@ -7,66 +7,77 @@
 - type: tile
   parent: RMCFloorHybrisaYellowBase
   id: RMCFloorHybrisaYellow
-  name: yellow metal tile
+  name: tiles-hybrisa-yellow # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/yellow_bigtile.png
 
 - type: tile
   parent: RMCFloorHybrisaYellow
   id: RMCFloorHybrisaOrangeLine1
-  name: orange metal tile
+  name: tiles-hybrisa-orange-line1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_1.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine2
+  name: tiles-hybrisa-orange-line2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_2.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine3
+  name: tiles-hybrisa-orange-line3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_3.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine4
+  name: tiles-hybrisa-orange-line4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_4.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine5
+  name: tiles-hybrisa-orange-line5 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_5.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine6
+  name: tiles-hybrisa-orange-line6 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_6.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine7
+  name: tiles-hybrisa-orange-line7 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_7.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLine8
+  name: tiles-hybrisa-orange-line8 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangeline_8.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLineCorner1
+  name: tiles-hybrisa-orange-line-corner1 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangelinecorner_1.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLineCorner2
+  name: tiles-hybrisa-orange-line-corner2 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangelinecorner_2.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLineCorner3
+  name: tiles-hybrisa-orange-line-corner3 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangelinecorner_3.png
 
 - type: tile
   parent: RMCFloorHybrisaOrangeLine1
   id: RMCFloorHybrisaOrangeLineCorner4
+  name: tiles-hybrisa-orange-line-corner4 # MAID fix localization
   sprite: /Textures/_RMC14/Tiles/hybrisa/orangelinecorner_4.png
