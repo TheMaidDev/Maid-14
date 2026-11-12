@@ -514,11 +514,11 @@
   components:
   - type: Stack
     stackType: Diamond
-    baseLayer: base
+    baseLayer: diamond
     layerStates:
     - diamond
-    - diamond_2
-    - diamond_3
+    # - diamond_2
+    # - diamond_3
   # Goobstation - Custom stack splitting dialog
   - type: UserInterface
     interfaces:
