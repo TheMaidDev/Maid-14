@@ -54,9 +54,9 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
         Coordinates = coordinates;
 
         // Load fonts
-        var headerFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Bold.ttf"), 11);
-        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
-        var smallFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
+        var headerFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf"), 11); // Maid-Tweak
+        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf"), 11); // Maid-Tweak
+        var smallFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf"), 10); // Maid-Tweak
 
         // Set fonts
         TemperatureHeaderLabel.FontOverride = headerFont;
@@ -80,7 +80,7 @@ public sealed partial class AtmosAlarmEntryContainer : BoxContainer
         Coordinates = _entManager.GetCoordinates(entry.Coordinates);
 
         // Load fonts
-        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
+        var normalFont = new VectorFont(_cache.GetResource<FontResource>("/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf"), 11); // Maid-Tweak
 
         // Update alarm state
         if (!_alarmStrings.TryGetValue(entry.AlarmState, out var alarmString))
