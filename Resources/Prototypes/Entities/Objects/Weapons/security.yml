@@ -211,6 +211,14 @@
   #   delays: # Goobstation
   #     stunbaton:
   #       length: 2.5
+  - type: TgStunbaton
+    throwStaminaDamage: 60
+    knockdownDelay: 2
+    knockdownTime: 5
+    cooldown: 2.5
+    throwStunChance: 0.35
+    jitterTime: 4
+    stutterTime: 16
   # MAID END stunbaton fix
   - type: Item
     heldPrefix: off
