@@ -349,7 +349,7 @@
     mode: SnapgridCenter
   components:
     - type: Sprite
-      sprite: Structures/Piping/Atmospherics/thermomachine.rsi
+      sprite: _Maid/Structures/Piping/Atmospherics/thermomachine.rsi
       snapCardinals: true
     - type: Appearance
     - type: PipeColorVisuals
