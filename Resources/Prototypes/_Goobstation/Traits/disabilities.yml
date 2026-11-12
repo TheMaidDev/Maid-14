@@ -23,13 +23,13 @@
     - type: LegsStartParalyzed
     - type: LegsParalyzed
 
-- type: trait
-  id: ByondYourPrime
-  name: trait-tile-movement-name
-  description: trait-tile-movement-desc
-  category: Disabilities
-  components:
-  - type: TileMovement
+# - type: trait # Toggled off by Maid
+#   id: ByondYourPrime
+#   name: trait-tile-movement-name
+#   description: trait-tile-movement-desc
+#   category: Disabilities
+#   components:
+#   - type: TileMovement
 
 - type: trait
   id: MovementImpaired

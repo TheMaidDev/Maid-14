@@ -60,11 +60,11 @@
     ClothingRandomSpawner: 8
 #    ClothingUniformRandomShorts: 4 #Maid
     ClothingHeadHatBeret: 4
-    ClothingHeadBandBlack: 2
-    ClothingHeadBandBlue: 2
-    ClothingHeadBandGreen: 2
-    ClothingHeadBandRed: 2
-    ClothingHeadBandSkull: 2
+    ClothingHeadBandBlack: 3
+    ClothingHeadBandBlue: 3
+    ClothingHeadBandGreen: 3
+    ClothingHeadBandRed: 3
+    ClothingHeadBandSkull: 3
 #    ClothingHeadHatPropeller: 2 #Maid
     ClothingHeadHatGreyFlatcap: 3
     ClothingHeadHatBrownFlatcap: 3
@@ -97,6 +97,7 @@
     ClothingUniformJumpskirtColorTeal: 2
     ClothingUniformMNKOfficeSkirt: 2 # Maid
     ClothingUniformMNKBlackOveralls: 2 #Maid
+    ClothingUniformMNKOfficeSuit: 2 #Maid
     ClothingUniformJumpsuitHawaiBlack: 2
     ClothingUniformJumpsuitHawaiBlue: 2
     ClothingUniformJumpsuitHawaiRed: 2
@@ -161,6 +162,10 @@
 #    ClothingOuterCoatBomberPinkSleeves: 3 # NF #Maid
 #    ClothingNeckCloakCOG: 3 # Monolith #Maid
     ClothingShoesClothwrap: 3 # NF
+    ClothingOuterCoatBomber: 1 # Maid
+    ClothingOuterWinterCoat: 1 # Maid
+    ClothingOuterCoatGentle: 1 # Maid
+    ClothingOuterPonchoClassic: 1 # Maid
 #    ClothingNeckPonchoBlack: 3 # Monolith #Maid
 #    ClothingNeckPonchoArctic: 3 # Monolith #Maid
 #    ClothingNeckPonchoSyndicate: 3 # Monolith #Maid
@@ -250,6 +255,8 @@
     # ClothingUniformJumpsuitMercer: 1 # Goobstation
     # ClothingOuterCoatZeusJacket: 1 # Goobstation
     # ClothingShoesRealJordans: 1 #IF YOU WANT TO REMOVE THIS, DO. I THINK ITS FUNNY AND ILYA DOES TOO SO ITS GOING IN
+    ClothingHeadHatBeretMerc: 1 # Maid
+    ClothingHeadBandMerc: 1 # Maid
     ToyFigurinePassenger: 1
     ToyFigurineGreytider: 1
     # ClothingBackpackSatchelSmugglerUnanchored: 1

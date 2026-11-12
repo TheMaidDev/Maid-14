@@ -78,7 +78,6 @@
     ClothingOuterSanta: 2
     ClothingHeadHatSkub: 2
     ClothingOuterSkub: 2
-    ClothingHeadHatBeretFrench: 2
     ClothingOuterSuitChicken: 2
     ClothingHeadHatChickenhead: 2
     ClothingOuterSuitMonkey: 2
@@ -86,11 +85,6 @@
     ClothingHeadHatShrineMaidenWig: 2
     ClothingOuterSuitShrineMaiden: 2
     Gohei: 2
-    ClothingOuterSuitWitchRobes: 2
-    ClothingHeadHatWitch1: 2
-    Broomstick: 2 # Goobstation
-    ClothingHeadHatRedRacoon: 2
-    ClothingOuterRedRacoon: 2
     ClothingHeadPaperSack: 2
     ClothingHeadPaperSackSmile: 2
     ClothingEyesBlindfold: 1
@@ -103,33 +97,27 @@
     ClothingMaskScaredMime: 1
     ClothingUniformJumpsuitKimono: 1
     ClothingHeadHatCasa: 1
-    FoodPoppy: 1
-#    ClothingHeadHatGladiator: 1 #Maid
-#    ClothingUniformJumpsuitGladiator: 1 #Maid
-    ClothingHeadHatCowboyBrown: 1
-    ClothingHeadHatCowboyBlack: 1
-    ClothingHeadHatCowboyWhite: 1
-    ClothingHeadHatCowboyGrey: 1
-    ClothingShoesBootsCowboyBrown: 1
-    ClothingShoesBootsCowboyBlack: 1
-    ClothingShoesBootsCowboyWhite: 1
-#    ClothingCostumeAbductorHead: 1 #Maid
-#    ClothingCostumeAbductor: 1 #Maid
-#    ClothingHeadSanabi: 1 # Goobstation #Maid
-#    ClothingNeckCloakSanabi: 1 # Goobstation #Maid
-#    ClothingCostumeGingerbreadHead: 1 #goob #Maid
-#    ClothingOuterSuitHotDog: 1 # Goob #Maid
-#    ClothingOuterSuitPickle: 1 #Maid
-    ClothingHeadHatTinfoilHat: 2 # Goobstation
-    ClothingOuterBumblebeeCostume: 3 #Maid
-    
+    # Maid start
+    ClothingHeadHatHairflower: 1
+    ClothingShoesClownLarge: 1
+    ClothingMaskItalianMoustache: 1
+    ClothingShoesFlippers: 1
+    ClothingMaskRat: 1
+    ClothingMaskRaven: 1
+    ClothingMaskBear: 1
+    ClothingMaskJackal: 1
+    ClothingMaskFox: 1
+    ClothingShoeSlippersDuck: 3
+    ClothingShoesSlippers: 1
+    ClothingHeadHatHoodMoth: 2
+    ClothingNeckCloakMoth: 2
+    ClothingOuterDogi: 1
+    ClothingHeadHatMagician: 1
+    # Maid end
   contrabandInventory:
     # ClothingHeadHatRichard: 1 #Maid
-    ClothingShoesBling: 1
     ClothingShoesBootsCowboyFancy: 1
-    ClothingOuterDogi: 1
     # ClothingMaskSexyClown: 1 #Maid
-    ClothingMaskSexyMime: 1
     ClothingHeadHatCowboyBountyHunter: 1
     ToyFigurineBoxer: 1
     ToyFigurineMusician: 1
@@ -143,3 +131,7 @@
   emaggedInventory: # goob
     ClothingOuterPonchoClassicRobust: 1
     ClothingHeadHatCowboyBrownRobust: 1
+    ClothingShoesBling: 1 # Maid
+    ClothingOuterDogi: 1  # Maid
+    ClothingMaskSexyClown: 1  # Maid
+    ClothingMaskSexyMime: 1 # Maid
