@@ -525,10 +525,11 @@
       enum.StackCustomSplitUiKey.Key:
         type: StackCustomSplitBoundUserInterface
   - type: Sprite
+    sprite: _Maid/Objects/Materials/materials.rsi
     state: diamond
-    layers:
-    - state: diamond
-      map: ["base"]
+  #   layers:
+  #   - state: diamond
+  #     map: ["base"]
   - type: Appearance
   - type: Item
     heldPrefix: diamond
