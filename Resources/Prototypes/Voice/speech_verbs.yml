@@ -53,19 +53,19 @@
   id: Arachnid
   name: chat-speech-verb-name-arachnid
   speechVerbStrings:
-  - chat-speech-verb-insect-1
-  - chat-speech-verb-insect-2
-  - chat-speech-verb-insect-3
-  - chat-speech-verb-reptilian-1
+  - chat-speech-verb-default # - chat-speech-verb-insect-1  # Toggled off by Maid
+  # - chat-speech-verb-insect-2
+  # - chat-speech-verb-insect-3
+  # - chat-speech-verb-reptilian-1
 
 - type: speechVerb
   id: Moth
   name: chat-speech-verb-name-moth
   speechVerbStrings:
-  - chat-speech-verb-winged-1
-  - chat-speech-verb-winged-2
-  - chat-speech-verb-winged-3
-  - chat-speech-verb-insect-1
+  - chat-speech-verb-default # - chat-speech-verb-winged-1  # Toggled off by Maid
+  # - chat-speech-verb-winged-2
+  # - chat-speech-verb-winged-3
+  # - chat-speech-verb-insect-1
 
 - type: speechVerb
   id: Robotic
@@ -78,52 +78,52 @@
   id: Reptilian
   name: chat-speech-verb-name-reptilian
   speechVerbStrings:
-  - chat-speech-verb-reptilian-1
-  - chat-speech-verb-reptilian-2
-  - chat-speech-verb-reptilian-3
-  - chat-speech-verb-insect-2
+  - chat-speech-verb-default # - chat-speech-verb-reptilian-1 # Toggled off by Maid
+  # - chat-speech-verb-reptilian-2
+  # - chat-speech-verb-reptilian-3
+  # - chat-speech-verb-insect-2
 
 - type: speechVerb
   id: Skeleton
   name: chat-speech-verb-name-skeleton
   speechVerbStrings:
-  - chat-speech-verb-skeleton-1
-  - chat-speech-verb-skeleton-2
-  - chat-speech-verb-skeleton-3
-  - chat-speech-verb-skeleton-4
-  - chat-speech-verb-skeleton-5
+   - chat-speech-verb-default  # - chat-speech-verb-skeleton-1  # Toggled off by Maid
+  # - chat-speech-verb-skeleton-2
+  # - chat-speech-verb-skeleton-3
+  # - chat-speech-verb-skeleton-4
+  # - chat-speech-verb-skeleton-5
 
 - type: speechVerb
   id: Slime
   name: chat-speech-verb-name-slime
   speechVerbStrings:
-  - chat-speech-verb-slime-1
-  - chat-speech-verb-slime-2
-  - chat-speech-verb-slime-3
+  - chat-speech-verb-default # - chat-speech-verb-slime-1 # Toggled off by Maid
+  # - chat-speech-verb-slime-2
+  # - chat-speech-verb-slime-3
 
 - type: speechVerb
   id: Vox
   name: chat-speech-verb-name-vox
   speechVerbStrings:
-  - chat-speech-verb-vox-1
-  - chat-speech-verb-vox-2
-  - chat-speech-verb-vox-3
+  - chat-speech-verb-default # - chat-speech-verb-vox-1 # Toggled off by Maid
+  # - chat-speech-verb-vox-2
+  # - chat-speech-verb-vox-3
 
 - type: speechVerb
   id: Plant
   name: chat-speech-verb-name-plant
   speechVerbStrings:
-  - chat-speech-verb-plant-1
-  - chat-speech-verb-plant-2
-  - chat-speech-verb-plant-3
+  - chat-speech-verb-default # - chat-speech-verb-plant-1 # Toggled off by Maid
+  # - chat-speech-verb-plant-2
+  # - chat-speech-verb-plant-3
 
 - type: speechVerb
   id: Canine
   name: chat-speech-verb-name-canine
   speechVerbStrings:
-  - chat-speech-verb-canine-1
-  - chat-speech-verb-canine-2
-  - chat-speech-verb-canine-3
+  - chat-speech-verb-default # - chat-speech-verb-canine-1 # Toggled off by Maid
+  # - chat-speech-verb-canine-2
+  # - chat-speech-verb-canine-3
 
 - type: speechVerb
   id: Goat

@@ -527,9 +527,9 @@
   - type: Sprite
     sprite: _Maid/Objects/Materials/materials.rsi
     state: diamond
-  #   layers:
-  #   - state: diamond
-  #     map: ["base"]
+    layers:
+    - state: diamond
+      map: ["diamond"]
   - type: Appearance
   - type: Item
     heldPrefix: diamond
