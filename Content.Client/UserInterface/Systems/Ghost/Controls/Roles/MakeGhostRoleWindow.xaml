@@ -13,7 +13,8 @@ SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-<DefaultWindow Title="{Loc Make Ghost Role}"
+<!-- MAID fix localization spam: unquoted spacey id is not a valid fluent message -->
+<DefaultWindow Title="{Loc 'make-ghost-role-window-title'}"
             xmlns="https://spacestation14.io">
 
     <BoxContainer Orientation="Vertical">

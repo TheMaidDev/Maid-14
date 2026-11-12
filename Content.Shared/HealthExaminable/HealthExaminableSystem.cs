@@ -82,11 +82,18 @@ public sealed class HealthExaminableSystem : EntitySystem
             foreach (var threshold in component.Thresholds)
             {
                 var str = $"health-examinable-{component.LocPrefix}-{type}-{threshold}";
+                // MAID BEGIN fix localization spam
+                /*
                 var tempLocStr = Loc.GetString($"health-examinable-{component.LocPrefix}-{type}-{threshold}", ("target", Identity.Entity(uid, EntityManager)));
 
                 // i.e., this string doesn't exist, because theres nothing for that threshold
                 if (tempLocStr == str)
                     continue;
+                */
+                // Probe lookup: missing keys are expected here, TryGetString doesn't log a warning for them.
+                if (!Loc.TryGetString(str, out var tempLocStr, ("target", Identity.Entity(uid, EntityManager))))
+                    continue;
+                // MAID END fix localization spam
 
                 if (dmg > threshold && threshold > closest)
                 {

@@ -1,8 +1,5 @@
-admin-camera-window-title = Monitoring { $name }
 cargo-console-menu-order-reason-description = Reason: { $reason }
 ghost-respawn-same-character-slightly-changed-name = Attempt to bypass the ban on entering the round as the same character. Your actions will be reported to the admins!
-parse-bool-fail = { $arg } cannot be interpreted as a boolean
-comp-storagevoicecontrol-self-insert = You can't put { $entity } inside itself!
 reputation-round-end-earned = You earned [color=green]{ $value }[/color] reputation this round. Total: [color=green]{ $total }[/color].
 cmd-setmind-target-has-no-mind-message = Target has no mind.
 cmd-setmind-target-has-no-content-data-message = Target has no player data.
@@ -24,3 +21,13 @@ blob-no-using-guns-popup = You can't use guns while in blob form!
 reagent-effect-guidebook-mutate-plants = Randomly mutates nearby plants.
 reagent-effect-guidebook-scramble-nearby = Randomly scrambles the DNA of nearby humanoids.
 cqc-fail-used = { CAPITALIZE(THE($manual)) } has nothing left to teach you.
+necro-heal-success-none-self = You hit { THE($target) } with { THE($bible) }, but { POSS-ADJ($target) } flesh has no wounds to warp!
+necro-heal-success-none-others = { CAPITALIZE(THE($user)) } hits { THE($target) } with { THE($bible) }, but { POSS-ADJ($target) } flesh has no wounds to warp!
+unknown = Unknown
+cargo-pallet-menu-no-goods-text = Nothing to sell
+grinder-menu-auto-button = Auto
+portable-generator-ui-power-switch = Power switch
+portable-generator-ui-switch = Output
+voice-mask-voice-change-info = Select the voice you want to mimic.
+radial-ui-close = Close
+make-ghost-role-window-title = Make Ghost Role

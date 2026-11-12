@@ -379,7 +379,13 @@ namespace Content.Server.Cargo.Systems
                 order.SetApproverData(tryGetIdentityShortInfoEvent.Title);
 
                 var message = Loc.GetString("cargo-console-unlock-approved-order-broadcast",
+                    // MAID BEGIN fix double localization
+                    /*
                     ("productName", Loc.GetString(order.ProductName)),
+                    */
+                    // CargoProductPrototype.Name falls back to EntityPrototype.Name, which is already localized.
+                    ("productName", order.ProductName),
+                    // MAID END fix double localization
                     ("orderAmount", order.OrderQuantity),
                     ("approver", order.Approver ?? string.Empty),
                     ("cost", cost));

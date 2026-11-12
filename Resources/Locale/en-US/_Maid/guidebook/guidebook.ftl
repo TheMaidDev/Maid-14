@@ -5,7 +5,6 @@ guide-entry-xenobiology = Xenobiology
 guide-entry-slasher = Slasher
 guide-entry-devil = Devil
 guide-entry-devil-clauses = Devil Clauses
-guide-entry-changelings = Changelings
 guide-entry-changeling-abilities = Changeling Abilities
 guide-entry-slaughter-demon = Slaughter Demon
 guide-entry-rules-c0 = C0

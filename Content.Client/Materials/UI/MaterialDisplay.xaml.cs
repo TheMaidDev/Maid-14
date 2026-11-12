@@ -92,7 +92,13 @@ public sealed partial class MaterialDisplay : PanelContainer
             {
                 Name = $"{sheetsToEject}",
                 Access = AccessLevel.Public,
+                // MAID BEGIN fix localization spam
+                /*
                 Text = Loc.GetString($"{sheetsToEject}"),
+                */
+                // A bare number is not a fluent message id; display it as-is.
+                Text = $"{sheetsToEject}",
+                // MAID END fix localization spam
                 MinWidth = 45,
                 StyleClasses = { styleClass }
             };

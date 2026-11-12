@@ -198,7 +198,13 @@ public abstract class SharedRoleSystem : EntitySystem
         var message = new RoleAddedEvent(mindId, mind, update, silent);
         RaiseLocalEvent(mindId, message, true);
 
+        // MAID BEGIN fix double localization
+        /*
         var name = Loc.GetString(protoEnt.Name);
+        */
+        // EntityPrototype.Name is already localized; the second lookup only logs Unknown messageId.
+        var name = protoEnt.Name;
+        // MAID END fix double localization
         if (mind.OwnedEntity is not null)
         {
             _adminLogger.Add(LogType.Mind,
