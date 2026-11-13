@@ -34,7 +34,7 @@ public sealed class AdaptiveBalanceCommand : ToolshedCommand
     }
 
     [CommandImplementation("calculatesexpectedscores")]
-    public string ExpectedScoresStart([PipedArgument] List<AdaptiveRuleParam> rules)
+    public string ExpectedScoresStart([PipedArgument] List<AdaptiveRuleParam> rules, int playerCount = -1)
     {
         var sysManager = IoCManager.Resolve<IEntitySystemManager>();
         var ruleSys = sysManager.GetEntitySystem<AdaptiveRuleSystem>();
@@ -44,7 +44,7 @@ public sealed class AdaptiveBalanceCommand : ToolshedCommand
 
         foreach (var rule in rules)
         {
-            var score = ruleSys.CalculatePossibleScoreForPrototype(rule.Id);
+            var score = ruleSys.CalculatePrototypePotentialScore(rule.Id, playerCount < 0 ? null : playerCount);
             sb.AppendLine($"{rule.Id},{score.Chaos},{score.Combat}");
         }
 

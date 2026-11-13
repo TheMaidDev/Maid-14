@@ -515,7 +515,7 @@
   - type: MultipleTool
     statusShowBehavior: true
     entries:
-    - behavior: Screwing
+    - behavior: [ Screwing ] # MAID rt-update
       sprite:
         sprite: _ShitChap/Objects/Weapons/Nullrod/uristhand.rsi
         state: icon
@@ -523,7 +523,7 @@
         path: /Audio/Items/drill_use.ogg
       changeSound:
         path: /Audio/Items/change_drill.ogg
-    - behavior: Prying
+    - behavior: [ Prying ] # MAID rt-update
       sprite:
         sprite: _ShitChap/Objects/Weapons/Nullrod/uristhand.rsi
         state: icon
@@ -531,7 +531,7 @@
         path: /Audio/Items/jaws_pry.ogg
       changeSound:
         path: /Audio/Items/change_drill.ogg
-    - behavior: Anchoring
+    - behavior: [ Anchoring ] # MAID rt-update
       sprite:
         sprite: _ShitChap/Objects/Weapons/Nullrod/uristhand.rsi
         state: icon
@@ -539,7 +539,7 @@
         path: /Audio/Items/ratchet.ogg
       changeSound:
         path: /Audio/Items/change_drill.ogg
-    - behavior: Cutting
+    - behavior: [ Cutting ] # MAID rt-update
       sprite:
         sprite: _ShitChap/Objects/Weapons/Nullrod/uristhand.rsi
         state: icon
@@ -547,7 +547,7 @@
         path: /Audio/Items/jaws_cut.ogg
       changeSound:
         path: /Audio/Items/change_drill.ogg
-    - behavior: Pulsing
+    - behavior: [ Pulsing ] # MAID rt-update
       sprite:
         sprite: _ShitChap/Objects/Weapons/Nullrod/uristhand.rsi
         state: icon
@@ -681,16 +681,21 @@
   - type: ContainerContainer
     containers:
       ballistic-ammo: !type:Container
-  - type: Multishot
-    spreadMultiplier: 1.25
+  # MAID EDIT START
+  # - type: Multishot
+  #   spreadMultiplier: 1.25
+  - type: DualWield  #MAID DualWield
+  # MAID EDIT END
   - type: Tag
     tags:
     - WeaponPistolCasul
     - Sidearm
-  - type: RequiresDualWield
-    whitelist:
-      tags:
-      - WeaponPistolJackal
+  # MAID EDIT START DualWield
+  # - type: RequiresDualWield
+  #   whitelist:
+  #     tags:
+  #     - WeaponPistolJackal
+  # MAID EDIT END
   - type: ReloadOnPray
   - type: AlternatePrayable # needs this, since it ain't parented of nullrod.
     prayDoAfterDuration: 3.5
@@ -710,10 +715,12 @@
     tags:
     - WeaponPistolJackal
     - Sidearm
-  - type: RequiresDualWield
-    whitelist:
-      tags:
-      - WeaponPistolCasul
+  # MAID EDIT START DualWield
+  # - type: RequiresDualWield
+  #   whitelist:
+  #     tags:
+  #     - WeaponPistolCasul
+  # MAID EDIT END
 
 - type: entity
   parent: BaseNullrod

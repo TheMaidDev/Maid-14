@@ -21,6 +21,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Piping.Unary.Components;
 using Content.Shared.DeviceLinking;
@@ -161,11 +162,11 @@ namespace Content.Server.Atmos.Piping.Unary.Components
         [DataField]
         public bool CanLink = false;
 
-        [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
-        public string PressurizePort = "Pressurize";
+        [DataField]
+        public ProtoId<SinkPortPrototype> PressurizePort = "Pressurize";
 
-        [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<SinkPortPrototype>))]
-        public string DepressurizePort = "Depressurize";
+        [DataField]
+        public ProtoId<SinkPortPrototype> DepressurizePort = "Depressurize";
 
         [DataField]
         public float PressurizePressure = Atmospherics.OneAtmosphere;

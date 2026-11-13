@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.Storage;
 using Robust.Shared.Network;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -45,6 +46,6 @@ public sealed partial class LimitedItemGiverComponent : Component
     /// <summary>
     /// The holiday required for this giver to work, if any.
     /// </summary>
-    [DataField("requiredHoliday", customTypeSerializer: typeof(PrototypeIdSerializer<HolidayPrototype>)), ViewVariables(VVAccess.ReadWrite)]
-    public string? RequiredHoliday = null;
+    [DataField("requiredHoliday"), ViewVariables(VVAccess.ReadWrite)]
+    public ProtoId<HolidayPrototype>? RequiredHoliday = null;
 }

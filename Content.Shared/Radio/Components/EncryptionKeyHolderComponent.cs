@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.Chat;
 using Content.Shared.Tools;
 using Robust.Shared.Audio;
@@ -32,8 +33,8 @@ public sealed partial class EncryptionKeyHolderComponent : Component
     ///     The tool required to extract the encryption keys from the headset.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("keysExtractionMethod", customTypeSerializer: typeof(PrototypeIdSerializer<ToolQualityPrototype>))]
-    public string KeysExtractionMethod = "Screwing";
+    [DataField("keysExtractionMethod")]
+    public ProtoId<ToolQualityPrototype> KeysExtractionMethod = "Screwing";
 
     [ViewVariables(VVAccess.ReadWrite)]
     [DataField("keySlots")]
@@ -55,7 +56,7 @@ public sealed partial class EncryptionKeyHolderComponent : Component
     ///     Combined set of radio channels provided by all contained keys.
     /// </summary>
     [ViewVariables]
-    public HashSet<string> Channels = new();
+    public HashSet<ProtoId<RadioChannelPrototype>> Channels = new(); // MAID rt-update
 
     /// <summary>
     ///     This is the channel that will be used when using the default/department prefix (<see cref="SharedChatSystem.DefaultChannelKey"/>).

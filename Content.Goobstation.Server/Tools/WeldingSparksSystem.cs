@@ -1,4 +1,5 @@
 using Content.Goobstation.Common.Tools;
+using Content.Goobstation.Server._Maid.Tools; // MAID welding sparks cleanup
 using Content.Goobstation.Shared.Tools;
 using Content.Server.Tools;
 using Content.Shared.Coordinates.Helpers;
@@ -22,7 +23,81 @@ public sealed class WeldingSparksSystem : EntitySystem
         SubscribeLocalEvent<WeldingSparksComponent, UseToolEvent>(OnUseTool);
         SubscribeLocalEvent<WeldingSparksComponent, SharedToolSystem.ToolDoAfterEvent>(OnAfterUseTool);
         SubscribeLocalEvent<WeldingSparksComponent, BeforeRangedInteractEvent>(OnBeforeInteract);
+        // MAID BEGIN welding sparks cleanup
+        SubscribeLocalEvent<WeldingSparksComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<WeldingSparksUserComponent, ComponentShutdown>(OnUserShutdown);
+        SubscribeLocalEvent<DoAfterComponent, ComponentShutdown>(OnDoAfterShutdown);
+        // MAID END welding sparks cleanup
     }
+
+    // MAID BEGIN welding sparks cleanup
+    // DoAfter end events are raised on the tool, so they are lost if the tool or the user is deleted mid-weld.
+    // Sparks are tracked on the tool, and the user remembers which tools hold its sparks.
+    private void OnShutdown(Entity<WeldingSparksComponent> ent, ref ComponentShutdown args)
+    {
+        if (ent.Comp.SpawnedEffects.Count == 0)
+            return;
+
+        var ids = new List<DoAfterId>(ent.Comp.SpawnedEffects.Keys);
+        foreach (var effect in ent.Comp.SpawnedEffects.Values)
+            QueueDel(effect);
+
+        ent.Comp.SpawnedEffects.Clear();
+
+        foreach (var id in ids)
+            UntrackUser(id.Uid, ent.Owner);
+    }
+
+    private void OnUserShutdown(Entity<WeldingSparksUserComponent> ent, ref ComponentShutdown args)
+    {
+        foreach (var tool in ent.Comp.Tools)
+        {
+            if (!TryComp<WeldingSparksComponent>(tool, out var sparks))
+                continue;
+
+            var ids = new List<DoAfterId>();
+            foreach (var id in sparks.SpawnedEffects.Keys)
+            {
+                if (id.Uid == ent.Owner)
+                    ids.Add(id);
+            }
+
+            foreach (var id in ids)
+            {
+                if (sparks.SpawnedEffects.Remove(id, out var effect))
+                    QueueDel(effect);
+            }
+        }
+
+        ent.Comp.Tools.Clear();
+    }
+
+    // A user that loses its DoAfterComponent loses its DoAfters without any event.
+    private void OnDoAfterShutdown(Entity<DoAfterComponent> ent, ref ComponentShutdown args)
+    {
+        if (!TerminatingOrDeleted(ent))
+            RemComp<WeldingSparksUserComponent>(ent);
+    }
+
+    private void UntrackUser(EntityUid user, EntityUid tool)
+    {
+        if (!TryComp<WeldingSparksUserComponent>(user, out var userComp))
+            return;
+
+        if (TryComp<WeldingSparksComponent>(tool, out var sparks))
+        {
+            foreach (var id in sparks.SpawnedEffects.Keys)
+            {
+                if (id.Uid == user)
+                    return;
+            }
+        }
+
+        userComp.Tools.Remove(tool);
+        if (userComp.Tools.Count == 0 && !TerminatingOrDeleted(user))
+            RemComp<WeldingSparksUserComponent>(user);
+    }
+    // MAID END welding sparks cleanup
 
     private void OnUseTool(Entity<WeldingSparksComponent> ent, ref UseToolEvent args)
     {
@@ -45,6 +120,7 @@ public sealed class WeldingSparksSystem : EntitySystem
     {
         var effect = Spawn(ent.Comp.EffectProto, spawnLoc);
         ent.Comp.SpawnedEffects.Add(id, effect);
+        EnsureComp<WeldingSparksUserComponent>(id.Uid).Tools.Add(ent.Owner); // MAID welding sparks cleanup
 
         if (args.Target is { } target)
         {
@@ -74,6 +150,7 @@ public sealed class WeldingSparksSystem : EntitySystem
 
         QueueDel(effect);
         ent.Comp.SpawnedEffects.Remove(args.DoAfter.Id);
+        UntrackUser(args.DoAfter.Id.Uid, ent.Owner); // MAID welding sparks cleanup
     }
 
     // This is a pretty hacky way of putting the spark effect in the right spot when welding a floor tile, since that doesn't pass a `target` arg.

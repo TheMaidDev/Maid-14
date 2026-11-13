@@ -1,0 +1,90 @@
+- type: !PartialOnly entity
+  id: UristHand
+  components:
+  - type: Tool
+    useSound: /Audio/_Maid/Override/Items/drill_use.ogg
+  - type: MultipleTool
+    entries:
+    - !CombineIndex:0 useSound:
+        path: /Audio/_Maid/Override/Items/drill_use.ogg
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: BaseNullrod
+  components:
+  - type: DivineIntervention
+    denialSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: Nullrod
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: HolyClaymore
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: Rosary
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: GodHand
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: ArrythmicKnife
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: MonkStaff
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: AtheistFedora
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: Bulwark
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: HonkmotherMaw
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: HolyChainsaw
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: WeaponPistolCasul
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg
+- type: !PartialOnly entity
+  id: RatvarianSpear
+  components:
+  - type: Nullrod
+    untrainedUseSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg

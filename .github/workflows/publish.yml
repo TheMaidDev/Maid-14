@@ -17,6 +17,8 @@ name: Publish
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -50,7 +52,7 @@ jobs:
       if: env.skip == 'false'
       uses: actions/setup-dotnet@v3.2.0
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
 
     - name: Get Engine Tag
       run: |

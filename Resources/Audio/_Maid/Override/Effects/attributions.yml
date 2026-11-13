@@ -1,0 +1,12 @@
+- files: [ teleport_departure.ogg ]
+  license: CC-BY-SA-3.0
+  copyright: tgstation
+  source: https://github.com/tgstation/tgstation/commit/906fb0682bab6a0975b45036001c54f021f58ae7
+- files: [ hallelujah.ogg ]
+  license: CC-BY-SA-3.0
+  copyright: "Composer: Georg Friedrich Händel; Performed by: MIT Concert Choir; Directed by William C. Cutter; + cropped and mixed from stereo to mono"
+  source: https://en.wikipedia.org/wiki/File:Handel_-_messiah_-_44_hallelujah.ogg
+- files: [ teleport_arrival.ogg ]
+  license: CC-BY-SA-3.0
+  copyright: tgstation
+  source: https://github.com/tgstation/tgstation/commit/906fb0682bab6a0975b45036001c54f021f58ae7

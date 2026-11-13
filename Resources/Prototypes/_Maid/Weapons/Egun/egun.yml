@@ -10,6 +10,7 @@
         - state: base
           map: ["enum.GunVisualLayers.Base"]
         - state: mag-twomode1-4
+          map: ["enum.TwoModeEnergyGunVisualLayers.Mag"]
           shader: unshaded
     - type: Clothing
       sprite: _Maid/Objects/Weapons/Guns/Battery/egun.rsi
@@ -19,22 +20,29 @@
       - suitStorage
     - type: Gun
       soundGunshot:
-        path: /Audio/Weapons/Guns/Gunshots/taser2.ogg
+        path: /Audio/_Maid/Weapons/Guns/Gunshots/laser_cannon.ogg #Maid
       soundMode:
         path: /Audio/_Maid/Weapons/Guns/Misc/egun_toggle.ogg
+    # fireCost is the price of one charge, 1000 battery = 20 charges
     - type: ProjectileBatteryAmmoProvider
       proto: BulletDisabler
-      fireCost: 49
-    - type: BatteryWeaponFireModes
-      fireModes:
+      fireCost: 50
+    # Switched by using it in hand, the stun mode spends 1 charge per shot and the laser 2
+    - type: TwoModeEnergyGun
+      modes:
       - proto: BulletDisabler
-        fireCost: 49
+        charges: 1
+        name: gun-twomode-Stun
+        magState: mag-twomode1
+        soundGunshot:
+          path: /Audio/Weapons/Guns/Gunshots/taser.ogg
       - proto: BulletTrailLaser
-        fireCost: 99
-    - type: MagazineVisuals
-      magState: mag
-      steps: 5
-      zeroVisible: true
+        charges: 2
+        name: gun-twomode-Laser
+        magState: mag-twomode2
+        heldPrefix: laser
+        soundGunshot:
+          path: /Audio/_Maid/Weapons/Guns/Gunshots/laser_cannon.ogg
     - type: Appearance
     - type: StaticPrice
       price: 800

@@ -6,8 +6,9 @@ cd "$gitroot/BuildChecker"
 
 if [[ `uname` == MINGW* || `uname` == CYGWIN* ]]; then
     # Windows
-    py -3 git_helper.py --quiet
+    py -3 git_helper.py --quiet || true
 else
     # Not Windows, so probably some other Unix thing.
-    python3 git_helper.py --quiet
+    python3 git_helper.py --quiet || true
 fi
+exit 0

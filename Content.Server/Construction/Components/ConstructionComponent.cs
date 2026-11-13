@@ -45,6 +45,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Goobstation.Common.Construction;
 using Content.Shared.Construction.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -54,8 +55,8 @@ namespace Content.Server.Construction.Components
     [RegisterComponent, Access(typeof(ConstructionSystem))]
     public sealed partial class ConstructionComponent : SharedConstructionComponent // Goobstation
     {
-        [DataField("graph", required:true, customTypeSerializer:typeof(PrototypeIdSerializer<ConstructionGraphPrototype>))]
-        public string Graph { get; set; } = string.Empty;
+        [DataField("graph", required:true)]
+        public ProtoId<ConstructionGraphPrototype> Graph { get; set; } = string.Empty;
 
         [DataField("node", required:true)]
         public string Node { get; set; } = default!;

@@ -9,6 +9,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Shared.Random;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -54,9 +55,9 @@ public sealed partial class RatKingRummageableComponent : Component
     /// <summary>
     /// A weighted random entity prototype containing the different loot that rummaging can provide.
     /// </summary>
-    [DataField("rummageLoot", customTypeSerializer: typeof(PrototypeIdSerializer<WeightedRandomEntityPrototype>)), ViewVariables(VVAccess.ReadWrite)]
+    [DataField("rummageLoot"), ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
-    public string RummageLoot = "RatKingLoot";
+    public ProtoId<WeightedRandomEntityPrototype> RummageLoot = "RatKingLoot";
 
     /// <summary>
     /// Sound played on rummage completion.

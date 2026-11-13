@@ -25,6 +25,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Stack;
+using Content.Shared._Maid.Stacks; // MAID revert machine parts
 using Content.Shared.Popups;
 using Content.Shared.Stacks;
 using Content.Shared.Verbs;
@@ -81,6 +82,12 @@ namespace Content.Server.Stack
             var prototype = _prototypeManager.TryIndex<StackPrototype>(stack.StackTypeId, out var stackType)
                 ? stackType.Spawn.ToString()
                 : Prototype(uid)?.ID;
+
+            // MAID BEGIN revert machine parts
+            // Rated machine parts share a stack type with the basic ones, keep the original prototype instead of the stack's default one.
+            if (HasComp<StrictStackPrototypeComponent>(uid) && Prototype(uid) is { } ownPrototype)
+                prototype = ownPrototype.ID;
+            // MAID END revert machine parts
 
             // Set the output parameter in the event instance to the newly split stack.
             var entity = Spawn(prototype, spawnPosition);

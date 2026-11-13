@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: CrateSyndicateUndetermined
+  components:
+  - type: SetSelector
+    approveSound:
+      path: /Audio/_Maid/Override/Effects/closetopen.ogg

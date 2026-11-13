@@ -121,7 +121,29 @@ public sealed class MaidCVars
     /// Price of vending machine items that have no estimated price.
     /// </summary>
     public static readonly CVarDef<int> EconomyVendingDefaultPrice =
-        CVarDef.Create("maid.economy.vending_default_price", 67676767, CVar.SERVERONLY);
+        CVarDef.Create("maid.economy.vending_default_price", 15, CVar.SERVERONLY);
+
+    #endregion
+
+    #region End of round stats
+
+    /// <summary>
+    ///     How many slips are needed to show the slip count and the top slipper in the round end summary.
+    /// </summary>
+    public static readonly CVarDef<int> SlippedCountThreshold =
+        CVarDef.Create("eorstats.slippedcount_threshold", 30, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Show a line in the round end summary when nobody slipped at all.
+    /// </summary>
+    public static readonly CVarDef<bool> SlippedCountDisplayNone =
+        CVarDef.Create("eorstats.slippedcount_displaynone", true, CVar.SERVERONLY);
+
+    /// <summary>
+    ///     Show who slipped the most in the round end summary.
+    /// </summary>
+    public static readonly CVarDef<bool> SlippedCountTopSlipper =
+        CVarDef.Create("eorstats.slippedcount_topslipper", true, CVar.SERVERONLY);
 
     #endregion
 
@@ -175,6 +197,30 @@ public sealed class MaidCVars
     /// </summary>
     public static readonly CVarDef<float> AhelpVolume =
         CVarDef.Create("maid.admin.ahelp_volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    #endregion
+
+    #region Discord feeds
+
+    /// <summary>
+    ///     URL of the Discord webhook that receives admin chat messages. If left empty, disables the feed.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordAdminChatWebhook =
+        CVarDef.Create("discord.admin_chat_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    /// <summary>
+    ///     URL of the Discord webhook that receives notifications about players joining for the first time.
+    ///     If left empty, disables the feed.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordNewPlayerWebhook =
+        CVarDef.Create("discord.new_player_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
+    /// <summary>
+    ///     The new player notification gets an extra warning when the account shares a HWID (according to the auth server)
+    ///     with other accounts and has played fewer than this many minutes. 0 disables the warning.
+    /// </summary>
+    public static readonly CVarDef<int> DiscordNewPlayerAltPlaytimeMinutes =
+        CVarDef.Create("discord.new_player_alt_playtime_minutes", 30, CVar.SERVERONLY);
 
     #endregion
 }

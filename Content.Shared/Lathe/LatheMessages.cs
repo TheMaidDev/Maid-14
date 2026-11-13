@@ -26,6 +26,7 @@ using Content.Shared.Research.Prototypes;
 using NetSerializer;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Shared.Lathe;
 
@@ -34,17 +35,88 @@ public sealed class LatheUpdateState : BoundUserInterfaceState
 {
     public List<ProtoId<LatheRecipePrototype>> Recipes;
 
+    // MAID BEGIN lathe batch queue
+    /*
     public ProtoId<LatheRecipePrototype>[] Queue;
+    */
+    public LatheQueueEntry[] Queue;
+    // MAID END lathe batch queue
 
     public ProtoId<LatheRecipePrototype>? CurrentlyProducing;
 
-    public LatheUpdateState(List<ProtoId<LatheRecipePrototype>> recipes, ProtoId<LatheRecipePrototype>[] queue, ProtoId<LatheRecipePrototype>? currentlyProducing = null)
+    // MAID BEGIN lathe batch queue
+    /// <summary>
+    /// Units of the current batch still to be printed, including the one in progress.
+    /// </summary>
+    public int BatchRemaining;
+
+    /// <summary>
+    /// Total size of the current batch.
+    /// </summary>
+    public int BatchTotal;
+
+    /// <summary>
+    /// Id of the batch shown as currently producing.
+    /// </summary>
+    public int BatchId;
+    // MAID END lathe batch queue
+
+    public LatheUpdateState(List<ProtoId<LatheRecipePrototype>> recipes, LatheQueueEntry[] queue, ProtoId<LatheRecipePrototype>? currentlyProducing = null, int batchRemaining = 0, int batchTotal = 0, int batchId = 0) // MAID lathe batch queue
     {
         Recipes = recipes;
         Queue = queue;
         CurrentlyProducing = currentlyProducing;
+        // MAID BEGIN lathe batch queue
+        BatchRemaining = batchRemaining;
+        BatchTotal = batchTotal;
+        BatchId = batchId;
+        // MAID END lathe batch queue
     }
 }
+
+// MAID BEGIN lathe cancel entry
+/// <summary>
+///     Sent to the server to cancel one batch, queued or currently printing, addressed by its stable id.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class LatheCancelQueueEntryMessage : BoundUserInterfaceMessage
+{
+    public readonly int BatchId;
+
+    public LatheCancelQueueEntryMessage(int batchId)
+    {
+        BatchId = batchId;
+    }
+}
+// MAID END lathe cancel entry
+
+// MAID BEGIN lathe batch queue
+/// <summary>
+/// One queue slot: a recipe printed <see cref="Amount"/> times in a row.
+/// </summary>
+[DataDefinition, Serializable, NetSerializable]
+public partial record struct LatheQueueEntry
+{
+    [DataField]
+    public ProtoId<LatheRecipePrototype> Recipe;
+
+    [DataField]
+    public int Amount;
+
+    /// <summary>
+    /// Unique (per lathe) batch id, used to address this entry from the UI.
+    /// </summary>
+    [DataField]
+    public int Id;
+
+    public LatheQueueEntry(ProtoId<LatheRecipePrototype> recipe, int amount, int id)
+    {
+        Recipe = recipe;
+        Amount = amount;
+        Id = id;
+    }
+}
+// MAID END lathe batch queue
 
 /// <summary>
 ///     Sent to the server to sync material storage and the recipe queue.

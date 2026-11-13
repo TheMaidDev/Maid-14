@@ -35,7 +35,7 @@
 - type: latheRecipe
   id: SheetSteel
   result: SheetSteel1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawIron: 100
     Coal: 30
@@ -43,7 +43,7 @@
 - type: latheRecipe
   id: SheetSteel30
   result: SheetSteel
-  completetime: 2
+  completetime: 1
   materials:
     RawIron: 3000
     Coal: 1000
@@ -51,14 +51,14 @@
 - type: latheRecipe
   id: SheetGlass1
   result: SheetGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawQuartz: 100
 
 - type: latheRecipe
   id: SheetGlass30
   result: SheetGlass
-  completetime: 2
+  completetime: 1
   materials:
     RawQuartz: 3000
 
@@ -66,7 +66,7 @@
 - type: latheRecipe
   id: SheetRGlass
   result: SheetRGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     Glass: 100
     Steel: 50
@@ -75,7 +75,7 @@
 - type: latheRecipe
   id: SheetRGlassRaw
   result: SheetRGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawQuartz: 100
     RawIron: 50
@@ -84,7 +84,7 @@
 - type: latheRecipe
   id: SheetRGlass30
   result: SheetRGlass
-  completetime: 2
+  completetime: 1
   materials:
     RawQuartz: 3000
     RawIron: 1500
@@ -93,7 +93,7 @@
 - type: latheRecipe
   id: SheetPGlass1
   result: SheetPGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawQuartz: 100
     RawPlasma: 100
@@ -101,7 +101,7 @@
 - type: latheRecipe
   id: SheetPGlass30
   result: SheetPGlass
-  completetime: 2
+  completetime: 1
   materials:
     RawQuartz: 3000
     RawPlasma: 3000
@@ -109,7 +109,7 @@
 - type: latheRecipe
   id: SheetRPGlass1
   result: SheetRPGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawQuartz: 100
     RawPlasma: 100
@@ -119,7 +119,7 @@
 - type: latheRecipe
   id: SheetRPGlass30
   result: SheetRPGlass
-  completetime: 2
+  completetime: 1
   materials:
     RawQuartz: 3000
     RawPlasma: 3000
@@ -129,21 +129,21 @@
 - type: latheRecipe
   id: SheetPlasma1
   result: SheetPlasma1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawPlasma: 100
 
 - type: latheRecipe
   id: SheetPlasma30
   result: SheetPlasma
-  completetime: 2
+  completetime: 1
   materials:
     RawPlasma: 3000
 
 - type: latheRecipe
   id: SheetPlasteel1
   result: SheetPlasteel1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawPlasma: 100
     RawIron: 200 #Twice as durable as steel, Twice the material cost
@@ -161,14 +161,14 @@
 - type: latheRecipe
   id: SheetUranium30
   result: SheetUranium
-  completetime: 2
+  completetime: 1
   materials:
     RawUranium: 3000
 
 - type: latheRecipe
   id: SheetUGlass1
   result: SheetUGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawUranium: 100
     RawQuartz: 100
@@ -176,7 +176,7 @@
 - type: latheRecipe
   id: SheetUGlass30
   result: SheetUGlass
-  completetime: 2
+  completetime: 1
   materials:
     RawUranium: 3000
     RawQuartz: 3000
@@ -184,7 +184,7 @@
 - type: latheRecipe
   id: SheetRUGlass1
   result: SheetRUGlass1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawUranium: 100
     RawQuartz: 100
@@ -194,7 +194,7 @@
 - type: latheRecipe
   id: SheetRUGlass30
   result: SheetRUGlass
-  completetime: 2
+  completetime: 1
   materials:
     RawUranium: 3000
     RawQuartz: 3000
@@ -204,49 +204,49 @@
 - type: latheRecipe
   id: IngotGold30
   result: IngotGold
-  completetime: 2
+  completetime: 1
   materials:
     RawGold: 3000
 
 - type: latheRecipe
   id: IngotSilver30
   result: IngotSilver
-  completetime: 2
+  completetime: 1
   materials:
     RawSilver: 3000
 
 - type: latheRecipe
   id: MaterialBananium10
   result: MaterialBananium
-  completetime: 2
+  completetime: 1
   materials:
     RawBananium: 3000
 
 - type: latheRecipe
   id: MaterialDiamond
   result: MaterialDiamond1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawDiamond: 100
 
 - type: latheRecipe
   id: SheetUranium1
   result: SheetUranium1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawUranium: 100
 
 - type: latheRecipe
   id: IngotGold1
   result: IngotGold1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawGold: 100
 
 - type: latheRecipe
   id: IngotSilver1
   result: IngotSilver1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawSilver: 100
 
@@ -254,14 +254,14 @@
   id: SheetPlastic
   result: SheetPlastic1
   applyMaterialDiscount: false
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     Plastic: 100
 
 - type: latheRecipe
   id: MaterialBananium1
   result: MaterialBananium1
-  completetime: 0
+  completetime: 0.1 # MAID min recipe time (was 0)
   materials:
     RawBananium: 100
 
@@ -275,13 +275,13 @@
 - type: latheRecipe
   id: SheetPaper
   result: SheetPaper1
-  completetime: 1
+  completetime: 0.1
   materials:
     Wood: 50
 
 - type: latheRecipe
   id: MaterialClothCotton
   result: MaterialCloth1
-  completetime: 1
+  completetime: 0.1
   materials:
     Cotton: 200 #my pyrocloth keeps catching on fire whenever I make it!

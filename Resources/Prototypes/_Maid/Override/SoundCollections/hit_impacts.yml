@@ -1,0 +1,11 @@
+- type: !PartialOnly soundCollection
+  id: GlassSmack
+  files:
+  - !Index:0 /Audio/_Maid/Override/Effects/glass_hit.ogg
+  - !Remove /Audio/Effects/glass_smack.ogg
+
+- type: !PartialOnly soundCollection
+  id: GlassSmash
+  files:
+  - !Index:0 /Audio/_Maid/Override/Effects/glass_hit.ogg
+  - !Remove /Audio/Effects/glass_smash.ogg

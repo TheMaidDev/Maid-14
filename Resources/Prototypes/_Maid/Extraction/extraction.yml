@@ -1,0 +1,141 @@
+- type: entity
+  parent: BaseItem
+  id: ExtractionDevice
+  name: device of unknown purpose
+  description: A device of unknown purpose.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Devices/extraction_device.rsi
+    state: icon
+  - type: Item
+    size: Small
+  - type: ExtractionDevice
+  - type: ActivatableUI
+    inHandsOnly: true
+    singleUser: true
+    key: enum.ExtractionDeviceUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.ExtractionDeviceUiKey.Key:
+        type: ExtractionDeviceBoundUserInterface
+
+- type: entity
+  parent: BaseAction
+  id: ActionLaunchDropPod
+  name: START
+  description: Seal the drop pod and launch it.
+  components:
+  - type: Action
+    icon:
+      sprite: _Maid/Structures/Storage/drop_pod.rsi
+      state: icon
+    checkCanInteract: false
+    useDelay: 2
+  - type: InstantAction
+    event: !type:LaunchDropPodActionEvent
+
+- type: entity
+  id: ExtractionZoneMarker
+  name: extraction marker
+  description: Extraction marker.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: true
+  - type: Sprite
+    drawdepth: FloorObjects
+    layers:
+    - sprite: _Maid/Effects/extraction_zone.rsi
+      state: zone
+      shader: unshaded
+  - type: Clickable
+  - type: Visibility
+    layer: 256 # VisibilityFlags.MaidExtraction
+  - type: ExtractionZone
+
+- type: entity
+  id: ExtractionDropPod
+  name: drop pod
+  description: A small armoured pod. A code keypad blinks next to the hatch.
+  categories: [ HideSpawnMenu ]
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+    noRot: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Sprite
+    sprite: _Maid/Structures/Storage/drop_pod.rsi
+    noRot: true
+    # the pod is drawn low in its 64x64 frame, lift it onto the middle of its tile
+    offset: 0,0.25
+    layers:
+    - state: base
+      map: ["enum.StorageVisualLayers.Base"]
+    - state: door
+      map: ["enum.StorageVisualLayers.Door"]
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.45,-0.45,0.45,0.45"
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: EntityStorage
+    # Goob: allow walking into the open pod
+    masksToRemove: 84
+  - type: ContainerContainer
+    containers:
+      entity_storage: !type:Container
+  - type: Appearance
+  # no open door sprite: the door is hidden while the pod is open
+  - type: EntityStorageVisuals
+    stateBaseClosed: base
+    stateDoorClosed: door
+  - type: PointLight
+    radius: 1.5
+    energy: 0.6
+    color: "#ff3b3b"
+  - type: DropPod
+    keypadSound:
+      path: /Audio/_Maid/Machines/DropPod/button_beep.ogg
+    unlockSound:
+      path: /Audio/_Maid/Machines/DropPod/success_sound.ogg
+    wrongCodeSound:
+      path: /Audio/_Maid/Machines/DropPod/failure_sound.ogg
+    engineSound:
+      path: /Audio/_Maid/Machines/DropPod/engine_pod_startup.ogg
+    launchSound:
+      path: /Audio/_Maid/Machines/DropPod/engine_pod_launch.ogg
+  - type: UserInterface
+    interfaces:
+      enum.DropPodUiKey.Key:
+        type: DropPodBoundUserInterface
+
+- type: decal
+  id: DropPodRubble
+  defaultCleanable: true
+  sprite:
+    sprite: _Maid/Decals/drop_pod.rsi
+    state: rubble
+
+# testing: drops an empty, unlocked pod on its tile a few seconds after being spawned
+- type: entity
+  parent: MarkerBase
+  id: ExtractionDropPodLandingTest
+  name: drop pod landing test
+  description: Drops an empty drop pod here a few seconds after spawning. Does not clear the tile.
+  suffix: Testing
+  components:
+  - type: Sprite
+    sprite: _Maid/Structures/Storage/drop_pod.rsi
+    state: icon
+  - type: DropPodLandingTest

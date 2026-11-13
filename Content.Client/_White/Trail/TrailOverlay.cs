@@ -70,6 +70,10 @@ public sealed class TrailOverlay : Overlay
 
     private Texture? GetCachedTexture(string path)
     {
+        // MAID rt-update empty path throws in RT 293 resource loading
+        if (string.IsNullOrEmpty(path))
+            return null;
+
         if (_textureDict.TryGetValue(path, out var texture))
             return texture;
 

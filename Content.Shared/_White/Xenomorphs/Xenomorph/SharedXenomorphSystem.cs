@@ -1,3 +1,4 @@
+using Robust.Shared.Prototypes;
 using Content.Shared.Item;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
@@ -9,8 +10,7 @@ public abstract class SharedXenomorphSystem : EntitySystem
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
-    [ValidatePrototypeId<TagPrototype>]
-    private const string XenomorphItemTag = "XenomorphItem";
+    private static readonly ProtoId<TagPrototype> XenomorphItemTag = "XenomorphItem";
 
     public override void Initialize()
     {

@@ -1,0 +1,8 @@
+- type: !PartialOnly entity
+  id: WeaponTurretFlockBroken
+  components:
+  - type: Destructible
+    thresholds:
+    - !CombineIndex:0 behaviors:
+      - !CombineIndex:1 sound:
+          path: /Audio/_Maid/Override/Effects/glass_break1.ogg

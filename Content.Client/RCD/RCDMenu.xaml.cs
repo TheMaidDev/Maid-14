@@ -62,13 +62,28 @@ public sealed partial class RCDMenu : RadialMenu
                 continue;
 
             var parent = FindControl<RadialContainer>(proto.Category);
+            // MAID BEGIN fix double localization
+            /*
             var tooltip = Loc.GetString(proto.SetName);
 
             if ((proto.Mode == RcdMode.ConstructTile || proto.Mode == RcdMode.ConstructObject) &&
-                proto.Prototype != null && _protoManager.TryIndex(proto.Prototype, out var entProto, logError: false))
+                proto.Prototype != null && _protoManager.TryIndex(proto.Prototype, out var entProto)) // MAID rt-update
             {
                 tooltip = Loc.GetString(entProto.Name);
             }
+            */
+            string tooltip;
+
+            if ((proto.Mode == RcdMode.ConstructTile || proto.Mode == RcdMode.ConstructObject) &&
+                proto.Prototype != null && _protoManager.TryIndex(proto.Prototype, out var entProto))
+            {
+                tooltip = entProto.Name; // already localized
+            }
+            else
+            {
+                tooltip = Loc.GetString(proto.SetName);
+            }
+            // MAID END fix double localization
 
             tooltip = OopsConcat(char.ToUpper(tooltip[0]).ToString(), tooltip.Remove(0, 1));
 
@@ -150,11 +165,19 @@ public sealed partial class RCDMenu : RadialMenu
 
                     if (proto.Mode == RcdMode.ConstructTile || proto.Mode == RcdMode.ConstructObject)
                     {
+                        // MAID BEGIN fix double localization
+                        /*
                         var name = Loc.GetString(proto.SetName);
 
                         if (proto.Prototype != null &&
-                            _protoManager.TryIndex(proto.Prototype, out var entProto, logError: false))
+                            _protoManager.TryIndex(proto.Prototype, out var entProto)) // MAID rt-update
                             name = entProto.Name;
+                        */
+                        var name = proto.Prototype != null &&
+                                   _protoManager.TryIndex(proto.Prototype, out var entProto)
+                            ? entProto.Name
+                            : Loc.GetString(proto.SetName);
+                        // MAID END fix double localization
 
                         msg = Loc.GetString("rcd-component-change-build-mode", ("name", name));
                     }

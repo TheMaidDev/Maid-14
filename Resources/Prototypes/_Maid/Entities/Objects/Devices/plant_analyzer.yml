@@ -17,6 +17,8 @@
       enum.PlantAnalyzerUiKey.Key:
         type: PlantAnalyzerBoundUserInterface
   - type: PlantAnalyzer
+    scanningEndSound:
+      path: /Audio/_Maid/Override/Items/Medical/healthscanner.ogg
   - type: Tag
     tags:
     - PlantAnalyzer

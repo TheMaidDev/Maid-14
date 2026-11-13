@@ -70,8 +70,42 @@ public sealed partial class GunSystem
         RaiseLocalEvent(uid, ev, false);
     }
 
+    // MAID BEGIN ammo counter on state
+    private readonly HashSet<EntityUid> _pendingAmmoCounters = new();
+
+    private void QueueAmmoCounterUpdate(EntityUid uid)
+    {
+        if (HasComp<AmmoCounterComponent>(uid))
+            _pendingAmmoCounters.Add(uid);
+    }
+
+    public override void FrameUpdate(float frameTime)
+    {
+        base.FrameUpdate(frameTime);
+
+        if (_pendingAmmoCounters.Count == 0)
+            return;
+
+        foreach (var uid in _pendingAmmoCounters)
+        {
+            if (TryComp<AmmoCounterComponent>(uid, out var clientComp))
+                UpdateAmmoCount(uid, clientComp);
+        }
+
+        _pendingAmmoCounters.Clear();
+    }
+    // MAID END ammo counter on state
+
     protected override void UpdateAmmoCount(EntityUid uid, bool prediction = true)
     {
+        // MAID BEGIN ammo counter on state
+        if (prediction && !Timing.IsFirstTimePredicted && Timing.ApplyingState)
+        {
+            QueueAmmoCounterUpdate(uid);
+            return;
+        }
+        // MAID END ammo counter on state
+
         // Don't use resolves because the method is shared and there's no compref and I'm trying to
         // share as much code as possible
         if (prediction && !Timing.IsFirstTimePredicted ||

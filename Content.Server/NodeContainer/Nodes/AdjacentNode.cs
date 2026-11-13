@@ -19,6 +19,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.GameObjects; // MAID rt-update
+using Robust.Shared.IoC; // MAID rt-update
 using Content.Shared.NodeContainer;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -31,6 +33,7 @@ namespace Content.Server.NodeContainer.Nodes
     [DataDefinition]
     public sealed partial class AdjacentNode : Node
     {
+        private static SharedMapSystem RtMapSystem => IoCManager.Resolve<IEntityManager>().System<SharedMapSystem>(); // MAID rt-update
         public override IEnumerable<Node> GetReachableNodes(TransformComponent xform,
             EntityQuery<NodeContainerComponent> nodeQuery,
             EntityQuery<TransformComponent> xformQuery,
@@ -40,7 +43,7 @@ namespace Content.Server.NodeContainer.Nodes
             if (!xform.Anchored || grid == null)
                 yield break;
 
-            var gridIndex = grid.TileIndicesFor(xform.Coordinates);
+            var gridIndex = RtMapSystem.TileIndicesFor(grid.Owner, grid, xform.Coordinates);
 
             foreach (var (_, node) in NodeHelpers.GetCardinalNeighborNodes(nodeQuery, grid, gridIndex))
             {

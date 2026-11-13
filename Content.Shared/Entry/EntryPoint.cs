@@ -31,6 +31,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions; // MAID partial prototypes
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.IoC;
 using Content.Shared.Maps;
@@ -77,6 +78,7 @@ namespace Content.Shared.Entry
         public override void Init()
         {
             IgnorePrototypes();
+            MarkPartialPrototypes(); // MAID partial prototypes
         }
 
         public override void PostInit()
@@ -186,7 +188,17 @@ namespace Content.Shared.Entry
             return true;
         }
 
-        // Goobstation - GoobMod Throws Start
+        // MAID BEGIN partial prototypes
+        private void MarkPartialPrototypes()
+        {
+            Content.Shared._Maid.Prototypes.MaidPartialPrototypes.Mark(
+                _prototypeManager,
+                new ResPath("/Prototypes"),
+                _resMan.ContentFindFiles(new ResPath("/")));
+        }
+        // MAID END partial prototypes
+
+        // Goobstation - GoobMod Throws StartMaidPartialPrototypes
         private void VerifyModules()
         {
             var loadedAssemblies = _refMan.Assemblies

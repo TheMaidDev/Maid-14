@@ -7,6 +7,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.IntegrationTests.Tests.Interaction;
+using Content.Shared.Stacks; // MAID revert machine parts
+using Robust.Shared.GameObjects; // MAID revert machine parts
 
 namespace Content.IntegrationTests.Tests.Construction.Interaction;
 
@@ -26,7 +28,7 @@ public sealed class MachineConstruction : InteractionTest
         ClientAssertPrototype(Unfinished, Target);
         await Interact(Wrench, Cable);
         AssertPrototype(MachineFrame);
-        await Interact(ProtolatheBoard, Manipulator1, Manipulator1, Manipulator1, Manipulator1, Beaker, Beaker, Screw);
+        await Interact(ProtolatheBoard, Bin1, Bin1, Manipulator1, Manipulator1, Beaker, Beaker, Screw); // MAID add Bin1, Bin1
         AssertPrototype(Protolathe);
     }
 
@@ -44,7 +46,8 @@ public sealed class MachineConstruction : InteractionTest
             (Steel, 5),
             (Cable, 1),
             (Beaker, 2),
-            (Manipulator1, 4),
+            (Manipulator1, 2), // MAID (Manipulator1, 4) -> (Manipulator1, 2)
+            (Bin1, 2), // MAID revert machine parts
             (ProtolatheBoard, 1));
     }
 
@@ -59,7 +62,121 @@ public sealed class MachineConstruction : InteractionTest
         // Change it into an autolathe
         await InteractUsing("AutolatheMachineCircuitboard");
         AssertPrototype(MachineFrame);
-        await Interact(Manipulator1, Manipulator1, Manipulator1, Manipulator1, Glass, Screw);
+        await Interact(Bin1, Bin1, Bin1, Manipulator1, Glass, Screw); // MAID Manipulator1, Manipulator1, Manipulator1 -> Bin1, Bin1, Bin1
         AssertPrototype("Autolathe");
     }
+
+    // MAID BEGIN revert machine parts
+    /*
+    [Test]
+    public async Task UpgradeLathe()
+    {
+        // Partially deconstruct a protolathe.
+        await SpawnTarget(Protolathe);
+        var serverTarget = SEntMan.GetEntity(Target!.Value);
+
+        // Initially has all quality-1 parts.
+        foreach (var part in SConstruction.GetAllParts(serverTarget))
+        {
+            Assert.That(part.Rating, Is.EqualTo(1));
+        }
+
+        // Partially deconstruct lathe
+        await Interact(Screw, Pry, Pry);
+        AssertPrototype(MachineFrame);
+
+        // Reconstruct with better parts.
+        await Interact(ProtolatheBoard, Bin4, Bin4, Manipulator4, Manipulator4, Beaker, Beaker);
+        await Interact(Screw);
+        AssertPrototype(Protolathe);
+
+        // Query now returns higher quality parts.
+        foreach (var part in SConstruction.GetAllParts(SEntMan.GetEntity(Target!.Value)))
+        {
+            Assert.That(part.Rating, Is.EqualTo(4));
+        }
+    }
+    */
+
+    /// <summary>
+    /// Machine upgrading (part ratings) was ripped out upstream in #24413, so we can only check
+    /// that higher tier parts are still accepted by machine frames as their base stack type
+    /// and come back with the same rating when the machine is deconstructed.
+    /// </summary>
+    [Test]
+    public async Task RebuildLatheWithHighTierParts()
+    {
+        // Partially deconstruct a protolathe.
+        await SpawnTarget(Protolathe);
+
+        // Partially deconstruct lathe
+        await Interact(Screw, Pry, Pry);
+        AssertPrototype(MachineFrame);
+
+        // Reconstruct with better parts.
+        // Interact() spawns stack entities by their stack type, i.e. as basic parts, so the rated parts are spawned by prototype.
+        await Interact(ProtolatheBoard);
+
+        // A stack of 3 bins covers the split case: the frame takes 2 of them, 1 has to stay in hand as the same rated part.
+        var bins = await InsertExactPrototype(Bin4, 3);
+        await Server.WaitAssertion(() =>
+        {
+            var leftover = SEntMan.GetEntity(bins);
+            Assert.That(SEntMan.GetComponent<MetaDataComponent>(leftover).EntityPrototype?.ID, Is.EqualTo(Bin4));
+            Assert.That(SEntMan.GetComponent<StackComponent>(leftover).Count, Is.EqualTo(1));
+        });
+
+        // Single manipulators cover inserting a whole stack (first one) and splitting off the last needed part (second one).
+        await InsertExactPrototype(Manipulator4);
+        await InsertExactPrototype(Manipulator4);
+        await Interact(Beaker, Beaker);
+        await Interact(Screw);
+        AssertPrototype(Protolathe);
+
+        // Deconstruct it again, the inserted parts must come back with the same rating
+        // (they share a stack type with basic parts, splitting them used to spawn basic ones).
+        await Interact(Screw, Pry, Pry);
+        AssertPrototype(MachineFrame);
+
+        var entities = await DoEntityLookup();
+        await Server.WaitAssertion(() =>
+        {
+            int Count(string proto)
+            {
+                var count = 0;
+                foreach (var ent in entities)
+                {
+                    if (SEntMan.GetComponent<MetaDataComponent>(ent).EntityPrototype?.ID != proto)
+                        continue;
+
+                    count += SEntMan.TryGetComponent<StackComponent>(ent, out var stack) ? stack.Count : 1;
+                }
+
+                return count;
+            }
+
+            Assert.That(Count(Bin4), Is.EqualTo(2));
+            Assert.That(Count(Manipulator4), Is.EqualTo(2));
+        });
+    }
+
+    /// <summary>
+    /// Spawns an entity of exactly this prototype (with the given stack count), picks it up and uses it on the target.
+    /// </summary>
+    private async Task<NetEntity> InsertExactPrototype(string prototype, int count = 1)
+    {
+        EntityUid part = default;
+        await Server.WaitPost(() =>
+        {
+            part = SEntMan.SpawnEntity(prototype, SEntMan.GetCoordinates(PlayerCoords));
+            if (count != 1)
+                Stack.SetCount(part, count);
+        });
+
+        var netPart = SEntMan.GetNetEntity(part);
+        await Pickup(netPart);
+        await Interact();
+        return netPart;
+    }
+    // MAID END revert machine parts
 }

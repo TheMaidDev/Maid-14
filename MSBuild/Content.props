@@ -1,0 +1,13 @@
+﻿<Project>
+  <!--
+  Content specific properties
+  Import *before* Robust.Properties.targets
+  -->
+
+  <PropertyGroup>
+    <LangVersion Condition="'$(LangVersion)' == ''">14</LangVersion>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+    <Nullable Condition="'$(Nullable)' == ''">enable</Nullable>
+    <NoWarn>$(NoWarn);RA0049;RA0051</NoWarn> <!-- MAID rt-update: [Dependency] partial/readonly warnings, see RT_UPDATE/CONTROVERSIAL.md -->
+  </PropertyGroup>
+</Project>

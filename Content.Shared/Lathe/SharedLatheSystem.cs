@@ -77,6 +77,11 @@ namespace Content.Shared.Lathe;
 /// </summary>
 public abstract class SharedLatheSystem : EntitySystem
 {
+    // MAID BEGIN lathe batch queue
+    public const int MaxQueueSize = 20;
+    public const int MaxBatchAmount = 50;
+    // MAID END lathe batch queue
+
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedMaterialStorageSystem _materialStorage = default!;
     [Dependency] private readonly EmagSystem _emag = default!;

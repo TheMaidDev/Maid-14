@@ -473,6 +473,9 @@
 - type: Tag
   id: CanPilot
 
+- type: Tag # MAID
+  id: CapacitorStockPart # MAID
+
 - type: Tag
   id: CaptainSabre
 

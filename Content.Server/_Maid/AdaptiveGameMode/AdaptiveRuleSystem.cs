@@ -64,7 +64,7 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
     {
         var readyPlayersCount = _playerManager.Sessions
             .Count(session => GameTicker.PlayerGameStatuses.TryGetValue(session.UserId, out var status)
-                              && (status == PlayerGameStatus.ReadyToPlay || status == PlayerGameStatus.JoinedGame)
+                              && status is PlayerGameStatus.ReadyToPlay or PlayerGameStatus.JoinedGame
             );
 
         var candidateRules = component.RoundstartRules
@@ -78,7 +78,7 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
         Log($"Spawning roundstart rules with budget {roundstartTargetBudget} (of {readyPlayersCount} players)...");
 
-        for (var i = 0; i < 5; i++) // for now - hardcoded limit. TODO
+        for (var i = 0; i < component.RoundstartMaxRules; i++)
         {
             // TODO: Also temporary. Probably should do probability for spawning next rule based on distance to target score
             if (accumulatedScore.Average >= roundstartTargetBudget.Average)
@@ -93,14 +93,25 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
             }
 
             var remainingBudget = roundstartTargetBudget - accumulatedScore;
-            var chosenRule = ChooseRandomRule(component, candidateRules, remainingBudget, readyPlayersCount);
+
+            var chosenRule = component.RoundstartUsePotentialScore
+                ? ChooseRandomRule(component, candidateRules, remainingBudget, readyPlayersCount)
+                : _random.Pick(candidateRules);
 
             if (chosenRule == null)
                 break;
 
+            var possibleScore = CalculatePrototypePotentialScore(chosenRule.Id, readyPlayersCount);
+
+            // <Current score> -- <target score> -- <current score + this event>
+            // If current score is closer to target score, then skip this rule (this is too much)
+            if (MathF.Abs(accumulatedScore.Average - roundstartTargetBudget.Average) <
+                MathF.Abs((accumulatedScore+possibleScore).Average - roundstartTargetBudget.Average))
+                break;
+
             if (SpawnRule(uid, component, chosenRule.Id) != null)
             {
-                accumulatedScore += CalculatePossibleScoreForPrototype(chosenRule.Id, readyPlayersCount);
+                accumulatedScore += possibleScore;
             }
 
             candidateRules.Remove(chosenRule); // can't spawn same rule multiple times
@@ -130,27 +141,35 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
     private void TrySpawnRandomRule(EntityUid uid, AdaptiveRuleComponent component)
     {
-        if (component.MidroundRules.Count == 0)
-            return;
-
         // Evaluate conditions for candidate rules
-        var candidateRules = new List<AdaptiveRuleParam>();
-        foreach (var ruleParam in component.MidroundRules)
+        var candidateRules = component.MidroundRules
+            .Where(rule =>
+                rule.Conditions.All(c => c.Condition(rule, component, EntityManager)))
+            .ToList();
+
+        var currentScore = CalculateChaosScore();
+        var targetBudget = GetTargetBudget(component, _gameTicker.RoundDuration());
+        var scoreBudget = targetBudget - currentScore.Score;
+
+        if (currentScore.Score.Average < targetBudget.Average * component.MajorMidroundRulesMaxScorePercentage)
         {
-            if (ruleParam.Conditions.All(c => c.Condition(ruleParam, component, EntityManager)))
-            {
-                candidateRules.Add(ruleParam);
-            }
+            candidateRules
+                .AddRange(
+                    component.MajorMidroundRules
+                        .Where(rule => rule.Conditions.All(c => c.Condition(rule, component, EntityManager))
+                )
+            );
         }
 
         if (candidateRules.Count == 0)
             return;
 
-        var currentScore = CalculateChaosScore();
-        var targetBudget = GetTargetBudget(component, _gameTicker.RoundDuration());
-        var scoreBudget = targetBudget - new AdaptiveScore { Chaos = currentScore.ChaosScore, Combat = currentScore.CombatScore };
+        var playerCount = _playerManager.Sessions
+            .Count(session => GameTicker.PlayerGameStatuses.TryGetValue(session.UserId, out var status)
+                              && status is PlayerGameStatus.ReadyToPlay or PlayerGameStatus.JoinedGame
+            );
 
-        var chosenRule = ChooseRandomRule(component, candidateRules, scoreBudget);
+        var chosenRule = ChooseRandomRule(component, candidateRules, scoreBudget, playerCount);
         if (chosenRule == null)
             return;
 
@@ -197,6 +216,7 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
         if (_balancing.TrackingEnabled)
             _balancing.AppendRandomRuleSelectionData(weightedRules, null);
+
         return weightedRules.Last().Rule;
     }
 
@@ -213,7 +233,7 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
         foreach (var rule in rules)
         {
-            var expectedBudget = CalculatePossibleScoreForPrototype(rule.Id, playerCount);
+            var expectedBudget = CalculatePrototypePotentialScore(rule.Id, playerCount);
 
             var multiplierChaos = GetMultiplier(scoreBudget.Chaos, expectedBudget.Chaos);
             var multiplierCombat = GetMultiplier(scoreBudget.Combat, expectedBudget.Combat);
@@ -245,15 +265,6 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
             return MathF.Exp(-x * k2 - MathF.Pow(x / s2, p2));
         }
-    }
-
-    public AdaptiveScore CalculatePossibleScoreForPrototype(string ruleId, int? playerCount = null)
-    {
-        // TODO: Move entire logic into GetPrototypeStaticScore. I don't see reason to keep those separate
-
-        var score = GetPrototypeStaticScore(ruleId, playerCount);
-
-        return score;
     }
 
     public EntityUid? SpawnRule(EntityUid uid, AdaptiveRuleComponent component, string ruleId)
@@ -299,12 +310,12 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
         // Kinda gross but it is what it is
         // TODO: Rewrite whole tracking system and make it pretty and not that shit
-        _balancing.SaveCalculationRun(ev.ChaosScore, ev.CombatScore, targetBudget.Chaos, targetBudget.Combat, ev.Records);
+        _balancing.SaveCalculationRun(ev.Score.Chaos, ev.Score.Combat, targetBudget.Chaos, targetBudget.Combat, ev.Records);
 
         return ev;
     }
 
-    private AdaptiveScore GetPrototypeStaticScore(string protoId, int? playerCount = null, int depth = 0)
+    public AdaptiveScore CalculatePrototypePotentialScore(string protoId, int? playerCount = null, int depth = 0)
     {
         if (depth > 20)
         {
@@ -319,9 +330,15 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
         // We can't check everything (like some complex entity table shit) to estimate it properly
         // So we need a way to define score manually
-        if (proto.TryGetComponent(out AdaptiveScoreStaticGameruleEntityComponent? gameruleEntity, _compFactory))
+        if (proto.TryGetComponent(out AdaptivePotentialScoreEntityComponent? gameruleEntity, _compFactory))
         {
-            score += GetPrototypeStaticScore(gameruleEntity.Prototype, playerCount, depth + 1) * gameruleEntity.Count;
+            score += CalculatePrototypePotentialScore(gameruleEntity.Prototype, playerCount, depth + 1) *
+                     (gameruleEntity.Count + gameruleEntity.CountPerPlayer * playerCount ?? 0);
+        }
+
+        if (proto.TryGetComponent(out AdaptivePotentialScoreComponent? gameruleScore, _compFactory))
+        {
+            score += gameruleScore.Score;
         }
 
         // Score was explicitly defined on this entity
@@ -333,7 +350,7 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
         // Some random spawner
         if (proto.TryGetComponent(out RandomEntityStorageSpawnRuleComponent? storageSpawnRule, _compFactory))
         {
-            score += GetPrototypeStaticScore(storageSpawnRule.Prototype, playerCount, depth + 1);
+            score += CalculatePrototypePotentialScore(storageSpawnRule.Prototype, playerCount, depth + 1);
         }
 
         // Has ghost role, and since ghost roles have mind roles we need to check those
@@ -341,7 +358,7 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
         {
             foreach (var role in ghostComp.MindRoles)
             {
-                score += GetPrototypeStaticScore(role, playerCount, depth + 1);
+                score += CalculatePrototypePotentialScore(role, playerCount, depth + 1);
             }
         }
 
@@ -350,26 +367,26 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
         {
             if (spawnerComp.Prototype != null)
             {
-                score += GetPrototypeStaticScore(spawnerComp.Prototype, playerCount, depth + 1);
+                score += CalculatePrototypePotentialScore(spawnerComp.Prototype, playerCount, depth + 1);
             }
 
             foreach (var selectable in spawnerComp.SelectablePrototypes)
             {
-                score += GetPrototypeStaticScore(selectable, playerCount, depth + 1);
+                score += CalculatePrototypePotentialScore(selectable, playerCount, depth + 1);
             }
         }
 
         // Is antag spawner
         if (proto.TryGetComponent(out AntagSpawnerComponent? antagSpawner, _compFactory))
         {
-            score += GetPrototypeStaticScore(antagSpawner.Prototype, playerCount, depth + 1);
+            score += CalculatePrototypePotentialScore(antagSpawner.Prototype, playerCount, depth + 1);
         }
 
         if (proto.TryGetComponent(out Spawners.Components.ConditionalSpawnerComponent? condSpawner, _compFactory))
         {
             foreach (var spawnerProto in condSpawner.Prototypes)
             {
-                score += GetPrototypeStaticScore(spawnerProto, playerCount, depth + 1);
+                score += CalculatePrototypePotentialScore(spawnerProto, playerCount, depth + 1);
             }
         }
 
@@ -384,13 +401,13 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
 
             if (speciesId != null && _protoManager.TryIndex<SpeciesPrototype>(speciesId.Value, out var species))
             {
-                score += GetPrototypeStaticScore(species.Prototype, playerCount, depth + 1);
+                score += CalculatePrototypePotentialScore(species.Prototype, playerCount, depth + 1);
             }
         }
 
         if (proto.TryGetComponent(out RandomSpawnRuleComponent? randomSpawnRule, _compFactory))
         {
-            score += GetPrototypeStaticScore(randomSpawnRule.Prototype, playerCount, depth + 1);
+            score += CalculatePrototypePotentialScore(randomSpawnRule.Prototype, playerCount, depth + 1);
         }
 
         if (proto.TryGetComponent(out AntagSelectionComponent? antagComp, _compFactory))
@@ -415,14 +432,14 @@ public sealed class AdaptiveRuleSystem : GameRuleSystem<AdaptiveRuleComponent>
                 {
                     foreach (var role in def.MindRoles)
                     {
-                        score += GetPrototypeStaticScore(role, playerCount, depth + 1) * antagCount;
+                        score += CalculatePrototypePotentialScore(role, playerCount, depth + 1) * antagCount;
                     }
                 }
 
                 // Spawners
                 if (def.SpawnerPrototype != null)
                 {
-                    score += GetPrototypeStaticScore(def.SpawnerPrototype, playerCount, depth + 1) * antagCount;
+                    score += CalculatePrototypePotentialScore(def.SpawnerPrototype, playerCount, depth + 1) * antagCount;
                 }
 
                 // Added components

@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: BaseChemistryEmptyBottle
+  components:
+  - type: Drink
+    useSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

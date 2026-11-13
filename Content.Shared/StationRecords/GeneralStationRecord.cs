@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Enums;
 using Robust.Shared.Serialization;
 
@@ -16,7 +17,8 @@ namespace Content.Shared.StationRecords;
 ///     General station record. Indicates the crewmember's name and job.
 /// </summary>
 [Serializable, NetSerializable]
-public sealed record GeneralStationRecord
+[DataDefinition] // MAID rt-update
+public sealed partial record GeneralStationRecord
 {
     /// <summary>
     ///     Name tied to this station record.

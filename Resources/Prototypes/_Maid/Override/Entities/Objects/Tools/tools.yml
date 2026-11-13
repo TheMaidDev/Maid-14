@@ -1,0 +1,37 @@
+- type: !PartialOnly entity
+  id: Wrench
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/wrench_pickup.ogg
+- type: !PartialOnly entity
+  id: Multitool
+  components:
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_Maid/Override/_Goobstation/Items/handling/multitool_pickup.ogg
+- type: !PartialOnly entity
+  id: PowerDrill
+  components:
+  - type: Tool
+    useSound: /Audio/_Maid/Override/Items/drill_use.ogg
+  - type: MultipleTool
+    entries:
+    - !CombineIndex:0 useSound:
+        path: /Audio/_Maid/Override/Items/drill_use.ogg
+    - !CombineIndex:1 useSound:
+        path: /Audio/_Maid/Override/Items/drill_use.ogg
+  - type: MeleeWeapon
+    soundHit:
+      path: /Audio/_Maid/Override/Items/drill_hit.ogg
+  - type: SurgeryTool
+    startSound: /Audio/_Maid/Override/Items/drill_use.ogg
+- type: !PartialOnly entity
+  id: Omnitool
+  components:
+  - type: Tool
+    useSound: /Audio/_Maid/Override/Items/drill_use.ogg
+  - type: MultipleTool
+    entries:
+    - !CombineIndex:0 useSound:
+        path: /Audio/_Maid/Override/Items/drill_use.ogg

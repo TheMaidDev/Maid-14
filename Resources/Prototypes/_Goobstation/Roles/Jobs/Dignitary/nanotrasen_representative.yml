@@ -95,8 +95,9 @@
 
 - type: job
   id: NanotrasenRepresentative
-  name: Nanotrasen Representative
-  description: "Represent NT, Send reports back to them on the station's situation, Inform the heads of anything CentCom orders them to do."
+  # MAID fix job localization
+  name: job-name-nanotrasen-representative
+  description: job-description-nanotrasen-representative
   playTimeTracker: JobNanotrasenRepresentative
   requirements:
     - !type:DepartmentTimeRequirement

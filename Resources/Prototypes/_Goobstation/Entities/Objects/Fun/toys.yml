@@ -819,7 +819,7 @@
   - type: PointLight
     radius: 8
     energy: 6
-    mask: /Textures/Effects/LightMasks/double_cone.png
+    lightMask: ConeDouble # MAID
   - type: RgbLightController
     cycleRate: 0.3
   - type: RotatingLight

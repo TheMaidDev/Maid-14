@@ -104,7 +104,7 @@ namespace Content.Client.Cargo.BUI
                 description.Clear();
                 description.PushColor(Color.White); // Rich text default color is grey
                 if (row.MainButton.ToolTip != null)
-                    description.AddText(row.MainButton.ToolTip);
+                    description.AddMarkupPermissive(row.MainButton.ToolTip);
 
                 _orderMenu.Description.SetMessage(description);
                 _product = row.Product;

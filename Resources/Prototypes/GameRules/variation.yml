@@ -149,6 +149,8 @@
   parent: BaseVariationPass
   components:
   - type: PuddleMessVariationPass
+    tilesPerSpillAverage: 1200 # MAID halve puddles
+    tilesPerSpillStdDev: 100 # MAID halve puddles
     randomPuddleSolutionFill: RandomFillTrashPuddle
 
 - type: entity
@@ -156,8 +158,8 @@
   parent: BaseVariationPass
   components:
   - type: PuddleMessVariationPass
-    tilesPerSpillAverage: 150
-    tilesPerSpillStdDev: 10
+    tilesPerSpillAverage: 300 # MAID halve puddles
+    tilesPerSpillStdDev: 20 # MAID halve puddles
     randomPuddleSolutionFill: RandomFillTrashPuddleBloodbath
 
 - type: entity

@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: HolyHandGrenade
+  components:
+  - type: TimerTriggerVisuals
+    primingSound:
+      path: /Audio/_Maid/Override/Effects/hallelujah.ogg

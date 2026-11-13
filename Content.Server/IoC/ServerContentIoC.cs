@@ -175,6 +175,7 @@ using Content.Server.Connection;
 using Content.Server.Database;
 using Content.Server.Discord;
 using Content.Server.Discord.WebhookMessages;
+using Content.Server._Maid.Discord; // MAID discord feed
 using Content.Server.EUI;
 using Content.Server.GhostKick;
 using Content.Server.Info;
@@ -241,6 +242,7 @@ namespace Content.Server.IoC
             IoCManager.Register<SharedPlayerRateLimitManager, PlayerRateLimitManager>();
             IoCManager.Register<MappingManager>();
             IoCManager.Register<IWatchlistWebhookManager, WatchlistWebhookManager>();
+            IoCManager.Register<IDiscordFeedManager, DiscordFeedManager>(); // MAID discord feed
             IoCManager.Register<ConnectionManager>();
             IoCManager.Register<MultiServerKickManager>();
             IoCManager.Register<CVarControlManager>();

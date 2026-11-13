@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: MobPlantbot
+  components:
+  - type: Plantbot
+    removeWaterSound:
+      path: /Audio/_Maid/Override/Items/drink.ogg

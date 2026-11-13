@@ -244,7 +244,7 @@ public sealed partial class PlantAnalyzerWindow : FancyWindow
             .Select(g =>
             {
                 var gas = atmos.GetGas(g.Key);
-                var color = Color.TryFromHex("#" + gas.Color) ?? Color.White;
+                var color = Color.FromHex("#" + Color.White);
                 return (Loc.GetString(gas.Name), $"{g.Value:0.##} {unit}", color);
             });
 

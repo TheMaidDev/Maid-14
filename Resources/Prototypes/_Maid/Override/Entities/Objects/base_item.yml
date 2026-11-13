@@ -1,0 +1,7 @@
+- type: !PartialOnly entity
+  id: BaseItem
+  components:
+  - type: EmitSoundOnCollide
+    sound:
+      collection: !Remove
+      path: /Audio/_Maid/Override/Effects/wall_bonk.ogg

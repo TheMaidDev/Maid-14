@@ -55,6 +55,11 @@ public sealed partial class GunSystem
     {
         base.OnMagazineSlotChange(uid, component, args);
 
+        // MAID BEGIN ammo counter on state
+        if (ChamberSlot == args.Container.ID && Timing.ApplyingState)
+            QueueAmmoCounterUpdate(uid);
+        // MAID END ammo counter on state
+
         if (ChamberSlot != args.Container.ID || args is not EntRemovedFromContainerMessage removedArgs)
             return;
 

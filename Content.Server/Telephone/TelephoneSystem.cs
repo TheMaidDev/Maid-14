@@ -111,7 +111,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
             !IsSourceConnectedToReceiver(args.TelephoneSource, entity))
             return;
 
-        var nameEv = new TransformSpeakerNameEvent(args.MessageSource, Name(args.MessageSource));
+        var nameEv = new TransformSpeakerNameEvent(args.MessageSource, Name(args.MessageSource)) { IsRadio = true }; // MAID Bush radio name
         RaiseLocalEvent(args.MessageSource, nameEv);
 
         // Determine if speech should be relayed via the telephone itself or a designated speaker
@@ -343,7 +343,7 @@ public sealed class TelephoneSystem : SharedTelephoneSystem
         // telephone is able to transmit messages and that it can
         // send messages to any telephones linked to it
 
-        var ev = new TransformSpeakerNameEvent(messageSource, MetaData(messageSource).EntityName);
+        var ev = new TransformSpeakerNameEvent(messageSource, MetaData(messageSource).EntityName) { IsRadio = true }; // MAID Bush radio name
         RaiseLocalEvent(messageSource, ev);
 
         var name = ev.VoiceName;

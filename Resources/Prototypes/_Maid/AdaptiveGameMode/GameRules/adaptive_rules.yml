@@ -24,20 +24,22 @@
       value:
         chaos: 50
         combat: 100
+    roundstartMaxRules: 1
+    roundstartUsePotentialScore: false
     roundstartRules:
-    - id: Zombie
+    - id: AdaptiveZombie
       baseWeight: 10
-    - id: Changeling
+    - id: AdaptiveChangeling
       baseWeight: 10
-    - id: CorporateAgent
+    - id: AdaptiveCorporateAgent
       baseWeight: 10
-    - id: Nukeops
+    - id: AdaptiveNukeops
       baseWeight: 10
-    - id: Wizard
+    - id: AdaptiveWizard
       baseWeight: 10
-    - id: Revolutionary
+    - id: AdaptiveRevolutionary
       baseWeight: 10
-    - id: Traitor
+    - id: AdaptiveTraitor
       baseWeight: 10
 
     midroundSpawnTimer: # How often we spawn rules
@@ -61,23 +63,21 @@
         cooldown: 900 # 15 min
       - !type:AdaptiveRuleMaxOccurenceCondition
         amount: 2
-    - id: AnomalySpawn
+    - id: AdaptiveAnomalySpawn
       baseWeight: 10
-    - id: BingleSpawn
-      baseWeight: 10
-    - id: BluespaceArtifact
+    - id: AdaptiveBluespaceArtifact
       baseWeight: 10
     - id: BluespaceLocker
       baseWeight: 10
     - id: BureaucraticError
       baseWeight: 10
-    - id: ChangelingMidround
+    - id: AdaptiveChangelingMidround
       baseWeight: 10
     - id: DragonSpawn
       baseWeight: 10
-    - id: DuoAbductorSpawn
+    - id: AdaptiveDuoAbductorSpawn
       baseWeight: 4
-    - id: GasLeak
+    - id: AdaptiveGasLeak
       baseWeight: 10
     - id: GiftsEngineering
       baseWeight: 10
@@ -99,11 +99,11 @@
       baseWeight: 10
     - id: GiftsVendingRestock
       baseWeight: 10
-    - id: IonStorm
+    - id: AdaptiveIonStorm
       baseWeight: 10
-    - id: KingRatMigration
+    - id: AdaptiveKingRatMigration
       baseWeight: 10
-    - id: LoneAbductorSpawn
+    - id: AdaptiveLoneAbductorSpawn
       baseWeight: 4
     - id: LoneOpsSpawn
       baseWeight: 10
@@ -117,23 +117,23 @@
       baseWeight: 10
     - id: ParadoxCloneSpawn
       baseWeight: 10
-    - id: PowerGridCheck
+    - id: AdaptivePowerGridCheck
       baseWeight: 10
     - id: RandomSentience
       baseWeight: 10
     - id: SleeperAgents
       baseWeight: 10
-    - id: SlimesSpawn
+    - id: AdaptiveSlimesSpawn
       baseWeight: 10
-    - id: SnakeSpawn
+    - id: AdaptiveSnakeSpawn
       baseWeight: 10
-    - id: SolarFlare
+    - id: AdaptiveSolarFlare
       baseWeight: 10
 #    - id: SpacePirates
 #      baseWeight: 10
-    - id: SpiderClownSpawn
+    - id: AdaptiveSpiderClownSpawn
       baseWeight: 10
-    - id: SpiderSpawn
+    - id: AdaptiveSpiderSpawn
       baseWeight: 10
     - id: UnknownShuttleCargoLost
       baseWeight: 10
@@ -151,7 +151,7 @@
       baseWeight: 10
     - id: UnknownShuttleGym
       baseWeight: 10
-    - id: UnknownShuttleInstigator
+    - id: AdaptiveUnknownShuttleInstigator
       baseWeight: 10
     - id: UnknownShuttleJoe
       baseWeight: 10
@@ -171,7 +171,7 @@
       baseWeight: 10
     - id: WraithMidround
       baseWeight: 10
-    - id: ClosetSkeleton
+    - id: AdaptiveClosetSkeleton
       baseWeight: 10
     - id: CockroachMigration
       baseWeight: 10

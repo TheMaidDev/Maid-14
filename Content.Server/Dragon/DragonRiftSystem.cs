@@ -27,6 +27,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Random; // Goobstation - Buff carp rift
 using Robust.Shared.Utility;
+using Content.Server._Maid.PassiveEntitySpawner; // MAID track spawned dragons
 
 namespace Content.Server.Dragon;
 
@@ -99,6 +100,9 @@ public sealed class DragonRiftSystem : EntitySystem
                 _audio.PlayGlobal("/Audio/Misc/notice1.ogg", Filter.Broadcast(), true);
                 _navMap.SetBeaconEnabled(uid, true);
             }
+
+            if (HasComp<MaidPassiveEntitySpawnerComponent>(uid)) // MAID track spawned dragons
+                continue;
 
             if (comp.SpawnAccumulator > comp.SpawnCooldown)
             {

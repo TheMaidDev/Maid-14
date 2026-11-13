@@ -19,8 +19,8 @@
     requiresComplex: false
   - type: PaperVisuals
     backgroundImagePath: "/Textures/_Goobstation/Interface/Paper/paper_background_grey.svg.96dpi.png"
-    backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0
-    contentMargin: 16.0, 16.0, 16.0, 16.0
+    backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
+    contentMargin: 16.0, 16.0, 16.0, 16.0 # MAID rt-update Box2 (l,b,r,t) -> Thickness (l,t,r,b)
   - type: UserInterface
     interfaces:
       enum.PaperUiKey.Key:

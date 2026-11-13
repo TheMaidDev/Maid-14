@@ -26,7 +26,11 @@
     CableApcStack: 2
     FlashlightLantern: 2
     PowerCellSmallPrinted: 3
-    MicroManipulatorStockPart: 12
+    # MAID BEGIN
+    MatterBinStockPart: 4
+    CapacitorStockPart: 4
+    MicroManipulatorStockPart: 4 # MAID 12 -> 4
+    # MAID END
   contrabandInventory:
     EdgeDetector: 1 #Maid
     # ProximitySensor: 1 #Maid

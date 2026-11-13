@@ -81,4 +81,4 @@
     stealGroup: WeaponEnergyGunMultiphase
   - type: StaticPrice
     price: 750
-  - type: Multishot
+  # - type: Multishot #MAID DualWield

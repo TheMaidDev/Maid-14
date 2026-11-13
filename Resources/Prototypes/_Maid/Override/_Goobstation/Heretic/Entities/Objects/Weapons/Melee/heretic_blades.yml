@@ -1,0 +1,17 @@
+- type: !PartialOnly entity
+  id: HereticBladeBaseNoTeleport
+  components:
+  - type: HereticBlade
+    arrivalSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+    departureSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg
+
+- type: !PartialOnly entity
+  id: BaseRandomTeleportBlade
+  components:
+  - type: RandomTeleport
+    arrivalSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+    departureSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg

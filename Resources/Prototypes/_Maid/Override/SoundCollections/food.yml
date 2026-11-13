@@ -1,0 +1,9 @@
+- type: !PartialOnly soundCollection
+  id: eating
+  files:
+  - !Index:0 /Audio/_Maid/Override/Items/eating_1.ogg
+  - !Remove /Audio/Items/eating_1.ogg
+  - !Index:1 /Audio/_Maid/Override/Items/eating_2.ogg
+  - !Remove /Audio/Items/eating_2.ogg
+  - !Index:2 /Audio/_Maid/Override/Items/eating_3.ogg
+  - !Remove /Audio/Items/eating_3.ogg

@@ -40,6 +40,7 @@ using Content.Client.Gameplay;
 using Content.Client.Items;
 using Content.Client.Weapons.Ranged.Components;
 using Content.Shared._Goobstation.Heretic.Components;
+using Content.Shared._Maid.Weapons.DualWield; // MAID dual-wield
 using Content.Shared.Camera;
 using Content.Shared.CombatMode;
 using Content.Shared.Mech.Components; // Goobstation
@@ -226,8 +227,18 @@ public sealed partial class GunSystem : SharedGunSystem
             return;
         }
 
+        // MAID EDIT START DualWield
         if (gun.NextFire > Timing.CurTime)
-            return;
+        {
+            var linkedReady = TryComp<DualWieldComponent>(gunUid, out var dualWield)
+                              && dualWield.LinkedWeapon is { } linkedWeapon
+                              && TryComp<GunComponent>(linkedWeapon, out var linkedGun)
+                              && linkedGun.NextFire <= Timing.CurTime;
+
+            if (!linkedReady)
+                return;
+        }
+        // MAID EDIT END
 
         var mousePos = _eyeManager.PixelToMap(_inputManager.MouseScreenPosition);
 

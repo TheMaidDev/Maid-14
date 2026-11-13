@@ -334,7 +334,8 @@ internal sealed class AdminNameOverlay : Overlay
             {
                 color = Color.GreenYellow;
                 color.A = alpha;
-                args.ScreenHandle.DrawString(_font, screenCoordinates + currentOffset, Loc.GetString(playerInfo.StartingJob), uiScale, playerInfo.Connected ? color : colorDisconnected);
+                // MAID fix double localization
+                args.ScreenHandle.DrawString(_font, screenCoordinates + currentOffset, playerInfo.StartingJob, uiScale, playerInfo.Connected ? color : colorDisconnected);
                 currentOffset += lineoffset;
             }
 
@@ -369,7 +370,8 @@ internal sealed class AdminNameOverlay : Overlay
                     color = roleColor;
                     symbol = IsFiltered(playerInfo.RoleProto) ? symbol : string.Empty;
                     text = IsFiltered(playerInfo.RoleProto)
-                        ? _roles.GetRoleSubtypeLabel(roleName, playerInfo.Subtype).ToUpper()
+                        // MAID fix double localization
+                        ? _roles.GetRoleSubtypeLabel(rolePrototype?.Name ?? RoleTypePrototype.FallbackName, playerInfo.Subtype).ToUpper()
                         : string.Empty;
                     break;
                 case AdminOverlayAntagFormat.Off: // Goobstation

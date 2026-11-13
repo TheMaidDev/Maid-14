@@ -1,0 +1,8 @@
+- type: !PartialOnly entity
+  id: BasePortal
+  components:
+  - type: Portal
+    arrivalSound:
+      path: /Audio/_Maid/Override/Effects/teleport_arrival.ogg
+    departureSound:
+      path: /Audio/_Maid/Override/Effects/teleport_departure.ogg

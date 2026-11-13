@@ -1,0 +1,5 @@
+- type: !PartialOnly soundCollection
+  id: Welder
+  files:
+  - !Index:1 /Audio/_Maid/Override/Items/welder2.ogg
+  - !Remove /Audio/Items/welder2.ogg

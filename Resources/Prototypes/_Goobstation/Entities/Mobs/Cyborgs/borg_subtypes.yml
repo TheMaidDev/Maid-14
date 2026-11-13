@@ -22,6 +22,7 @@
   id: mining_basic
   spritePath: _Goobstation/Mobs/Silicon/Miner/basic.rsi
   dummyPrototype: BorgChassisMiningBasic
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: mining
@@ -58,6 +59,7 @@
   id: mining_squat
   spritePath: _Goobstation/Mobs/Silicon/Miner/squat.rsi
   dummyPrototype: BorgChassisMiningSquat
+  inventoryTemplateId: borg # MAID
 
 # Engineer subtypes
 - type: borgSubtype
@@ -71,12 +73,14 @@
   id: engineer_basic
   spritePath: _Goobstation/Mobs/Silicon/Engineering/basic.rsi
   dummyPrototype: BorgChassisEngineerBasic
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: engineering
   id: engineer_antique
   spritePath: _Goobstation/Mobs/Silicon/Engineering/antique.rsi
   dummyPrototype: BorgChassisEngineerAntique
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: engineering
@@ -89,12 +93,14 @@
   id: engineer_noble
   spritePath: _Goobstation/Mobs/Silicon/Engineering/noble.rsi
   dummyPrototype: BorgChassisEngineerNoble
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: engineering
   id: engineer_cricket
   spritePath: _Goobstation/Mobs/Silicon/Engineering/cricket.rsi
   dummyPrototype: BorgChassisEngineerCricket
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: engineering
@@ -114,12 +120,14 @@
   id: janitor_basic
   spritePath: _Goobstation/Mobs/Silicon/Janitor/basic.rsi
   dummyPrototype: BorgChassisJanitorBasic
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: janitor
   id: janitor_mopbot
   spritePath: _Goobstation/Mobs/Silicon/Janitor/mopbot.rsi
   dummyPrototype: BorgChassisJanitorMopbot
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: janitor
@@ -132,24 +140,28 @@
   id: janitor_custodi
   spritePath: _Goobstation/Mobs/Silicon/Janitor/custodi.rsi
   dummyPrototype: BorgChassisJanitorCustodi
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: janitor
   id: janitor_noble
   spritePath: _Goobstation/Mobs/Silicon/Janitor/noble.rsi
   dummyPrototype: BorgChassisJanitorNoble
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: janitor
   id: janitor_cricket
   spritePath: _Goobstation/Mobs/Silicon/Janitor/cricket.rsi
   dummyPrototype: BorgChassisJanitorCricket
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: janitor
   id: janitor_rover
   spritePath: _Goobstation/Mobs/Silicon/Janitor/rover.rsi
   dummyPrototype: BorgChassisJanitorRover
+  inventoryTemplateId: borg # MAID
 
 # Medical subtypes
 - type: borgSubtype
@@ -163,48 +175,56 @@
   id: medical_standart
   spritePath: _Goobstation/Mobs/Silicon/Medical/standart.rsi
   dummyPrototype: BorgChassisMedicalStandart
+  inventoryTemplateId: borgShort # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_medbot
   spritePath: _Goobstation/Mobs/Silicon/Medical/medbot.rsi
   dummyPrototype: BorgChassisMedicalMedbot
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_needles
   spritePath: _Goobstation/Mobs/Silicon/Medical/needles.rsi
   dummyPrototype: BorgChassisMedicalNeedles
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_advanced
   spritePath: _Goobstation/Mobs/Silicon/Medical/advanced.rsi
   dummyPrototype: BorgChassisMedicalAdvanced
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_qualified
   spritePath: _Goobstation/Mobs/Silicon/Medical/qualified.rsi
   dummyPrototype: BorgChassisMedicalQualified
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_noble
   spritePath: _Goobstation/Mobs/Silicon/Medical/noble.rsi
   dummyPrototype: BorgChassisMedicalNoble
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_cricket
   spritePath: _Goobstation/Mobs/Silicon/Medical/cricket.rsi
   dummyPrototype: BorgChassisMedicalCricket
+  inventoryTemplateId: borgTall # MAID
 
 - type: borgSubtype
   parentBorgType: medical
   id: medical_rover
   spritePath: _Goobstation/Mobs/Silicon/Medical/rover.rsi
   dummyPrototype: BorgChassisMedicalRover
+  inventoryTemplateId: borgShort # MAID
 
 # Service subtypes
 - type: borgSubtype
@@ -218,18 +238,21 @@
   id: service_standart
   spritePath: _Goobstation/Mobs/Silicon/Service/standart.rsi
   dummyPrototype: BorgChassisServiceStandart
+  inventoryTemplateId: borgShort # MAID
 
 - type: borgSubtype
   parentBorgType: service
   id: service_brobot
   spritePath: _Goobstation/Mobs/Silicon/Service/standart.rsi
   dummyPrototype: BorgChassisServiceBrobot
+  inventoryTemplateId: borgShort # MAID
 
 - type: borgSubtype
   parentBorgType: service
   id: service_waitress
   spritePath: _Goobstation/Mobs/Silicon/Service/waitress.rsi
   dummyPrototype: BorgChassisServiceWaitress
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: service
@@ -254,9 +277,11 @@
   id: service_rich
   spritePath: _Goobstation/Mobs/Silicon/Service/rich.rsi
   dummyPrototype: BorgChassisServiceRich
+  inventoryTemplateId: borg # MAID
 
 - type: borgSubtype
   parentBorgType: service
   id: service_rover
   spritePath: _Goobstation/Mobs/Silicon/Service/rover.rsi
   dummyPrototype: BorgChassisServiceRover
+  inventoryTemplateId: borgLow # MAID

@@ -1,0 +1,5 @@
+- type: !PartialOnly job
+  id: Clown
+  special:
+  - !CombineIndex:0 components:
+    - !CombineIndex:1 snore: /Audio/_Maid/Override/Voice/Misc/silly_snore.ogg

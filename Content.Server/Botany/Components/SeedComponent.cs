@@ -20,6 +20,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Robust.Shared.Prototypes;
 using Content.Server.Botany.Systems;
 using Content.Shared.Botany.Components;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
@@ -46,7 +47,7 @@ namespace Content.Server.Botany.Components
         /// <summary>
         ///     Name of a base seed prototype that is used if <see cref="Seed"/> is null.
         /// </summary>
-        [DataField("seedId", customTypeSerializer: typeof(PrototypeIdSerializer<SeedPrototype>))]
-        public string? SeedId;
+        [DataField("seedId")]
+        public ProtoId<SeedPrototype>? SeedId;
     }
 }

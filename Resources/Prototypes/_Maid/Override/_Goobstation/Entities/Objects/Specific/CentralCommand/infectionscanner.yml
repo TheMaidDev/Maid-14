@@ -1,0 +1,6 @@
+- type: !PartialOnly entity
+  id: InfectionScannerCburn
+  components:
+  - type: CheckInfection
+    scanningEndSound:
+      path: /Audio/_Maid/Override/Items/Medical/healthscanner.ogg

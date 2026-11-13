@@ -22,6 +22,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Shared._Maid.BushDisguise; // MAID Bush drop distance
 using Content.Shared.Database;
 using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
@@ -211,6 +212,15 @@ public abstract partial class SharedHandsSystem
         var dropVector = target.Position - origin.Position;
         var requestedDropDistance = dropVector.Length();
         var dropLength = dropVector.Length();
+
+        // MAID BEGIN Bush drop distance
+        if (TryComp<BushDisguiseComponent>(held, out var bush) && dropVector.Length() > bush.MaxDropDistance)
+        {
+            dropVector = dropVector.Normalized() * bush.MaxDropDistance;
+            target = new MapCoordinates(origin.Position + dropVector, target.MapId);
+            requestedDropDistance = dropLength = dropVector.Length();
+        }
+        // MAID END Bush drop distance
 
         if (ShouldIgnoreRestrictions(user))
         {

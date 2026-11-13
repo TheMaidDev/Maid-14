@@ -123,11 +123,11 @@ public sealed class ExaminableCharacterSystem : EntitySystem
                 FormattedMessage message = new();
                 message.PushTag(new MarkupNode("fancyborder", null, null));
                 message.PushNewline();
-                message.AddText(formatedName);
+                message.AddMarkupPermissive(formatedName); // MAID rt-update AddText escapes markup in the new engine
                 message.PushNewline();
                 foreach (var line in logLines)
                 {
-                    message.AddText(line);
+                    message.AddMarkupPermissive(line); // MAID rt-update
                     message.PushNewline();
                 }
                 message.Pop();
@@ -175,10 +175,10 @@ public sealed class ExaminableCharacterSystem : EntitySystem
                     ("id", GetNetEntity(uid).Id),
                     ("size", 14));
 
-                message.AddText($"[color=DarkGray][font size=11]{item}[/font][/color]");
+                message.AddMarkupPermissive($"[color=DarkGray][font size=11]{item}[/font][/color]"); // MAID rt-update
                 message.PushNewline();
 
-                message.AddText($"[color=DarkGray][font size=10]{args.Message.ToMarkup()}[/font][/color]");
+                message.AddMarkupPermissive($"[color=DarkGray][font size=10]{args.Message.ToMarkup()}[/font][/color]"); // MAID rt-update
                 message.PushNewline();
                 message.Pop();
 

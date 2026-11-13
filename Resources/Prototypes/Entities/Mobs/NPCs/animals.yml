@@ -622,7 +622,6 @@
   parent: FoodEgg
   suffix: Fertilized, Chicken
   components:
-  - type: Timer
   - type: TimedSpawner
     prototypes:
     - MobChicken
@@ -1066,7 +1065,6 @@
   parent: FoodEgg
   suffix: Fertilized, Duck
   components:
-    - type: Timer
     - type: TimedSpawner
       prototypes:
       - MobDuckMallard
@@ -3920,6 +3918,24 @@
   - type: Inventory
     speciesId: hamster
     templateId: hamster
+    # MAID BEGIN hamster hats
+    displacements:
+      head:
+        sizeMaps:
+          32:
+            sprite: _Maid/Mobs/Pets/hamster_displacement.rsi
+            state: head
+      eyes:
+        sizeMaps:
+          32:
+            sprite: _Maid/Mobs/Pets/hamster_displacement.rsi
+            state: head
+      mask:
+        sizeMaps:
+          32:
+            sprite: _Maid/Mobs/Pets/hamster_displacement.rsi
+            state: head
+    # MAID END hamster hats
   - type: DamageStateVisuals
     states:
       Alive:

@@ -34,6 +34,11 @@ public sealed class BorgSelectTypeUserInterface : BoundUserInterface
         base.Open();
 
         _menu = this.CreateWindow<BorgSelectTypeMenu>();
+        // MAID BEGIN no borg skins
+        /*
         _menu.ConfirmedBorgType += (prototype, subtype) => SendPredictedMessage(new BorgSelectTypeMessage(prototype, subtype));
+        */
+        _menu.ConfirmedBorgType += prototype => SendPredictedMessage(new BorgSelectTypeMessage(prototype));
+        // MAID END no borg skins
     }
 }

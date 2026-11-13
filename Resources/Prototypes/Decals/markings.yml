@@ -87,7 +87,7 @@
   id: Caution
   tags: ["station", "markings"]
   sprite:
-    sprite: Decals/markings.rsi
+    sprite: _Maid/Decals/caution.rsi #Maid
     state: caution
 
 - type: decal
@@ -95,7 +95,7 @@
   tags: ["station", "markings"]
   defaultCustomColor: true
   sprite:
-    sprite: Decals/markings.rsi
+    sprite: _Maid/Decals/caution.rsi #Maid
     state: caution_greyscale
 
 - type: decal

@@ -12,8 +12,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                Title="{Loc 'atmos-alerts-window-title'}"
                Resizable="False"
-               SetSize="1120 750"
-               MinSize="1120 750">
+               SetSize="1200 750"
+               MinSize="1200 750">
     <BoxContainer Orientation="Vertical">
         <!-- Main display -->
         <BoxContainer Orientation="Horizontal" VerticalExpand="True" HorizontalExpand="True">
@@ -65,7 +65,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             </BoxContainer>
 
             <!-- Atmosphere status -->
-            <BoxContainer Orientation="Vertical" VerticalExpand="True" SetWidth="440" Margin="0 0 10 10">
+            <BoxContainer Orientation="Vertical" VerticalExpand="True" SetWidth="500" Margin="0 0 10 10">
 
                 <!-- Station name -->
                 <controls:StripeBack>

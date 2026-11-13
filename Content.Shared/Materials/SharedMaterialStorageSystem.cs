@@ -209,6 +209,11 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
         if (!Resolve(entity, ref entity.Comp))
             return false;
 
+        // MAID BEGIN lathe batch queue
+        if (!CanTakeVolume(entity, materials.Values.Sum(), entity.Comp))
+            return false;
+        // MAID END lathe batch queue
+
         foreach (var (material, amount) in materials)
         {
             if (!CanChangeMaterialAmount(entity, material, amount, entity.Comp))
@@ -269,6 +274,13 @@ public abstract class SharedMaterialStorageSystem : EntitySystem
             Dirty(uid, component);
         return true;
     }
+
+    // MAID BEGIN rt-update ProtoId overload
+    public bool TryChangeMaterialAmount(Entity<MaterialStorageComponent?> entity, Dictionary<ProtoId<MaterialPrototype>, int> materials)
+    {
+        return TryChangeMaterialAmount(entity, materials.ToDictionary(p => p.Key.Id, p => p.Value));
+    }
+    // MAID END rt-update ProtoId overload
 
     /// <summary>
     /// Changes the amount of a specific material in the storage.
