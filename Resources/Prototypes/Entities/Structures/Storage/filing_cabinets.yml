@@ -163,7 +163,7 @@
     state: chestdrawer
     layers:
     - state: chestdrawer-open
-    - state: chestdrawer-open
+    - state: chestdrawer-open #MAID EDIT
       map: ["openLayer"]
   - type: Fixtures
     fixtures:

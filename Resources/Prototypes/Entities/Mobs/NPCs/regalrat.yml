@@ -367,7 +367,6 @@
   id: MobRatServant
   parent: [ SimpleMobBase, MobCombat ]
   description: He's da mini rat. He don't make da roolz.
-  suffix: Сломан ИИ
   components:
   - type: AdaptiveScoreStatic
     combatScore: 0.5
@@ -430,7 +429,7 @@
         state: rat-moving
     noMovementLayers:
       movement:
-        state: rat-moving
+        state: rat-moving #MAID EDIT
   - type: Physics
     bodyType: KinematicController
   - type: Fixtures

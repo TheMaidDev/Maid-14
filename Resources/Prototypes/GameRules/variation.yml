@@ -50,8 +50,8 @@
   parent: BaseVariationPass
   components:
   - type: EntitySpawnVariationPass
-    tilesPerEntityAverage: 210
-    tilesPerEntityStdDev: 24
+    tilesPerEntityAverage: 210 #MAID EDIT
+    tilesPerEntityStdDev: 24 #MAID EDIT
     entities:
     - id: RandomSpawner
 
@@ -60,8 +60,8 @@
   parent: BaseVariationPass
   components:
   - type: EntitySpawnVariationPass
-    tilesPerEntityAverage: 1000000
-    tilesPerEntityStdDev: 0
+    tilesPerEntityAverage: 1000000 #MAID EDIT
+    tilesPerEntityStdDev: 0 #MAID EDIT
     entities:
     - id: DecalSpawnerDirtWide
 
@@ -70,8 +70,8 @@
   parent: BaseVariationPass
   components:
   - type: EntitySpawnVariationPass
-    tilesPerEntityAverage: 1000000
-    tilesPerEntityStdDev: 0
+    tilesPerEntityAverage: 1000000 #MAID EDIT
+    tilesPerEntityStdDev: 0 #MAID EDIT
     entities:
     - id: DecalSpawnerGraffiti
 
@@ -80,8 +80,8 @@
   parent: BaseVariationPass
   components:
   - type: EntitySpawnVariationPass
-    tilesPerEntityAverage: 1000000
-    tilesPerEntityStdDev: 0
+    tilesPerEntityAverage: 1000000 #MAID EDIT
+    tilesPerEntityStdDev: 0 #MAID EDIT
     entities:
     - id: DecalSpawnerBurns
 
@@ -149,8 +149,8 @@
   parent: BaseVariationPass
   components:
   - type: PuddleMessVariationPass
-    tilesPerSpillAverage: 2400 # MAID halve puddles
-    tilesPerSpillStdDev: 200 # MAID halve puddles
+    tilesPerSpillAverage: 2400 #MAID EDIT
+    tilesPerSpillStdDev: 200 #MAID EDIT
     randomPuddleSolutionFill: RandomFillTrashPuddle
 
 - type: entity
@@ -158,8 +158,8 @@
   parent: BaseVariationPass
   components:
   - type: PuddleMessVariationPass
-    tilesPerSpillAverage: 600 # MAID halve puddles
-    tilesPerSpillStdDev: 40 # MAID halve puddles
+    tilesPerSpillAverage: 600 #MAID EDIT
+    tilesPerSpillStdDev: 40 #MAID EDIT
     randomPuddleSolutionFill: RandomFillTrashPuddleBloodbath
 
 - type: entity

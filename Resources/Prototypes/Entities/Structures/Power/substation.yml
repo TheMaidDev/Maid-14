@@ -187,8 +187,8 @@
     startingCharge: 0
   - type: PointLight
     radius: 1.5
-    energy: 1.6
-    color: "#3db83b"
+    energy: 1.6 #MAID EDIT
+    color: "#3db83b" #MAID EDIT
     castShadows: false
   - type: PowerMonitoringDevice
     sprite: _Maid/Structures/Power/substation.rsi # Maid

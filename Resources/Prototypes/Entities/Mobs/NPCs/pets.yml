@@ -966,7 +966,7 @@
         state: hamster-moving-0
     noMovementLayers:
       movement:
-        state: hamster-moving-0
+        state: hamster-moving-0 #MAID EDIT
   - type: GhostRole
     makeSentient: true
     allowSpeech: true
@@ -1044,7 +1044,7 @@
         state: shiva-moving
     noMovementLayers:
       movement:
-        state: shiva-moving
+        state: shiva-moving #MAID EDIT
   - type: HTN
     rootTask:
       task: SimpleHostileCompound
