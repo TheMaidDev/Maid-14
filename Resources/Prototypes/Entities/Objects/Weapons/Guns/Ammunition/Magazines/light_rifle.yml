@@ -102,7 +102,7 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
-    - state: stripe
+    - state: stripe # Maid changes start
       color: "#990000"
   - type: Item
     inhandVisuals:
@@ -113,7 +113,7 @@
       right:
       - state: inhand-right-mag
       - state: inhand-right-stripe
-        color: "#990000"
+        color: "#990000"  # Maid changes end
 
 - type: entity
   id: MagazineLightRifleEmpty

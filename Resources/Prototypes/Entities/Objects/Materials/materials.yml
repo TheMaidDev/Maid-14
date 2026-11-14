@@ -517,7 +517,7 @@
     baseLayer: diamond
     layerStates:
     - diamond
-    # - diamond_2
+    - diamond_2
     # - diamond_3
   # Goobstation - Custom stack splitting dialog
   - type: UserInterface
