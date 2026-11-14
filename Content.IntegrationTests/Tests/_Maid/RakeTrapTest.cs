@@ -30,18 +30,35 @@ public sealed class RakeTrapTest : MovementTest
     }
 
     /// <summary>
-    ///     Using the rake in hand drops it, armed, on the tile in front of the player.
+    ///     Puts the rake in hand, wields it (the first use-in-hand is the two-hand grip),
+    ///     then uses it again to deploy it armed on the tile in front of the player.
+    /// </summary>
+    private async Task<EntityUid> DeployRake()
+    {
+        var rake = await PlaceInHands("Rake");
+        await FaceEast();
+        await UseInHand(); // wield
+        await RunSeconds(1.1f); // UseDelay started by wielding
+        await UseInHand(); // deploy
+        return rake;
+    }
+
+    /// <summary>
+    ///     Using the wielded rake in hand drops it, armed, on the tile in front of the player,
+    ///     facing away from them.
     /// </summary>
     [Test]
     public async Task DeployRakeTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
 
         Assert.That(HandSys.TryGetActiveItem((ToServer(Player), Hands), out _), Is.False,
             "Rake was not dropped from the hand");
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
+
+        // The rake copies the player's facing: the directional sprite points the head away.
+        Assert.That(Xform(rake).LocalRotation.Theta, Is.EqualTo(Xform(Player).LocalRotation.Theta).Within(0.01),
+            "Deployed rake does not face away from the installer");
 
         // The rake should be on the tile in front of the player (east).
         var delta = Xform(rake).Coordinates.Position - Xform(Player).Coordinates.Position;
@@ -55,9 +72,7 @@ public sealed class RakeTrapTest : MovementTest
     [Test]
     public async Task DeployerStepsOnOwnRakeTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
         // Walk over the rake tile: the installer must not set their own trap off.
@@ -74,9 +89,7 @@ public sealed class RakeTrapTest : MovementTest
     [Test]
     public async Task InstallerStepsOnOwnRakeAfterGraceTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
         // Shrink the grace window so the test doesn't have to wait it out.
@@ -97,9 +110,7 @@ public sealed class RakeTrapTest : MovementTest
     [Test]
     public async Task IpcSteppingOnRakeTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
         var ipc = await SpawnEntity("MobIPC", Xform(rake).Coordinates);
@@ -115,9 +126,7 @@ public sealed class RakeTrapTest : MovementTest
     [Test]
     public async Task NonHumanMobDoesNotTriggerTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
         // A mouse stepping onto the rake tile must not set it off.
@@ -135,9 +144,7 @@ public sealed class RakeTrapTest : MovementTest
     [Test]
     public async Task SteppingOnRakeTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
         // A victim (not the installer) steps onto the rake tile.
@@ -166,9 +173,7 @@ public sealed class RakeTrapTest : MovementTest
     [Test]
     public async Task DisarmArmedRakeTest()
     {
-        var rake = await PlaceInHands("Rake");
-        await FaceEast();
-        await UseInHand();
+        var rake = await DeployRake();
         var rakeUid = ToServer(rake);
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 

@@ -98,6 +98,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
         _transform.SetCoordinates(ent, coords);
 
+        // Face the rake away from the user: the 4-directional placed sprite picks the frame
+        // from entity rotation, so copying the user's facing points the head away from them.
+        _transform.SetLocalRotation(ent, xform.LocalRotation);
+
         ent.Comp.Armed = true;
         ent.Comp.Installer = user;
         ent.Comp.DeployedAt = _timing.CurTime;

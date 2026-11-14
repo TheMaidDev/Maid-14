@@ -7,6 +7,7 @@ using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
 using Content.Shared.StepTrigger.Systems;
 using Content.Shared.Timing;
+using Content.Shared.Wieldable.Components;
 
 namespace Content.Shared._Maid.RakeTrap;
 
@@ -83,9 +84,19 @@ public abstract class SharedRakeTrapSystem : EntitySystem
         args.Cancel();
     }
 
-    /// <summary>Using the rake in hand deploys it, armed, on the tile in front of the user.</summary>
+    /// <summary>
+    ///     Using the rake in hand deploys it, armed, on the tile in front of the user — but only
+    ///     while wielded: unwielded use-in-hand is left to WieldableSystem (two-hand grip first),
+    ///     and an already-handled use is not redeployed.
+    /// </summary>
     private void OnUseInHand(Entity<RakeTrapComponent> ent, ref UseInHandEvent args)
     {
+        if (args.Handled)
+            return;
+
+        if (TryComp<WieldableComponent>(ent, out var wieldable) && !wieldable.Wielded)
+            return;
+
         if (IsMindIgnored(args.User))
             return;
 

@@ -11,16 +11,28 @@
       "name": "rake"
     },
     {
-      "name": "rake_armed"
+      "name": "rake_armed",
+      "directions": 4
     },
     {
-      "name": "rake_hit"
+      "name": "rake_hit",
+      "directions": 4
     },
     {
-      "name": "inhand-left"
+      "name": "inhand-left",
+      "directions": 4
     },
     {
-      "name": "inhand-right"
+      "name": "inhand-right",
+      "directions": 4
+    },
+    {
+      "name": "wielded-inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "wielded-inhand-right",
+      "directions": 4
     }
   ]
 }
