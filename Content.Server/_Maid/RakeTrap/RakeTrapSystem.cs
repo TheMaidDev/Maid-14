@@ -72,6 +72,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         _transform.SetCoordinates(ent, coords);
 
         ent.Comp.Armed = true;
+        Dirty(ent, ent.Comp);
         _audio.PlayPvs(ent.Comp.DeploySound, ent);
         _popup.PopupEntity(Loc.GetString("rake-deployed"), ent, user);
     }
@@ -99,6 +100,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
         ent.Comp.Armed = false;
         ent.Comp.HitAt = null;
+        Dirty(ent, ent.Comp);
         _audio.PlayPvs(ent.Comp.DisarmSound, ent);
         _popup.PopupEntity(Loc.GetString("rake-disarmed"), ent, args.User);
     }
@@ -111,6 +113,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         // Disarm immediately so nothing else can set it off.
         ent.Comp.Armed = false;
         ent.Comp.HitAt = _timing.CurTime;
+        Dirty(ent, ent.Comp);
 
         Whack(ent.Owner, args.Tripper);
     }
@@ -141,10 +144,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
                 RemComp<RakeMuffledComponent>(victim);
         });
 
-        // Screen daze on the victim's client: impact flash + dizzy wobble overlay.
+        // Screen daze on the victim's client: impact flash + dizzy wobble, then tunnel vision.
         var dazed = EnsureComp<RakeDazedComponent>(victim);
         dazed.HitAt = _timing.CurTime;
-        Timer.Spawn(dazed.Duration, () =>
+        Timer.Spawn(dazed.Duration + dazed.TunnelTime, () =>
         {
             if (!TerminatingOrDeleted(victim))
                 RemComp<RakeDazedComponent>(victim);
@@ -183,7 +186,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         Timer.Spawn(comp.ResetVisualTime, () =>
         {
             if (TryComp<RakeTrapComponent>(rake, out var c))
+            {
                 c.HitAt = null;
+                Dirty(rake, c);
+            }
         });
     }
 

@@ -16,7 +16,6 @@
     intersectRatio: 0.2
     requiredTriggeredSpeed: 0
     stepOn: true
-  - type: PreventableStepTrigger
   - type: RakeTrap
   - type: UseDelay
   - type: Physics

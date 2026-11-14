@@ -1,5 +1,6 @@
 using Content.Shared.Examine;
 using Content.Shared.Ghost;
+using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
@@ -21,6 +22,7 @@ public abstract class SharedRakeTrapSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<RakeTrapComponent, UseInHandEvent>(OnUseInHand);
+        SubscribeLocalEvent<RakeTrapComponent, InteractHandEvent>(OnInteractHand, before: [typeof(SharedItemSystem)]);
         SubscribeLocalEvent<RakeTrapComponent, StepTriggerAttemptEvent>(OnStepTriggerAttempt);
         SubscribeLocalEvent<RakeTrapComponent, GettingPickedUpAttemptEvent>(OnGettingPickedUp);
         SubscribeLocalEvent<RakeTrapComponent, ExamineAttemptEvent>(OnExamineAttempt);
@@ -39,8 +41,25 @@ public abstract class SharedRakeTrapSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Clicking an armed rake never picks it up — the click starts a disarm instead.
-    ///     Picking an unarmed rake up works normally.
+    ///     Clicking an armed rake starts a disarm instead of a pickup. Intercepted before
+    ///     SharedItemSystem so the pickup is never attempted (no client prediction rollback).
+    /// </summary>
+    private void OnInteractHand(Entity<RakeTrapComponent> ent, ref InteractHandEvent args)
+    {
+        if (!ent.Comp.Armed)
+            return;
+
+        args.Handled = true;
+
+        if (IsMindIgnored(args.User))
+            return;
+
+        OnArmedClicked(ent, args.User);
+    }
+
+    /// <summary>
+    ///     Backstop for pickup routes that bypass the click (storage, verbs): an armed rake
+    ///     can never be picked up. Picking an unarmed rake up works normally.
     /// </summary>
     private void OnGettingPickedUp(Entity<RakeTrapComponent> ent, ref GettingPickedUpAttemptEvent args)
     {
@@ -48,7 +67,6 @@ public abstract class SharedRakeTrapSystem : EntitySystem
             return;
 
         args.Cancel();
-        OnArmedClicked(ent, args.User);
     }
 
     /// <summary>Using the rake in hand deploys it, armed, on the tile in front of the user.</summary>

@@ -5,6 +5,7 @@ using Content.IntegrationTests.Tests.Movement;
 using Content.Shared._Maid.RakeTrap;
 using Content.Shared.Damage;
 using Content.Shared.Examine;
+using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Stunnable;
 using Robust.Shared.GameObjects;
@@ -90,18 +91,21 @@ public sealed class RakeTrapTest : MovementTest
         var rakeUid = ToServer(rake);
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
-        // A pickup attempt (a click) on the armed rake gets cancelled and starts the disarm.
-        var ev = new GettingPickedUpAttemptEvent(ToServer(Player), rakeUid);
+        // A click (InteractHand) on the armed rake is intercepted before the pickup
+        // attempt: handled, no pickup, disarm starts.
+        var ev = new InteractHandEvent(ToServer(Player), rakeUid);
         await Server.WaitPost(() => SEntMan.EventBus.RaiseLocalEvent(rakeUid, ev));
         await RunTicks(5);
-        Assert.That(ev.Cancelled, Is.True, "Picking up an armed rake should be blocked");
+        Assert.That(ev.Handled, Is.True, "Click on an armed rake should be handled");
+        Assert.That(HandSys.IsHolding((ToServer(Player), Hands), rakeUid, out _), Is.False,
+            "Armed rake should never end up in a hand");
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Armed rake should not disarm instantly");
 
         // The disarm doafter takes 2 seconds.
         await RunSeconds(2.5f);
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "Rake was not disarmed by the click");
 
-        // Once disarmed, a pickup attempt is not blocked anymore.
+        // Once disarmed, a pickup attempt is not blocked anymore (backstop path).
         var ev2 = new GettingPickedUpAttemptEvent(ToServer(Player), rakeUid);
         await Server.WaitPost(() => SEntMan.EventBus.RaiseLocalEvent(rakeUid, ev2));
         await RunTicks(5);

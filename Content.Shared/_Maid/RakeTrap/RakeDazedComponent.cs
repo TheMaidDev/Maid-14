@@ -15,7 +15,14 @@ public sealed partial class RakeDazedComponent : Component
     [DataField, AutoNetworkedField]
     public TimeSpan? HitAt;
 
-    /// <summary>How long the screen daze lasts.</summary>
+    /// <summary>How long the impact flash + dizzy wobble phase lasts.</summary>
     [DataField, AutoNetworkedField]
     public TimeSpan Duration = TimeSpan.FromSeconds(1.5);
+
+    /// <summary>
+    ///     How long the tunnel-vision phase (dark screen, clear circle in the middle opening up)
+    ///     lasts after the wobble phase. The component is removed after Duration + TunnelTime.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public TimeSpan TunnelTime = TimeSpan.FromSeconds(4);
 }
