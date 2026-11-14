@@ -781,20 +781,24 @@
   description: A blue cap surgeons wear during operations. Keeps their hair from tickling your internal organs.
   components:
   - type: Sprite
-    sprite: Clothing/Head/Hats/surgcap_blue.rsi
+    sprite: _Maid/Clothing/Head/Hats/surgcap_blue.rsi #Maid changes
   - type: Clothing
-    sprite: Clothing/Head/Hats/surgcap_blue.rsi
+    sprite: _Maid/Clothing/Head/Hats/surgcap_blue.rsi #Maid changes
   - type: Tag
     tags:
     - ClothMade
     - Recyclable
     - HamsterWearable
     - WhitelistChameleon
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop : HEAD
-      HeadSide : HEAD
+    layers: { HeadTop: HEAD }
 
 - type: entity
   parent: ClothingHeadBase
@@ -803,14 +807,18 @@
   description: A green cap surgeons wear during operations. Keeps their hair from tickling your internal organs.
   components:
   - type: Sprite
-    sprite: Clothing/Head/Hats/surgcap_green.rsi
+    sprite: _Maid/Clothing/Head/Hats/surgcap_green.rsi #Maid changes
   - type: Clothing
-    sprite: Clothing/Head/Hats/surgcap_green.rsi
+    sprite: _Maid/Clothing/Head/Hats/surgcap_green.rsi #Maid changes
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop : HEAD
-      HeadSide : HEAD
+    layers: { HeadTop: HEAD }
 
 - type: entity
   parent: ClothingHeadBase
@@ -819,14 +827,18 @@
   description: A purple cap surgeons wear during operations. Keeps their hair from tickling your internal organs.
   components:
   - type: Sprite
-    sprite: Clothing/Head/Hats/surgcap_purple.rsi
+    sprite: _Maid/Clothing/Head/Hats/surgcap_purple.rsi #Maid changes
   - type: Clothing
-    sprite: Clothing/Head/Hats/surgcap_purple.rsi
+    sprite: _Maid/Clothing/Head/Hats/surgcap_purple.rsi #Maid changes
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop : HEAD
-      HeadSide : HEAD
+    layers: { HeadTop: HEAD }
 
 - type: entity
   parent: ClothingHeadBase

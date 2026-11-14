@@ -114,11 +114,15 @@
         Slash: 0.9
         Piercing: 0.9
         Heat: 0.9
+  - type: Foldable
+    canFoldInsideContainer: true
+  - type: FoldableClothing
+    foldedHideLayers:
+    - Hair
+    - HeadTop
+    unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers:
-      Hair: HEAD
-      HeadTop: HEAD
-      HeadSide: HEAD
+    layers: { HeadTop: HEAD }
 
 - type: entity
   parent: ClothingHeadHatHardhatBase

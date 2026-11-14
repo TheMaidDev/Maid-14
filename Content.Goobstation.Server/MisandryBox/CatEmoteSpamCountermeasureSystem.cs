@@ -56,8 +56,8 @@ public sealed class CatEmoteSpamCountermeasureSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<SpeechComponent, EmoteEvent>(OnEmoteEvent);
-        SubscribeLocalEvent<SpeechComponent, EmoteSoundPitchShiftEvent>(OnGetPitchShiftEvent);
+        SubscribeLocalEvent<SpeechComponent, EmoteEvent>(OnEmoteEvent); // Off for Maid
+        SubscribeLocalEvent<SpeechComponent, EmoteSoundPitchShiftEvent>(OnGetPitchShiftEvent); // Off for Maid
     }
 
     private void OnGetPitchShiftEvent(Entity<SpeechComponent> ent, ref EmoteSoundPitchShiftEvent ev)
