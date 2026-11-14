@@ -15,6 +15,7 @@ using Content.Shared.Physics;
 using Content.Shared.StepTrigger.Systems;
 using Content.Shared.Stunnable;
 using Content.Server.Chat.Systems;
+using Content.Shared.Timing;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -42,6 +43,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedContentEyeSystem _eye = default!;
+    [Dependency] private readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -80,6 +82,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
     protected override void OnDeployTry(Entity<RakeTrapComponent> ent, EntityUid user)
     {
+        // Deploy cooldown, moved here from the removed use-in-hand handler.
+        if (!_useDelay.TryResetDelay(ent.Owner, checkDelayed: true))
+            return;
+
         var xform = Transform(user);
 
         // The tile in front of the user (mime invisible-wall pattern).

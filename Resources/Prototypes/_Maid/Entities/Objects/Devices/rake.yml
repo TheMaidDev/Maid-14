@@ -23,7 +23,7 @@
       types:
         Blunt: 12
     soundHit:
-      collection: WoodDestroyHeavy
+      collection: MetalThud # blunt thud like the other wooden melee weapons (bat, shovel)
   - type: Wieldable
     unwieldOnUse: false # use-in-hand wields first; a second use deploys the trap
   - type: IncreaseDamageOnWield

@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.IntegrationTests.Tests.Interaction;
 using Content.IntegrationTests.Tests.Movement;
@@ -8,7 +9,9 @@ using Content.Shared.Examine;
 using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Stunnable;
+using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Localization;
 using Robust.Shared.Maths;
 
 namespace Content.IntegrationTests.Tests._Maid;
@@ -30,17 +33,33 @@ public sealed class RakeTrapTest : MovementTest
     }
 
     /// <summary>
-    ///     Puts the rake in hand, wields it (the first use-in-hand is the two-hand grip),
-    ///     then uses it again to deploy it armed on the tile in front of the player.
+    ///     Puts the rake in hand and deploys it armed on the tile in front of the player
+    ///     through its right-click deploy verb.
     /// </summary>
-    private async Task<EntityUid> DeployRake()
+    private async Task<NetEntity> DeployRake()
     {
         var rake = await PlaceInHands("Rake");
         await FaceEast();
-        await UseInHand(); // wield
-        await RunSeconds(1.1f); // UseDelay started by wielding
-        await UseInHand(); // deploy
+        await ExecuteDeployVerb(rake);
         return rake;
+    }
+
+    /// <summary>
+    ///     Finds the deploy verb on the held rake and executes it server-side, like the
+    ///     right-click verb menu would.
+    /// </summary>
+    private async Task ExecuteDeployVerb(NetEntity rake)
+    {
+        var rakeUid = ToServer(rake);
+        await Server.WaitPost(() =>
+        {
+            var verbSystem = SEntMan.System<SharedVerbSystem>();
+            var verbs = verbSystem.GetLocalVerbs(rakeUid, ToServer(Player), typeof(InteractionVerb));
+            var deploy = verbs.FirstOrDefault(v => v.Text == Loc.GetString("rake-deploy-verb"));
+            Assert.That(deploy, Is.Not.Null, "The held rake has no deploy verb");
+            verbSystem.ExecuteVerb(deploy!, ToServer(Player), rakeUid);
+        });
+        await RunTicks(5);
     }
 
     /// <summary>
@@ -59,6 +78,11 @@ public sealed class RakeTrapTest : MovementTest
         // The rake copies the player's facing: the directional sprite points the head away.
         Assert.That(Xform(rake).LocalRotation.Theta, Is.EqualTo(Xform(Player).LocalRotation.Theta).Within(0.01),
             "Deployed rake does not face away from the installer");
+
+        // The deployed trap is hidden: no examine for anyone.
+        var examine = new ExamineAttemptEvent(ToServer(Player));
+        await Server.WaitPost(() => SEntMan.EventBus.RaiseLocalEvent(ToServer(rake), examine));
+        Assert.That(examine.Cancelled, Is.True, "Deployed trap should not be examinable");
 
         // The rake should be on the tile in front of the player (east).
         var delta = Xform(rake).Coordinates.Position - Xform(Player).Coordinates.Position;
@@ -208,10 +232,10 @@ public sealed class RakeTrapTest : MovementTest
         var rakeUid = ToServer(rake);
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "Freshly spawned rake should be unarmed");
 
-        // Examine is hidden even for an unarmed rake.
+        // The unarmed item examines normally (stats and description).
         var ev = new ExamineAttemptEvent(ToServer(Player));
         await Server.WaitPost(() => SEntMan.EventBus.RaiseLocalEvent(rakeUid, ev));
-        Assert.That(ev.Cancelled, Is.True, "Rake should not be examinable");
+        Assert.That(ev.Cancelled, Is.False, "Unarmed rake should be examinable");
 
         await Move(DirectionFlag.East, 1.5f);
         await RunSeconds(1f);

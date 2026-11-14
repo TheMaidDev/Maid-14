@@ -1,29 +1,29 @@
 using Content.Shared.Examine;
 using Content.Shared.Ghost;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
-using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
 using Content.Shared.StepTrigger.Systems;
-using Content.Shared.Timing;
-using Content.Shared.Wieldable.Components;
+using Content.Shared.Verbs;
 
 namespace Content.Shared._Maid.RakeTrap;
 
 /// <summary>
-///     Shared logic for the rake trap: gates the step trigger on the armed state, hides it
-///     from examine and turns clicks on an armed trap into disarm attempts (pickup is blocked).
+///     Shared logic for the rake trap: gates the step trigger on the armed state, hides the
+///     deployed trap from examine and hover outline, turns clicks on an armed trap into disarm
+///     attempts (pickup is blocked), and deploys the held rake via a right-click verb.
 /// </summary>
 public abstract class SharedRakeTrapSystem : EntitySystem
 {
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<RakeTrapComponent, UseInHandEvent>(OnUseInHand);
+        SubscribeLocalEvent<RakeTrapComponent, GetVerbsEvent<InteractionVerb>>(OnGetVerbs);
         SubscribeLocalEvent<RakeTrapComponent, InteractHandEvent>(OnInteractHand, before: [typeof(SharedItemSystem)]);
         SubscribeLocalEvent<RakeTrapComponent, StepTriggerAttemptEvent>(OnStepTriggerAttempt);
         SubscribeLocalEvent<RakeTrapComponent, GettingPickedUpAttemptEvent>(OnGettingPickedUp);
@@ -49,10 +49,31 @@ public abstract class SharedRakeTrapSystem : EntitySystem
         return HasComp<HumanoidAppearanceComponent>(uid);
     }
 
-    /// <summary>The trap is hidden: no examine text for anyone.</summary>
+    /// <summary>
+    ///     Deploying the rake is a right-click verb on the held item: use-in-hand belongs to
+    ///     wielding (the rake is also a weapon). The act runs server-side via ExecuteVerb.
+    /// </summary>
+    private void OnGetVerbs(Entity<RakeTrapComponent> ent, ref GetVerbsEvent<InteractionVerb> args)
+    {
+        if (args.Hands == null || !args.CanAccess || !args.CanInteract)
+            return;
+
+        if (!_hands.IsHolding((args.User, args.Hands), ent, out _))
+            return;
+
+        var user = args.User;
+        args.Verbs.Add(new InteractionVerb
+        {
+            Text = Loc.GetString("rake-deploy-verb"),
+            Act = () => OnDeployTry(ent, user),
+        });
+    }
+
+    /// <summary>The deployed trap is hidden: no examine for anyone. The item itself examines normally.</summary>
     private void OnExamineAttempt(Entity<RakeTrapComponent> ent, ref ExamineAttemptEvent args)
     {
-        args.Cancel();
+        if (ent.Comp.Armed)
+            args.Cancel();
     }
 
     /// <summary>
@@ -82,29 +103,6 @@ public abstract class SharedRakeTrapSystem : EntitySystem
             return;
 
         args.Cancel();
-    }
-
-    /// <summary>
-    ///     Using the rake in hand deploys it, armed, on the tile in front of the user — but only
-    ///     while wielded: unwielded use-in-hand is left to WieldableSystem (two-hand grip first),
-    ///     and an already-handled use is not redeployed.
-    /// </summary>
-    private void OnUseInHand(Entity<RakeTrapComponent> ent, ref UseInHandEvent args)
-    {
-        if (args.Handled)
-            return;
-
-        if (TryComp<WieldableComponent>(ent, out var wieldable) && !wieldable.Wielded)
-            return;
-
-        if (IsMindIgnored(args.User))
-            return;
-
-        if (!_useDelay.TryResetDelay(ent.Owner, checkDelayed: true))
-            return;
-
-        args.Handled = true;
-        OnDeployTry(ent, args.User);
     }
 
     /// <summary>Ghosts and observers can neither deploy nor disarm the trap (wizard-traps pattern).</summary>

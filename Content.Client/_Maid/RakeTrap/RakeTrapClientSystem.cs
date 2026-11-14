@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Client.Interactable.Components;
 using Content.Shared._Maid.RakeTrap;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
@@ -42,6 +43,13 @@ public sealed class RakeTrapClientSystem : SharedRakeTrapSystem
                 ? "rake_armed"
                 : "rake";
         sprite.LayerSetState(0, state);
+
+        // The deployed trap must not glow on hover: drop the interaction outline while armed
+        // (StealthSystem pattern), restore it once the rake is a normal item again.
+        if (ent.Comp.Armed)
+            RemCompDeferred<InteractionOutlineComponent>(ent);
+        else
+            EnsureComp<InteractionOutlineComponent>(ent);
     }
 
     private void PlayWhack(Entity<RakeTrapComponent> ent)
