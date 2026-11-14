@@ -92,7 +92,25 @@ public sealed class RakeTrapTest : MovementTest
     }
 
     /// <summary>
-    ///     Mobs that are not MobHuman-likes (mice, pets, borgs) step over the rake harmlessly.
+    ///     An IPC stepping onto the rake sets it off like a human does (HumanoidAppearance check).
+    /// </summary>
+    [Test]
+    public async Task IpcSteppingOnRakeTest()
+    {
+        var rake = await PlaceInHands("Rake");
+        await FaceEast();
+        await UseInHand();
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
+
+        var ipc = await SpawnEntity("MobIPC", Xform(rake).Coordinates);
+        await RunSeconds(1.5f);
+
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "IPC did not trigger the rake");
+        Assert.That(SEntMan.HasComponent<KnockedDownComponent>(ipc), Is.True, "IPC was not knocked down by the rake");
+    }
+
+    /// <summary>
+    ///     Mobs that are not humanoids (mice, pets, borgs) step over the rake harmlessly.
     /// </summary>
     [Test]
     public async Task NonHumanMobDoesNotTriggerTest()

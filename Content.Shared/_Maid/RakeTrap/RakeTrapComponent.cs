@@ -7,9 +7,9 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Maid.RakeTrap;
 
 /// <summary>
-///     A rake trap. Deployed on the tile in front of the user; while armed, any MobHuman-like
-///     that steps on it gets whacked in the head, after which the rake disarms itself until
-///     deployed again.
+///     A rake trap. Deployed on the tile in front of the user; while armed, any humanoid
+///     (HumanoidAppearanceComponent: humans, IPCs and the other species) that steps on it
+///     gets whacked in the head, after which the rake disarms itself until deployed again.
 /// </summary>
 [RegisterComponent]
 [NetworkedComponent, AutoGenerateComponentState(true)]
@@ -18,13 +18,6 @@ public sealed partial class RakeTrapComponent : Component
     /// <summary>Whether the trap is set and can trigger.</summary>
     [ViewVariables, AutoNetworkedField]
     public bool Armed;
-
-    /// <summary>
-    ///     Only entities with this entity prototype in their inheritance chain can set the trap
-    ///     off (MobHuman and everything deriving from it). Null lets any mob trigger it.
-    /// </summary>
-    [DataField]
-    public string? TriggerPrototype = "MobHuman";
 
     /// <summary>
     ///     Who deployed this rake, server-side only: during the grace window after deploying

@@ -1,13 +1,12 @@
 using Content.Shared.Examine;
 using Content.Shared.Ghost;
+using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
 using Content.Shared.StepTrigger.Systems;
 using Content.Shared.Timing;
-using Robust.Shared.GameObjects;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Maid.RakeTrap;
 
@@ -18,7 +17,6 @@ namespace Content.Shared._Maid.RakeTrap;
 public abstract class SharedRakeTrapSystem : EntitySystem
 {
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public override void Initialize()
     {
@@ -32,45 +30,22 @@ public abstract class SharedRakeTrapSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Only armed rakes can trigger, and only MobHuman-likes can set them off — furniture,
+    ///     Only armed rakes can trigger, and only humanoids can set them off — furniture,
     ///     items or other mobs must not. Installer immunity is checked server-side only.
     /// </summary>
     private void OnStepTriggerAttempt(Entity<RakeTrapComponent> ent, ref StepTriggerAttemptEvent args)
     {
-        args.Continue |= ent.Comp.Armed && IsTriggerTarget(ent.Comp, args.Tripper);
+        args.Continue |= ent.Comp.Armed && IsTriggerTarget(args.Tripper);
     }
 
     /// <summary>
-    ///     Whether this entity can set the trap off at all: the configured trigger prototype
-    ///     and everything inheriting from it (any mob when no prototype is configured).
+    ///     Whether this entity can set the trap off at all: any humanoid
+    ///     (HumanoidAppearanceComponent — humans, IPCs and the other species).
+    ///     Mice, pets and borgs must not.
     /// </summary>
-    protected bool IsTriggerTarget(RakeTrapComponent comp, EntityUid uid)
+    protected bool IsTriggerTarget(EntityUid uid)
     {
-        if (comp.TriggerPrototype is not { } baseId)
-            return HasComp<MobStateComponent>(uid);
-
-        if (!TryComp<MetaDataComponent>(uid, out var meta) || meta.EntityPrototype is not { } proto)
-            return false;
-
-        return PrototypeInheritsFrom(proto, baseId);
-    }
-
-    /// <summary>Walks the (possibly multi-parent) prototype inheritance chain up to the base prototype.</summary>
-    private bool PrototypeInheritsFrom(EntityPrototype proto, string baseId)
-    {
-        if (proto.ID == baseId)
-            return true;
-
-        if (proto.Parents == null)
-            return false;
-
-        foreach (var parent in proto.Parents)
-        {
-            if (_proto.TryIndex<EntityPrototype>(parent, out var parentProto) && PrototypeInheritsFrom(parentProto, baseId))
-                return true;
-        }
-
-        return false;
+        return HasComp<HumanoidAppearanceComponent>(uid);
     }
 
     /// <summary>The trap is hidden: no examine text for anyone.</summary>

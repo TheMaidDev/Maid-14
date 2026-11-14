@@ -63,8 +63,8 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!ent.Comp.Armed || !args.OtherFixture.Hard)
             return;
 
-        // Only MobHuman-likes step on rakes (thrown items and other mobs don't set them off)...
-        if (!IsTriggerTarget(ent.Comp, args.OtherEntity))
+        // Only humanoids step on rakes (thrown items and other mobs don't set them off)...
+        if (!IsTriggerTarget(args.OtherEntity))
             return;
 
         // ...and the installer only walks over their own trap during the grace window.
@@ -141,8 +141,8 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!ent.Comp.Armed)
             return;
 
-        // Only MobHuman-likes step on rakes (furniture/items and other mobs must not disarm it)...
-        if (!IsTriggerTarget(ent.Comp, args.Tripper))
+        // Only humanoids step on rakes (furniture/items and other mobs must not disarm it)...
+        if (!IsTriggerTarget(args.Tripper))
             return;
 
         // ...and the installer only walks over their own trap during the grace window.
