@@ -22,6 +22,7 @@ maid-music-ui-file-ready = File selected ({ $size } MB).
 maid-music-ui-too-big = The file is too big. Maximum is { $max } MB.
 maid-music-ui-sent = Sent for recording.
 maid-music-ui-bad-file = The file is damaged or is not an .ogg (Vorbis) file.
+maid-music-ui-error = Could not read the file.
 maid-music-ui-too-long = The song is too long. Maximum is { $max } s.
 maid-music-ui-too-heavy = The song is too heavy to play. Choose a shorter file or one with a lower sample rate.
 
@@ -39,5 +40,6 @@ maid-music-storage-full = The song storage is full.
 maid-music-recorded = Recorded: { $name }
 maid-music-recorded-stereo = Recorded: { $name }. Stereo audio has no direction, use a mono file for 3D sound.
 maid-music-song-lost = The recording on this cassette is damaged.
+maid-music-recorder-lost = The player disappeared before the song finished uploading.
 
 ui-options-boombox-volume = Boombox volume:

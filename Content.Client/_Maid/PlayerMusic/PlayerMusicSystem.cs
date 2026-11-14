@@ -1,3 +1,4 @@
+using Content.Shared.GameTicking;
 using Content.Shared._Maid.PlayerMusic;
 using Robust.Client.Audio;
 using Robust.Client.Player;
@@ -33,7 +34,28 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// </summary>
     private const int MaxCachedSongs = 3;
 
+    /// <summary>
+    /// Byte budget for the decoded song cache. One long stereo song takes ~46 MB,
+    /// and songs that are currently playing are never evicted, so the count cap alone is not enough.
+    /// </summary>
+    private const long MaxCachedBytes = 128_000_000;
+
     private const int ChunksPerFrame = 4;
+
+    /// <summary>
+    /// Downloads of different songs at the same time are capped: a hostile server must not be able
+    /// to make the client hold an unbounded number of buffers.
+    /// </summary>
+    private const int MaxIncomingDownloads = 3;
+
+    /// <summary>
+    /// Client-side hard limits. The real limits come from the server, but they are replicated cvars,
+    /// so a hostile server could raise them and make clients allocate unbounded memory.
+    /// They are deliberately higher than the default server cvars.
+    /// </summary>
+    private const int HardMaxSongBytes = 8_000_000;
+    private const int HardMaxSongSeconds = 600;
+    private const long HardMaxDecodedBytes = 100_000_000;
 
     /// <summary>
     /// A song that already started playing is dropped only after the player walks this far past the hearing distance.
@@ -53,7 +75,9 @@ public sealed class PlayerMusicSystem : EntitySystem
     private float _userGain = 1f;
 
     private readonly Dictionary<string, AudioResource> _cache = new();
+    private readonly Dictionary<string, long> _cacheSizes = new();
     private readonly Queue<string> _cacheOrder = new();
+    private long _cacheBytes;
     private readonly Dictionary<string, TimeSpan> _requested = new();
     private readonly Dictionary<string, IncomingFile> _incoming = new();
     private readonly HashSet<string> _failed = new();
@@ -88,6 +112,19 @@ public sealed class PlayerMusicSystem : EntitySystem
         SubscribeNetworkEvent<PlayerMusicFileChunkEvent>(OnFileChunk);
         SubscribeLocalEvent<PlayerMusicBoomboxComponent, AfterAutoHandleStateEvent>(OnState);
         SubscribeLocalEvent<PlayerMusicBoomboxComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
+    }
+
+    /// <summary>
+    /// The server forgets all songs on restart, so ids and failure marks from the last round mean nothing now.
+    /// Decoded songs stay cached: their ids are content hashes, they are still valid.
+    /// </summary>
+    private void OnRoundRestart(RoundRestartCleanupEvent ev)
+    {
+        _requested.Clear();
+        _failed.Clear();
+        _incoming.Clear();
+        _outgoing.Clear();
     }
 
     public override void Shutdown()
@@ -109,7 +146,11 @@ public sealed class PlayerMusicSystem : EntitySystem
         }
 
         _cache.Clear();
+        _cacheSizes.Clear();
+        _cacheBytes = 0;
         _cacheOrder.Clear();
+        _requested.Clear();
+        _failed.Clear();
         _incoming.Clear();
         _outgoing.Clear();
         _contentRoot.Clear();
@@ -126,7 +167,7 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnVolumeChanged(float value)
     {
-        _userGain = Math.Max(value, 0f);
+        _userGain = Math.Clamp(value, 0f, 2f);
 
         // Mono sounds are changed here, stereo ones are updated every frame together with the distance fade
         foreach (var (uid, state) in _playing)
@@ -266,8 +307,10 @@ public sealed class PlayerMusicSystem : EntitySystem
             if (!TryComp(uid, out PlayerMusicBoomboxComponent? comp))
                 continue;
 
-            var gain = 1f;
-            if (local != null && Exists(local.Value))
+            var gain = 0f;
+            if (local != null &&
+                Exists(local.Value) &&
+                Transform(uid).MapID == Transform(local.Value).MapID)
             {
                 var distance = (_xform.GetWorldPosition(uid) - _xform.GetWorldPosition(local.Value)).Length();
                 gain = Math.Clamp(1f - distance / comp.MaxDistance, 0f, 1f);
@@ -402,10 +445,8 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (!Exists(audio))
             return;
 
+        // Stop deletes the audio entity
         _audio.Stop(audio);
-
-        if (Exists(audio))
-            QueueDel(audio);
     }
 
     private void RequestFile(EntityUid boombox, string songId)
@@ -425,10 +466,15 @@ public sealed class PlayerMusicSystem : EntitySystem
     private void OnFileStart(PlayerMusicFileStartEvent ev)
     {
         // Only accept what we asked for
-        if (!_requested.ContainsKey(ev.SongId) || _cache.ContainsKey(ev.SongId))
+        if (ev.SongId == null || !_requested.ContainsKey(ev.SongId) || _cache.ContainsKey(ev.SongId))
             return;
 
-        if (ev.TotalBytes <= 0 || ev.TotalBytes > _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes))
+        // Already downloading it, and a few downloads at most
+        if (_incoming.ContainsKey(ev.SongId) || _incoming.Count >= MaxIncomingDownloads)
+            return;
+
+        if (ev.TotalBytes <= 0 ||
+            ev.TotalBytes > Math.Min(HardMaxSongBytes, _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes)))
         {
             Fail(ev.SongId, "unexpected file size");
             return;
@@ -439,10 +485,16 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnFileChunk(PlayerMusicFileChunkEvent ev)
     {
-        if (!_incoming.TryGetValue(ev.SongId, out var file))
+        if (ev.SongId == null || !_incoming.TryGetValue(ev.SongId, out var file))
             return;
 
-        var length = ev.Data.Length;
+        if (ev.Data is not { } data)
+        {
+            _incoming.Remove(ev.SongId);
+            return;
+        }
+
+        var length = data.Length;
 
         // Any inconsistency drops the download, it is requested again by the retry
         if (ev.Index != file.NextIndex ||
@@ -454,7 +506,7 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
-        Array.Copy(ev.Data, 0, file.Buffer, file.Received, length);
+        Array.Copy(data, 0, file.Buffer, file.Received, length);
         file.Received += length;
         file.NextIndex++;
         file.Last = _timing.CurTime;
@@ -468,10 +520,14 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnFileComplete(string songId, byte[] data)
     {
-        // Never give unchecked data to the decoder: it decodes the whole file into memory
+        // Never give unchecked data to the decoder: it decodes the whole file into memory.
+        // The hard limits bound what a hostile server can make the client allocate.
+        var maxSeconds = Math.Min(HardMaxSongSeconds, _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds));
+        var maxDecoded = Math.Min(HardMaxDecodedBytes, (long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes));
+
         if (!PlayerMusicOgg.TryAnalyze(data, out var info) ||
-            info.Seconds > _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds) ||
-            info.DecodedBytes > _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes))
+            info.Seconds > maxSeconds ||
+            info.DecodedBytes > maxDecoded)
         {
             Fail(songId, "file is damaged or too big after decoding");
             return;
@@ -504,6 +560,8 @@ public sealed class PlayerMusicSystem : EntitySystem
         }
 
         _cache[songId] = resource;
+        _cacheSizes[songId] = info.DecodedBytes;
+        _cacheBytes += info.DecodedBytes;
         _cacheOrder.Enqueue(songId);
         _requested.Remove(songId);
         EvictOldSongs();
@@ -531,7 +589,9 @@ public sealed class PlayerMusicSystem : EntitySystem
     private void EvictOldSongs()
     {
         var attempts = _cacheOrder.Count;
-        while (_cache.Count > MaxCachedSongs && attempts-- > 0)
+        while (attempts-- > 0 &&
+               _cacheOrder.Count > 0 &&
+               (_cache.Count > MaxCachedSongs || _cacheBytes > MaxCachedBytes))
         {
             var old = _cacheOrder.Dequeue();
 
@@ -543,7 +603,11 @@ public sealed class PlayerMusicSystem : EntitySystem
 
             // Disposing frees the OpenAL buffer, dropping the reference alone would not
             if (_cache.Remove(old, out var resource))
+            {
+                _cacheBytes -= _cacheSizes.GetValueOrDefault(old);
+                _cacheSizes.Remove(old);
                 resource.AudioStream.Dispose();
+            }
         }
     }
 

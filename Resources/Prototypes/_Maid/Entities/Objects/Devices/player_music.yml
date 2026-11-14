@@ -1,8 +1,6 @@
 - type: entity
   parent: BaseItem
   id: MaidBoombox
-  name: boombox
-  description: A portable cassette player. Put a blank cassette in it to record your own song.
   components:
   - type: Sprite
     sprite: _Maid/Objects/Devices/player_music/boombox.rsi
@@ -43,8 +41,6 @@
 - type: entity
   parent: BaseItem
   id: MaidBlankCassette
-  name: blank cassette
-  description: A cassette tape for the boombox. Can hold one song.
   components:
   - type: Sprite
     sprite: _Maid/Objects/Devices/player_music/cassette.rsi
@@ -57,8 +53,6 @@
 - type: entity
   parent: BaseItem
   id: MaidWalkman
-  name: walkman
-  description: A mini cassette player that clips onto your belt. Quiet, only people nearby can hear it.
   components:
   - type: Sprite
     sprite: _Maid/Objects/Devices/player_music/walkman.rsi

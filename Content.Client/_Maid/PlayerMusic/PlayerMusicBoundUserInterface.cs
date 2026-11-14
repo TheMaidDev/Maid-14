@@ -16,6 +16,14 @@ public sealed class PlayerMusicBoundUserInterface : BoundUserInterface
     {
         base.Open();
 
+        // The engine can queue the open twice when the entity has not been synced to the client yet;
+        // opening twice would create two overlapping windows
+        if (_window != null)
+        {
+            Reload();
+            return;
+        }
+
         _window = this.CreateWindow<PlayerMusicWindow>();
 
         _window.OnPlayTrack += track => SendMessage(new PlayerMusicPlayMessage(track));

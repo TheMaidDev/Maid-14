@@ -22,6 +22,7 @@ maid-music-ui-file-ready = Файл выбран ({ $size } МБ).
 maid-music-ui-too-big = Файл слишком большой. Максимум { $max } МБ.
 maid-music-ui-sent = Отправлено на запись.
 maid-music-ui-bad-file = Файл повреждён или это не .ogg (Vorbis).
+maid-music-ui-error = Не удалось прочитать файл.
 maid-music-ui-too-long = Песня слишком длинная. Максимум { $max } с.
 maid-music-ui-too-heavy = Песня слишком тяжёлая для воспроизведения. Выберите файл покороче или с меньшей частотой.
 
@@ -39,5 +40,6 @@ maid-music-storage-full = Хранилище песен заполнено.
 maid-music-recorded = Записано: { $name }
 maid-music-recorded-stereo = Записано: { $name }. Стерео-звук слышен без направления, для объёмного звука нужен моно-файл.
 maid-music-song-lost = Запись на кассете повреждена.
+maid-music-recorder-lost = Проигрыватель исчез до того, как песня загрузилась.
 
 ui-options-boombox-volume = Громкость бумбоксов:

@@ -5,6 +5,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Configuration;
+using Robust.Shared.Log;
 using FancyWindow = Content.Client.UserInterface.Controls.FancyWindow;
 
 namespace Content.Client._Maid.PlayerMusic;
@@ -87,56 +88,74 @@ public sealed partial class PlayerMusicWindow : FancyWindow
             return;
 
         _dialogOpen = true;
-        var filters = new FileDialogFilters(new FileDialogFilters.Group("ogg"));
-        await using var file = await _dialog.OpenFile(filters);
-        _dialogOpen = false;
-
-        if (Disposed || file == null)
-            return;
-
-        var max = _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes);
-
-        using var memory = new MemoryStream();
-        await file.CopyToAsync(memory);
-
-        if (Disposed)
-            return;
-
-        if (memory.Length > max)
+        try
         {
-            _pending = null;
-            FileLabel.Text = string.Empty;
-            StatusLabel.Text = Loc.GetString("maid-music-ui-too-big", ("max", FormatMb((int) max)));
+            var filters = new FileDialogFilters(new FileDialogFilters.Group("ogg"));
+            await using var file = await _dialog.OpenFile(filters);
+
+            if (Disposed || file == null)
+                return;
+
+            var max = _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes);
+
+            // Reject oversized files before reading them into memory
+            if (file.CanSeek && file.Length > max)
+            {
+                RejectFile("maid-music-ui-too-big", ("max", FormatMb((int) max)));
+                return;
+            }
+
+            using var memory = new MemoryStream();
+            await file.CopyToAsync(memory);
+
+            if (Disposed)
+                return;
+
+            if (memory.Length > max)
+            {
+                RejectFile("maid-music-ui-too-big", ("max", FormatMb((int) max)));
+                return;
+            }
+
+            var bytes = memory.ToArray();
+
+            // Same checks as on the server, so a bad file is not even sent
+            if (!PlayerMusicOgg.TryAnalyze(bytes, out var info))
+            {
+                RejectFile("maid-music-ui-bad-file");
+                return;
+            }
+
+            var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
+            if (info.Seconds > maxSeconds)
+            {
+                RejectFile("maid-music-ui-too-long", ("max", maxSeconds));
+                return;
+            }
+
+            if (info.DecodedBytes > _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes))
+            {
+                RejectFile("maid-music-ui-too-heavy");
+                return;
+            }
+
+            _pending = bytes;
+            FileLabel.Text = Loc.GetString("maid-music-ui-file-ready", ("size", FormatMb(_pending.Length)));
+            StatusLabel.Text = string.Empty;
             UpdateUploadButton();
-            return;
         }
-
-        var bytes = memory.ToArray();
-
-        // Same checks as on the server, so a bad file is not even sent
-        if (!PlayerMusicOgg.TryAnalyze(bytes, out var info))
+        catch (Exception e)
         {
-            RejectFile("maid-music-ui-bad-file");
-            return;
-        }
+            // An exception in an async void handler would crash the client
+            Logger.GetSawmill("playermusic").Error($"PlayerMusic: file dialog failed: {e}");
 
-        var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
-        if (info.Seconds > maxSeconds)
+            if (!Disposed)
+                RejectFile("maid-music-ui-error");
+        }
+        finally
         {
-            RejectFile("maid-music-ui-too-long", ("max", maxSeconds));
-            return;
+            _dialogOpen = false;
         }
-
-        if (info.DecodedBytes > _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes))
-        {
-            RejectFile("maid-music-ui-too-heavy");
-            return;
-        }
-
-        _pending = bytes;
-        FileLabel.Text = Loc.GetString("maid-music-ui-file-ready", ("size", FormatMb(_pending.Length)));
-        StatusLabel.Text = string.Empty;
-        UpdateUploadButton();
     }
 
     private void RejectFile(string locKey, params (string, object)[] args)
