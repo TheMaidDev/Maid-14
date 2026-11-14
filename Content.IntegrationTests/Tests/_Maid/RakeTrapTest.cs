@@ -49,7 +49,8 @@ public sealed class RakeTrapTest : MovementTest
     }
 
     /// <summary>
-    ///     The installer steps over their own armed rake freely — no trigger, rake stays armed.
+    ///     The installer steps over their own armed rake during the grace window — no trigger,
+    ///     rake stays armed.
     /// </summary>
     [Test]
     public async Task DeployerStepsOnOwnRakeTest()
@@ -65,6 +66,48 @@ public sealed class RakeTrapTest : MovementTest
 
         AssertComp<KnockedDownComponent>(false, Player);
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Installer's own rake should stay armed");
+    }
+
+    /// <summary>
+    ///     After the grace window expires the installer sets off their own rake like anyone else.
+    /// </summary>
+    [Test]
+    public async Task InstallerStepsOnOwnRakeAfterGraceTest()
+    {
+        var rake = await PlaceInHands("Rake");
+        await FaceEast();
+        await UseInHand();
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
+
+        // Shrink the grace window so the test doesn't have to wait it out.
+        await Server.WaitPost(() => Comp<RakeTrapComponent>(rake).InstallerGrace = TimeSpan.FromSeconds(0.5));
+        await RunSeconds(1f);
+
+        // Walk over the rake tile: the installer is no longer immune.
+        await Move(DirectionFlag.East, 1.5f);
+        await RunSeconds(1f);
+
+        AssertComp<KnockedDownComponent>(true, Player);
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "Rake should disarm after hitting its installer");
+    }
+
+    /// <summary>
+    ///     Mobs that are not MobHuman-likes (mice, pets, borgs) step over the rake harmlessly.
+    /// </summary>
+    [Test]
+    public async Task NonHumanMobDoesNotTriggerTest()
+    {
+        var rake = await PlaceInHands("Rake");
+        await FaceEast();
+        await UseInHand();
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
+
+        // A mouse stepping onto the rake tile must not set it off.
+        var mouse = await SpawnEntity("MobMouse", Xform(rake).Coordinates);
+        await RunSeconds(1.5f);
+
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Rake should stay armed when a mouse steps on it");
+        Assert.That(SEntMan.HasComponent<KnockedDownComponent>(mouse), Is.False, "Mouse should not be knocked down");
     }
 
     /// <summary>

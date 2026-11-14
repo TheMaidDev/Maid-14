@@ -7,8 +7,9 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Maid.RakeTrap;
 
 /// <summary>
-///     A rake trap. Deployed on the tile in front of the user; while armed, whoever steps on it
-///     gets whacked in the head, after which the rake disarms itself until deployed again.
+///     A rake trap. Deployed on the tile in front of the user; while armed, any MobHuman-like
+///     that steps on it gets whacked in the head, after which the rake disarms itself until
+///     deployed again.
 /// </summary>
 [RegisterComponent]
 [NetworkedComponent, AutoGenerateComponentState(true)]
@@ -19,11 +20,27 @@ public sealed partial class RakeTrapComponent : Component
     public bool Armed;
 
     /// <summary>
-    ///     Who deployed this rake, server-side only: the installer steps on their own trap
-    ///     freely. Cleared when the rake disarms, re-set on the next deploy.
+    ///     Only entities with this entity prototype in their inheritance chain can set the trap
+    ///     off (MobHuman and everything deriving from it). Null lets any mob trigger it.
+    /// </summary>
+    [DataField]
+    public string? TriggerPrototype = "MobHuman";
+
+    /// <summary>
+    ///     Who deployed this rake, server-side only: during the grace window after deploying
+    ///     (see <see cref="InstallerGrace"/>) the installer steps over their own trap safely.
+    ///     Cleared when the rake disarms or fires, re-set on the next deploy.
     /// </summary>
     [DataField]
     public EntityUid? Installer;
+
+    /// <summary>When the trap was last deployed, server-side only: the installer grace window starts here.</summary>
+    [DataField]
+    public TimeSpan? DeployedAt;
+
+    /// <summary>How long after deploying the installer steps over their own trap safely — not forever.</summary>
+    [DataField]
+    public TimeSpan InstallerGrace = TimeSpan.FromSeconds(10);
 
     /// <summary>
     ///     Set when the trap fires, replicated so clients can play the whack animation.

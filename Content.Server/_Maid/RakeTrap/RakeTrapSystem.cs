@@ -9,7 +9,6 @@ using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
@@ -64,12 +63,12 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!ent.Comp.Armed || !args.OtherFixture.Hard)
             return;
 
-        // Only mobs step on rakes (thrown items and other clutter don't set them off).
-        if (!HasComp<MobStateComponent>(args.OtherEntity))
+        // Only MobHuman-likes step on rakes (thrown items and other mobs don't set them off)...
+        if (!IsTriggerTarget(ent.Comp, args.OtherEntity))
             return;
 
-        // The installer walks over their own trap freely.
-        if (args.OtherEntity == ent.Comp.Installer)
+        // ...and the installer only walks over their own trap during the grace window.
+        if (IsInstallerImmune(ent.Comp, args.OtherEntity))
             return;
 
         ent.Comp.Armed = false;
@@ -101,6 +100,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
         ent.Comp.Armed = true;
         ent.Comp.Installer = user;
+        ent.Comp.DeployedAt = _timing.CurTime;
         Dirty(ent, ent.Comp);
         _audio.PlayPvs(ent.Comp.DeploySound, ent);
         _popup.PopupEntity(Loc.GetString("rake-deployed"), ent, user);
@@ -130,6 +130,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         ent.Comp.Armed = false;
         ent.Comp.HitAt = null;
         ent.Comp.Installer = null;
+        ent.Comp.DeployedAt = null;
         Dirty(ent, ent.Comp);
         _audio.PlayPvs(ent.Comp.DisarmSound, ent);
         _popup.PopupEntity(Loc.GetString("rake-disarmed"), ent, args.User);
@@ -140,12 +141,12 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!ent.Comp.Armed)
             return;
 
-        // Only mobs step on rakes (furniture/items colliding must not disarm it)...
-        if (!HasComp<MobStateComponent>(args.Tripper))
+        // Only MobHuman-likes step on rakes (furniture/items and other mobs must not disarm it)...
+        if (!IsTriggerTarget(ent.Comp, args.Tripper))
             return;
 
-        // ...and the installer steps over their own trap freely.
-        if (args.Tripper == ent.Comp.Installer)
+        // ...and the installer only walks over their own trap during the grace window.
+        if (IsInstallerImmune(ent.Comp, args.Tripper))
             return;
 
         // Disarm immediately so nothing else can set it off.
@@ -154,6 +155,17 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         Dirty(ent, ent.Comp);
 
         Whack(ent.Owner, args.Tripper);
+    }
+
+    /// <summary>
+    ///     The installer steps over their own trap safely only during the grace window after
+    ///     deploying it — not forever.
+    /// </summary>
+    private bool IsInstallerImmune(RakeTrapComponent comp, EntityUid uid)
+    {
+        return uid == comp.Installer
+            && comp.DeployedAt is { } deployedAt
+            && _timing.CurTime - deployedAt < comp.InstallerGrace;
     }
 
     private void Whack(EntityUid rake, EntityUid victim)
