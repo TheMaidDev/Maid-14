@@ -6,11 +6,9 @@ using Content.Shared.Camera;
 using Content.Shared.Coordinates.Helpers;
 using Content.Shared.Damage;
 using Content.Shared.DoAfter;
-using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
-using Content.Shared.StatusEffect;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
@@ -19,6 +17,8 @@ using Content.Shared.Stunnable;
 using Content.Server.Chat.Systems;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Physics;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Maid.RakeTrap;
@@ -36,7 +36,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
     [Dependency] private readonly TurfSystem _turf = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly DamageableSystem _damage = default!;
-    [Dependency] private readonly StatusEffectsSystem _status = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
@@ -60,7 +60,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         var coords = xform.Coordinates.Offset(offset).SnapToGrid(EntityManager);
         var tile = _turf.GetTileRef(coords);
 
-        if (tile == null || _turf.IsTileBlocked(tile.Value, CollisionGroup.Impassable | CollisionGroup.Opaque))
+        if (tile == null || TileBlockedFor(user, tile.Value))
         {
             _popup.PopupEntity(Loc.GetString("rake-deploy-blocked"), ent, user);
             return;
@@ -130,9 +130,8 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         // Head hit.
         _damage.TryChangeDamage(victim, comp.Damage, origin: rake, targetPart: TargetBodyPart.Head);
 
-        // Stunned (figuratively): down for a while, crawling, blurred vision, muffled audio.
+        // Stunned (figuratively): down for a while, crawling, muffled audio.
         _stun.TryKnockdown(victim, comp.KnockdownTime, refresh: true, drop: true);
-        _status.TryAddStatusEffect<BlurryVisionComponent>(victim, "BlurryVision", comp.BlurTime, true);
 
         var muffled = EnsureComp<RakeMuffledComponent>(victim);
         muffled.Gain = comp.MuffleGain;
@@ -168,9 +167,6 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
             _eye.SetZoom(victim, originalZoom, ignoreLimits: true);
         });
 
-        // Cartoon dizzy stars circling the victim.
-        EntityManager.SpawnAttachedTo("RakeDizzyStars", new EntityCoordinates(victim, Vector2.Zero));
-
         RaiseLocalEvent(victim, new MoodEffectEvent(comp.Mood));
         _chat.TryEmoteWithChat(victim, "Scream", forceEmote: true);
 
@@ -189,5 +185,62 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
             if (TryComp<RakeTrapComponent>(rake, out var c))
                 c.HitAt = null;
         });
+    }
+
+    /// <summary>
+    ///     TurfSystem.IsTileBlocked, but the deploying user's own body doesn't block the tile
+    ///     — standing on the tile edge used to block the deploy out of nowhere.
+    /// </summary>
+    private bool TileBlockedFor(EntityUid user, TileRef tile)
+    {
+        if (!TryComp<MapGridComponent>(tile.GridUid, out var grid))
+            return false;
+
+        var xformQuery = GetEntityQuery<TransformComponent>();
+        var (gridPos, gridRot, matrix) = _transform.GetWorldPositionRotationMatrix(Transform(tile.GridUid), xformQuery);
+
+        var size = grid.TileSize;
+        var localPos = new Vector2(tile.GridIndices.X * size + size / 2f, tile.GridIndices.Y * size + size / 2f);
+        var worldPos = Vector2.Transform(localPos, matrix);
+
+        // Scaled to 95% so it doesn't encompass walls on other tiles (as in TurfSystem).
+        var tileAabb = Box2.UnitCentered.Scale(0.95f * size);
+        var worldBox = new Box2Rotated(tileAabb.Translated(worldPos), gridRot, worldPos);
+        tileAabb = tileAabb.Translated(localPos);
+
+        var intersectionArea = 0f;
+        var fixtureQuery = GetEntityQuery<FixturesComponent>();
+        foreach (var ent in _lookup.GetEntitiesIntersecting(tile.GridUid, worldBox, LookupFlags.Dynamic | LookupFlags.Static))
+        {
+            if (ent == user)
+                continue;
+
+            if (!fixtureQuery.TryGetComponent(ent, out var fixtures))
+                continue;
+
+            var (pos, rot) = _transform.GetWorldPositionRotation(xformQuery.GetComponent(ent), xformQuery);
+            rot -= gridRot;
+            pos = (-gridRot).RotateVec(pos - gridPos);
+            var entXform = new Transform(pos, (float)rot.Theta);
+
+            foreach (var fixture in fixtures.Fixtures.Values)
+            {
+                if (!fixture.Hard)
+                    continue;
+
+                if ((fixture.CollisionLayer & (int)(CollisionGroup.Impassable | CollisionGroup.Opaque)) == 0)
+                    continue;
+
+                for (var i = 0; i < fixture.Shape.ChildCount; i++)
+                {
+                    var intersection = fixture.Shape.ComputeAABB(entXform, i).Intersect(tileAabb);
+                    intersectionArea += intersection.Width * intersection.Height;
+                    if (intersectionArea > 0.1f)
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

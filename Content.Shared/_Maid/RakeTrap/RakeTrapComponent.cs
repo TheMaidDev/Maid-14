@@ -29,10 +29,6 @@ public sealed partial class RakeTrapComponent : Component
     [DataField]
     public TimeSpan KnockdownTime = TimeSpan.FromSeconds(5);
 
-    /// <summary>How long the victim's vision stays blurred.</summary>
-    [DataField]
-    public TimeSpan BlurTime = TimeSpan.FromSeconds(5);
-
     /// <summary>How long the victim's audio stays muffled.</summary>
     [DataField]
     public TimeSpan MuffleTime = TimeSpan.FromSeconds(5);
