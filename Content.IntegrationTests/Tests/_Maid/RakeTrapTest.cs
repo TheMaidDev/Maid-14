@@ -49,8 +49,27 @@ public sealed class RakeTrapTest : MovementTest
     }
 
     /// <summary>
-    ///     Walking over an armed rake knocks the player down, damages them and muffles their audio,
-    ///     and disarms the rake.
+    ///     The installer steps over their own armed rake freely — no trigger, rake stays armed.
+    /// </summary>
+    [Test]
+    public async Task DeployerStepsOnOwnRakeTest()
+    {
+        var rake = await PlaceInHands("Rake");
+        await FaceEast();
+        await UseInHand();
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
+
+        // Walk over the rake tile: the installer must not set their own trap off.
+        await Move(DirectionFlag.East, 1.5f);
+        await RunSeconds(1f);
+
+        AssertComp<KnockedDownComponent>(false, Player);
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Installer's own rake should stay armed");
+    }
+
+    /// <summary>
+    ///     A mob stepping onto an armed rake is knocked down, damaged, muffled and dazed,
+    ///     and the rake disarms. The installer is not affected.
     /// </summary>
     [Test]
     public async Task SteppingOnRakeTest()
@@ -60,23 +79,24 @@ public sealed class RakeTrapTest : MovementTest
         await UseInHand();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
-        // Walk onto the rake tile and give the knockdown a moment to settle in.
-        await Move(DirectionFlag.East, 1.5f);
-
-        // The screen daze is short-lived: check it before its removal timer runs out.
-        Assert.That(SEntMan.HasComponent<RakeDazedComponent>(ToServer(Player)), Is.True,
-            "Victim does not have the screen daze component");
-
+        // A victim (not the installer) steps onto the rake tile.
+        var victim = await SpawnEntity("MobHuman", Xform(rake).Coordinates);
         await RunSeconds(1.5f);
 
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "Rake did not disarm after triggering");
-        AssertComp<KnockedDownComponent>(true, Player);
+        Assert.That(SEntMan.HasComponent<KnockedDownComponent>(victim), Is.True,
+            "Victim was not knocked down by the rake");
 
-        var damage = Comp<DamageableComponent>(Player).TotalDamage;
+        var damage = SEntMan.GetComponent<DamageableComponent>(victim).TotalDamage;
         Assert.That(damage, Is.GreaterThan(FixedPoint2.Zero), "Rake did not deal any damage");
 
-        Assert.That(SEntMan.HasComponent<RakeMuffledComponent>(ToServer(Player)), Is.True,
+        Assert.That(SEntMan.HasComponent<RakeMuffledComponent>(victim), Is.True,
             "Victim does not have the muffled audio component");
+        Assert.That(SEntMan.HasComponent<RakeDazedComponent>(victim), Is.True,
+            "Victim does not have the screen daze component");
+
+        // The installer walked nowhere, but must not be affected regardless.
+        AssertComp<KnockedDownComponent>(false, Player);
     }
 
     /// <summary>

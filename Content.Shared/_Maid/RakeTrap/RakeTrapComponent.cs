@@ -19,6 +19,13 @@ public sealed partial class RakeTrapComponent : Component
     public bool Armed;
 
     /// <summary>
+    ///     Who deployed this rake, server-side only: the installer steps on their own trap
+    ///     freely. Cleared when the rake disarms, re-set on the next deploy.
+    /// </summary>
+    [DataField]
+    public EntityUid? Installer;
+
+    /// <summary>
     ///     Set when the trap fires, replicated so clients can play the whack animation.
     ///     Null when the trap is not currently springing.
     /// </summary>

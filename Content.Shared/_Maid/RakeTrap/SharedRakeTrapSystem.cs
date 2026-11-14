@@ -28,10 +28,10 @@ public abstract class SharedRakeTrapSystem : EntitySystem
         SubscribeLocalEvent<RakeTrapComponent, ExamineAttemptEvent>(OnExamineAttempt);
     }
 
-    /// <summary>Only armed rakes can trigger, and anyone can trip over them — even whoever set them.</summary>
+    /// <summary>Only armed rakes can trigger, and only mobs can set them off — furniture or items colliding must not.</summary>
     private void OnStepTriggerAttempt(Entity<RakeTrapComponent> ent, ref StepTriggerAttemptEvent args)
     {
-        args.Continue |= ent.Comp.Armed;
+        args.Continue |= ent.Comp.Armed && HasComp<MobStateComponent>(args.Tripper);
     }
 
     /// <summary>The trap is hidden: no examine text for anyone.</summary>

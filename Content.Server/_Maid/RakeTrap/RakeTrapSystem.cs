@@ -68,6 +68,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!HasComp<MobStateComponent>(args.OtherEntity))
             return;
 
+        // The installer walks over their own trap freely.
+        if (args.OtherEntity == ent.Comp.Installer)
+            return;
+
         ent.Comp.Armed = false;
         ent.Comp.HitAt = _timing.CurTime;
         Dirty(ent, ent.Comp);
@@ -96,6 +100,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         _transform.SetCoordinates(ent, coords);
 
         ent.Comp.Armed = true;
+        ent.Comp.Installer = user;
         Dirty(ent, ent.Comp);
         _audio.PlayPvs(ent.Comp.DeploySound, ent);
         _popup.PopupEntity(Loc.GetString("rake-deployed"), ent, user);
@@ -124,6 +129,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
         ent.Comp.Armed = false;
         ent.Comp.HitAt = null;
+        ent.Comp.Installer = null;
         Dirty(ent, ent.Comp);
         _audio.PlayPvs(ent.Comp.DisarmSound, ent);
         _popup.PopupEntity(Loc.GetString("rake-disarmed"), ent, args.User);
@@ -132,6 +138,14 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
     private void OnStepTriggered(Entity<RakeTrapComponent> ent, ref StepTriggeredOnEvent args)
     {
         if (!ent.Comp.Armed)
+            return;
+
+        // Only mobs step on rakes (furniture/items colliding must not disarm it)...
+        if (!HasComp<MobStateComponent>(args.Tripper))
+            return;
+
+        // ...and the installer steps over their own trap freely.
+        if (args.Tripper == ent.Comp.Installer)
             return;
 
         // Disarm immediately so nothing else can set it off.
@@ -205,6 +219,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         _recoil.KickCamera(victim, dir * 1.2f);
 
         _popup.PopupEntity(Loc.GetString("rake-hit"), victim, victim);
+        comp.Installer = null;
 
         // Let the whack animation finish before the rake is shown lying down again.
         Timer.Spawn(comp.ResetVisualTime, () =>
