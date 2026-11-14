@@ -1409,7 +1409,7 @@
   - type: SpeakOnUIClosed
     pack: GenericVendGoodbyes
   - type: Sprite
-    sprite: Structures/Machines/VendingMachines/seeds_green.rsi
+    sprite: _Maid/Structures/Machines/VendingMachines/seeds_green.rsi # Maid changes
     layers:
     - state: "off"
       map: ["enum.VendingMachineVisualLayers.Base"]

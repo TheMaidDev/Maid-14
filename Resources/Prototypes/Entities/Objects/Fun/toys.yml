@@ -551,10 +551,10 @@
   description: Mass-produced by a sadistic corporate conglomerate!
   components:
   - type: Sprite
-    sprite: Objects/Fun/toy_singularity.rsi
+    sprite: _Maid/Objects/Fun/toy_singularity.rsi #Maid changes
     state: icon
   - type: Icon
-    sprite: Objects/Fun/toy_singularity.rsi
+    sprite: _Maid/Objects/Fun/toy_singularity.rsi #Maid changes
     state: icon
   - type: SingularityDistortion
     intensity: 2000

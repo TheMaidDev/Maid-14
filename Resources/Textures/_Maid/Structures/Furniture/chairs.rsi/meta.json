@@ -18,6 +18,14 @@
     {
       "name": "office-white",
       "directions": 4
+    },
+    {
+      "name": "shuttle",
+      "directions": 4
+    },
+    {
+      "name": "shuttle-overlay",
+      "directions": 4
     }
   ]
 }

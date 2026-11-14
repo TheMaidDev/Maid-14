@@ -664,7 +664,7 @@
   components:
   - type: RoundstartStationVariationRule
     rules:
-    # - id: BasicPoweredLightVariationPass
+    # - id: BasicPoweredLightVariationPass # Turned off for Maid changes
     - id: BasicTrashVariationPass
     - id: SolidWallRustingVariationPass
     - id: ReinforcedWallRustingVariationPass
