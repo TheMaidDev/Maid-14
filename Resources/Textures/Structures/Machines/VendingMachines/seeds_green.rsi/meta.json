@@ -104,7 +104,8 @@
       "directions": 4
     },
     {
-      "name": "panel"
+      "name": "panel",
+      "directions": 4
     },
     {
       "name": "seeds_generic-shelf0",
