@@ -9,6 +9,7 @@ using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
@@ -19,6 +20,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Maid.RakeTrap;
@@ -48,7 +50,29 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         base.Initialize();
 
         SubscribeLocalEvent<RakeTrapComponent, StepTriggeredOnEvent>(OnStepTriggered);
+        SubscribeLocalEvent<RakeTrapComponent, StartCollideEvent>(OnStartCollide);
         SubscribeLocalEvent<RakeTrapComponent, RakeDisarmDoAfterEvent>(OnDisarmDoAfter);
+    }
+
+    /// <summary>
+    ///     Trigger the moment the victim's fixture touches the rake instead of waiting for
+    ///     StepTriggerSystem's per-tick intersection-ratio check — makes the whack feel instant.
+    ///     StepTriggerSystem's own trigger is the fallback; it no-ops because we disarm first.
+    /// </summary>
+    private void OnStartCollide(Entity<RakeTrapComponent> ent, ref StartCollideEvent args)
+    {
+        if (!ent.Comp.Armed || !args.OtherFixture.Hard)
+            return;
+
+        // Only mobs step on rakes (thrown items and other clutter don't set them off).
+        if (!HasComp<MobStateComponent>(args.OtherEntity))
+            return;
+
+        ent.Comp.Armed = false;
+        ent.Comp.HitAt = _timing.CurTime;
+        Dirty(ent, ent.Comp);
+
+        Whack(ent.Owner, args.OtherEntity);
     }
 
     protected override void OnDeployTry(Entity<RakeTrapComponent> ent, EntityUid user)

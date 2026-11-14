@@ -13,7 +13,7 @@
   - type: Item
     sprite: _Maid/Objects/Devices/rake.rsi
   - type: StepTrigger
-    intersectRatio: 0.2
+    intersectRatio: 0.1
     requiredTriggeredSpeed: 0
     stepOn: true
   - type: RakeTrap
@@ -27,14 +27,14 @@
       slips:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.2,-0.2,0.2,0.2"
+          bounds: "-0.28,-0.28,0.28,0.28"
         hard: false
         layer:
         - LowImpassable
       fix1:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.2,-0.2,0.2,0.2"
+          bounds: "-0.28,-0.28,0.28,0.28"
         density: 30
         mask:
         - ItemMask
