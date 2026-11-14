@@ -49,17 +49,17 @@ public sealed class RakeTrapClientSystem : SharedRakeTrapSystem
         var animComp = EnsureComp<AnimationPlayerComponent>(ent);
         _animation.Stop((ent, animComp), WhackKey);
 
-        var cockTime = (float)ent.Comp.CockTime.TotalSeconds;
-        var whackTime = 0.12f;
-        var settleTime = 0.3f;
-        var total = cockTime + whackTime + settleTime;
+        // Instant-feel whack: a quick snap up and back down (timings are presentation-only).
+        const float riseTime = 0.08f;
+        const float smackTime = 0.22f;
+        const float settleTime = 0.45f;
+        const float total = settleTime;
 
         var animation = new Animation
         {
             Length = TimeSpan.FromSeconds(total),
             AnimationTracks =
             {
-                // Slowly cock the rake, then snap it down onto the victim.
                 new AnimationTrackComponentProperty
                 {
                     ComponentType = typeof(SpriteComponent),
@@ -68,8 +68,8 @@ public sealed class RakeTrapClientSystem : SharedRakeTrapSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(Angle.Zero, 0f),
-                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(-35f), cockTime),
-                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(15f), cockTime + whackTime),
+                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(-20f), riseTime),
+                        new AnimationTrackProperty.KeyFrame(Angle.FromDegrees(15f), smackTime),
                         new AnimationTrackProperty.KeyFrame(Angle.Zero, total),
                     },
                 },
@@ -82,8 +82,7 @@ public sealed class RakeTrapClientSystem : SharedRakeTrapSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(Vector2.Zero, 0f),
-                        new AnimationTrackProperty.KeyFrame(Vector2.Zero, cockTime),
-                        new AnimationTrackProperty.KeyFrame(new Vector2(0f, 0.25f), cockTime + whackTime),
+                        new AnimationTrackProperty.KeyFrame(new Vector2(0f, 0.25f), smackTime),
                         new AnimationTrackProperty.KeyFrame(Vector2.Zero, total),
                     },
                 },

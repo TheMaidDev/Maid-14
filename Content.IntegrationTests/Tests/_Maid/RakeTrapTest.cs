@@ -59,8 +59,13 @@ public sealed class RakeTrapTest : MovementTest
         await UseInHand();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
-        // Walk onto the rake tile and give the cock timer time to land the hit.
+        // Walk onto the rake tile and give the knockdown a moment to settle in.
         await Move(DirectionFlag.East, 1.5f);
+
+        // The screen daze is short-lived: check it before its removal timer runs out.
+        Assert.That(SEntMan.HasComponent<RakeDazedComponent>(ToServer(Player)), Is.True,
+            "Victim does not have the screen daze component");
+
         await RunSeconds(1.5f);
 
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "Rake did not disarm after triggering");

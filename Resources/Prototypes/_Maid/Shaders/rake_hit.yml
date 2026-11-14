@@ -1,0 +1,4 @@
+- type: shader
+  id: MaidRakeHit
+  kind: source
+  path: "/Textures/_Maid/Shaders/rake_hit.swsl"

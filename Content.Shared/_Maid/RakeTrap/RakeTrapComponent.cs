@@ -25,10 +25,6 @@ public sealed partial class RakeTrapComponent : Component
     [ViewVariables, AutoNetworkedField]
     public TimeSpan? HitAt;
 
-    /// <summary>How long the rake takes to cock before the whack lands.</summary>
-    [DataField]
-    public TimeSpan CockTime = TimeSpan.FromSeconds(0.5);
-
     /// <summary>How long the victim stays knocked down.</summary>
     [DataField]
     public TimeSpan KnockdownTime = TimeSpan.FromSeconds(5);
@@ -51,7 +47,7 @@ public sealed partial class RakeTrapComponent : Component
 
     /// <summary>How long the whack animation plays before the sprite resets.</summary>
     [DataField]
-    public TimeSpan ResetVisualTime = TimeSpan.FromSeconds(1.2);
+    public TimeSpan ResetVisualTime = TimeSpan.FromSeconds(0.9);
 
     [DataField]
     public DamageSpecifier Damage = new() { DamageDict = { ["Blunt"] = 30 } };

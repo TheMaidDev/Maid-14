@@ -11,6 +11,8 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
 using Content.Shared.StatusEffect;
+using Content.Shared.Movement.Components;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
 using Content.Shared.StepTrigger.Systems;
 using Content.Shared.Stunnable;
@@ -38,6 +40,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
     [Dependency] private readonly SharedCameraRecoilSystem _recoil = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly SharedContentEyeSystem _eye = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -105,14 +108,11 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!ent.Comp.Armed)
             return;
 
-        // Disarm immediately so nothing else can set it off while the rake is cocking.
+        // Disarm immediately so nothing else can set it off.
         ent.Comp.Armed = false;
         ent.Comp.HitAt = _timing.CurTime;
-        _audio.PlayPvs(ent.Comp.CockSound, ent);
 
-        var rake = ent.Owner;
-        var victim = args.Tripper;
-        Timer.Spawn(ent.Comp.CockTime, () => Whack(rake, victim));
+        Whack(ent.Owner, args.Tripper);
     }
 
     private void Whack(EntityUid rake, EntityUid victim)
@@ -122,6 +122,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
         if (TerminatingOrDeleted(victim))
             return;
+
+        // The rake snaps up and smacks: spring + impact sounds together.
+        _audio.PlayPvs(comp.CockSound, rake);
+        _audio.PlayPvs(comp.HitSound, rake);
 
         // Head hit.
         _damage.TryChangeDamage(victim, comp.Damage, origin: rake, targetPart: TargetBodyPart.Head);
@@ -138,6 +142,35 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
                 RemComp<RakeMuffledComponent>(victim);
         });
 
+        // Screen daze on the victim's client: impact flash + dizzy wobble overlay.
+        var dazed = EnsureComp<RakeDazedComponent>(victim);
+        dazed.HitAt = _timing.CurTime;
+        Timer.Spawn(dazed.Duration, () =>
+        {
+            if (!TerminatingOrDeleted(victim))
+                RemComp<RakeDazedComponent>(victim);
+        });
+
+        // Zoom punch: snap in, then let the eye lerp carry it back out.
+        var eye = EnsureComp<ContentEyeComponent>(victim);
+        var originalZoom = eye.TargetZoom;
+        var punchZoom = originalZoom * 1.3f;
+        _eye.SetZoom(victim, punchZoom, ignoreLimits: true);
+        Timer.Spawn(TimeSpan.FromSeconds(0.15), () =>
+        {
+            if (TerminatingOrDeleted(victim) || !TryComp<ContentEyeComponent>(victim, out var e))
+                return;
+
+            // Don't clobber a zoom someone changed during the punch (e.g. a telescope).
+            if (e.TargetZoom != punchZoom)
+                return;
+
+            _eye.SetZoom(victim, originalZoom, ignoreLimits: true);
+        });
+
+        // Cartoon dizzy stars circling the victim.
+        EntityManager.SpawnAttachedTo("RakeDizzyStars", new EntityCoordinates(victim, Vector2.Zero));
+
         RaiseLocalEvent(victim, new MoodEffectEvent(comp.Mood));
         _chat.TryEmoteWithChat(victim, "Scream", forceEmote: true);
 
@@ -148,7 +181,6 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         var dir = delta.LengthSquared() > 0.01f ? delta.Normalized() : Vector2.UnitY;
         _recoil.KickCamera(victim, dir * 1.2f);
 
-        _audio.PlayPvs(comp.HitSound, rake);
         _popup.PopupEntity(Loc.GetString("rake-hit"), victim, victim);
 
         // Let the whack animation finish before the rake is shown lying down again.
