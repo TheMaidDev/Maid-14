@@ -72,7 +72,7 @@ public sealed class TgStunbatonSystem : EntitySystem
         var user = ent.Comp.SwingUser;
         ent.Comp.SwingUser = null;
 
-        if (!ent.Comp.Enabled || user == null || !_toggle.IsActivated(ent.Owner) || args.HitEntities.Count == 0 || args.Direction != null)
+        if (!ent.Comp.Enabled || user == null || args.HitEntities.Count == 0 || args.Direction != null)
             return;
 
         foreach (var (target, _) in args.HitEntities)
