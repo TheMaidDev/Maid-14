@@ -12,27 +12,27 @@
     - state: rake
   - type: Item
     sprite: _Maid/Objects/Devices/rake.rsi
-    size: Ginormous # too big for any container, and no Clothing slot either — no back-wearing
+    size: Ginormous
   - type: MeleeWeapon
-    attackRate: 0.5 # huge and slow
-    range: 2.0 # long handle
-    angle: 90 # wide head sweep
+    attackRate: 0.5
+    range: 2.0
+    angle: 90
     wideAnimationRotation: 135
     heavyStaminaCost: 10
     damage:
       types:
-        Blunt: 12
+        Blunt: 3
     soundHit:
-      collection: MetalThud # blunt thud like the other wooden melee weapons (bat, shovel)
+      collection: MetalThud
   - type: Wieldable
-    unwieldOnUse: false # use-in-hand wields first; a second use deploys the trap
+    unwieldOnUse: true
   - type: IncreaseDamageOnWield
     damage:
       types:
         Blunt: 8
   - type: StepTrigger
     intersectRatio: 0.1
-    requiredTriggeredSpeed: 1.5 # must actually step on it; crawling/lying bodies don't trigger
+    requiredTriggeredSpeed: 1.5
     stepOn: true
   - type: RakeTrap
   - type: UseDelay
@@ -45,14 +45,14 @@
       slips:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.28,-0.28,0.28,0.28"
+          bounds: "-0.28,-0.40,0.28,-0.05"
         hard: false
         layer:
         - LowImpassable
       fix1:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.28,-0.28,0.28,0.28"
+          bounds: "-0.28,-0.40,0.28,-0.05"
         density: 30
         mask:
         - ItemMask
