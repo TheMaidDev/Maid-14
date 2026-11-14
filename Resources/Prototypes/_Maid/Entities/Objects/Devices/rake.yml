@@ -32,7 +32,7 @@
         Blunt: 8
   - type: StepTrigger
     intersectRatio: 0.1
-    requiredTriggeredSpeed: 0
+    requiredTriggeredSpeed: 1.5 # must actually step on it; crawling/lying bodies don't trigger
     stepOn: true
   - type: RakeTrap
   - type: UseDelay

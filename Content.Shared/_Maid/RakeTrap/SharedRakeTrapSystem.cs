@@ -5,6 +5,7 @@ using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Standing;
 using Content.Shared.StepTrigger.Systems;
 using Content.Shared.Verbs;
 
@@ -18,6 +19,7 @@ namespace Content.Shared._Maid.RakeTrap;
 public abstract class SharedRakeTrapSystem : EntitySystem
 {
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly StandingStateSystem _standingState = default!;
 
     public override void Initialize()
     {
@@ -31,12 +33,13 @@ public abstract class SharedRakeTrapSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Only armed rakes can trigger, and only humanoids can set them off — furniture,
-    ///     items or other mobs must not. Installer immunity is checked server-side only.
+    ///     Only armed rakes can trigger, and only upright humanoids can set them off —
+    ///     furniture, items or other mobs must not, and lying/crawling bodies slide over.
+    ///     Installer immunity and the speed threshold are checked server-side only.
     /// </summary>
     private void OnStepTriggerAttempt(Entity<RakeTrapComponent> ent, ref StepTriggerAttemptEvent args)
     {
-        args.Continue |= ent.Comp.Armed && IsTriggerTarget(args.Tripper);
+        args.Continue |= ent.Comp.Armed && IsTriggerTarget(args.Tripper) && !_standingState.IsDown(args.Tripper);
     }
 
     /// <summary>

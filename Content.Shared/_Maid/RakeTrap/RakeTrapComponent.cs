@@ -54,6 +54,13 @@ public sealed partial class RakeTrapComponent : Component
     [DataField]
     public float MuffleGain = 0.3f;
 
+    /// <summary>
+    ///     Minimum speed (m/s) the victim must be moving at for the trap to go off, and they
+    ///     must be on their feet: lying or crawling bodies slide over the rake harmlessly.
+    /// </summary>
+    [DataField]
+    public float MinimumTriggerSpeed = 1.5f;
+
     /// <summary>How long disarming an armed trap by clicking it takes.</summary>
     [DataField]
     public TimeSpan DisarmTime = TimeSpan.FromSeconds(2);

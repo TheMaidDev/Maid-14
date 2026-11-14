@@ -1,5 +1,6 @@
 #nullable enable
 using System.Linq;
+using System.Numerics;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.IntegrationTests.Tests.Interaction;
 using Content.IntegrationTests.Tests.Movement;
@@ -8,11 +9,16 @@ using Content.Shared.Damage;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
 using Content.Shared.Item;
+using Content.Shared.Movement.Components;
 using Content.Shared.Stunnable;
+using Content.Shared.StepTrigger.Components;
 using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Localization;
 using Robust.Shared.Maths;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Systems;
 
 namespace Content.IntegrationTests.Tests._Maid;
 
@@ -60,6 +66,33 @@ public sealed class RakeTrapTest : MovementTest
             verbSystem.ExecuteVerb(deploy!, ToServer(Player), rakeUid);
         });
         await RunTicks(5);
+    }
+
+    /// <summary>
+    ///     Spawns a mob on the tile east of the rake and sends it sliding west onto the rake,
+    ///     at the given speed (the trap needs a moving victim). Optionally knocks it down first,
+    ///     turning it into a sliding crawling body.
+    /// </summary>
+    private async Task<EntityUid> SlideOntoRake(NetEntity rake, string proto, float speed, bool down = false)
+    {
+        var victim = await SpawnEntity(proto, Xform(rake).Coordinates.Offset(new Vector2(0.65f, 0f)));
+        await Server.WaitPost(() =>
+        {
+            // Mobs are kinematic-controller bodies driven by the movement system: with no input
+            // their velocity is zeroed every tick. Strip the movement components and switch to a
+            // plain dynamic body so the dummy slides at the given speed.
+            SEntMan.RemoveComponent<InputMoverComponent>(victim);
+            SEntMan.RemoveComponent<MobMoverComponent>(victim);
+
+            if (down)
+                SEntMan.System<SharedStunSystem>().TryKnockdown(victim, TimeSpan.FromSeconds(10));
+
+            var physics = SEntMan.System<SharedPhysicsSystem>();
+            physics.SetBodyType(victim, BodyType.Dynamic);
+            physics.SetLinearVelocity(victim, new Vector2(-speed, 0));
+        });
+        await RunSeconds(1.5f);
+        return victim;
     }
 
     /// <summary>
@@ -137,8 +170,7 @@ public sealed class RakeTrapTest : MovementTest
         var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
-        var ipc = await SpawnEntity("MobIPC", Xform(rake).Coordinates);
-        await RunSeconds(1.5f);
+        var ipc = await SlideOntoRake(rake, "MobIPC", 3f);
 
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "IPC did not trigger the rake");
         Assert.That(SEntMan.HasComponent<KnockedDownComponent>(ipc), Is.True, "IPC was not knocked down by the rake");
@@ -162,6 +194,39 @@ public sealed class RakeTrapTest : MovementTest
     }
 
     /// <summary>
+    ///     A knocked-down body sliding over the rake does not set it off — lying or crawling
+    ///     through the trap is safe.
+    /// </summary>
+    [Test]
+    public async Task DownedMobDoesNotTriggerTest()
+    {
+        var rake = await DeployRake();
+
+        var body = await SlideOntoRake(rake, "MobHuman", 3f, down: true);
+
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True,
+            "Rake should stay armed when a lying body slides over it");
+        Assert.That(SEntMan.HasComponent<RakeMuffledComponent>(body), Is.False,
+            "Sliding body should not be hit by the rake");
+    }
+
+    /// <summary>
+    ///     A mob moving below the trigger speed does not set the rake off.
+    /// </summary>
+    [Test]
+    public async Task SlowMobDoesNotTriggerTest()
+    {
+        var rake = await DeployRake();
+
+        var slowpoke = await SlideOntoRake(rake, "MobHuman", 1.4f);
+
+        Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True,
+            "Rake should stay armed when a slow mob steps on it");
+        Assert.That(SEntMan.HasComponent<KnockedDownComponent>(slowpoke), Is.False,
+            "Slow mob should not be knocked down by the rake");
+    }
+
+    /// <summary>
     ///     A mob stepping onto an armed rake is knocked down, damaged, muffled and dazed,
     ///     and the rake disarms. The installer is not affected.
     /// </summary>
@@ -171,9 +236,8 @@ public sealed class RakeTrapTest : MovementTest
         var rake = await DeployRake();
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.True, "Deployed rake is not armed");
 
-        // A victim (not the installer) steps onto the rake tile.
-        var victim = await SpawnEntity("MobHuman", Xform(rake).Coordinates);
-        await RunSeconds(1.5f);
+        // A victim (not the installer) steps onto the rake tile at walking pace.
+        var victim = await SlideOntoRake(rake, "MobHuman", 3f);
 
         Assert.That(Comp<RakeTrapComponent>(rake).Armed, Is.False, "Rake did not disarm after triggering");
         Assert.That(SEntMan.HasComponent<KnockedDownComponent>(victim), Is.True,

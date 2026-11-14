@@ -12,6 +12,7 @@ using Content.Shared.Popups;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
+using Content.Shared.Standing;
 using Content.Shared.StepTrigger.Systems;
 using Content.Shared.Stunnable;
 using Content.Server.Chat.Systems;
@@ -20,6 +21,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;
 
@@ -44,6 +46,7 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedContentEyeSystem _eye = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly StandingStateSystem _standingState = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -67,6 +70,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
 
         // Only humanoids step on rakes (thrown items and other mobs don't set them off)...
         if (!IsTriggerTarget(args.OtherEntity))
+            return;
+
+        // ...moving fast enough and on their feet...
+        if (!IsMovingUpright(args.OtherEntity, ent.Comp))
             return;
 
         // ...and the installer only walks over their own trap during the grace window.
@@ -155,6 +162,10 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         if (!IsTriggerTarget(args.Tripper))
             return;
 
+        // ...moving fast enough and on their feet...
+        if (!IsMovingUpright(args.Tripper, ent.Comp))
+            return;
+
         // ...and the installer only walks over their own trap during the grace window.
         if (IsInstallerImmune(ent.Comp, args.Tripper))
             return;
@@ -176,6 +187,19 @@ public sealed class RakeTrapSystem : SharedRakeTrapSystem
         return uid == comp.Installer
             && comp.DeployedAt is { } deployedAt
             && _timing.CurTime - deployedAt < comp.InstallerGrace;
+    }
+
+    /// <summary>
+    ///     A rake needs someone actually stepping on it: the victim must be on their feet
+    ///     (lying or crawling bodies slide over harmlessly) and moving at the trigger speed.
+    /// </summary>
+    private bool IsMovingUpright(EntityUid tripper, RakeTrapComponent comp)
+    {
+        if (_standingState.IsDown(tripper))
+            return false;
+
+        return TryComp<PhysicsComponent>(tripper, out var physics)
+            && physics.LinearVelocity.Length() >= comp.MinimumTriggerSpeed;
     }
 
     private void Whack(EntityUid rake, EntityUid victim)
