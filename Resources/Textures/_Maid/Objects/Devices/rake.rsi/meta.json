@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "license": "CC0-1.0",
+  "copyright": "Made by Maid-14 contributors, use or modify it how you please.",
+  "states": [
+    {
+      "name": "rake"
+    },
+    {
+      "name": "rake_armed"
+    },
+    {
+      "name": "rake_hit"
+    },
+    {
+      "name": "inhand-left"
+    },
+    {
+      "name": "inhand-right"
+    }
+  ]
+}

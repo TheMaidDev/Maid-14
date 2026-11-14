@@ -7,6 +7,7 @@ mood-effect-suffocating = I CAN'T... BREATHE...
 mood-effect-on-fire = I'M ON FIRE!!!
 mood-effect-creampied = I've been creamed. Tastes like pie.
 mood-effect-mob-slipped = I slipped again. I should be more careful.
+mood-effect-mob-raked = I stepped on a rake... I can still feel the handle in my face.
 mood-effect-mob-vomit = I just threw up. Gross.
 mood-effect-mob-low-pressure = I'm about to burst open!
 mood-effect-mob-high-pressure = I'm being crushed by the pressure!

@@ -1,0 +1,44 @@
+# Maid-14 rake trap: armed with use-in-hand, hidden step trigger, whacks the stepper.
+- type: entity
+  id: Rake
+  parent: BaseItem
+  name: rake
+  description: A garden rake. Lying around innocently, waiting for someone to step on it.
+  components:
+  - type: Sprite
+    sprite: _Maid/Objects/Devices/rake.rsi
+    drawdepth: SmallMobs # lying flat on the floor
+    layers:
+    - state: rake
+  - type: Item
+    sprite: _Maid/Objects/Devices/rake.rsi
+  - type: StepTrigger
+    intersectRatio: 0.2
+    requiredTriggeredSpeed: 0
+    stepOn: true
+  - type: PreventableStepTrigger
+  - type: RakeTrap
+  - type: UseDelay
+  - type: Physics
+    bodyType: Dynamic
+  - type: CollisionWake
+    enabled: false
+  - type: Fixtures
+    fixtures:
+      slips:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.2,-0.2,0.2,0.2"
+        hard: false
+        layer:
+        - LowImpassable
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.2,-0.2,0.2,0.2"
+        density: 30
+        mask:
+        - ItemMask
+  - type: Tag
+    tags:
+    - HideContextMenu
