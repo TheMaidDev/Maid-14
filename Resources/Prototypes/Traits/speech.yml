@@ -93,15 +93,15 @@
 #  components:
 #  - type: SpanishAccent
 
-- type: trait
-  id: Liar
-  name: trait-liar-name
-  description: trait-liar-desc
-  category: SpeechTraits
-  cost: 1
-  components:
-  - type: ReplacementAccent
-    accent: liar
+# - type: trait # Toggled off by Maid
+#   id: Liar
+#   name: trait-liar-name
+#   description: trait-liar-desc
+#   category: SpeechTraits
+#   cost: 1
+#   components:
+#   - type: ReplacementAccent
+#     accent: liar
 
 # 2 Cost
 

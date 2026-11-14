@@ -514,21 +514,22 @@
   components:
   - type: Stack
     stackType: Diamond
-    baseLayer: base
+    baseLayer: diamond
     layerStates:
     - diamond
     - diamond_2
-    - diamond_3
+    # - diamond_3
   # Goobstation - Custom stack splitting dialog
   - type: UserInterface
     interfaces:
       enum.StackCustomSplitUiKey.Key:
         type: StackCustomSplitBoundUserInterface
   - type: Sprite
+    sprite: _Maid/Objects/Materials/materials.rsi
     state: diamond
     layers:
     - state: diamond
-      map: ["base"]
+      map: ["diamond"]
   - type: Appearance
   - type: Item
     heldPrefix: diamond

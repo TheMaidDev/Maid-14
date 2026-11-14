@@ -427,16 +427,22 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
+    - state: stripe # Maid changes start
+      color: "#990000"
   - type: Item
     inhandVisuals:
       left:
       - state: inhand-left-mag
+      - state: inhand-left-stripe
+        color: "#990000"
       right:
       - state: inhand-right-mag
+      - state: inhand-right-stripe
+        color: "#990000"  # Maid changes end
 
 - type: entity
   id: MagazinePistolSubMachineGunEmpty
-  name: SMG magazine (.35 auto) # MAID feat-sprite-porting-3
+  name: SMG magazine (.35 auto)
   suffix: empty
   parent: BaseMagazinePistolSubMachineGun
   description: 30-round double-stack magazine for submachine guns.
@@ -449,12 +455,18 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-1
       map: ["enum.GunVisualLayers.Mag"]
+    - state: stripe # Maid changes start
+      color: "#990000"
   - type: Item
     inhandVisuals:
       left:
       - state: inhand-left-mag
+      - state: inhand-left-stripe
+        color: "#990000"
       right:
       - state: inhand-right-mag
+      - state: inhand-right-stripe
+        color: "#990000"  # Maid changes end
 
 - type: entity
   id: MagazinePistolSubMachineGunPractice
