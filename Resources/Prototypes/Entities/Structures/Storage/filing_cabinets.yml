@@ -162,8 +162,8 @@
   - type: Sprite
     state: chestdrawer
     layers:
-    - state: chestdrawer
     - state: chestdrawer-open
+    - state: chestdrawer-open #MAID EDIT
       map: ["openLayer"]
   - type: Fixtures
     fixtures:

@@ -367,7 +367,6 @@
   id: MobRatServant
   parent: [ SimpleMobBase, MobCombat ]
   description: He's da mini rat. He don't make da roolz.
-  categories: [ HideSpawnMenu ] #Must be configured to a King or the AI breaks.
   components:
   - type: AdaptiveScoreStatic
     combatScore: 0.5
@@ -430,7 +429,7 @@
         state: rat-moving
     noMovementLayers:
       movement:
-        state: rat
+        state: rat-moving #MAID EDIT
   - type: Physics
     bodyType: KinematicController
   - type: Fixtures
