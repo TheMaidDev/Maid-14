@@ -790,7 +790,7 @@
     - Recyclable
     - HamsterWearable
     - WhitelistChameleon
-  - type: Foldable
+  - type: Foldable  # Maid changes start
     canFoldInsideContainer: true
   - type: FoldableClothing
     foldedHideLayers:
@@ -798,7 +798,7 @@
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers: { HeadTop: HEAD }
+    layers: { HeadTop: HEAD } # Maid changes end
 
 - type: entity
   parent: ClothingHeadBase
@@ -812,13 +812,13 @@
     sprite: _Maid/Clothing/Head/Hats/surgcap_green.rsi #Maid changes
   - type: Foldable
     canFoldInsideContainer: true
-  - type: FoldableClothing
+  - type: FoldableClothing  # Maid changes start
     foldedHideLayers:
     - Hair
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers: { HeadTop: HEAD }
+    layers: { HeadTop: HEAD } # Maid changes end
 
 - type: entity
   parent: ClothingHeadBase
@@ -832,13 +832,13 @@
     sprite: _Maid/Clothing/Head/Hats/surgcap_purple.rsi #Maid changes
   - type: Foldable
     canFoldInsideContainer: true
-  - type: FoldableClothing
+  - type: FoldableClothing  # Maid changes start
     foldedHideLayers:
     - Hair
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
   - type: HideLayerClothing
-    layers: { HeadTop: HEAD }
+    layers: { HeadTop: HEAD } # Maid changes end
 
 - type: entity
   parent: ClothingHeadBase

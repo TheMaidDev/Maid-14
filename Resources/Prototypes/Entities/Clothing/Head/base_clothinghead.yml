@@ -249,11 +249,11 @@
     - PlasmamanSafe # EE Plasmeme Change
   - type: IdentityBlocker
   - type: HideLayerClothing
-    slots:
-    - Hair
-    - Snout
-    - HeadTop
-    - HeadSide
+    layers: # Maid changes
+      Hair: HEAD
+      Snout: HEAD
+      HeadTop: HEAD
+      HeadSide: HEAD
 
 - type: entity
   abstract: true
@@ -311,11 +311,11 @@
     - PlasmamanSafe # EE Plasmeme Change
   - type: IdentityBlocker
   - type: HideLayerClothing
-    slots:
-    - Hair
-    - Snout
-    - HeadTop
-    - HeadSide
+    layers: # Maid changes
+      Hair: HEAD
+      Snout: HEAD
+      HeadTop: HEAD
+      HeadSide: HEAD
   - type: FaceHuggerBlocker # Goobstation
   - type: HideClothingLayerClothing # Maid
     hiddenSlots:
@@ -405,7 +405,7 @@
       coefficients: { }
   - type: GroupExamine
   - type: HideLayerClothing
-    slots:
-    - Hair
-    - HeadTop
-    - HeadSide
+    layers: # Maid changes
+      Hair: HEAD
+      HeadTop: HEAD
+      HeadSide: HEAD
