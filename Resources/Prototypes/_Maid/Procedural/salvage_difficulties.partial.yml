@@ -1,0 +1,9 @@
+- type: salvageDifficulty
+  id: Moderate
+  modifierBudget: 3
+  color: "#EFB34196"
+  structureCount: 5
+  rewards:
+  - SalvageRewardCommon
+  - SalvageRewardRare
+  - SalvageRewardRare
