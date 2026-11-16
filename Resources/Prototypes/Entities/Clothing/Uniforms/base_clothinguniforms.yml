@@ -100,7 +100,7 @@
   - type: PhysicalComposition #Goobstation - Recycle update
     materialComposition:
       Cloth: 75
-  - type: SuitSensorShockable # Goobstation
+  # - type: SuitSensorShockable # Goobstation # Maid
   - type: VendingPrice #Maid
     price: 30 #Maid
 
