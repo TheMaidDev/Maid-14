@@ -1,0 +1,54 @@
+- type: salvageDifficulty
+  id: Minimal
+  lootBudget: 15
+  mobBudget: 5
+  modifierBudget: 0
+  color: "#52B4E996"
+  recommendedPlayers: 1
+  structureCount: 1
+  rewards:
+  - SalvageRewardCommon
+  - SalvageRewardCommon
+  - SalvageRewardCommon
+
+- type: salvageDifficulty
+  id: Minor
+  lootBudget: 20
+  mobBudget: 12
+  modifierBudget: 1
+  color: "#9FED5896"
+  recommendedPlayers: 2
+  structureCount: 3
+  rewards:
+  - SalvageRewardCommon
+  - SalvageRewardCommon
+  - SalvageRewardRare
+
+- type: salvageDifficulty
+  id: Hazardous
+  lootBudget: 45
+  mobBudget: 38
+  modifierBudget: 7
+  color: "#DE3A3A96"
+  recommendedPlayers: 3
+  structureCount: 7
+  rewards:
+  - SalvageRewardRare
+  - SalvageRewardRare
+  - SalvageRewardRare
+  - SalvageRewardEpic
+
+- type: salvageDifficulty
+  id: Extreme
+  lootBudget: 60
+  mobBudget: 50
+  modifierBudget: 15
+  color: "#D381C996"
+  recommendedPlayers: 4
+  structureCount: 9
+  rewards:
+  - SalvageRewardRare
+  - SalvageRewardRare
+  - SalvageRewardEpic
+  - SalvageRewardEpic
+  - SalvageRewardEpic

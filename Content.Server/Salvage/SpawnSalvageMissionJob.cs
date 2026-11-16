@@ -48,10 +48,11 @@ using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Content.Server.Shuttles.Components;
+using Content.Shared._Maid.Salvage; // MAID salvage-expeditions
 
 namespace Content.Server.Salvage;
 
-public sealed class SpawnSalvageMissionJob : Job<bool>
+public sealed partial class SpawnSalvageMissionJob : Job<bool> // MAID salvage-expeditions
 {
     private readonly IEntityManager _entManager;
     private readonly IGameTiming _timing;
@@ -127,7 +128,12 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
 
         // Setup mission configs
         // As we go through the config the rating will deplete so we'll go for most important to least important.
+        // MAID BEGIN salvage-expeditions
+        /*
         var difficultyId = "Moderate";
+        */
+        var difficultyId = string.IsNullOrEmpty(_missionParams.Difficulty) ? "Moderate" : _missionParams.Difficulty;
+        // MAID END salvage-expeditions
         var difficultyProto = _prototypeManager.Index<SalvageDifficultyPrototype>(difficultyId);
 
         var mission = _entManager.System<SharedSalvageSystem>()
@@ -238,11 +244,20 @@ public sealed class SpawnSalvageMissionJob : Job<bool>
 
         // Handle remaining loot
 
+        // MAID BEGIN salvage-expeditions
+        await SetupObjective(mission, difficultyProto, (mapUid, grid), dungeon, random);
+        // MAID END salvage-expeditions
+
         /*
          * MOB SPAWNS
          */
 
         var mobBudget = difficultyProto.MobBudget;
+
+        // MAID BEGIN salvage-expeditions
+        if (_missionParams.MissionType == SalvageMissionType.Elimination)
+            mobBudget *= 0.5f;
+        // MAID END salvage-expeditions
         var faction = _prototypeManager.Index<SalvageFactionPrototype>(mission.Faction);
         var randomSystem = _entManager.System<RandomSystem>();
 

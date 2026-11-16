@@ -5,6 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared.Random; // MAID salvage-expeditions
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Procedural;
@@ -40,4 +41,15 @@ public sealed partial class SalvageDifficultyPrototype : IPrototype
 
     [DataField("recommendedPlayers", required: true)]
     public int RecommendedPlayers;
+
+    // MAID BEGIN salvage-expeditions
+    [DataField]
+    public List<ProtoId<WeightedRandomEntityPrototype>> Rewards = new();
+
+    /// <summary>
+    /// How many faction structures have to be destroyed on destruction missions.
+    /// </summary>
+    [DataField]
+    public int StructureCount = 1;
+    // MAID END salvage-expeditions
 }

@@ -11,6 +11,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Shared._Maid.Salvage; // MAID salvage-expeditions
 using Content.Shared.Salvage.Expeditions.Modifiers;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
@@ -99,6 +100,14 @@ public sealed record SalvageMissionParams
     [ViewVariables(VVAccess.ReadWrite)] public int Seed;
 
     public string Difficulty = string.Empty;
+
+    // MAID BEGIN salvage-expeditions
+    /// <summary>
+    /// Objective of the mission.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public SalvageMissionType MissionType;
+    // MAID END salvage-expeditions
 }
 
 /// <summary>
@@ -160,6 +169,13 @@ public sealed record SalvageMission(
     /// Modifiers (outside of the above) applied to the mission.
     /// </summary>
     public List<string> Modifiers = Modifiers;
+
+    // MAID BEGIN salvage-expeditions
+    /// <summary>
+    /// Entity prototypes ordered through cargo on mission completion.
+    /// </summary>
+    public List<string> Rewards { get; init; } = new();
+    // MAID END salvage-expeditions
 }
 
 [Serializable, NetSerializable]
