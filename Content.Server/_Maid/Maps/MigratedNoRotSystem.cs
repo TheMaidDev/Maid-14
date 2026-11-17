@@ -14,7 +14,7 @@ public sealed class MigratedNoRotSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<BeforeEntityReadEvent>(OnBeforeRead, after: [typeof(MapMigrationSystem)]);
-        SubscribeLocalEvent<TransformComponent, MapInitEvent>(OnXformMapInit);
+        SubscribeLocalEvent<TransformComponent, TransformStartupEvent>(OnXformStartup);
     }
 
     private void OnBeforeRead(BeforeEntityReadEvent ev)
@@ -26,7 +26,7 @@ public sealed class MigratedNoRotSystem : EntitySystem
         }
     }
 
-    private void OnXformMapInit(Entity<TransformComponent> ent, ref MapInitEvent args)
+    private void OnXformStartup(Entity<TransformComponent> ent, ref TransformStartupEvent args)
     {
         if (_migratedTargets.Count == 0 || !ent.Comp.NoLocalRotation || ent.Comp.LocalRotation == Angle.Zero)
             return;
