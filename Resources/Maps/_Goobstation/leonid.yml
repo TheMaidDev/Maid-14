@@ -103006,7 +103006,6 @@ entities:
   - uid: 10550
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: -26.5,28.5
       parent: 2
 - proto: ComputerCargoOrdersMedical
@@ -103014,7 +103013,6 @@ entities:
   - uid: 14362
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -45.5,-14.5
       parent: 2
 - proto: ComputerCargoOrdersScience
@@ -103022,7 +103020,6 @@ entities:
   - uid: 10547
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -57.5,-54.5
       parent: 2
 - proto: ComputerCargoOrdersSecurity
@@ -103030,7 +103027,6 @@ entities:
   - uid: 13796
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -68.5,31.5
       parent: 2
 - proto: ComputerCargoOrdersService
@@ -103038,7 +103034,6 @@ entities:
   - uid: 15596
     components:
     - type: Transform
-      rot: 3.141592653589793 rad
       pos: -18.5,-5.5
       parent: 2
 - proto: ComputerCloningConsole

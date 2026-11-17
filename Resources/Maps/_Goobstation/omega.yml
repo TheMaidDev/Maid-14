@@ -33294,7 +33294,6 @@ entities:
   - uid: 6324
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: -28.5,-7.5
       parent: 2
 - proto: ComputerCargoOrdersMedical
@@ -33309,7 +33308,6 @@ entities:
   - uid: 11321
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 3.5,-18.5
       parent: 2
 - proto: ComputerCargoOrdersSecurity
@@ -33324,7 +33322,6 @@ entities:
   - uid: 11720
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: -17.5,-1.5
       parent: 2
 - proto: ComputerComms

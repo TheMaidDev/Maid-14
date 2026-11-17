@@ -68916,7 +68916,6 @@ entities:
   - uid: 10838
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 2.5,-52.5
       parent: 2
 - proto: ComputerCargoOrdersMedical
@@ -68931,7 +68930,6 @@ entities:
   - uid: 10840
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 69.5,-25.5
       parent: 2
 - proto: ComputerCargoOrdersSecurity
@@ -68946,7 +68944,6 @@ entities:
   - uid: 10842
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: -25.5,-5.5
       parent: 2
 - proto: ComputerCloningConsole
