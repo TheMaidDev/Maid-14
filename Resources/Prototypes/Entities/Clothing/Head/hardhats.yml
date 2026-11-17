@@ -121,8 +121,7 @@
     - Hair
     - HeadTop
     unfoldedHideLayers: [ HeadTop ]
-  - type: HideLayerClothing
-    layers: { HeadTop: HEAD } # Maid changes end
+  - type: HideLayerClothing # Maid changes end
 
 - type: entity
   parent: ClothingHeadHatHardhatBase
