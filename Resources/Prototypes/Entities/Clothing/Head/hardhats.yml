@@ -114,14 +114,11 @@
         Slash: 0.9
         Piercing: 0.9
         Heat: 0.9
-  - type: Foldable # Maid changes start
-    canFoldInsideContainer: true
-  - type: FoldableClothing
-    foldedHideLayers:
-    - Hair
-    - HeadTop
-    unfoldedHideLayers: [ HeadTop ]
-  - type: HideLayerClothing # Maid changes end
+  - type: HideLayerClothing
+    layers:
+      Hair: HEAD
+      HeadTop: HEAD
+      HeadSide: HEAD
 
 - type: entity
   parent: ClothingHeadHatHardhatBase

@@ -249,11 +249,11 @@
     - PlasmamanSafe # EE Plasmeme Change
   - type: IdentityBlocker
   - type: HideLayerClothing
-    layers: # Maid changes
-      Hair: HEAD
-      Snout: HEAD
-      HeadTop: HEAD
-      HeadSide: HEAD
+    slots:
+    - Hair
+    - Snout
+    - HeadTop
+    - HeadSide
 
 - type: entity
   abstract: true
