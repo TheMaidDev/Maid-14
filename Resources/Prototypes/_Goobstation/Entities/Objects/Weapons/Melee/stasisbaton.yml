@@ -40,6 +40,3 @@
   - type: BatterySelfRecharger
     autoRecharge: true
     autoRechargeRate: 5
-  # MAID TWEAK
-  - type: TgStunbaton
-    enabled: false
