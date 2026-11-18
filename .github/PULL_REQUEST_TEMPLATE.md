@@ -1,3 +1,4 @@
+<!-- Перед открытием изучите контрибьют гайдлайны: https://github.com/TheMaidDev/Maid-14/blob/main/CONTRIBUTING.md -->
 ## Описание
 <!-- Изменения в этом PR -->
 
