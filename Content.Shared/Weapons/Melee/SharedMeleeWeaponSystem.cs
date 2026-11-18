@@ -127,6 +127,7 @@ using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Common.MartialArts;
 using Content.Goobstation.Common.Weapons; // Goobstation - Martial Arts
 using Content.Shared._EinsteinEngines.Contests;
+using Content.Shared._Maid.Structures; // MAID window-redirect
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions.Events;
 using Content.Shared.Administration.Components;
@@ -781,6 +782,21 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
             return;
         // Maid-Tweak-end
 
+        // MAID BEGIN window-redirect
+        // Даём цели шанс перенаправить удар до нанесения урона,
+        // чтобы урон, логи MeleeHit и эффекты указывали на реальную цель.
+        var redirectEv = new MeleeDamageRedirectEvent();
+        RaiseLocalEvent(target.Value, ref redirectEv);
+        if (redirectEv.NewTarget is { } redirected
+            && redirected != target.Value
+            && !TerminatingOrDeleted(redirected)
+            && TryComp(redirected, out TransformComponent? redirectedXform))
+        {
+            target = redirected;
+            targetXform = redirectedXform;
+        }
+        // MAID END window-redirect
+
         var targets = new List<EntityUid>(1)
         {
             target.Value
@@ -977,6 +993,16 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
             if (blockEvent.Blocked)
                 continue;
             // Maid-Tweak-end
+
+            // MAID BEGIN window-redirect
+            var redirectEv = new MeleeDamageRedirectEvent();
+            RaiseLocalEvent(entity, ref redirectEv);
+            if (redirectEv.NewTarget is { } redirected && redirected != entity && !TerminatingOrDeleted(redirected))
+            {
+                entity = redirected;
+                targets[i] = redirected;
+            }
+            // MAID END window-redirect
 
             var attackedEvent = new AttackedEvent(meleeUid, user, GetCoordinates(ev.Coordinates));
             RaiseLocalEvent(entity, attackedEvent);

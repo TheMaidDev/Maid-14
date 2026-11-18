@@ -135,6 +135,7 @@ public sealed class BureaucraticErrorRule : StationEventSystem<BureaucraticError
         else
         {
             var num = RobustRandom.Next((int) (jobList.Count * 0.2f), (int) (jobList.Count * 0.3f));
+            var changed = 0;
 
             for (var i = 0; i < num; i++)
             {
@@ -142,11 +143,19 @@ public sealed class BureaucraticErrorRule : StationEventSystem<BureaucraticError
                 if (_stationJobs.IsJobUnlimited(chosenStation.Value, chosenJob))
                     continue;
 
-                _stationJobs.TryAdjustJobSlot(chosenStation.Value, chosenJob, RobustRandom.Next(-3, 6), clamp: true);
+                // Считаем только реальные изменения
+                if (!_stationJobs.TryGetJobSlot(chosenStation.Value, chosenJob, out var slotsBefore) || slotsBefore == null)
+                    continue;
+
+                if (!_stationJobs.TryAdjustJobSlot(chosenStation.Value, chosenJob, RobustRandom.Next(-3, 6), clamp: true))
+                    continue;
+
+                if (_stationJobs.TryGetJobSlot(chosenStation.Value, chosenJob, out var slotsAfter) && slotsAfter != slotsBefore)
+                    changed++;
             }
 
-            _chat.SendAdminAlert($"Bureaucratic Error: Changed slots of {num} jobs");
-            _adminLog.Add(LogType.AdminMessage, LogImpact.Low, $"Bureaucratic Error: Changed slots of {num} jobs");
+            _chat.SendAdminAlert($"Bureaucratic Error: Changed slots of {changed} jobs");
+            _adminLog.Add(LogType.AdminMessage, LogImpact.Low, $"Bureaucratic Error: Changed slots of {changed} jobs");
         }
         // MAID END bureaucratic-error
     }

@@ -6,10 +6,10 @@ namespace Content.Client._Maid.Lobby.UI;
 
 public sealed class LobbyServerListBox : BoxContainer
 {
-    // Сервера добавляются сюда. Название, описание, адрес подключения.
-    private static readonly (string Name, string Desc, string Url)[] Servers =
+    // Сервера добавляются сюда. Название, локализация описания, адрес подключения.
+    private static readonly (string Name, string DescLoc, string Url)[] Servers =
     {
-        ("BattleFront", "Сервер на нашем хосте", "ss14://battlefront.maidstation14.ru:1213"),
+        ("BattleFront", "ui-lobby-server-battlefront-desc", "ss14://battlefront.maidstation14.ru:1213"),
     };
 
     private readonly IGameController _gameController;
@@ -20,13 +20,13 @@ public sealed class LobbyServerListBox : BoxContainer
         _gameController = IoCManager.Resolve<IGameController>();
         Orientation = LayoutOrientation.Vertical;
 
-        foreach (var (name, desc, url) in Servers)
+        foreach (var (name, descLoc, url) in Servers)
         {
-            AddServerInfo(name, desc, url);
+            AddServerInfo(name, descLoc, url);
         }
     }
 
-    private void AddServerInfo(string serverName, string description, string url)
+    private void AddServerInfo(string serverName, string descriptionLoc, string url)
     {
         var serverBox = new BoxContainer
         {
@@ -48,7 +48,7 @@ public sealed class LobbyServerListBox : BoxContainer
         {
             MaxWidth = 500
         };
-        descriptionLabel.SetMessage(FormattedMessage.FromMarkup(description));
+        descriptionLabel.SetMessage(FormattedMessage.FromMarkup(Loc.GetString(descriptionLoc)));
 
         var buttonBox = new BoxContainer
         {
@@ -66,7 +66,7 @@ public sealed class LobbyServerListBox : BoxContainer
 
         connectButton.OnPressed += _ =>
         {
-            _gameController.Redial(url, "Connecting to another server...");
+            _gameController.Redial(url, Loc.GetString("ui-lobby-server-list-connecting"));
 
             foreach (var button in _connectButtons)
             {

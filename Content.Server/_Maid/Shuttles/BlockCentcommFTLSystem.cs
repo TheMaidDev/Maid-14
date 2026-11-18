@@ -1,6 +1,7 @@
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking.Rules;
 using Content.Shared._Maid.Shuttles;
+using Robust.Server.Physics;
 
 namespace Content.Server._Maid.Shuttles;
 
@@ -12,6 +13,7 @@ public sealed class BlockCentcommFTLSystem : EntitySystem
 
         SubscribeLocalEvent<AntagSelectionComponent, RuleLoadedGridsEvent>(OnAntagRuleLoadedGrids);
         SubscribeLocalEvent<BlockCentcommFTLComponent, RuleLoadedGridsEvent>(OnBlockedRuleLoadedGrids);
+        SubscribeLocalEvent<BlockCentcommFTLComponent, GridSplitEvent>(OnGridSplit);
     }
 
     private void OnAntagRuleLoadedGrids(Entity<AntagSelectionComponent> ent, ref RuleLoadedGridsEvent args)
@@ -22,6 +24,11 @@ public sealed class BlockCentcommFTLSystem : EntitySystem
     private void OnBlockedRuleLoadedGrids(Entity<BlockCentcommFTLComponent> ent, ref RuleLoadedGridsEvent args)
     {
         BlockGrids(args.Grids);
+    }
+
+    private void OnGridSplit(Entity<BlockCentcommFTLComponent> ent, ref GridSplitEvent args)
+    {
+        BlockGrids(args.NewGrids);
     }
 
     private void BlockGrids(IReadOnlyList<EntityUid> grids)

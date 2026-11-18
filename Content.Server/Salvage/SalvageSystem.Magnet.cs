@@ -58,6 +58,7 @@ public sealed partial class SalvageSystem
         _mobStateQuery = GetEntityQuery<MobStateComponent>();
 
         SubscribeLocalEvent<SalvageMagnetDataComponent, MapInitEvent>(OnMagnetDataMapInit);
+        SubscribeLocalEvent<SalvageMagnetDataComponent, ComponentShutdown>(OnMagnetDataShutdown); // MAID local-magnet
 
         SubscribeLocalEvent<SalvageMagnetTargetComponent, GridSplitEvent>(OnMagnetTargetSplit);
 
@@ -115,6 +116,14 @@ public sealed partial class SalvageSystem
     {
         CreateMagnetOffers((uid, component));
     }
+
+    // MAID BEGIN local-magnet
+    private void OnMagnetDataShutdown(EntityUid uid, SalvageMagnetDataComponent component, ComponentShutdown args)
+    {
+        if (component.EndTime != null)
+            EndMagnet((uid, component));
+    }
+    // MAID END local-magnet
 
     private void OnMagnetTargetSplit(EntityUid uid, SalvageMagnetTargetComponent component, ref GridSplitEvent args)
     {

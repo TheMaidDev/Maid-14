@@ -295,7 +295,8 @@ namespace Content.Server.Atmos.EntitySystems
                 }
             }
             */
-            var maxForce = MathF.Sqrt(pressureDifference) * 2.25f;
+            // MAID space-wind: линейная шкала по документации CVar
+            var maxForce = pressureDifference * 2.25f;
             var moveProb = 100f;
 
             if (component.PressureResistance > 0)
@@ -314,11 +315,13 @@ namespace Content.Server.Atmos.EntitySystems
             if (!canMove)
                 return;
 
-            if (HasComp<MobStateComponent>(uid))
-                AddMobMovedByPressure(uid, component, physics);
-
+            // MAID space-wind: регистрируем InAir только если импульс реально будет применён,
+            // иначе повторное давление будет бесконечно сбрасывать таймаут без движения
             if (maxForce <= MovedByPressureComponent.ThrowForce)
                 return;
+
+            if (HasComp<MobStateComponent>(uid))
+                AddMobMovedByPressure(uid, component, physics);
 
             var moveForce = maxForce / (throwTarget != EntityCoordinates.Invalid
                 ? SpaceWindPressureForceDivisorThrow

@@ -19,7 +19,15 @@ public sealed class ProtectedByWindowSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<ProtectedByWindowComponent, BeforeDamageChangedEvent>(OnBeforeDamageChanged);
+        SubscribeLocalEvent<ProtectedByWindowComponent, MeleeDamageRedirectEvent>(OnMeleeRedirect);
         SubscribeLocalEvent<ProtectedByWindowComponent, PreventCollideEvent>(OnPreventCollide);
+    }
+
+    // Перенаправляем мили-удар на окно до нанесения урона.
+    private void OnMeleeRedirect(Entity<ProtectedByWindowComponent> ent, ref MeleeDamageRedirectEvent args)
+    {
+        if (TryGetWindow(ent, out var window))
+            args.NewTarget = window;
     }
 
     private void OnBeforeDamageChanged(Entity<ProtectedByWindowComponent> ent, ref BeforeDamageChangedEvent args)

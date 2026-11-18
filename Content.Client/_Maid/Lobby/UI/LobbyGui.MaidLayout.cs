@@ -14,7 +14,10 @@ public sealed partial class LobbyGui
     private void MaidInitializeLayout()
     {
         SwitchLayoutButton.OnPressed += _ =>
+        {
             _maidCfg.SetCVar(MaidCVars.LobbyClassicLayout, !_maidCfg.GetCVar(MaidCVars.LobbyClassicLayout));
+            _maidCfg.SaveToFile();
+        };
         _maidCfg.OnValueChanged(MaidCVars.LobbyClassicLayout, MaidApplyLayout, true);
     }
 
