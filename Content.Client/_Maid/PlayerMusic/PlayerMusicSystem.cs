@@ -369,7 +369,9 @@ public sealed class PlayerMusicSystem : EntitySystem
 
             // New run, or "repeat" was switched. The loop flag of a sound cannot be changed while it plays,
             // so it is restarted at the same position (the server keeps StartedAt consistent for this).
-            StopLocal(ent.Owner);
+            // The eviction is deferred: for a moment the restarted song is not playing, and a full
+            // cache must not evict it right before it is started again.
+            StopLocal(ent.Owner, evict: false);
         }
 
         if (_failed.Contains(songId))
@@ -430,18 +432,25 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
 
         _playing[ent.Owner] = new PlayingState(played.Entity, songId, startedAt, comp.Repeat);
+
+        // The playback slot was freed above without evicting: reclaim the space now that
+        // the restarted song is playing again and protected from eviction
+        EvictOldSongs();
     }
 
-    private void StopLocal(EntityUid boombox)
+    private void StopLocal(EntityUid boombox, bool evict = true)
     {
         if (!_playing.Remove(boombox, out var state))
             return;
 
         DeleteAudio(state.AudioEntity);
 
-        // The stopped song no longer needs protection from eviction: free its decoded
-        // bytes right away instead of waiting for the next download to trigger it
-        EvictOldSongs();
+        if (evict)
+        {
+            // The stopped song no longer needs protection from eviction: free its decoded
+            // bytes right away instead of waiting for the next download to trigger it
+            EvictOldSongs();
+        }
     }
 
     private void DeleteAudio(EntityUid audio)
