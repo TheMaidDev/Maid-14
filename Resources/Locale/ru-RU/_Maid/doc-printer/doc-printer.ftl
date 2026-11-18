@@ -1,0 +1,17 @@
+doc-printer-window-title = Принтер документов
+doc-printer-tab-documents = Документы
+doc-printer-tab-cargo = Заказ карго
+doc-printer-search = Поиск...
+doc-printer-cargo-requester = Заказчик
+doc-printer-cargo-reason = Причина
+doc-printer-cargo-amount = Количество
+doc-printer-cargo-print = Распечатать бланк
+doc-printer-section-centcomm = Центральное Командование
+doc-printer-section-command = Командование
+doc-printer-section-security = Служба безопасности
+doc-printer-section-engineering = Инженерный отдел
+doc-printer-section-medical = Медицинский отдел
+doc-printer-section-science = Научный отдел
+doc-printer-section-cargo = Карго
+doc-printer-section-service = Сервис
+doc-printer-section-syndicate = J@4D*S

@@ -57,6 +57,12 @@
   result: RipleyHarness
   categories:
   - Ripley # Goobstation
+  # Maid-edit-start
+  completetime: 10
+  materials:
+    Steel: 1500
+    Glass: 1200
+  # Maid-edit-end
 
 - type: latheRecipe
   parent: BaseRipleyLimbRecipe

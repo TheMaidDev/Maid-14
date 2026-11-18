@@ -97189,7 +97189,6 @@ entities:
   - uid: 14832
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: 79.5,-11.5
       parent: 2
 - proto: ComputerCargoOrdersMedical
@@ -97197,7 +97196,6 @@ entities:
   - uid: 14833
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: 18.5,41.5
       parent: 2
 - proto: ComputerCargoOrdersScience
@@ -97212,7 +97210,6 @@ entities:
   - uid: 14835
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 29.5,18.5
       parent: 2
 - proto: ComputerCargoOrdersService
@@ -97220,7 +97217,6 @@ entities:
   - uid: 14836
     components:
     - type: Transform
-      rot: 3.141592653589793 rad
       pos: -6.5,9.5
       parent: 2
 - proto: ComputerCloningConsole

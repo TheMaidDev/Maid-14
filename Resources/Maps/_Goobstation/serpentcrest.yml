@@ -74328,7 +74328,6 @@ entities:
   - uid: 4876
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -12.5,49.5
       parent: 2
   - uid: 7182
@@ -74351,19 +74350,16 @@ entities:
   - uid: 6827
     components:
     - type: Transform
-      rot: 3.141592653589793 rad
       pos: -14.5,-48.5
       parent: 2
   - uid: 8517
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -14.5,40.5
       parent: 2
   - uid: 21956
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 9.5,-47.5
       parent: 2
 - proto: ComputerCargoOrdersScience
@@ -74376,13 +74372,11 @@ entities:
   - uid: 6508
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 55.5,17.5
       parent: 2
   - uid: 8518
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -14.5,48.5
       parent: 2
 - proto: ComputerCargoOrdersSecurity
@@ -74390,13 +74384,11 @@ entities:
   - uid: 200
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: -7.5,6.5
       parent: 2
   - uid: 8522
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -16.5,42.5
       parent: 2
 - proto: ComputerCargoOrdersService
@@ -74404,13 +74396,11 @@ entities:
   - uid: 1072
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 26.5,47.5
       parent: 2
   - uid: 8526
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: -16.5,47.5
       parent: 2
   - uid: 17641

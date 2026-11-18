@@ -27,6 +27,12 @@
   timeout: 180
 
 - type: moodEffect
+  id: MobRaked
+  description: mood-effect-mob-raked
+  moodChange: Big
+  timeout: 180
+
+- type: moodEffect
   id: MobVomit
   description: mood-effect-mob-vomit
   moodChange: Small

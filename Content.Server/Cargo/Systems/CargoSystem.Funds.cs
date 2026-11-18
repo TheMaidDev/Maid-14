@@ -35,7 +35,7 @@ public sealed partial class CargoSystem
 
         if (args.Account == ent.Comp.Account ||
             args.Amount <= 0 ||
-            args.Amount > GetBalanceFromAccount((station, bank), ent.Comp.Account) * ent.Comp.TransferLimit)
+            args.Amount > GetBalanceFromAccount((station, bank), bank.PrimaryAccount) * ent.Comp.TransferLimit) // MAID fix department balance
             return;
 
         if (Timing.CurTime < ent.Comp.NextAccountActionTime)

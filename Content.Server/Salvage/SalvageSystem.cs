@@ -118,6 +118,7 @@ namespace Content.Server.Salvage
             InitializeExpeditions();
             InitializeMagnet();
             InitializeRunner();
+            InitializeMissions(); // MAID salvage-expeditions
         }
 
         private void Report(EntityUid source, string channelName, string messageKey, params (string, object)[] args)
@@ -132,6 +133,7 @@ namespace Content.Server.Salvage
             UpdateExpeditions();
             UpdateMagnet();
             UpdateRunner();
+            UpdateMissions(); // MAID salvage-expeditions
         }
     }
 }

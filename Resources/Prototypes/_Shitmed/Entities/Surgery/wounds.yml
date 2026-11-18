@@ -223,8 +223,10 @@
 #      BoneDamage: -0.21
       VeinsDamage: 0.34
       NerveDamage: 0.34
-    mangledMultipliers:
-      BoneDamage: 1
+    # Maid-edit-start
+    # mangledMultipliers:
+      # BoneDamage: 1
+    # Maid-edit-end
   - type: PainInflicter
     multiplier: 0.6
 

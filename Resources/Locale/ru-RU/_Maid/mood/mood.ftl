@@ -7,6 +7,7 @@ mood-effect-suffocating = НЕ.. МОГУ... ДЫШАТЬ...
 mood-effect-on-fire = ГОРЮ!!!
 mood-effect-creampied = Меня окремили. На вкус как пирог.
 mood-effect-mob-slipped = Опять поскальзываюсь. Надо быть аккуратнее.
+mood-effect-mob-raked = Наступил на грабли... до сих пор чувствую черенок в лице.
 mood-effect-mob-vomit = Меня только что вырвало. Мерзость.
 mood-effect-mob-low-pressure = Меня сейчас разорвёт наружу!
 mood-effect-mob-high-pressure = На меня оказывается огромное давление!

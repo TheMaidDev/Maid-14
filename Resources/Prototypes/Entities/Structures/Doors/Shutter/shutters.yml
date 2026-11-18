@@ -107,6 +107,7 @@
       path: /Audio/Machines/shutter.ogg
     closeSound:
       path: /Audio/Machines/shutter.ogg
+    pryTime: 0.1 # Maid
   - type: Weldable
     time: 3
   - type: Appearance

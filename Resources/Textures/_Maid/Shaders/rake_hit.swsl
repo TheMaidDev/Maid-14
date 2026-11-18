@@ -1,0 +1,33 @@
+uniform sampler2D SCREEN_TEXTURE;
+uniform highp float impact; // 0..1 — impact flash strength (first moments of the hit)
+uniform highp float daze;   // 0..1 — dizzy wobble strength (decays over the daze duration)
+
+const highp float DazeScale = 0.010;
+const highp float CAScale = 0.030; // chromatic aberration amplitude, the main juice
+const highp vec3 FlashTint = vec3(1.0, 0.82, 0.72); // hot red-white
+
+void fragment() {
+    // NOTE: like drunk.swsl / grain.swsl the output stays LIT (no light_mode unshaded) —
+    // an unshaded screen copy would wipe out lighting and FOV shadows.
+
+    highp vec2 coord = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
+    highp float time = TIME;
+
+    // Dizzy wobble: layered sine offsets scaled by the daze amount (drunk.swsl style).
+    highp float mod = DazeScale * daze;
+    highp vec2 offset = vec2(mod * 1.5 * sin(time * 6.0), mod * 2.0 * cos(time * 5.0 - 0.2));
+    highp vec4 tex1 = zTextureSpec(SCREEN_TEXTURE, coord + offset);
+
+    // Chromatic aberration: strong color split while dizzy — red and blue ghosts
+    // drift apart and back, decaying with the daze.
+    highp vec2 ca = vec2(CAScale * daze * sin(time * 4.0), CAScale * daze * cos(time * 3.5 - 0.4));
+    highp float r = zTextureSpec(SCREEN_TEXTURE, coord + ca).r;
+    highp float g = zTextureSpec(SCREEN_TEXTURE, coord - ca * 0.35).g;
+    highp float b = zTextureSpec(SCREEN_TEXTURE, coord - ca).b;
+    tex1 = vec4(r, g, b, tex1.a);
+
+    // Impact flash: mix toward a hot red-white in the first moments of the hit.
+    highp vec3 col = mix(tex1.rgb, FlashTint, impact);
+
+    COLOR = vec4(col, tex1.a);
+}
