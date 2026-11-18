@@ -16,7 +16,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
     [Dependency] private readonly IFileDialogManager _dialog = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
-    public event Action<int>? OnPlayTrack;
+    public event Action<int, string>? OnPlayTrack;
     public event Action? OnStop;
     public event Action<bool>? OnRepeat;
     public event Action<string, byte[]>? OnUpload;
@@ -70,7 +70,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
                     ("name", track.Name)),
                 HorizontalExpand = true,
             };
-            button.OnPressed += _ => OnPlayTrack?.Invoke(index);
+            button.OnPressed += _ => OnPlayTrack?.Invoke(index, track.Id);
             TrackList.AddChild(button);
         }
 
@@ -88,6 +88,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
             return;
 
         _dialogOpen = true;
+        UpdateUploadButton();
         try
         {
             var filters = new FileDialogFilters(new FileDialogFilters.Group("ogg"));
@@ -163,6 +164,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
         finally
         {
             _dialogOpen = false;
+            UpdateUploadButton();
         }
     }
 
@@ -176,7 +178,9 @@ public sealed partial class PlayerMusicWindow : FancyWindow
 
     private void Upload()
     {
-        if (_pending == null || NameField.Text.Trim().Length == 0)
+        // The dialog open guard keeps the previous selection from being sent
+        // while a replacement file is still being read
+        if (_dialogOpen || _pending == null || NameField.Text.Trim().Length == 0)
             return;
 
         OnUpload?.Invoke(NameField.Text, _pending);
@@ -190,7 +194,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
 
     private void UpdateUploadButton()
     {
-        UploadButton.Disabled = !_canRecord || _pending == null || NameField.Text.Trim().Length == 0;
+        UploadButton.Disabled = !_canRecord || _dialogOpen || _pending == null || NameField.Text.Trim().Length == 0;
     }
 
     private static string FormatMb(int bytes)

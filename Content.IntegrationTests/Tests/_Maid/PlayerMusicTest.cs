@@ -113,7 +113,7 @@ public sealed class PlayerMusicTest
             Assert.That(
                 cUi.TryGetOpenUi<PlayerMusicBoundUserInterface>(cBoombox, PlayerMusicUiKey.Key, out var bui),
                 Is.True, "the device window must be open on the client");
-            bui!.SendMessage(new PlayerMusicPlayMessage(0));
+            bui!.SendMessage(new PlayerMusicPlayMessage(0, songId));
         });
 
         // Nearby client downloads the song in chunks and decodes it; both sides have to tick

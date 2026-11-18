@@ -213,6 +213,12 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
 
         var track = tracks[args.Track];
+
+        // The selection must still match what the window showed: another player may have
+        // swapped the cassette since the track list was synced to the clicking player
+        if (track.Id != args.TrackId)
+            return;
+
         if (!_songs.ContainsKey(track.Id))
         {
             _popup.PopupEntity(Loc.GetString("maid-music-song-lost"), ent, args.Actor, PopupType.SmallCaution);
@@ -431,7 +437,14 @@ public sealed class PlayerMusicSystem : EntitySystem
         // The throttle comes next: repeated starts must not churn multi-megabyte buffers
         var now = _timing.CurTime;
         if (_lastUploadStart.TryGetValue(userId, out var lastStart) && now - lastStart < UploadStartThrottle)
+        {
+            // The client has already discarded the replacement file and cleared its status:
+            // at least tell the player why nothing is going to be recorded
+            if (session.AttachedEntity is { } throttled)
+                _popup.PopupEntity(Loc.GetString("maid-music-cooldown"), throttled, throttled, PopupType.SmallCaution);
+
             return;
+        }
         _lastUploadStart[userId] = now;
 
         var boomboxUid = GetEntity(ev.Boombox);
@@ -569,15 +582,19 @@ public sealed class PlayerMusicSystem : EntitySystem
         var userId = session.UserId;
         var id = Convert.ToHexString(SHA256.HashData(data))[..32];
 
+        // The round quota is per player and independent of the song storage: re-recording a song
+        // this player already recorded is always free, and a song somebody else stored still
+        // charges the quota of the player recording it now.
+        var owned = _owned.GetOrNew(userId);
+        if (!owned.Contains(id) && owned.Count >= _cfg.GetCVar(PlayerMusicCVars.MaxSongsPerPlayer))
+        {
+            Deny(boomboxUid, user, "maid-music-quota");
+            return;
+        }
+
         if (!_songs.ContainsKey(id))
         {
-            var owned = _owned.GetOrNew(userId);
-            if (owned.Count >= _cfg.GetCVar(PlayerMusicCVars.MaxSongsPerPlayer))
-            {
-                Deny(boomboxUid, user, "maid-music-quota");
-                return;
-            }
-
+            // The bytes are not stored yet, so the global storage budget applies here
             if (_totalBytes + data.Length > _cfg.GetCVar(PlayerMusicCVars.MaxTotalBytes))
             {
                 Deny(boomboxUid, user, "maid-music-storage-full");
@@ -586,8 +603,9 @@ public sealed class PlayerMusicSystem : EntitySystem
 
             _songs[id] = new StoredSong(id, name, data, userId, TimeSpan.FromSeconds(info.Seconds));
             _totalBytes += data.Length;
-            owned.Add(id);
         }
+
+        owned.Add(id);
 
         _lastUpload[userId] = _timing.CurTime;
 
@@ -682,12 +700,12 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (_transfers.Count >= MaxTransfers)
             return;
 
-        // Dropped requests are fine: the client asks again after a few seconds
+        // Dropped requests are fine: the client asks again after a few seconds. The throttle
+        // marker is recorded only for ACCEPTED requests: a refused one (out of range, wrong
+        // boombox) must not block an eligible request the client makes right after it.
         var now = _timing.CurTime;
         if (_lastRequest.TryGetValue(session.UserId, out var last) && now - last < TimeSpan.FromSeconds(1))
             return;
-
-        _lastRequest[session.UserId] = now;
 
         if (ev.SongId is not { } songId || songId.Length > MaxSongIdLength)
             return;
@@ -707,6 +725,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (!_xform.InRange(Transform(user).Coordinates, Transform(boombox).Coordinates, range))
             return;
 
+        _lastRequest[session.UserId] = now;
         _transfers[session.UserId] = new Transfer(session, song);
         RaiseNetworkEvent(new PlayerMusicFileStartEvent(song.Id, song.Data.Length), Filter.SinglePlayer(session), false);
     }

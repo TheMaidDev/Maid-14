@@ -9,12 +9,14 @@ public enum PlayerMusicUiKey : byte
 }
 
 /// <summary>
-/// Play the track with the given index from the inserted cassette.
+/// Play the track with the given index from the inserted cassette. The expected track id
+/// is included so a cassette swapped since the window was synced cannot start a wrong track.
 /// </summary>
 [Serializable, NetSerializable]
-public sealed class PlayerMusicPlayMessage(int track) : BoundUserInterfaceMessage
+public sealed class PlayerMusicPlayMessage(int track, string trackId) : BoundUserInterfaceMessage
 {
     public int Track { get; } = track;
+    public string TrackId { get; } = trackId;
 }
 
 [Serializable, NetSerializable]

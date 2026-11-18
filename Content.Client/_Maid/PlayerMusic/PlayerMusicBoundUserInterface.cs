@@ -26,7 +26,7 @@ public sealed class PlayerMusicBoundUserInterface : BoundUserInterface
 
         _window = this.CreateWindow<PlayerMusicWindow>();
 
-        _window.OnPlayTrack += track => SendMessage(new PlayerMusicPlayMessage(track));
+        _window.OnPlayTrack += (track, trackId) => SendMessage(new PlayerMusicPlayMessage(track, trackId));
         _window.OnStop += () => SendMessage(new PlayerMusicStopMessage());
         _window.OnRepeat += repeat => SendMessage(new PlayerMusicRepeatMessage(repeat));
         _window.OnUpload += (name, data) => EntMan.System<PlayerMusicSystem>().RequestUpload(Owner, name, data);

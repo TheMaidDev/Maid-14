@@ -37,6 +37,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// <summary>
     /// Byte budget for the decoded song cache. One long song takes ~46 MB decoded,
     /// and songs that are currently playing are never evicted, so the count cap alone is not enough.
+    /// Playing songs may temporarily exceed this budget; space is reclaimed as soon as they stop.
     /// </summary>
     private const long MaxCachedBytes = 128_000_000;
 
@@ -60,6 +61,13 @@ public sealed class PlayerMusicSystem : EntitySystem
     private static readonly TimeSpan IncomingTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(0.5);
     private static readonly TimeSpan EndSlack = TimeSpan.FromMilliseconds(50);
+
+    /// <summary>
+    /// A song rejected by a configurable server limit is retried after a while: an admin may
+    /// restore the limit, and the song must start for listeners who are still waiting.
+    /// </summary>
+    private static readonly TimeSpan LimitRetry = TimeSpan.FromSeconds(60);
+
     private static ulong _shareIdx;
 
     private readonly MemoryContentRoot _contentRoot = new();
@@ -76,6 +84,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     private readonly Dictionary<string, TimeSpan> _requested = new();
     private readonly Dictionary<string, IncomingFile> _incoming = new();
     private readonly HashSet<string> _failed = new();
+    private readonly Dictionary<string, TimeSpan> _limitFailed = new();
     private readonly Dictionary<EntityUid, PlayingState> _playing = new();
     private readonly Queue<EntityEventArgs> _outgoing = new();
 
@@ -117,6 +126,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     {
         _requested.Clear();
         _failed.Clear();
+        _limitFailed.Clear();
         _incoming.Clear();
         _outgoing.Clear();
     }
@@ -145,6 +155,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         _cacheOrder.Clear();
         _requested.Clear();
         _failed.Clear();
+        _limitFailed.Clear();
         _incoming.Clear();
         _outgoing.Clear();
         _contentRoot.Clear();
@@ -364,6 +375,15 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (_failed.Contains(songId))
             return;
 
+        // A song rejected by a server limit is retried after a while: the limit may have been restored
+        if (_limitFailed.TryGetValue(songId, out var limitAt))
+        {
+            if (_timing.CurTime - limitAt < LimitRetry)
+                return;
+
+            _limitFailed.Remove(songId);
+        }
+
         if (!_cache.TryGetValue(songId, out var resource))
         {
             RequestFile(ent.Owner, songId);
@@ -418,6 +438,10 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
 
         DeleteAudio(state.AudioEntity);
+
+        // The stopped song no longer needs protection from eviction: free its decoded
+        // bytes right away instead of waiting for the next download to trigger it
+        EvictOldSongs();
     }
 
     private void DeleteAudio(EntityUid audio)
@@ -456,7 +480,12 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (ev.TotalBytes <= 0 ||
             ev.TotalBytes > Math.Min(PlayerMusicLimits.HardMaxSongBytes, _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes)))
         {
-            Fail(ev.SongId, "unexpected file size");
+            // Above the hard ceiling the file can never be played: permanent failure.
+            // Above only the current server limit: retryable, the limit may be restored later.
+            if (ev.TotalBytes > PlayerMusicLimits.HardMaxSongBytes)
+                Fail(ev.SongId, "unexpected file size");
+            else
+                LimitFail(ev.SongId, "file exceeds the current server size limit");
             return;
         }
 
@@ -509,11 +538,23 @@ public sealed class PlayerMusicSystem : EntitySystem
         var maxSeconds = Math.Min(PlayerMusicLimits.HardMaxSongSeconds, _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds));
         var maxDecoded = Math.Min(PlayerMusicLimits.HardMaxDecodedBytes, (long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes));
 
-        if (!PlayerMusicOgg.TryAnalyze(data, out var info) ||
-            info.Seconds > maxSeconds ||
-            info.DecodedBytes > maxDecoded)
+        if (!PlayerMusicOgg.TryAnalyze(data, out var info))
         {
-            Fail(songId, "file is damaged or too big after decoding");
+            Fail(songId, "file is damaged");
+            return;
+        }
+
+        if (info.Seconds > PlayerMusicLimits.HardMaxSongSeconds ||
+            info.DecodedBytes > PlayerMusicLimits.HardMaxDecodedBytes)
+        {
+            Fail(songId, "file exceeds the hard playback limits");
+            return;
+        }
+
+        if (info.Seconds > maxSeconds || info.DecodedBytes > maxDecoded)
+        {
+            // A configurable limit was lowered below this song: retryable, not a broken file
+            LimitFail(songId, "file exceeds the current server limits");
             return;
         }
 
@@ -548,6 +589,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         _cacheBytes += info.DecodedBytes;
         _cacheOrder.Enqueue(songId);
         _requested.Remove(songId);
+        _limitFailed.Remove(songId);
 
         // Start playback on every boombox that was waiting for this song. This runs before the
         // eviction below: a playing song is protected from it, so a full cache cannot evict the
@@ -569,6 +611,19 @@ public sealed class PlayerMusicSystem : EntitySystem
     {
         Log.Warning($"PlayerMusic: song {songId} rejected: {reason}");
         _failed.Add(songId);
+        _limitFailed.Remove(songId);
+        _incoming.Remove(songId);
+        _requested.Remove(songId);
+    }
+
+    /// <summary>
+    /// A song rejected by a configurable limit is not broken: it is retried after a while,
+    /// and starts playing once the limit permits it again.
+    /// </summary>
+    private void LimitFail(string songId, string reason)
+    {
+        Log.Warning($"PlayerMusic: song {songId} rejected by a server limit: {reason}");
+        _limitFailed[songId] = _timing.CurTime;
         _incoming.Remove(songId);
         _requested.Remove(songId);
     }
