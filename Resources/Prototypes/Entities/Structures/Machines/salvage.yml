@@ -60,6 +60,10 @@
     channels:
     - Supply
   - type: SalvageMagnet
+  # MAID BEGIN
+  - type: SalvageMagnetData
+    offerCount: 1
+  # MAID END
   - type: ApcPowerReceiver
     powerLoad: 2500 # TODO change this to a HV power draw that really hits the grid hard WHEN active
   - type: Machine

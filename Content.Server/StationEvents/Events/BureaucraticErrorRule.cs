@@ -55,6 +55,8 @@ public sealed class BureaucraticErrorRule : StationEventSystem<BureaucraticError
         if (jobList.Count == 0)
             return;
 
+        // MAID BEGIN bureaucratic-error
+        /*
         #region Goobstation changes
         // Fully re-do how this event works, to be less shit,
         // This fully replaces the code.
@@ -113,5 +115,39 @@ public sealed class BureaucraticErrorRule : StationEventSystem<BureaucraticError
             }
         }
         #endregion
+        */
+        if (RobustRandom.Prob(0.25f))
+        {
+            var chosenJob = RobustRandom.PickAndTake(jobList);
+            _stationJobs.MakeJobUnlimited(chosenStation.Value, chosenJob);
+
+            foreach (var job in jobList)
+            {
+                if (_stationJobs.IsJobUnlimited(chosenStation.Value, job))
+                    continue;
+
+                _stationJobs.TrySetJobSlot(chosenStation.Value, job, 0);
+            }
+
+            _chat.SendAdminAlert($"Bureaucratic Error: Made {chosenJob} unlimited and closed the other jobs");
+            _adminLog.Add(LogType.AdminMessage, LogImpact.Medium, $"Bureaucratic Error: Made {chosenJob} unlimited and closed the other jobs");
+        }
+        else
+        {
+            var num = RobustRandom.Next((int) (jobList.Count * 0.2f), (int) (jobList.Count * 0.3f));
+
+            for (var i = 0; i < num; i++)
+            {
+                var chosenJob = RobustRandom.PickAndTake(jobList);
+                if (_stationJobs.IsJobUnlimited(chosenStation.Value, chosenJob))
+                    continue;
+
+                _stationJobs.TryAdjustJobSlot(chosenStation.Value, chosenJob, RobustRandom.Next(-3, 6), clamp: true);
+            }
+
+            _chat.SendAdminAlert($"Bureaucratic Error: Changed slots of {num} jobs");
+            _adminLog.Add(LogType.AdminMessage, LogImpact.Low, $"Bureaucratic Error: Changed slots of {num} jobs");
+        }
+        // MAID END bureaucratic-error
     }
 }

@@ -194,3 +194,11 @@
       base: 3
       target: 0
       in: 300
+
+- type: entity
+  parent: ImmovableRodSpawn
+  id: AdaptiveImmovableRodSpawn
+  components:
+  - type: AdaptiveScoreStatic
+    chaosScore: 5
+    combatScore: 0

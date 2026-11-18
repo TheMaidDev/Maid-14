@@ -92,6 +92,7 @@
     heldPrefix: brain
   - type: Sprite
     state: brain
+  - type: ProtectedBrain # MAID
   - type: Organ # Shitmed
     intCap: 28
     integrity: 28

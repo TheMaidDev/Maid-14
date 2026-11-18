@@ -209,6 +209,7 @@
   - type: Examiner
   - type: BlockMovement
   - type: BadFood
+  - type: ProtectedBrain # MAID
   - type: Tag # goob edit
     tags:
     - Meat

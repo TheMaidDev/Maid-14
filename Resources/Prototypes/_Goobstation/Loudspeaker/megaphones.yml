@@ -58,7 +58,7 @@
   description: A comedian has to make their voice known.
   components:
   - type: Loudspeaker
-    affectRadio: true # :trollface:
+    affectRadio: false # MAID true -> false
   - type: Sprite
     sprite: _Goobstation/Objects/Tools/megaphones/clown.rsi
     state: icon

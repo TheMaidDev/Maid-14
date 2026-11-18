@@ -512,8 +512,12 @@ public sealed class SupermatterSystem : SharedSupermatterSystem
             // var absorbedGas = mix.Remove(sm.GasEfficiency * mix.TotalMoles);
             var moles = mix.TotalMoles;
 
+            // MAID BEGIN sm-delam
+            /*
             if (moles >= sm.MolePenaltyThreshold)
                 return DelamType.Singulo;
+            */
+            // MAID END sm-delam
         }
 
         if (sm.Power >= sm.PowerPenaltyThreshold)

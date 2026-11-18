@@ -136,6 +136,7 @@
     maxOccurrences: 2 # should be the same as [copies] in shuttle_incoming_event.yml
   - type: LoadMapRule
     preloadedGrid: SyndieEvacPod
+  - type: BlockCentcommFTL # MAID
 
 #- type: entity # Maid - thats strange.
 #  id: UnknownShuttleNTQuark
@@ -254,6 +255,7 @@
     chaosScore: 900
   - type: LoadMapRule
     preloadedGrid: Instigator
+  - type: BlockCentcommFTL # MAID
 
 - type: entity
   id: UnknownShuttleJoe

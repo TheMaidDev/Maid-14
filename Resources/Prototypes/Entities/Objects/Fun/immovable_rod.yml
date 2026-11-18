@@ -28,17 +28,19 @@
     state: icon
     noRot: false
   - type: ImmovableRod
-    minSpeed: 15 # Goobstation
-    maxSpeed: 15 # Goobstation
+    minSpeed: 10 # MAID 15 -> 10
+    maxSpeed: 35 # MAID 15 -> 35
   - type: Physics
     bodyType: Dynamic
     linearDamping: 0
   - type: TileFrictionModifier
     modifier: 0
-  - type: PointLight
-    radius: 3
-    color: red
-    energy: 2.0
+# MAID BEGIN
+#  - type: PointLight
+#    radius: 3
+#    color: red
+#    energy: 2.0
+# MAID END
   - type: Fixtures
     fixtures:
       fix1:

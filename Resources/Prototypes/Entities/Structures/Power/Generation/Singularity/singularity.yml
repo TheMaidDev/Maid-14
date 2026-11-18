@@ -132,7 +132,7 @@
   - type: Singularity
     energy: 180
     level: 1
-    radsPerLevel: 6 # Goobstation - Radiation Overhaul
+    radsPerLevel: 2 # MAID 6 -> 2
     energyLoss: 1
   - type: RandomWalk # To make the singularity move around.
     maxSpeed: 2.5
@@ -141,7 +141,8 @@
     falloffPower: 2.529822
     intensity: 3645
   - type: RadiationSource
-    intensity: 6 # Goobstation - Radiation Overhaul
+    intensity: 2 # MAID 6 -> 2
+    slope: 0.2 # MAID
   - type: PointLight
     enabled: true
     radius: 10

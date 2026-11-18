@@ -28,6 +28,7 @@
   - type: Examiner
   - type: BlockMovement
   - type: BadFood
+  - type: ProtectedBrain # MAID
   - type: Tag
     tags:
       - Meat

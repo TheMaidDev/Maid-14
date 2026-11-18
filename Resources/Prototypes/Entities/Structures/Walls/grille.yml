@@ -179,6 +179,7 @@
     - type: AnimationPlayer
     - type: Penetratable # Goobstation - Better snipers
       penetrateDamage: 10
+    - type: ProtectedByWindow # MAID
 
 - type: entity
   id: ClockworkGrille

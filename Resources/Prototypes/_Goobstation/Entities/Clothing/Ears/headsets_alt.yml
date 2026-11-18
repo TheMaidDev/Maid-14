@@ -19,10 +19,12 @@
   abstract: true
   parent: ClothingHeadsetAlt
   id: ClothingHeadsetAltLoudspeaker
-  components:
-  - type: Loudspeaker
-    canToggle: true
-    affectRadio: true
+# MAID BEGIN
+#  components:
+#  - type: Loudspeaker
+#    canToggle: true
+#    affectRadio: true
+# MAID END
 
 - type: entity
   parent: [ClothingHeadsetAltSyndicate, ClothingHeadsetAltLoudspeaker]
