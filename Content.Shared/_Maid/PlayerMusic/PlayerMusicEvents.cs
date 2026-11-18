@@ -32,6 +32,15 @@ public static class PlayerMusicLimits
     /// Songs are sent in pieces of this size, never as one big message.
     /// </summary>
     public const int ChunkBytes = 32 * 1024;
+
+    /// <summary>
+    /// Hard playback ceilings mirrored by the client. The client rejects downloads above them
+    /// no matter what the server cvars say, so the server must not admit anything bigger either:
+    /// such a song would be stored and then stay silent for everyone.
+    /// </summary>
+    public const int HardMaxSongBytes = 8_000_000;
+    public const int HardMaxSongSeconds = 600;
+    public const long HardMaxDecodedBytes = 100_000_000;
 }
 
 /// <summary>

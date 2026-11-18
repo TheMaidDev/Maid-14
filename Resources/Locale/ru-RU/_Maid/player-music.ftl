@@ -38,8 +38,10 @@ maid-music-bad-name = Укажите название песни.
 maid-music-cooldown = Подождите немного перед следующей записью.
 maid-music-quota = Вы уже записали максимум песен за раунд.
 maid-music-storage-full = Хранилище песен заполнено.
+maid-music-server-busy = Устройство записи сейчас занято другими загрузками, попробуйте чуть позже.
+maid-music-cassette-changed = Кассета была заменена во время записи песни.
 maid-music-recorded = Записано: { $name }
 maid-music-song-lost = Запись на кассете повреждена.
-maid-music-recorder-lost = Проигрыватель исчез до того, как песня загрузилась.
+maid-music-recorder-lost = Устройство записи исчезло до того, как песня загрузилась.
 
 ui-options-boombox-volume = Громкость бумбоксов:

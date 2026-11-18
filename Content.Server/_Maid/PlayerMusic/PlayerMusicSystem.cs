@@ -82,9 +82,10 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private sealed record StoredSong(string Id, string Name, byte[] Data, NetUserId Owner, TimeSpan Duration);
 
-    private sealed class PendingUpload(EntityUid boombox, string name, int total, TimeSpan now)
+    private sealed class PendingUpload(EntityUid boombox, EntityUid cassette, string name, int total, TimeSpan now)
     {
         public readonly EntityUid Boombox = boombox;
+        public readonly EntityUid Cassette = cassette;
         public readonly string Name = name;
         public readonly byte[] Buffer = new byte[total];
         public int Received;
@@ -93,11 +94,10 @@ public sealed class PlayerMusicSystem : EntitySystem
         public TimeSpan LastActivity = now;
     }
 
-    private sealed class Transfer(ICommonSession session, StoredSong song, EntityUid boombox)
+    private sealed class Transfer(ICommonSession session, StoredSong song)
     {
         public readonly ICommonSession Session = session;
         public readonly StoredSong Song = song;
-        public readonly EntityUid Boombox = boombox;
         public int Offset;
         public int Index;
     }
@@ -231,9 +231,11 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnStop(Entity<PlayerMusicBoomboxComponent> ent, ref PlayerMusicStopMessage args)
     {
-        if (ent.Comp.StartedAt == null || IsThrottled(ent))
+        if (ent.Comp.StartedAt == null)
             return;
 
+        // Stop always ends active playback: a throttled stop would leave the track playing
+        // even though the button is enabled. Repeated stops no-op on the check above.
         _lastUiAction[ent.Owner] = _timing.CurTime;
         StopPlaying(ent);
     }
@@ -321,8 +323,9 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (_songs.Remove(id, out var song))
         {
             _totalBytes -= song.Data.Length;
-            if (_owned.TryGetValue(song.Owner, out var owned))
-                owned.Remove(id);
+
+            // The round quota stays charged: the player did record this song, even if every
+            // cassette carrying it is gone now. _owned clears on round restart.
         }
     }
 
@@ -421,20 +424,23 @@ public sealed class PlayerMusicSystem : EntitySystem
         var session = args.SenderSession;
         var userId = session.UserId;
 
-        // The throttle comes first: repeated starts must not churn multi-megabyte buffers
+        // Any new start voids the client's previous upload: the client has already replaced it
+        // with new chunks, so a stale pending must not survive to receive them
+        DropPending(userId);
+
+        // The throttle comes next: repeated starts must not churn multi-megabyte buffers
         var now = _timing.CurTime;
         if (_lastUploadStart.TryGetValue(userId, out var lastStart) && now - lastStart < UploadStartThrottle)
             return;
         _lastUploadStart[userId] = now;
 
-        // A new start always cancels the previous unfinished upload
-        DropPending(userId);
-
         var boomboxUid = GetEntity(ev.Boombox);
-        if (!CanRecord(session, boomboxUid, out var user, out _))
+        if (!CanRecord(session, boomboxUid, out var user, out var startCassette))
             return;
 
-        var maxBytes = _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes);
+        // The client hard ceilings apply to admission too: a song above them would be stored
+        // and then silently ignored by every client on download
+        var maxBytes = Math.Min(_cfg.GetCVar(PlayerMusicCVars.MaxSongBytes), PlayerMusicLimits.HardMaxSongBytes);
         if (ev.TotalBytes <= 0 || ev.TotalBytes > maxBytes)
         {
             Deny(boomboxUid, user, "maid-music-too-big", ("max", FormatMb(maxBytes)));
@@ -443,7 +449,10 @@ public sealed class PlayerMusicSystem : EntitySystem
 
         // Half-finished uploads of all players together are capped too
         if (_pendingBytes + ev.TotalBytes > MaxPendingBytes)
+        {
+            Deny(boomboxUid, user, "maid-music-server-busy");
             return;
+        }
 
         var name = SanitizeName(ev.Name);
         if (name.Length == 0)
@@ -452,7 +461,7 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
-        _pending[userId] = new PendingUpload(boomboxUid, name, ev.TotalBytes, now);
+        _pending[userId] = new PendingUpload(boomboxUid, startCassette, name, ev.TotalBytes, now);
         _pendingBytes += ev.TotalBytes;
     }
 
@@ -516,6 +525,14 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (!CanRecord(session, boomboxUid, out var user, out var cassette))
             return;
 
+        // The cassette must still be the one the recording started on, otherwise the track
+        // would land on whatever replaced it while the chunks were on their way
+        if (cassette.Owner != upload.Cassette)
+        {
+            Deny(boomboxUid, user, "maid-music-cassette-changed");
+            return;
+        }
+
         var data = upload.Buffer;
         var name = upload.Name;
 
@@ -533,7 +550,8 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
-        var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
+        // The client hard ceilings apply here too, same as the byte cap in OnUploadStart
+        var maxSeconds = Math.Min(_cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds), PlayerMusicLimits.HardMaxSongSeconds);
         if (info.Seconds > maxSeconds)
         {
             Deny(boomboxUid, user, "maid-music-too-long", ("max", maxSeconds));
@@ -541,7 +559,8 @@ public sealed class PlayerMusicSystem : EntitySystem
         }
 
         // Memory used after decoding does not depend on the file size, only on length, rate and channels
-        if (info.DecodedBytes > _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes))
+        var maxDecoded = Math.Min((long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes), PlayerMusicLimits.HardMaxDecodedBytes);
+        if (info.DecodedBytes > maxDecoded)
         {
             Deny(boomboxUid, user, "maid-music-too-heavy");
             return;
@@ -605,17 +624,35 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (name.Length > MaxNameLength * 8)
             name = name[..(MaxNameLength * 8)];
 
+        var trimmed = name.Trim();
         var sb = new StringBuilder();
-        foreach (var c in name.Trim())
+        for (var i = 0; i < trimmed.Length; i++)
         {
+            var c = trimmed[i];
+
             if (char.IsControl(c))
                 continue;
 
-            // Skip stray low surrogates and don't split surrogate pairs (emoji) at the length cap
+            // Surrogate pairs (emoji) must travel together: an unpaired half renders as garbage.
+            // Isolated halves are skipped entirely.
+            if (char.IsHighSurrogate(c))
+            {
+                if (i + 1 >= trimmed.Length || !char.IsLowSurrogate(trimmed[i + 1]))
+                    continue;
+
+                if (sb.Length + 2 > MaxNameLength)
+                    break;
+
+                sb.Append(c);
+                sb.Append(trimmed[i + 1]);
+                i++;
+                continue;
+            }
+
             if (char.IsLowSurrogate(c))
                 continue;
 
-            if (sb.Length + (char.IsHighSurrogate(c) ? 2 : 1) > MaxNameLength)
+            if (sb.Length + 1 > MaxNameLength)
                 break;
 
             sb.Append(c);
@@ -670,7 +707,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (!_xform.InRange(Transform(user).Coordinates, Transform(boombox).Coordinates, range))
             return;
 
-        _transfers[session.UserId] = new Transfer(session, song, boombox);
+        _transfers[session.UserId] = new Transfer(session, song);
         RaiseNetworkEvent(new PlayerMusicFileStartEvent(song.Id, song.Data.Length), Filter.SinglePlayer(session), false);
     }
 
@@ -713,7 +750,10 @@ public sealed class PlayerMusicSystem : EntitySystem
             var user = order[(_sendCursor + n) % order.Count];
             var transfer = _transfers[user];
 
-            if (transfer.Session.Status != SessionStatus.InGame || !IsTransferWanted(transfer, range))
+            // Finished, disconnected or unwanted: no chunk for it, the ring drops it below
+            if (transfer.Session.Status != SessionStatus.InGame ||
+                transfer.Offset >= transfer.Song.Data.Length ||
+                !IsTransferWanted(transfer, range))
             {
                 (done ??= new()).Add(user);
                 continue;
@@ -749,21 +789,28 @@ public sealed class PlayerMusicSystem : EntitySystem
     }
 
     /// <summary>
-    /// The song must still play near the listener: teleports and stopped boomboxes cancel the transfer.
+    /// The song must still play near the listener on some boombox: teleports, stopped songs and
+    /// stopped devices cancel the transfer, but another device taking over the same song keeps
+    /// it alive without the client having to re-request it.
     /// </summary>
     private bool IsTransferWanted(Transfer transfer, float range)
     {
         if (transfer.Session.AttachedEntity is not { } user)
             return false;
 
-        if (!TryComp(transfer.Boombox, out PlayerMusicBoomboxComponent? comp) ||
-            comp.StartedAt == null ||
-            comp.SongId != transfer.Song.Id)
+        var userCoords = Transform(user).Coordinates;
+
+        var query = EntityQueryEnumerator<PlayerMusicBoomboxComponent>();
+        while (query.MoveNext(out var uid, out var comp))
         {
-            return false;
+            if (comp.StartedAt == null || comp.SongId != transfer.Song.Id)
+                continue;
+
+            if (_xform.InRange(userCoords, Transform(uid).Coordinates, range))
+                return true;
         }
 
-        return _xform.InRange(Transform(user).Coordinates, Transform(transfer.Boombox).Coordinates, range);
+        return false;
     }
 
     #endregion

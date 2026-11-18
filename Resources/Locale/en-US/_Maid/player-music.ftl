@@ -38,8 +38,10 @@ maid-music-bad-name = Enter a song name.
 maid-music-cooldown = Wait a bit before recording again.
 maid-music-quota = You have recorded the maximum number of songs this round.
 maid-music-storage-full = The song storage is full.
+maid-music-server-busy = The recorder is busy with other uploads right now, try again in a moment.
+maid-music-cassette-changed = The cassette was replaced while the song was being recorded.
 maid-music-recorded = Recorded: { $name }
 maid-music-song-lost = The recording on this cassette is damaged.
-maid-music-recorder-lost = The player disappeared before the song finished uploading.
+maid-music-recorder-lost = The recording device disappeared before the song finished uploading.
 
 ui-options-boombox-volume = Boombox volume:

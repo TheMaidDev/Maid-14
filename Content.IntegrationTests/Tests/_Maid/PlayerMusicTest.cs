@@ -193,7 +193,9 @@ public sealed class PlayerMusicTest
 
             cassette = sEntMan.SpawnEntity("MaidBlankCassette", coords);
             boombox = sEntMan.SpawnEntity("MaidBoombox", coords);
-            sSlots.TryInsert(boombox, PlayerMusicBoomboxComponent.CassetteSlotId, cassette, null);
+            Assert.That(
+                sSlots.TryInsert(boombox, PlayerMusicBoomboxComponent.CassetteSlotId, cassette, null),
+                Is.True, "cassette insertion failed");
         });
 
         await pair.RunTicksSync(15);
@@ -209,17 +211,27 @@ public sealed class PlayerMusicTest
                 "recording without the device window must be denied");
         });
 
-        // The window is open now, but the file is bigger than max_song_bytes
+        // The window is open now; a valid song above max_song_bytes is denied by the size check alone.
+        // The limit is temporarily lowered below the length of the valid mono song: this way the denial
+        // can only come from the size check, not from the ogg validation.
         await server.WaitPost(() => sUi.OpenUi(boombox, PlayerMusicUiKey.Key, sPlayers.Sessions.Single()));
         await pair.RunTicksSync(10);
 
         // Wait out the upload start throttle so this attempt really reaches the size check
         await pair.RunTicksSync(310);
 
-        var maxBytes = server.CfgMan.GetCVar(PlayerMusicCVars.MaxSongBytes);
-        var oversized = new byte[maxBytes + 1024];
-        await client.WaitPost(() => cSys.RequestUpload(cBoombox, "too big", oversized));
+        var originalMaxBytes = server.CfgMan.GetCVar(PlayerMusicCVars.MaxSongBytes);
+        await server.WaitPost(() => server.CfgMan.SetCVar(PlayerMusicCVars.MaxSongBytes, songBytes.Length - 1));
+        await client.WaitPost(() => cSys.RequestUpload(cBoombox, "too big", songBytes));
         await pair.RunTicksSync(30);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette).Tracks, Has.Count.EqualTo(0),
+                "oversized recording must be denied");
+        });
+
+        await server.WaitPost(() => server.CfgMan.SetCVar(PlayerMusicCVars.MaxSongBytes, originalMaxBytes));
 
         // A structurally valid stereo file is rejected too: the engine only positions mono audio
         await pair.RunTicksSync(310);

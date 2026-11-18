@@ -96,7 +96,9 @@ public sealed partial class PlayerMusicWindow : FancyWindow
             if (Disposed || file == null)
                 return;
 
-            var max = _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes);
+            // The same ceilings as on the server: a song above the client hard limit
+            // would be stored and then silently ignored on download
+            var max = Math.Min(_cfg.GetCVar(PlayerMusicCVars.MaxSongBytes), PlayerMusicLimits.HardMaxSongBytes);
 
             // Reject oversized files before reading them into memory
             if (file.CanSeek && file.Length > max)

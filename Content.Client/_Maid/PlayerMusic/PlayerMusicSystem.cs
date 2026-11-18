@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Content.Shared.GameTicking;
 using Content.Shared._Maid.PlayerMusic;
 using Robust.Client.Audio;
@@ -50,15 +51,6 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// to make the client hold an unbounded number of buffers.
     /// </summary>
     private const int MaxIncomingDownloads = 3;
-
-    /// <summary>
-    /// Client-side hard limits. The real limits come from the server, but they are replicated cvars,
-    /// so a hostile server could raise them and make clients allocate unbounded memory.
-    /// They are deliberately higher than the default server cvars.
-    /// </summary>
-    private const int HardMaxSongBytes = 8_000_000;
-    private const int HardMaxSongSeconds = 600;
-    private const long HardMaxDecodedBytes = 100_000_000;
 
     /// <summary>
     /// A song that already started playing is dropped only after the player walks this far past the hearing distance.
@@ -463,7 +455,7 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
 
         if (ev.TotalBytes <= 0 ||
-            ev.TotalBytes > Math.Min(HardMaxSongBytes, _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes)))
+            ev.TotalBytes > Math.Min(PlayerMusicLimits.HardMaxSongBytes, _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes)))
         {
             Fail(ev.SongId, "unexpected file size");
             return;
@@ -509,10 +501,18 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnFileComplete(string songId, byte[] data)
     {
+        // The file must really be the song that was requested: the id is the hash of its content.
+        // A mismatched file would otherwise play under a wrong id and stay cached.
+        if (Convert.ToHexString(SHA256.HashData(data))[..32] != songId)
+        {
+            Fail(songId, "file content does not match the requested song id");
+            return;
+        }
+
         // Never give unchecked data to the decoder: it decodes the whole file into memory.
         // The hard limits bound what a hostile server can make the client allocate.
-        var maxSeconds = Math.Min(HardMaxSongSeconds, _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds));
-        var maxDecoded = Math.Min(HardMaxDecodedBytes, (long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes));
+        var maxSeconds = Math.Min(PlayerMusicLimits.HardMaxSongSeconds, _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds));
+        var maxDecoded = Math.Min(PlayerMusicLimits.HardMaxDecodedBytes, (long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes));
 
         if (!PlayerMusicOgg.TryAnalyze(data, out var info) ||
             info.Seconds > maxSeconds ||
@@ -553,15 +553,18 @@ public sealed class PlayerMusicSystem : EntitySystem
         _cacheBytes += info.DecodedBytes;
         _cacheOrder.Enqueue(songId);
         _requested.Remove(songId);
-        EvictOldSongs();
 
-        // Start playback on every boombox that was waiting for this song
+        // Start playback on every boombox that was waiting for this song. This runs before the
+        // eviction below: a playing song is protected from it, so a full cache cannot evict the
+        // freshly decoded song right before it starts and make the client download it again.
         var query = AllEntityQuery<PlayerMusicBoomboxComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
             if (comp.SongId == songId && comp.StartedAt != null)
                 Sync((uid, comp));
         }
+
+        EvictOldSongs();
     }
 
     /// <summary>
