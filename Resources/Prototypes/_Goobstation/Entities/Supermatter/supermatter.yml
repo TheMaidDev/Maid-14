@@ -78,8 +78,8 @@
     - type: Explosive
       explosionType: Supermatter
       maxIntensity: 10000
-      intensitySlope: 10 # MAID 5 -> 10
-      totalIntensity: 500000 # MAID 10000 -> 500000
+      intensitySlope: 5
+      totalIntensity: 10000
     - type: GuideHelp
       guides: [ Supermatter, Power ]
     - type: WarpPoint

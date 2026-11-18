@@ -1,0 +1,4 @@
+- type: !PartialOnly entity
+  id: OrganDionaBrain
+  components:
+  - type: ProtectedBrain

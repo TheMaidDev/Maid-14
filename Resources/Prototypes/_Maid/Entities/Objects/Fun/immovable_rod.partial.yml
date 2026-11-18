@@ -1,0 +1,7 @@
+- type: !PartialOnly entity
+  id: ImmovableRod
+  components:
+  - type: ImmovableRod
+    minSpeed: 10
+    maxSpeed: 35
+  - !Remove type: PointLight
