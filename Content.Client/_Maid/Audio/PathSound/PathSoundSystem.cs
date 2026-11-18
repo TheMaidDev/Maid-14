@@ -1,3 +1,4 @@
+using System.Text;
 using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
 using Content.Shared.Physics;
@@ -114,10 +115,30 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Reused candidate list for the post-pass.</summary>
     private readonly List<SoundCandidate> _candidates = new();
 
+    /// <summary>Last applied per-sound values for the soundpathdebug dump command.</summary>
+    private readonly Dictionary<EntityUid, DebugEntry> _debug = new();
+
     private EntityQuery<SoundPathWeightComponent> _weightQuery;
 
     /// <summary>One candidate audio stream for the post-pass.</summary>
     private readonly record struct SoundCandidate(EntityUid Uid, AudioComponent Comp, TransformComponent Xform, float SourceX, float SourceY, float Distance);
+
+    /// <summary>Snapshot of one managed sound's computed values for the debug dump.</summary>
+    private readonly record struct DebugEntry(float SumWeight, float PathLen, float Delta, float Occlusion, float Volume, bool Written);
+
+    /// <summary>Formats the last post-pass values of managed sounds for the soundpathdebug command.</summary>
+    public string DumpDebug()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"managed sounds: {_debug.Count}, radius: {_fieldRadius}, grid: {_fieldGrid}, seed: {_baseTile}, enabled: {_enabled}");
+
+        foreach (var (uid, entry) in _debug)
+        {
+            sb.AppendLine($"{uid} sumW={entry.SumWeight:0.00} path={entry.PathLen:0.0} delta={entry.Delta:0.0} occl={entry.Occlusion:0.00} vol={entry.Volume:0.0} written={entry.Written}");
+        }
+
+        return sb.ToString();
+    }
 
     /// <summary>Distance comparison for candidate sorting.</summary>
     private static readonly Comparison<SoundCandidate> SortByDistance = (a, b) => a.Distance.CompareTo(b.Distance);
@@ -509,6 +530,8 @@ public sealed class PathSoundSystem : EntitySystem
             _candidates.RemoveRange(_maxSources, _candidates.Count - _maxSources);
         }
 
+        _debug.Clear();
+
         foreach (var candidate in _candidates)
         {
             var comp = candidate.Comp;
@@ -579,10 +602,14 @@ public sealed class PathSoundSystem : EntitySystem
 
             var delta = interpHops - (MathF.Abs(candidate.SourceX - listenerPos.X) + MathF.Abs(candidate.SourceY - listenerPos.Y)) / tileSize;
             if (interpSumW < 0.01f && delta < 0.5f)
+            {
+                _debug[candidate.Uid] = new DebugEntry(interpSumW, interpHops, delta, 0f, comp.Params.Volume, false);
                 continue;
+            }
 
             comp.Occlusion = _occlusionPerWeight * interpSumW;
             comp.Volume = comp.Params.Volume - _lossDbPerTile * MathF.Max(0f, delta);
+            _debug[candidate.Uid] = new DebugEntry(interpSumW, interpHops, delta, comp.Occlusion, comp.Volume, true);
         }
     }
 
