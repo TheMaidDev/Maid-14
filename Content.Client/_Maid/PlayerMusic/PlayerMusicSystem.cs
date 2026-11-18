@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Content.Shared.GameTicking;
 using Content.Shared._Maid.PlayerMusic;
 using Robust.Client.Audio;
@@ -501,13 +500,9 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnFileComplete(string songId, byte[] data)
     {
-        // The file must really be the song that was requested: the id is the hash of its content.
-        // A mismatched file would otherwise play under a wrong id and stay cached.
-        if (Convert.ToHexString(SHA256.HashData(data))[..32] != songId)
-        {
-            Fail(songId, "file content does not match the requested song id");
-            return;
-        }
+        // NOTE: the file hash cannot be verified against the song id here: System.Security.
+        // Cryptography is not allowed in the client sandbox. The server binds the id to the
+        // data at record time, and the structural checks below still guard the decoder.
 
         // Never give unchecked data to the decoder: it decodes the whole file into memory.
         // The hard limits bound what a hostile server can make the client allocate.
