@@ -230,6 +230,12 @@
             "directions": 4
         },
         {
+            "name": "bodycammonitor"
+        },
+        {
+            "name": "bodycamprogram"
+        },
+        {
             "name": "bounty",
             "directions": 4,
             "delays": [
