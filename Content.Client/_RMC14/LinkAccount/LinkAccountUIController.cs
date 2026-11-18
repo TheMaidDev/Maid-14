@@ -35,6 +35,7 @@ using Content.Shared._RMC14.LinkAccount;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Shared.Configuration;
+using Robust.Shared.Maths; // Maid-Tweak
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
@@ -56,6 +57,7 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
     private LinkAccountWindow? _window;
     private PatronPerksWindow? _patronPerksWindow;
     private TimeSpan _disableUntil;
+    private bool _lastBlinkState; // Maid-Tweak
 
     private Guid _code;
 
@@ -265,6 +267,23 @@ public sealed class LinkAccountUIController : UIController, IOnSystemChanged<Lin
 
     public override void FrameUpdate(FrameEventArgs args)
     {
+        // Maid-Tweak-start
+        if (UIManager.ActiveScreen is LobbyGui gui && gui.MenuDiscordButton.Label is { } label)
+        {
+            var blink = !_linkAccount.Linked
+                        && Math.Floor(_timing.RealTime.TotalSeconds * 2) % 2 == 0;
+            if (blink != _lastBlinkState)
+            {
+                _lastBlinkState = blink;
+                label.FontColorOverride = blink ? Color.FromHex("#F0C96A") : null;
+            }
+        }
+        else if (_lastBlinkState)
+        {
+            _lastBlinkState = false;
+        }
+        // Maid-Tweak-end
+
         if (_window == null)
             return;
 

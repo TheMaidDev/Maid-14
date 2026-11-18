@@ -33,93 +33,179 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths"
     xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
-    xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
-    xmlns:vote="clr-namespace:Content.Client.Voting.UI"
     xmlns:lobbyUi="clr-namespace:Content.Client.Lobby.UI"
     xmlns:info="clr-namespace:Content.Client.Info"
     xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
     xmlns:animated="clr-namespace:Content.Client._Maid.UserInterface.AnimatedBackground"
     xmlns:maidControls="clr-namespace:Content.Client._Maid.Lobby.UI"
-    xmlns:whiteButtons="clr-namespace:Content.Client._White.UserInterface.Buttons">
+    xmlns:neon="clr-namespace:Content.Client._Maid.UserInterface.Neon">
     <!-- Background -->
-    <animated:AnimatedBackgroundControl Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background" /> <!-- Tweak-Maid: Animated Lobby -->
+    <animated:AnimatedBackgroundControl Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background" /> <!-- Maid-Tweak -->
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Vertical"
-                  Margin="10 10 10 10" SeparationOverride="2">
-        <Control Name="DefaultState" VerticalExpand="True" HorizontalExpand="True">
-            <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
-                <!-- Top Panel -->
-                <BoxContainer Name="TopSide" Orientation="Horizontal" HorizontalExpand="True" MinSize="0 40" MaxSize="Infinity 40">
-                    <PanelContainer StyleClasses="TransparentBorderedWindowPanel" HorizontalExpand="True">
-                        <!-- Top Button Bar -->
-                        <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="3 3 3 3">
-                            <info:LinkBanner Name="LinkBanner" VerticalExpand="True" />
-                            <Button Name="AHelpButton" Access="Public" Text="{Loc 'ui-lobby-ahelp-button'}" />
-                            <vote:VoteCallMenuButton Name="CallVoteButton" />
-                            <Button Name="OptionsButton" Access="Public" Text="{Loc 'ui-lobby-options-button'}" />
-                            <whiteButtons:CustomGhostsMenuOpenButton Name="CustomGhostsButton" Text="{Loc 'ui-lobby-custom-ghosts-button'}" />
-                            <Button Name="LeaveButton" Access="Public" Text="{Loc 'ui-lobby-leave-button'}" />
-                        </BoxContainer>
-                    </PanelContainer>
-                </BoxContainer>
-                <!-- Voting Popups -->
-                <BoxContainer Orientation="Vertical" SeparationOverride="4" Name="VoteContainer"
-                              Access="Public" HorizontalAlignment="Left" VerticalAlignment="Top"
-                              Margin="20 60 0 0" />
-                <!-- Bottom Panel -->
-                <BoxContainer Name="BottomSide" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalExpand="True" VerticalExpand="True"
-                                  SeparationOverride="4" Margin="0 10 0 10">
-                    <PanelContainer StyleClasses="TransparentBorderedWindowPanel" HorizontalExpand="True"
-                                    SetHeight="390" Margin="0 0 2 0">
-                        <!-- Character Preview & Preferences -->
-                        <BoxContainer Orientation="Vertical">
-                            <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" HorizontalExpand="True" VerticalExpand="True" />
-                            <maidControls:CharacterPreferencesWidget Name="PreferencesWidget" Access="Public" HorizontalExpand="True" Margin="0 0 0 0"/>
-                        </BoxContainer>
-                    </PanelContainer>
-                    <!-- Server Info & Ready -->
-                    <PanelContainer StyleClasses="TransparentBorderedWindowPanel" HorizontalExpand="True"
-                                        SetHeight="390" Margin="2 0 2 0">
-                        <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
-                                          Margin="8 8 8 8">
-                            <Label Name="ServerName" Access="Public" StyleClasses="LabelHeadingBigger"
-                                       VAlign="Center" HorizontalExpand="True" HorizontalAlignment="Center"
-                                       Margin="0 0 0 10" />
-                                <controls:StripeBack Margin="0 0 0 10">
-                                    <BoxContainer Orientation="Horizontal" SeparationOverride="6" Margin="3 3 3 3">
-                                        <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public"
-                                                            HorizontalAlignment="Left"
-                                                            Text="{Loc 'ui-lobby-observe-button'}"
-                                                            StyleClasses="ButtonBig"
-                                                            WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
-                                        <Label Name="StartTime" Access="Public" Align="Center"
-                                               FontColorOverride="{x:Static maths:Color.DarkGray}"
-                                               StyleClasses="LabelBig" HorizontalExpand="True"
-                                               Margin="0 0 0 5" />
-                                        <Button Name="ReadyButton" Access="Public" ToggleMode="True"
-                                                HorizontalAlignment="Right"
-                                                Text="{Loc 'ui-lobby-ready-up-button'}"
-                                                StyleClasses="ButtonBig" MinWidth="137" />
-                                    </BoxContainer>
-                                </controls:StripeBack>
-                                <!-- Server info -->
-                                <info:ServerInfo Name="ServerInfo" Access="Public" MinSize="0 30"
-                                                 VerticalExpand="false" Margin="3 3 3 3"
-                                                 HorizontalAlignment="Left" />
-                                <Label Name="StationTime" Access="Public"
-                                       FontColorOverride="{x:Static maths:Color.LightGray}"
-                                       Margin="3 3 3 10" HorizontalAlignment="Left" />
+                  Margin="8 8 8 8" SeparationOverride="2">
+        <LayoutContainer Name="DefaultState" VerticalExpand="True" HorizontalExpand="True">
+            <!-- Maid-Tweak-start -->
+            <!-- Voting Popups -->
+            <BoxContainer Orientation="Vertical" SeparationOverride="4" Name="VoteContainer"
+                          Access="Public" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <TextureButton Name="HideUiButton" Access="Public"
+                           TexturePath="/Textures/Interface/hamburger.svg.192dpi.png"
+                           SetSize="24 24" ToolTip="{Loc 'ui-lobby-hide-ui-button'}" />
+            <!-- Bottom Panel -->
+            <BoxContainer Name="BottomSide" Orientation="Horizontal" VerticalAlignment="Stretch"
+                          HorizontalExpand="True" VerticalExpand="True"
+                          SeparationOverride="6" Margin="0 6 0 6">
+
+                    <neon:NeonFlickerControl MinSize="180 0" MaxSize="250 Infinity"
+                                             Margin="16 16 0 0" VerticalExpand="True">
+                        <BoxContainer Orientation="Vertical" MinSize="180 0" VerticalExpand="True"
+                                      SeparationOverride="13">
+                            <Control VerticalExpand="True" SizeFlagsStretchRatio="0.62" />
+                            <neon:NeonFlickerControl Intensity="1.45">
+                                <Label Text="Maid Cafe" StyleClasses="LobbyTitle" Margin="0 0 0 4" />
+                            </neon:NeonFlickerControl>
+
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <maidControls:ReadyStatusIcon Name="ReadyIcon" Access="Public" />
+                                <Button Name="ReadyButton" Access="Public" ToggleMode="True"
+                                        HorizontalAlignment="Left"
+                                        Text="{Loc 'lobby-state-player-status-not-ready'}"
+                                        StyleClasses="MenuTextButton" />
                             </BoxContainer>
-                    </PanelContainer>
-                    <!-- Chat -->
-                    <PanelContainer Access="Public" StyleClasses="TransparentBorderedWindowPanel"
-                                    HorizontalExpand="True" SetHeight="390"
-                                    Margin="2 0 0 0">
-                        <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True"
-                                         Margin="3 3 3 3" />
-                    </PanelContainer>
+
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="CharacterIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/character.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <Button Name="MenuCharacterSetupButton" Text="{Loc 'ui-lobby-character-setup-button'}"
+                                        StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
+                            </BoxContainer>
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="RulesIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/students-cap.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <Button Name="MenuRulesButton" Text="{Loc 'ui-lobby-rules-guidebook-button'}"
+                                        StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
+                            </BoxContainer>
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="OptionsIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/Nano/gear.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <Button Name="OptionsButton" Access="Public" Text="{Loc 'ui-lobby-options-button'}"
+                                        StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
+                            </BoxContainer>
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="DiscordIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/VerbIcons/open.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <Button Name="MenuDiscordButton" Access="Public" Text="{Loc 'ui-lobby-discord-button'}"
+                                        StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
+                            </BoxContainer>
+
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="ObserveIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/VerbIcons/light.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public"
+                                                    HorizontalAlignment="Left"
+                                                    Text="{Loc 'ui-lobby-observe-button'}"
+                                                    StyleClasses="MenuTextButton"
+                                                    WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
+                            </BoxContainer>
+
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="AHelpIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/VerbIcons/information.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <Button Name="AHelpButton" Access="Public" Text="{Loc 'ui-lobby-ahelp-button'}"
+                                        HorizontalAlignment="Left" StyleClasses="MenuTextButton" />
+                            </BoxContainer>
+                            <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" SeparationOverride="8">
+                                <TextureRect Name="LeaveIcon" Access="Public"
+                                             TexturePath="/Textures/Interface/VerbIcons/eject.svg.192dpi.png"
+                                             SetSize="18 18" Stretch="KeepAspectCentered" VerticalAlignment="Center" />
+                                <Button Name="LeaveButton" Access="Public" Text="{Loc 'ui-lobby-leave-button'}"
+                                        StyleClasses="MenuTextButton" HorizontalAlignment="Left" />
+                            </BoxContainer>
+
+                            <Control VerticalExpand="True" />
+                            <!-- Character Preview & Preferences -->
+                            <BoxContainer Name="HiddenCharacterArea" Visible="False" Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
+                                <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" HorizontalExpand="True" VerticalExpand="True" />
+                                <maidControls:CharacterPreferencesWidget Name="PreferencesWidget" Access="Public" HorizontalExpand="True" Margin="0 0 0 0"/>
+                            </BoxContainer>
+                        </BoxContainer>
+                    </neon:NeonFlickerControl>
+
+                    <Control HorizontalExpand="True" />
+
+                    <neon:NeonFlickerControl Name="ChangelogColumn" Access="Public" Intensity="0.85" VerticalExpand="True">
+                        <PanelContainer Name="ChangelogPanel" Access="Public"
+                                        StyleClasses="LobbyColumnPanel"
+                                        SetWidth="380" Margin="0 0 0 0" VerticalExpand="True">
+                            <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
+                                          Margin="8 6 8 8" SeparationOverride="0">
+                                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 0 0 6">
+                                    <Label Text="{Loc 'ui-lobby-changelog-heading'}" StyleClasses="LobbyHeading"
+                                           HorizontalExpand="True" HorizontalAlignment="Center" />
+                                    <TextureButton Name="ToggleChangelogButton" Access="Public"
+                                                   TexturePath="/Textures/Interface/Nano/cross.svg.png"
+                                                   SetSize="16 16" VerticalAlignment="Center"
+                                                   ToolTip="{Loc 'ui-lobby-toggle-changelog-button'}" />
+                                </BoxContainer>
+                                <PanelContainer Name="ChangelogBodyPanel" Access="Public"
+                                                VerticalExpand="True" HorizontalExpand="True">
+                                    <ScrollContainer Name="ChangelogScrollContainer" Access="Public"
+                                                     VerticalExpand="True" HorizontalExpand="True"
+                                                     HScrollEnabled="False" ReserveScrollbarSpace="False">
+                                        <BoxContainer Orientation="Vertical" Name="ChangelogBodyContainer" Access="Public"
+                                                      HorizontalExpand="True" Margin="0 0 8 0" />
+                                    </ScrollContainer>
+                                </PanelContainer>
+                            </BoxContainer>
+                        </PanelContainer>
+                    </neon:NeonFlickerControl>
+
+                    <neon:NeonFlickerControl Intensity="0.85" MinSize="414 0" MaxSize="414 Infinity" VerticalExpand="True">
+                        <PanelContainer StyleClasses="LobbyPanel"
+                                        SetWidth="414" VerticalExpand="True">
+                            <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True"
+                                          SeparationOverride="0">
+                                <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="False"
+                                              Margin="10 14 10 4" SeparationOverride="0">
+                                    <Label Name="ServerName" Access="Public" StyleClasses="LobbyServerName"
+                                           HorizontalAlignment="Stretch" HorizontalExpand="True"
+                                           Align="Center" ClipText="True" />
+                                    <PanelContainer Name="ServerNameRule" Access="Public" StyleClasses="LobbyRule"
+                                                    MinSize="0 2" Margin="0 5 0 12" />
+                                    <maidControls:LobbyBracketHeading Text="{Loc 'ui-lobby-server-info-block'}"
+                                                                      HorizontalAlignment="Left" VerticalExpand="False" />
+                                    <!-- Server info -->
+                                    <info:ServerInfo Name="ServerInfo" Access="Public" StyleClasses="LobbyText"
+                                                     VerticalExpand="False"
+                                                     HorizontalAlignment="Left" Margin="0 11 0 2" />
+                                    <Label Name="StationTime" Access="Public" StyleClasses="LobbyText"
+                                           FontColorOverride="#E255B0"
+                                           HorizontalAlignment="Left" Margin="0 15 0 0" />
+                                    <Label Name="StartTime" Access="Public" StyleClasses="LobbyText"
+                                           FontColorOverride="#E255B0"
+                                           HorizontalAlignment="Left" />
+                                </BoxContainer>
+                                <PanelContainer Name="ChatRule" Access="Public" StyleClasses="LobbyRule"
+                                                MinSize="0 2" Margin="10 14 10 0" />
+                                <!-- Chat -->
+                                <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True"
+                                                 HorizontalExpand="True"
+                                                 MinSize="0 180" Margin="0 4 0 0" />
+                            </BoxContainer>
+                        </PanelContainer>
+                    </neon:NeonFlickerControl>
                 </BoxContainer>
-            </BoxContainer>
-        </Control>
+            <TextureButton Name="ShowChangelogButton" Access="Public" Visible="False"
+                           TexturePath="/Textures/Interface/Changelog/plus.svg.192dpi.png"
+                           SetSize="20 20" ToolTip="{Loc 'ui-lobby-show-changelog-button'}" />
+            <!-- Maid-Tweak-end -->
+        </LayoutContainer>
         <!-- Character setup state -->
         <!-- This is injected on startup. Funky! -->
         <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" />
