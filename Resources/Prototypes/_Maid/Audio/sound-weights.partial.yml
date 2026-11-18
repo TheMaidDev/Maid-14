@@ -1,0 +1,50 @@
+- type: entity
+  id: Window
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: WindowDirectional
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: WindowDiagonal
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: WindowFrostedDirectional
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: ReinforcedWindow
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: PlasmaWindow
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: UraniumWindow
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: PlastitaniumWindowBase
+  components:
+  - type: SoundPathWeight
+    weight: 0.3
+- type: entity
+  id: Airlock
+  components:
+  - type: SoundPathWeight
+    weight: 0.8
+- type: entity
+  id: AirlockGlass
+  components:
+  - type: SoundPathWeight
+    weight: 0.8
