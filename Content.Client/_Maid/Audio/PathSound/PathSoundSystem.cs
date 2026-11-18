@@ -108,6 +108,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Audio streams whose NoOcclusion bit was set by this system.</summary>
     private readonly HashSet<EntityUid> _ownedNoOcclusion = new();
 
+    /// <summary>Reused removal buffer for dead owned-flag entries.</summary>
+    private readonly List<EntityUid> _flagSweep = new();
+
     /// <summary>Reused candidate list for the post-pass.</summary>
     private readonly List<SoundCandidate> _candidates = new();
 
@@ -188,8 +191,6 @@ public sealed class PathSoundSystem : EntitySystem
 
         _weightQuery = GetEntityQuery<SoundPathWeightComponent>();
 
-        SubscribeLocalEvent<AudioComponent, ComponentShutdown>(OnAudioShutdown);
-
         _overlay = new PathSoundOverlay(this);
     }
 
@@ -251,11 +252,6 @@ public sealed class PathSoundSystem : EntitySystem
         ProcessSounds(playerXform, gridUid, grid, fracX - baseTile.X, fracY - baseTile.Y);
     }
 
-    /// <summary>Drops dead audio streams from the owned-flag tracking set.</summary>
-    private void OnAudioShutdown(Entity<AudioComponent> ent, ref ComponentShutdown args)
-    {
-        _ownedNoOcclusion.Remove(ent.Owner);
-    }
 
     /// <summary>Tears the fields down and releases every owned NoOcclusion bit.</summary>
     private void ResetAll()
@@ -287,6 +283,26 @@ public sealed class PathSoundSystem : EntitySystem
             return;
 
         comp.Flags &= ~AudioFlags.NoOcclusion;
+    }
+
+    /// <summary>Removes deleted or compless audio streams from the owned-flag set, no unflag needed.</summary>
+    private void SweepOwnedFlags()
+    {
+        if (_ownedNoOcclusion.Count == 0)
+            return;
+
+        _flagSweep.Clear();
+
+        foreach (var uid in _ownedNoOcclusion)
+        {
+            if (!Exists(uid) || !TryComp(uid, out AudioComponent? _))
+                _flagSweep.Add(uid);
+        }
+
+        foreach (var uid in _flagSweep)
+        {
+            _ownedNoOcclusion.Remove(uid);
+        }
     }
 
     /// <summary>Allocates the per-root field and shared heap arrays for the current radius.</summary>
@@ -449,6 +465,8 @@ public sealed class PathSoundSystem : EntitySystem
         var baseTile = _baseTile;
 
         _candidates.Clear();
+
+        SweepOwnedFlags();
 
         var query = AllEntityQuery<AudioComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var comp, out var xform))
