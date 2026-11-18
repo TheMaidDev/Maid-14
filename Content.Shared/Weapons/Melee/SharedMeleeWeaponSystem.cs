@@ -999,6 +999,13 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
             RaiseLocalEvent(entity, ref redirectEv);
             if (redirectEv.NewTarget is { } redirected && redirected != entity && !TerminatingOrDeleted(redirected))
             {
+                // Если цель редиректа уже есть в этом замахе
+                if (targets.Contains(redirected))
+                {
+                    targets.RemoveAt(i);
+                    continue;
+                }
+
                 entity = redirected;
                 targets[i] = redirected;
             }
