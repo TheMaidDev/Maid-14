@@ -39306,7 +39306,6 @@ entities:
   - uid: 12589
     components:
     - type: Transform
-      rot: 3.141592653589793 rad
       pos: 22.5,-25.5
       parent: 2
 - proto: ComputerCargoOrdersMedical
@@ -39326,7 +39325,6 @@ entities:
   - uid: 12585
     components:
     - type: Transform
-      rot: 3.141592653589793 rad
       pos: 49.5,17.5
       parent: 2
 - proto: ComputerCargoOrdersSecurity
@@ -39334,7 +39332,6 @@ entities:
   - uid: 5967
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: 36.5,27.5
       parent: 2
 - proto: ComputerCargoOrdersService
@@ -39342,7 +39339,6 @@ entities:
   - uid: 692
     components:
     - type: Transform
-      rot: -1.5707963267948966 rad
       pos: 20.5,5.5
       parent: 2
 - proto: ComputerComms

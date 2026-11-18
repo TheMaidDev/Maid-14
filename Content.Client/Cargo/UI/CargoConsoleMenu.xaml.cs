@@ -379,14 +379,14 @@ namespace Content.Client.Cargo.UI
                 return;
             }
 
-            var balance = _cargoSystem.GetBalanceFromAccount((_station.Value, bankAccount), orderConsole.Account);
+            var balance = _cargoSystem.GetBalanceFromAccount((_station.Value, bankAccount), bankAccount.PrimaryAccount); // MAID fix department balance
             PointsLabel.Text = Loc.GetString("cargo-console-menu-points-amount", ("amount", balance));
             // PointsLabelFundsTransfer.Text = Loc.GetString("cargo-console-menu-points-amount", ("amount", balance)); // Goobstation // MAID old cargo ui
             // TransferLimitLabel.Text = Loc.GetString("cargo-console-menu-account-action-transfer-limit-amount", ("amount", Math.Floor(balance * orderConsole.TransferLimit))); // Goobstation // // MAID old cargo ui
 
             // UnlimitedNotifier.Visible = orderConsole.TransferUnbounded; // MAID old cargo ui
             AccountActionButton.Disabled = TransferSpinBox.Value <= 0 ||
-                                           TransferSpinBox.Value > bankAccount.Accounts[orderConsole.Account] * orderConsole.TransferLimit ||
+                                           TransferSpinBox.Value > bankAccount.Accounts[bankAccount.PrimaryAccount] * orderConsole.TransferLimit || // MAID fix department balance
                                            _timing.CurTime < orderConsole.NextAccountActionTime;
 
             // RightPart.Visible = orderConsole.Mode != CargoOrderConsoleMode.PrintSlip; // Goobstation // MAID old cargo ui
