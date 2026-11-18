@@ -26,9 +26,15 @@ namespace Content.IntegrationTests.Tests._Maid;
 public sealed class PlayerMusicTest
 {
     /// <summary>
-    /// A short stereo song from the game audio; stereo covers the PlayGlobal fade path too.
+    /// A short mono song from the game audio. Uploads are mono-only: the engine
+    /// cannot position stereo sources, so the server rejects them.
     /// </summary>
-    private const string SongPath = "/Audio/Ambience/ambimo2.ogg";
+    private const string SongPath = "/Audio/Ambience/ambitech3.ogg";
+
+    /// <summary>
+    /// A structurally valid stereo song: recording it must be denied.
+    /// </summary>
+    private const string StereoSongPath = "/Audio/Ambience/ambimo2.ogg";
 
     private static object? GetField(object system, string name)
     {
@@ -61,8 +67,10 @@ public sealed class PlayerMusicTest
             songBytes = memory.ToArray();
         });
 
-        // Sanity: the song from the game files must pass the same structural check as user uploads
-        Assert.That(PlayerMusicOgg.TryAnalyze(songBytes, out _), Is.True, $"{SongPath} must be a valid ogg file");
+        // Sanity: the song from the game files must pass the same structural check as user uploads,
+        // and it must be mono because uploads are mono-only
+        Assert.That(PlayerMusicOgg.TryAnalyze(songBytes, out var songInfo), Is.True, $"{SongPath} must be a valid ogg file");
+        Assert.That(songInfo.Channels, Is.EqualTo(1), $"{SongPath} must be mono: uploads are mono-only");
 
         EntityUid boombox = default;
         EntityUid cassette = default;
@@ -157,13 +165,24 @@ public sealed class PlayerMusicTest
         var cSys = client.System<PlayerMusicClientSystem>();
 
         byte[] songBytes = [];
+        byte[] stereoBytes = [];
         await server.WaitPost(() =>
         {
             using var file = sRes.ContentFileRead(new ResPath(SongPath));
             using var memory = new MemoryStream();
             file.CopyTo(memory);
             songBytes = memory.ToArray();
+
+            using var stereoFile = sRes.ContentFileRead(new ResPath(StereoSongPath));
+            using var stereoMemory = new MemoryStream();
+            stereoFile.CopyTo(stereoMemory);
+            stereoBytes = stereoMemory.ToArray();
         });
+
+        // Sanity: the stereo song is structurally valid; it must fail the mono check, not the ogg one
+        Assert.That(PlayerMusicOgg.TryAnalyze(stereoBytes, out var stereoInfo), Is.True,
+            $"{StereoSongPath} must be a valid ogg file");
+        Assert.That(stereoInfo.Channels, Is.EqualTo(2), $"{StereoSongPath} is expected to be stereo");
 
         EntityUid boombox = default;
         EntityUid cassette = default;
@@ -202,6 +221,18 @@ public sealed class PlayerMusicTest
         await client.WaitPost(() => cSys.RequestUpload(cBoombox, "too big", oversized));
         await pair.RunTicksSync(30);
 
+        // A structurally valid stereo file is rejected too: the engine only positions mono audio
+        await pair.RunTicksSync(310);
+
+        await client.WaitPost(() => cSys.RequestUpload(cBoombox, "stereo", stereoBytes));
+        await pair.RunTicksSync(30);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette).Tracks, Has.Count.EqualTo(0),
+                "stereo recording must be denied");
+        });
+
         // A disabled feature denies uploads too
         await server.WaitPost(() => server.CfgMan.SetCVar(PlayerMusicCVars.Enabled, false));
         await pair.RunTicksSync(310);
@@ -212,7 +243,7 @@ public sealed class PlayerMusicTest
         await server.WaitAssertion(() =>
         {
             Assert.That(sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette).Tracks, Has.Count.EqualTo(0),
-                "oversized and disabled uploads must be denied");
+                "oversized, stereo and disabled uploads must be denied");
 
             var songs = (ICollection) GetField(sSys, "_songs")!;
             Assert.That(songs.Count, Is.EqualTo(0), "no song data must be stored");

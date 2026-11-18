@@ -31,6 +31,7 @@ maid-music-no-cassette = There must be a cassette in the boombox.
 maid-music-cassette-full = There is no room left on the cassette.
 maid-music-too-big = The file is too big. Maximum is { $max } MB.
 maid-music-not-ogg = A complete .ogg (Vorbis) file is required, this one is damaged or cut off.
+maid-music-stereo = Stereo files are not supported: the engine plays positional audio in mono only. Use a mono file.
 maid-music-too-long = The song is too long. Maximum is { $max } s.
 maid-music-too-heavy = The song is too heavy to play. Choose a shorter file or one with a lower sample rate.
 maid-music-bad-name = Enter a song name.
@@ -38,7 +39,6 @@ maid-music-cooldown = Wait a bit before recording again.
 maid-music-quota = You have recorded the maximum number of songs this round.
 maid-music-storage-full = The song storage is full.
 maid-music-recorded = Recorded: { $name }
-maid-music-recorded-stereo = Recorded: { $name }. Stereo audio has no direction, use a mono file for 3D sound.
 maid-music-song-lost = The recording on this cassette is damaged.
 maid-music-recorder-lost = The player disappeared before the song finished uploading.
 

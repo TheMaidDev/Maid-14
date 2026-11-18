@@ -126,6 +126,12 @@ public sealed partial class PlayerMusicWindow : FancyWindow
                 return;
             }
 
+            if (info.Channels != 1)
+            {
+                RejectFile("maid-music-stereo");
+                return;
+            }
+
             var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
             if (info.Seconds > maxSeconds)
             {

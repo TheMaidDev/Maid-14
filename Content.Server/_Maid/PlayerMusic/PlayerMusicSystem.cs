@@ -111,6 +111,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     private readonly Dictionary<NetUserId, PendingUpload> _pending = new();
     private readonly Dictionary<NetUserId, Transfer> _transfers = new();
     private readonly Dictionary<EntityUid, TimeSpan> _lastUiAction = new();
+    private int _sendCursor;
     private TimeSpan _nextCheck;
     private long _totalBytes;
     private long _pendingBytes;
@@ -525,6 +526,13 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
+        // The engine only positions mono sources: stereo files would play without direction
+        if (info.Channels != 1)
+        {
+            Deny(boomboxUid, user, "maid-music-stereo");
+            return;
+        }
+
         var maxSeconds = _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds);
         if (info.Seconds > maxSeconds)
         {
@@ -573,8 +581,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         _adminLog.Add(LogType.Action, LogImpact.Low,
             $"{ToPrettyString(user):player} recorded song '{name}' ({data.Length} bytes, {seconds} s, id {id}) onto a cassette in {ToPrettyString(boomboxUid)}");
 
-        var message = info.Channels == 2 ? "maid-music-recorded-stereo" : "maid-music-recorded";
-        _popup.PopupEntity(Loc.GetString(message, ("name", name)), boomboxUid, user);
+        _popup.PopupEntity(Loc.GetString("maid-music-recorded", ("name", name)), boomboxUid, user);
     }
 
     private void Deny(EntityUid boombox, EntityUid user, string locKey, params (string, object)[] args)
@@ -678,7 +685,9 @@ public sealed class PlayerMusicSystem : EntitySystem
     }
 
     /// <summary>
-    /// Songs go out in small pieces, a few per tick, so one download never floods the connection.
+    /// Songs go out in small pieces with a shared per-tick budget. The budget is spent one chunk
+    /// at a time walking a ring of transfers that keeps rotating between ticks, so the cap is
+    /// never exceeded and a crowd around a boombox shares it fairly.
     /// </summary>
     private void SendChunks()
     {
@@ -692,14 +701,18 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
-        // A shared per-tick budget: one song playing in a crowded room must not saturate the connection
-        var perTransfer = Math.Max(1, MaxChunksPerTick / _transfers.Count);
         var range = _cfg.GetCVar(PlayerMusicCVars.ListenRange);
-
         List<NetUserId>? done = null;
+        var order = new List<NetUserId>(_transfers.Keys);
 
-        foreach (var (user, transfer) in _transfers)
+        if (_sendCursor >= order.Count)
+            _sendCursor = 0;
+
+        for (var n = 0; n < MaxChunksPerTick; n++)
         {
+            var user = order[(_sendCursor + n) % order.Count];
+            var transfer = _transfers[user];
+
             if (transfer.Session.Status != SessionStatus.InGame || !IsTransferWanted(transfer, range))
             {
                 (done ??= new()).Add(user);
@@ -707,25 +720,24 @@ public sealed class PlayerMusicSystem : EntitySystem
             }
 
             var data = transfer.Song.Data;
+            var length = Math.Min(PlayerMusicLimits.ChunkBytes, data.Length - transfer.Offset);
+            var chunk = new byte[length];
+            Array.Copy(data, transfer.Offset, chunk, 0, length);
 
-            for (var i = 0; i < perTransfer && transfer.Offset < data.Length; i++)
-            {
-                var length = Math.Min(PlayerMusicLimits.ChunkBytes, data.Length - transfer.Offset);
-                var chunk = new byte[length];
-                Array.Copy(data, transfer.Offset, chunk, 0, length);
+            // recordReplay: false, so replays don't get filled with audio files
+            RaiseNetworkEvent(
+                new PlayerMusicFileChunkEvent(transfer.Song.Id, transfer.Index++, chunk),
+                Filter.SinglePlayer(transfer.Session),
+                false);
 
-                // recordReplay: false, so replays don't get filled with audio files
-                RaiseNetworkEvent(
-                    new PlayerMusicFileChunkEvent(transfer.Song.Id, transfer.Index++, chunk),
-                    Filter.SinglePlayer(transfer.Session),
-                    false);
-
-                transfer.Offset += length;
-            }
+            transfer.Offset += length;
 
             if (transfer.Offset >= data.Length)
                 (done ??= new()).Add(user);
         }
+
+        // The rotation continues from this position on the next tick
+        _sendCursor = (_sendCursor + MaxChunksPerTick) % order.Count;
 
         if (done == null)
             return;

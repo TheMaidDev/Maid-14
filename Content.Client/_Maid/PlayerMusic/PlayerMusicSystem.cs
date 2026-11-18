@@ -35,12 +35,15 @@ public sealed class PlayerMusicSystem : EntitySystem
     private const int MaxCachedSongs = 3;
 
     /// <summary>
-    /// Byte budget for the decoded song cache. One long stereo song takes ~46 MB,
+    /// Byte budget for the decoded song cache. One long song takes ~46 MB decoded,
     /// and songs that are currently playing are never evicted, so the count cap alone is not enough.
     /// </summary>
     private const long MaxCachedBytes = 128_000_000;
 
-    private const int ChunksPerFrame = 4;
+    /// <summary>
+    /// Upload speed cap in bytes per second, so recording a song never saturates the connection.
+    /// </summary>
+    private const int UploadBytesPerSecond = 1_000_000;
 
     /// <summary>
     /// Downloads of different songs at the same time are capped: a hostile server must not be able
@@ -72,6 +75,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     private ResPath _prefix;
     private ulong _fileIdx;
     private TimeSpan _nextCheck;
+    private float _uploadBudget;
     private float _userGain = 1f;
 
     private readonly Dictionary<string, AudioResource> _cache = new();
@@ -88,8 +92,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         EntityUid AudioEntity,
         string SongId,
         TimeSpan StartedAt,
-        bool Repeat,
-        bool Stereo);
+        bool Repeat);
 
     private sealed class IncomingFile(int total, TimeSpan now)
     {
@@ -160,19 +163,18 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// <summary>
     /// Boombox volume from the player's audio settings, applied on top of the boombox's own volume.
     /// </summary>
-    private float GetVolume(PlayerMusicBoomboxComponent comp, float distanceGain = 1f)
+    private float GetVolume(PlayerMusicBoomboxComponent comp)
     {
-        return comp.Volume + SharedAudioSystem.GainToVolume(Math.Max(distanceGain * _userGain, 0.0001f));
+        return comp.Volume + SharedAudioSystem.GainToVolume(Math.Max(_userGain, 0.0001f));
     }
 
     private void OnVolumeChanged(float value)
     {
         _userGain = Math.Clamp(value, 0f, 2f);
 
-        // Mono sounds are changed here, stereo ones are updated every frame together with the distance fade
         foreach (var (uid, state) in _playing)
         {
-            if (state.Stereo || !Exists(state.AudioEntity) || !TryComp(uid, out PlayerMusicBoomboxComponent? comp))
+            if (!Exists(state.AudioEntity) || !TryComp(uid, out PlayerMusicBoomboxComponent? comp))
                 continue;
 
             _audio.SetVolume(state.AudioEntity, GetVolume(comp));
@@ -202,10 +204,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     {
         base.FrameUpdate(frameTime);
 
-        for (var i = 0; i < ChunksPerFrame && _outgoing.Count > 0; i++)
-        {
-            RaiseNetworkEvent(_outgoing.Dequeue());
-        }
+        PumpUploadQueue(frameTime);
 
         var now = _timing.CurTime;
         if (now >= _nextCheck)
@@ -213,8 +212,34 @@ public sealed class PlayerMusicSystem : EntitySystem
             _nextCheck = now + CheckInterval;
             Maintain(now);
         }
+    }
 
-        UpdateStereoFade();
+    /// <summary>
+    /// Sends queued upload messages at a capped speed: a few kilobytes per frame
+    /// instead of pushing megabytes into the connection in one burst.
+    /// </summary>
+    private void PumpUploadQueue(float frameTime)
+    {
+        if (_outgoing.Count == 0)
+            return;
+
+        // The budget is capped at one chunk, so a frame hitch cannot turn into a burst
+        _uploadBudget = Math.Min(_uploadBudget + UploadBytesPerSecond * frameTime, PlayerMusicLimits.ChunkBytes);
+
+        while (_outgoing.Count > 0)
+        {
+            var size = _outgoing.Peek() switch
+            {
+                PlayerMusicUploadChunkEvent chunk => chunk.Data.Length,
+                _ => 0,
+            };
+
+            if (size > _uploadBudget)
+                break;
+
+            _uploadBudget -= size;
+            RaiseNetworkEvent(_outgoing.Dequeue());
+        }
     }
 
     /// <summary>
@@ -288,39 +313,6 @@ public sealed class PlayerMusicSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Stereo audio cannot be positional in OpenAL (the engine only positions mono sources),
-    /// so for stereo songs we fade the volume with distance ourselves.
-    /// </summary>
-    private void UpdateStereoFade()
-    {
-        if (_playing.Count == 0)
-            return;
-
-        var local = _player.LocalEntity;
-
-        foreach (var (uid, state) in _playing)
-        {
-            if (!state.Stereo || !Exists(state.AudioEntity))
-                continue;
-
-            if (!TryComp(uid, out PlayerMusicBoomboxComponent? comp))
-                continue;
-
-            var gain = 0f;
-            if (local != null &&
-                Exists(local.Value) &&
-                Transform(uid).MapID == Transform(local.Value).MapID)
-            {
-                var distance = (_xform.GetWorldPosition(uid) - _xform.GetWorldPosition(local.Value)).Length();
-                gain = Math.Clamp(1f - distance / comp.MaxDistance, 0f, 1f);
-                gain *= gain;
-            }
-
-            _audio.SetVolume(state.AudioEntity, GetVolume(comp, gain));
-        }
-    }
-
     private void OnState(Entity<PlayerMusicBoomboxComponent> ent, ref AfterAutoHandleStateEvent args)
     {
         Sync(ent);
@@ -388,7 +380,6 @@ public sealed class PlayerMusicSystem : EntitySystem
         }
 
         var stream = resource.AudioStream;
-        var stereo = stream.ChannelCount > 1;
 
         var elapsed = _timing.CurTime - startedAt;
         if (elapsed < TimeSpan.Zero)
@@ -415,9 +406,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         (EntityUid Entity, AudioComponent Component)? result;
         try
         {
-            result = stereo
-                ? _audio.PlayGlobal(stream, null, audioParams)
-                : _audio.PlayEntity(stream, ent.Owner, null, audioParams);
+            result = _audio.PlayEntity(stream, ent.Owner, null, audioParams);
         }
         catch (Exception e)
         {
@@ -429,7 +418,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (result is not { } played)
             return;
 
-        _playing[ent.Owner] = new PlayingState(played.Entity, songId, startedAt, comp.Repeat, stereo);
+        _playing[ent.Owner] = new PlayingState(played.Entity, songId, startedAt, comp.Repeat);
     }
 
     private void StopLocal(EntityUid boombox)
