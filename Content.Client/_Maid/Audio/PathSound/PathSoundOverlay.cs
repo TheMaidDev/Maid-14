@@ -57,11 +57,12 @@ public sealed class PathSoundOverlay : Overlay
     }
 
     /// <summary>Audibility score of a tile: lowpass cutoff times linear volume fraction, 0..1.</summary>
-    private float Audibility(float sumOcclusion, int pathLen, Vector2i tile, Vector2i seed)
+    private float Audibility(float sumOcclusion, int pathLen, int past, Vector2i tile, Vector2i seed)
     {
-        var cutoff = MathF.Exp(-sumOcclusion);
+        var pastDb = sumOcclusion > 0f ? past : 0;
+        var cutoff = MathF.Exp(-MathF.Max(0f, sumOcclusion - _system.OcclusionDecayPerTile * pastDb));
         var manhattan = Math.Abs(tile.X - seed.X) + Math.Abs(tile.Y - seed.Y);
-        var lossDb = _system.LossDbPerTile * MathF.Max(0f, pathLen - manhattan);
+        var lossDb = _system.LossDbPerTile * (MathF.Max(0f, pathLen - manhattan) + pastDb);
         return Math.Clamp(cutoff * MathF.Pow(10f, -lossDb / 20f), 0f, 1f);
     }
 
@@ -131,9 +132,9 @@ public sealed class PathSoundOverlay : Overlay
                         continue;
                     }
 
-                    if (_system.TryGetTile(indices, out var sumWeight, out var pathLen))
+                    if (_system.TryGetTile(indices, out var sumWeight, out var pathLen, out var past))
                     {
-                        var s = Audibility(sumWeight, pathLen, indices, seed);
+                        var s = Audibility(sumWeight, pathLen, past, indices, seed);
                         worldHandle.DrawRect(box, AudibilityColor(s).WithAlpha(0.22f + 0.5f * s));
                     }
                     else if (_mapSystem.TryGetTile(gridComp, indices, out var tile) && !tile.IsEmpty)
@@ -155,7 +156,7 @@ public sealed class PathSoundOverlay : Overlay
                 continue;
 
             var s = Math.Clamp(
-                MathF.Exp(-entry.Occlusion) * MathF.Pow(10f, (entry.Volume - 0f) / 20f),
+                MathF.Exp(-entry.Occlusion) * MathF.Pow(10f, entry.VolumeDelta / 20f),
                 0f,
                 1f);
             var color = entry.Written ? AudibilityColor(s) : Color.LightGray;
@@ -227,7 +228,7 @@ public sealed class PathSoundOverlay : Overlay
         handle.DrawString(
             _font,
             pos + new Vector2(0f, 4f),
-            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  smooth {_system.Smoothing:0.00}  r {_system.Radius}",
+            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  fade {_system.OcclusionDecayPerTile:0.0}/t  smooth {_system.Smoothing:0.00}  r {_system.Radius}",
             Color.LightGray);
     }
 
@@ -263,10 +264,10 @@ public sealed class PathSoundOverlay : Overlay
             for (var y = minTile.Y; y <= maxTile.Y; y += step)
             {
                 var indices = new Vector2i(x, y);
-                if (!_system.TryGetTile(indices, out var sumWeight, out var pathLen))
+                if (!_system.TryGetTile(indices, out var sumWeight, out var pathLen, out var past))
                     continue;
 
-                var s = Audibility(sumWeight, pathLen, indices, seed);
+                var s = Audibility(sumWeight, pathLen, past, indices, seed);
                 var center = _mapTileCenterWorld(gridUid, grid, indices);
                 var screen = args.ViewportControl.WorldToScreen(center);
                 handle.DrawString(_font, screen, $"{s * 100f:0}%", AudibilityColor(s).WithAlpha(0.95f));
@@ -294,7 +295,7 @@ public sealed class PathSoundOverlay : Overlay
 
             var screen = args.ViewportControl!.WorldToScreen(pos);
             var color = entry.Written ? Color.White : Color.LightGray;
-            handle.DrawString(_font, screen + new Vector2(10f, -6f), $"o:{entry.Occlusion:0.00} v:{entry.Volume:0.0}dB", color.WithAlpha(0.9f));
+            handle.DrawString(_font, screen + new Vector2(10f, -6f), $"o:{entry.Occlusion:0.00} v:{entry.VolumeDelta:+0.0;-0.0}dB", color.WithAlpha(0.9f));
         }
     }
 

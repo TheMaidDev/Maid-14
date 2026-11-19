@@ -73,6 +73,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Volume loss in dB per tile of path detour.</summary>
     private float _lossDbPerTile;
 
+    /// <summary>Occlusion faded per tile of path past the last blocker.</summary>
+    private float _occlDecay;
+
     /// <summary>Heuristic weight for opaque blockers.</summary>
     private float _weightOpaque;
 
@@ -108,6 +111,9 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Path hop count per root field tile.</summary>
     private int[] _hops = Array.Empty<int>();
+
+    /// <summary>Path tiles past the last blocker per root field tile.</summary>
+    private int[] _past = Array.Empty<int>();
 
     /// <summary>Dijkstra settled flag per root field tile.</summary>
     private bool[] _settled = Array.Empty<bool>();
@@ -149,7 +155,7 @@ public sealed class PathSoundSystem : EntitySystem
     private readonly record struct SoundCandidate(EntityUid Uid, AudioComponent Comp, TransformComponent Xform, float SourceX, float SourceY, float Distance);
 
     /// <summary>Snapshot of one managed sound's applied values for the debug dump and overlay.</summary>
-    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Volume, bool Written);
+    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Volume, float VolumeDelta, float Past, bool Written);
 
     /// <summary>Formats the last post-pass values of managed sounds for the soundpathdebug command.</summary>
     public string DumpDebug()
@@ -159,7 +165,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         foreach (var (uid, entry) in _debug)
         {
-            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} occl={entry.Occlusion:0.00} vol={entry.Volume:0.0} written={entry.Written}");
+            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} vol={entry.Volume:0.0} delta={entry.VolumeDelta:+0.0;-0.0} written={entry.Written}");
         }
 
         return sb.ToString();
@@ -214,14 +220,17 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Volume loss in dB per tile of path detour.</summary>
     public float LossDbPerTile => _lossDbPerTile;
 
+    /// <summary>Occlusion faded per tile of path past the last blocker.</summary>
+    public float OcclusionDecayPerTile => _occlDecay;
+
     /// <summary>Fraction of the target values applied per update.</summary>
     public float Smoothing => _smoothing;
 
     /// <summary>Last post-pass snapshot of managed sounds.</summary>
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
-    /// <summary>Returns the summed blocking occlusion and hop count for a grid tile in root 0, if covered and reachable.</summary>
-    public bool TryGetTile(Vector2i tile, out float sumOcclusion, out int pathLen)
+    /// <summary>Returns the summed blocking occlusion, hop count and past-blocker distance for a grid tile in root 0, if covered and reachable.</summary>
+    public bool TryGetTile(Vector2i tile, out float sumOcclusion, out int pathLen, out int past)
     {
         if (_fieldGrid != null
             && Math.Abs(tile.X - _baseTile.X) <= _fieldRadius
@@ -233,12 +242,14 @@ public sealed class PathSoundSystem : EntitySystem
             {
                 sumOcclusion = _sumW[idx];
                 pathLen = _hops[idx];
+                past = _past[idx];
                 return true;
             }
         }
 
         sumOcclusion = 0f;
         pathLen = 0;
+        past = 0;
         return false;
     }
 
@@ -253,6 +264,7 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathMaxSources, v => _maxSources = Math.Max(0, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionPerWeight, v => _occlusionPerWeight = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathLossDbPerTile, v => _lossDbPerTile = v, true);
+        Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionDecayPerTile, v => _occlDecay = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightOpaque, v => _weightOpaque = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightGlass, v => _weightGlass = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathCacheTtl, v => _ttl = MathF.Max(0.25f, v), true);
@@ -347,12 +359,13 @@ public sealed class PathSoundSystem : EntitySystem
     }
 
     /// <summary>Computes the blended occlusion and volume change from the four fields for a sound at the given world position.</summary>
-    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float volDb, out float dbgSumW, out float dbgHops)
+    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float volDb, out float dbgSumW, out float dbgHops, out float dbgPast)
     {
         occlusion = 0f;
         volDb = 0f;
         dbgSumW = 0f;
         dbgHops = 0f;
+        dbgPast = 0f;
 
         if (_fieldGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
             return false;
@@ -384,11 +397,13 @@ public sealed class PathSoundSystem : EntitySystem
         var radius = _fieldRadius;
         var size = radius * 2 + 1;
         var baseTile = _baseTile;
+        var nearSrc = Math.Abs(srcBx - baseTile.X) <= 1 && Math.Abs(srcBy - baseTile.Y) <= 1;
 
         var rootCutoff = 0f;
         var rootVolDb = 0f;
         var rootSumW = 0f;
         var rootHops = 0f;
+        var rootPast = 0f;
         var rootWeightSum = 0f;
 
         for (var root = 0; root < RootCount; root++)
@@ -407,13 +422,17 @@ public sealed class PathSoundSystem : EntitySystem
                 continue;
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
-            var occlR = MathF.Max(0f, _sumW[idx] - TileWeight(gridUid, grid, srcTile, idx));
+            var selfW = nearSrc ? TileWeight(gridUid, grid, srcTile, idx) : 0f;
+            var occlR = MathF.Max(0f, _sumW[idx] - selfW);
+            var pastR = _sumW[idx] > 0f ? _past[idx] : 0;
+            occlR = MathF.Max(0f, occlR - _occlDecay * pastR);
             var deltaR = MathF.Max(0f, _hops[idx] - manhattan);
 
             rootCutoff += rootWeight * MathF.Exp(-occlR);
-            rootVolDb += rootWeight * (-_lossDbPerTile * deltaR);
+            rootVolDb += rootWeight * (-_lossDbPerTile * (deltaR + pastR));
             rootSumW += rootWeight * occlR;
             rootHops += rootWeight * _hops[idx];
+            rootPast += rootWeight * pastR;
             rootWeightSum += rootWeight;
         }
 
@@ -424,6 +443,7 @@ public sealed class PathSoundSystem : EntitySystem
         volDb = rootVolDb / rootWeightSum;
         dbgSumW = rootSumW / rootWeightSum;
         dbgHops = rootHops / rootWeightSum;
+        dbgPast = rootPast / rootWeightSum;
         return true;
     }
 
@@ -435,7 +455,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         var sourcePos = listener.Position + delta;
 
-        if (TryGetAudio(listener, sourcePos, out var occlusion, out _, out _, out _))
+        if (TryGetAudio(listener, sourcePos, out var occlusion, out _, out _, out _, out _))
             return SmoothOverride(sourcePos, occlusion);
 
         var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
@@ -474,6 +494,7 @@ public sealed class PathSoundSystem : EntitySystem
         _dist = new float[count * RootCount];
         _sumW = new float[count * RootCount];
         _hops = new int[count * RootCount];
+        _past = new int[count * RootCount];
         _settled = new bool[count * RootCount];
         _tileW = new float[count * RootCount];
         _heapIdx = new int[count * 4];
@@ -510,6 +531,7 @@ public sealed class PathSoundSystem : EntitySystem
         Array.Fill(_dist, float.PositiveInfinity, baseIdx, count);
         Array.Fill(_sumW, 0f, baseIdx, count);
         Array.Fill(_hops, 0, baseIdx, count);
+        Array.Fill(_past, 0, baseIdx, count);
         Array.Fill(_settled, false, baseIdx, count);
         Array.Fill(_tileW, -1f, baseIdx, count);
         _heapCount = 0;
@@ -555,6 +577,7 @@ public sealed class PathSoundSystem : EntitySystem
         _dist[idx] = dist;
         _hops[idx] = _hops[parentIdx] + 1;
         _sumW[idx] = _sumW[parentIdx] + weight;
+        _past[idx] = weight > 0f ? 0 : _past[parentIdx] + 1;
         Push(idx, dist);
     }
 
@@ -668,7 +691,7 @@ public sealed class PathSoundSystem : EntitySystem
         {
             var comp = candidate.Comp;
 
-            if (!TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out var volDb, out var dbgSumW, out var dbgHops))
+            if (!TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out var volDb, out var dbgSumW, out var dbgHops, out var dbgPast))
                 continue;
 
             var target = comp.Params.Volume + volDb;
@@ -678,7 +701,7 @@ public sealed class PathSoundSystem : EntitySystem
 
             _smoothVol[candidate.Uid] = applied;
             comp.Volume = applied;
-            _debug[candidate.Uid] = new DebugEntry(dbgSumW, dbgHops, occlusion, applied, true);
+            _debug[candidate.Uid] = new DebugEntry(dbgSumW, dbgHops, occlusion, applied, volDb, dbgPast, true);
         }
     }
 

@@ -79,6 +79,12 @@ public sealed class MaidCVars
         CVarDef.Create("maidsound.path_loss_db_per_tile", 1.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
+    /// Occlusion faded per tile of sound path past the last blocker.
+    /// </summary>
+    public static readonly CVarDef<float> SoundPathOcclusionDecayPerTile =
+        CVarDef.Create("maidsound.path_occlusion_decay_per_tile", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
     /// Sound path weight of opaque tiles.
     /// </summary>
     public static readonly CVarDef<float> SoundPathWeightOpaque =
