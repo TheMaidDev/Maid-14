@@ -741,8 +741,17 @@ public sealed class PathSoundSystem : EntitySystem
             }
 
             var target = MathF.Max(comp.Params.Volume + volDb, comp.Params.Volume - 60f);
-            var prev = _smoothVol.TryGetValue(candidate.Uid, out var prevVol) ? prevVol : comp.Volume;
-            var applied = prev + (target - prev) * _smoothing;
+            if (!float.IsFinite(target))
+                continue;
+
+            var applied = target;
+            if (_smoothVol.TryGetValue(candidate.Uid, out var prev) && float.IsFinite(prev))
+                applied = prev + (target - prev) * _smoothing;
+            else if (float.IsFinite(comp.Volume))
+                applied = comp.Volume + (target - comp.Volume) * _smoothing;
+
+            if (!float.IsFinite(applied))
+                continue;
 
             _smoothVol[candidate.Uid] = applied;
             comp.Volume = applied;
@@ -760,7 +769,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         foreach (var uid in _smoothVol.Keys)
         {
-            if (!Exists(uid) || !TryComp(uid, out AudioComponent? _))
+            if (!Exists(uid) || !TryComp(uid, out AudioComponent? _) || !float.IsFinite(_smoothVol[uid]))
                 _volSweep.Add(uid);
         }
 
