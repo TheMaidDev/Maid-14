@@ -20,7 +20,7 @@ Cost of entering a tile is `1 + tileOcclusion`, from the anchored entities:
 - an entity with `SoundPathWeightComponent` contributes `OcclFromMuffle` (`-ln(1 - muffle/100)`, so `muffle: 90` leaves a tenth of the highs) while its physics body `CanCollide` is true — open or destroyed doors drop out, welded ones stay;
 - otherwise a hard fixture on `Impassable` counts as a wall (`path_occlusion_per_weight * weight_opaque`, or `weight_glass` on `GlassLayer`); fixture layers exactly equal to `AirlockLayer`/`GlassAirlockLayer` count too — airlock fixtures carry no `Impassable` bit (`AirlockLayer = Opaque | GlassAirlockLayer`), so the vanilla occlusion raycast never sees airlocks at all.
 
-Component objects are absolute (percents, independent of cvars); heuristic objects scale with cvars. Rebuilds happen only when the player's base tile, grid or radius changes, or when `maidsound.path_cache_ttl` (2 s) expires — the TTL is what picks up world changes (built/broken walls, opened doors) while the player stands still. Tile weights are cached per rebuild.
+Component objects are absolute (percents, independent of cvars); heuristic objects scale with cvars. Rebuilds happen when the player's base tile, grid or radius changes, when a broadcast blocker event fires — `DoorStateChangedEvent` covers door open/close within a frame (rebuilds throttled to one per 50 ms), `AnchorStateChangedEvent` and `TileChangedEvent` cover built, broken and re-anchored blockers — or when `maidsound.path_cache_ttl` (2 s) expires as the fallback for anything without an event. Tile weights are cached per rebuild.
 
 ## Per-sound values
 
@@ -42,7 +42,7 @@ Smoothing exists because `BaseAudioSource.Occlusion` reissues the OpenAL EFX fil
 - The engine clips audible distance by euclidean `MaxDistance` before any of this runs: path-based audibility cannot extend hearing range (that would need `ProcessStreamOverride`, which is single-target and takes over the whole stream update).
 - Cross-grid sounds are skipped by the post-pass and fall back to the raycast in the override.
 - Occlusion smoothing slots are touched from the engine's parallel job threads; races are benign (worst case two positions share a slot for one tick).
-- World changes while standing still are picked up only on the TTL rebuild.
+- World changes while standing still are picked up by the blocker-event rebuilds; the TTL rebuild is only the fallback for events that never fire (direct `CanCollide` toggles outside the door system).
 
 ## Debug
 
