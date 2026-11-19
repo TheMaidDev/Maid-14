@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Text;
 using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
+using Content.Shared.Doors;
 using Content.Shared.Physics;
 using Robust.Client.Audio;
 using Robust.Client.Graphics;
@@ -99,6 +100,9 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Accumulated frame time towards the next post-pass.</summary>
     private float _accum;
+
+    /// <summary>Whether a blocker event requested a field rebuild.</summary>
+    private bool _dirty;
 
     private bool _overlayAdded;
     private PathSoundOverlayMode _overlayMode;
@@ -285,6 +289,10 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathSmoothing, v => _smoothing = Math.Clamp(v, 0.01f, 1f), true);
         Subs.CVar(_cfg, CVars.AudioTickRate, v => _updateInterval = v > 0 ? 1f / v : 1f / 30f, true);
 
+        SubscribeLocalEvent<DoorStateChangedEvent>(OnBlockerChanged);
+        SubscribeLocalEvent<AnchorStateChangedEvent>(OnBlockerChanged);
+        SubscribeLocalEvent<TileChangedEvent>(OnBlockerChanged);
+
         _weightQuery = GetEntityQuery<SoundPathWeightComponent>();
 
         if (!_overrideSubscribed)
@@ -313,7 +321,15 @@ public sealed class PathSoundSystem : EntitySystem
         Array.Clear(_smoothOcc);
         _smoothNext = 0;
         _fieldGrid = null;
+        _dirty = false;
     }
+
+    /// <summary>Marks the fields stale after a blocker changed; the rebuild itself runs on the next frame update.</summary>
+    private void OnBlockerChanged(DoorStateChangedEvent args) => _dirty = true;
+
+    private void OnBlockerChanged(ref AnchorStateChangedEvent args) => _dirty = true;
+
+    private void OnBlockerChanged(TileChangedEvent args) => _dirty = true;
 
     /// <summary>Rebuilds the fields when needed and runs the managed-sound post-pass at the engine audio tick rate.</summary>
     public override void FrameUpdate(float frameTime)
@@ -346,9 +362,11 @@ public sealed class PathSoundSystem : EntitySystem
         if (_fieldGrid != gridUid
             || _baseTile != baseTile
             || _fieldRadius != _radius
+            || _dirty && (float) (_timing.CurTime - _fieldTime).TotalSeconds > 0.05f
             || (float) (_timing.CurTime - _fieldTime).TotalSeconds > _ttl)
         {
             RebuildField(gridUid, grid, baseTile);
+            _dirty = false;
         }
 
         _accum += frameTime;
