@@ -362,6 +362,33 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
+        // These abandonments run before the restart below: a song that cannot play right now
+        // must not keep its playback slot, and every such exit reclaims the decoded bytes
+        if (_failed.Contains(songId))
+        {
+            StopLocal(ent.Owner);
+            return;
+        }
+
+        // A song rejected by a server limit is retried after a while: the limit may have been restored
+        if (_limitFailed.TryGetValue(songId, out var limitAt))
+        {
+            if (_timing.CurTime - limitAt < LimitRetry)
+            {
+                StopLocal(ent.Owner);
+                return;
+            }
+
+            _limitFailed.Remove(songId);
+        }
+
+        if (!_cache.TryGetValue(songId, out var resource))
+        {
+            StopLocal(ent.Owner);
+            RequestFile(ent.Owner, songId);
+            return;
+        }
+
         if (_playing.TryGetValue(ent.Owner, out var current))
         {
             if (current.SongId == songId && current.StartedAt == startedAt && current.Repeat == comp.Repeat)
@@ -372,24 +399,6 @@ public sealed class PlayerMusicSystem : EntitySystem
             // The eviction is deferred: for a moment the restarted song is not playing, and a full
             // cache must not evict it right before it is started again.
             StopLocal(ent.Owner, evict: false);
-        }
-
-        if (_failed.Contains(songId))
-            return;
-
-        // A song rejected by a server limit is retried after a while: the limit may have been restored
-        if (_limitFailed.TryGetValue(songId, out var limitAt))
-        {
-            if (_timing.CurTime - limitAt < LimitRetry)
-                return;
-
-            _limitFailed.Remove(songId);
-        }
-
-        if (!_cache.TryGetValue(songId, out var resource))
-        {
-            RequestFile(ent.Owner, songId);
-            return;
         }
 
         var stream = resource.AudioStream;
@@ -407,6 +416,9 @@ public sealed class PlayerMusicSystem : EntitySystem
         else if (elapsed >= stream.Length - EndSlack)
         {
             // The song is over. Starting it now would make the engine play its last few milliseconds.
+            // The deferred eviction from the restart above must still run: the abandoned playback
+            // freed its slot, and the finished song's bytes can be reclaimed.
+            EvictOldSongs();
             return;
         }
 
@@ -425,9 +437,14 @@ public sealed class PlayerMusicSystem : EntitySystem
         {
             Log.Error($"PlayerMusic: failed to start playback: {e}");
             _failed.Add(songId);
+
+            // The cached bytes of a permanently failed song are dead weight: reclaim them
+            EvictOldSongs();
             return;
         }
 
+        // Audio could not start (e.g. no output device): the song stays cached and is retried,
+        // an eviction here would make a device-less client re-download it forever
         if (result is not { } played)
             return;
 
