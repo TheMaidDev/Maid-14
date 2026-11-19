@@ -439,7 +439,8 @@ public sealed class PathSoundSystem : EntitySystem
             return SmoothOverride(sourcePos, occlusion);
 
         var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
-        var ray = new CollisionRay(listener.Position, delta / distance, _sharedAudio.OcclusionCollisionMask);
+        var mask = _sharedAudio.OcclusionCollisionMask | (int) CollisionGroup.GlassAirlockLayer;
+        var ray = new CollisionRay(listener.Position, delta / distance, mask);
         return _physics.IntersectRayPenetration(listener.MapId, ray, rayLength, ignoredEnt);
     }
 
