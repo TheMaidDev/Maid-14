@@ -97,10 +97,10 @@ public sealed class MaidCVars
         CVarDef.Create("maidsound.path_cache_ttl", 2f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
-    /// Sound path recalculations per second.
+    /// Fraction of the target occlusion and volume applied per audio tick; 1 disables smoothing.
     /// </summary>
-    public static readonly CVarDef<int> SoundPathUpdateRate =
-        CVarDef.Create("maidsound.path_update_rate", 30, CVar.CLIENTONLY | CVar.ARCHIVE);
+    public static readonly CVarDef<float> SoundPathSmoothing =
+        CVarDef.Create("maidsound.path_smoothing", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     #endregion
 
