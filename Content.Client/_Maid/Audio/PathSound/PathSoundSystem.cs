@@ -581,11 +581,11 @@ public sealed class PathSoundSystem : EntitySystem
         {
             float occl;
 
+            if (!TryComp(ent.Value, out PhysicsComponent? phys) || !phys.CanCollide)
+                continue;
+
             if (_weightQuery.TryGetComponent(ent.Value, out var weightComp))
             {
-                if (!TryComp(ent.Value, out PhysicsComponent? phys) || !phys.CanCollide)
-                    continue;
-
                 occl = OcclFromMuffle(weightComp.Muffle);
             }
             else
