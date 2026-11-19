@@ -13,6 +13,7 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 using AudioComponent = Robust.Shared.Audio.Components.AudioComponent;
@@ -568,7 +569,7 @@ public sealed class PathSoundSystem : EntitySystem
         return weight;
     }
 
-    /// <summary>Computes the blocking occlusion of a tile from its anchored entities' hard impassable fixtures.</summary>
+    /// <summary>Computes the blocking occlusion of a tile from its anchored entities: component entities use their muffle percent, static blockers use heuristics.</summary>
     private float ComputeTileWeight(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
     {
         if (!_map.TryGetTile(grid, tile, out var tileData) || tileData.IsEmpty)
@@ -578,30 +579,44 @@ public sealed class PathSoundSystem : EntitySystem
         var anchored = _map.GetAnchoredEntitiesEnumerator(gridUid, grid, tile);
         while (anchored.MoveNext(out var ent))
         {
-            if (!TryComp(ent.Value, out FixturesComponent? fixtures))
-                continue;
+            float occl;
 
-            var layer = 0;
-            foreach (var fixture in fixtures.Fixtures.Values)
+            if (_weightQuery.TryGetComponent(ent.Value, out var weightComp))
             {
-                if (!fixture.Hard || (fixture.CollisionLayer & ImpassableMask) == 0)
+                if (!TryComp(ent.Value, out PhysicsComponent? phys) || !phys.CanCollide)
                     continue;
 
-                layer |= fixture.CollisionLayer;
-            }
-
-            if (layer == 0)
-                continue;
-
-            float occl;
-            if (_weightQuery.TryGetComponent(ent.Value, out var weightComp))
                 occl = OcclFromMuffle(weightComp.Muffle);
-            else if ((layer & OpaqueMask) != 0)
-                occl = _occlusionPerWeight * _weightOpaque;
-            else if ((layer & GlassMask) != 0)
-                occl = _occlusionPerWeight * _weightGlass;
+            }
             else
-                occl = _occlusionPerWeight * _weightOpaque;
+            {
+                if (!TryComp(ent.Value, out FixturesComponent? fixtures))
+                    continue;
+
+                var layer = 0;
+                foreach (var fixture in fixtures.Fixtures.Values)
+                {
+                    if (!fixture.Hard)
+                        continue;
+
+                    if ((fixture.CollisionLayer & ImpassableMask) == 0
+                        && fixture.CollisionLayer != (int) CollisionGroup.AirlockLayer
+                        && fixture.CollisionLayer != (int) CollisionGroup.GlassAirlockLayer)
+                        continue;
+
+                    layer |= fixture.CollisionLayer;
+                }
+
+                if (layer == 0)
+                    continue;
+
+                if ((layer & OpaqueMask) != 0)
+                    occl = _occlusionPerWeight * _weightOpaque;
+                else if ((layer & GlassMask) != 0)
+                    occl = _occlusionPerWeight * _weightGlass;
+                else
+                    occl = _occlusionPerWeight * _weightOpaque;
+            }
 
             if (occl > best)
                 best = occl;
