@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text;
 using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
@@ -5,12 +6,14 @@ using Content.Shared.Physics;
 using Robust.Client.Audio;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
+using Robust.Shared;
 using Robust.Shared.Audio;
-using Robust.Shared.Audio.Components;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 using AudioComponent = Robust.Shared.Audio.Components.AudioComponent;
 
@@ -48,6 +51,9 @@ public sealed class PathSoundSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private readonly SharedAudioSystem _sharedAudio = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
 
     /// <summary>Whether the feature cvar is enabled.</summary>
     private bool _enabled = true;
@@ -106,11 +112,8 @@ public sealed class PathSoundSystem : EntitySystem
     private float[] _heapKey = Array.Empty<float>();
     private int _heapCount;
 
-    /// <summary>Audio streams whose NoOcclusion bit was set by this system.</summary>
-    private readonly HashSet<EntityUid> _ownedNoOcclusion = new();
-
-    /// <summary>Reused removal buffer for dead owned-flag entries.</summary>
-    private readonly List<EntityUid> _flagSweep = new();
+    /// <summary>Whether the engine occlusion override has been registered by this instance.</summary>
+    private bool _overrideSubscribed;
 
     /// <summary>Reused candidate list for the post-pass.</summary>
     private readonly List<SoundCandidate> _candidates = new();
@@ -212,6 +215,12 @@ public sealed class PathSoundSystem : EntitySystem
 
         _weightQuery = GetEntityQuery<SoundPathWeightComponent>();
 
+        if (!_overrideSubscribed)
+        {
+            _audio.GetOcclusionOverride += OnGetOcclusionOverride;
+            _overrideSubscribed = true;
+        }
+
         _overlay = new PathSoundOverlay(this);
     }
 
@@ -225,7 +234,12 @@ public sealed class PathSoundSystem : EntitySystem
             _overlayEnabled = false;
         }
 
-        ClearOwnedFlags();
+        if (_overrideSubscribed)
+        {
+            _audio.GetOcclusionOverride -= OnGetOcclusionOverride;
+            _overrideSubscribed = false;
+        }
+
         _fieldGrid = null;
     }
 
@@ -270,60 +284,121 @@ public sealed class PathSoundSystem : EntitySystem
             return;
 
         _accum = 0f;
-        ProcessSounds(playerXform, gridUid, grid, fracX - baseTile.X, fracY - baseTile.Y);
+        ProcessSounds(gridUid, grid);
     }
 
 
-    /// <summary>Tears the fields down and releases every owned NoOcclusion bit.</summary>
+    /// <summary>Tears the fields down; field values are only meaningful on the grid they were built on.</summary>
     private void ResetAll()
     {
-        if (_fieldGrid == null && _ownedNoOcclusion.Count == 0)
+        if (_fieldGrid == null)
             return;
 
-        ClearOwnedFlags();
         _fieldGrid = null;
         _accum = 0f;
     }
 
-    /// <summary>Clears the NoOcclusion bit on every sound we flagged.</summary>
-    private void ClearOwnedFlags()
+    /// <summary>Interpolates the path values from the fields for a sound at the given world position.</summary>
+    private bool TryGetPath(MapCoordinates listener, Vector2 sourcePos, out float sumW, out float hops)
     {
-        foreach (var uid in _ownedNoOcclusion)
+        sumW = 0f;
+        hops = 0f;
+
+        if (_fieldGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
+            return false;
+
+        var gridXform = Transform(gridUid);
+        if (gridXform.MapID != listener.MapId)
+            return false;
+
+        var tileSize = grid.TileSize;
+        var inv = _transform.GetInvWorldMatrix(gridXform);
+
+        var recvLocal = Vector2.Transform(listener.Position, inv);
+        var recvFx = recvLocal.X / tileSize;
+        var recvFy = recvLocal.Y / tileSize;
+        var recvBx = (int) MathF.Floor(recvFx);
+        var recvBy = (int) MathF.Floor(recvFy);
+        var recvAx = recvFx - recvBx;
+        var recvAy = recvFy - recvBy;
+
+        var srcLocal = Vector2.Transform(sourcePos, inv);
+        var srcFx = srcLocal.X / tileSize;
+        var srcFy = srcLocal.Y / tileSize;
+        var srcBx = (int) MathF.Floor(srcFx);
+        var srcBy = (int) MathF.Floor(srcFy);
+        var sax = srcFx - srcBx;
+        var say = srcFy - srcBy;
+
+        var radius = _fieldRadius;
+        var size = radius * 2 + 1;
+        var baseTile = _baseTile;
+
+        var rootSumW = 0f;
+        var rootSumH = 0f;
+        var rootWeightSum = 0f;
+
+        for (var root = 0; root < RootCount; root++)
         {
-            if (TryComp(uid, out AudioComponent? comp))
-                comp.Flags &= ~AudioFlags.NoOcclusion;
+            var rootDx = root & 1;
+            var rootDy = root >> 1;
+            var rootWeight = (rootDx == 0 ? 1f - recvAx : recvAx) * (rootDy == 0 ? 1f - recvAy : recvAy);
+
+            var cornerSumW = 0f;
+            var cornerSumH = 0f;
+            var cornerWeightSum = 0f;
+
+            for (var corner = 0; corner < RootCount; corner++)
+            {
+                var cdx = corner & 1;
+                var cdy = corner >> 1;
+                var cornerX = srcBx + cdx;
+                var cornerY = srcBy + cdy;
+                var offsetX = cornerX - baseTile.X - rootDx;
+                var offsetY = cornerY - baseTile.Y - rootDy;
+
+                if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
+                    continue;
+
+                if (!_map.TryGetTile(grid, new Vector2i(cornerX, cornerY), out _))
+                    continue;
+
+                var weight = (cdx == 0 ? 1f - sax : sax) * (cdy == 0 ? 1f - say : say);
+                var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
+
+                cornerSumW += weight * _sumW[idx];
+                cornerSumH += weight * _hops[idx];
+                cornerWeightSum += weight;
+            }
+
+            if (cornerWeightSum <= 0f)
+                continue;
+
+            rootSumW += rootWeight * (cornerSumW / cornerWeightSum);
+            rootSumH += rootWeight * (cornerSumH / cornerWeightSum);
+            rootWeightSum += rootWeight;
         }
 
-        _ownedNoOcclusion.Clear();
+        if (rootWeightSum <= 0f)
+            return false;
+
+        sumW = rootSumW / rootWeightSum;
+        hops = rootSumH / rootWeightSum;
+        return true;
     }
 
-    /// <summary>Clears our NoOcclusion bit on a sound that left management.</summary>
-    private void UnflagIfOwned(EntityUid uid, AudioComponent comp)
+    /// <summary>Engine occlusion override: field-based value for sounds inside the field, engine raycast otherwise.</summary>
+    private float OnGetOcclusionOverride(MapCoordinates listener, Vector2 delta, float distance, EntityUid? ignoredEnt)
     {
-        if (!_ownedNoOcclusion.Remove(uid))
-            return;
+        if (distance <= 0.1f)
+            return 0f;
 
-        comp.Flags &= ~AudioFlags.NoOcclusion;
-    }
+        if (TryGetPath(listener, listener.Position + delta, out var sumW, out _))
+            return _occlusionPerWeight * sumW;
 
-    /// <summary>Removes deleted or compless audio streams from the owned-flag set, no unflag needed.</summary>
-    private void SweepOwnedFlags()
-    {
-        if (_ownedNoOcclusion.Count == 0)
-            return;
-
-        _flagSweep.Clear();
-
-        foreach (var uid in _ownedNoOcclusion)
-        {
-            if (!Exists(uid) || !TryComp(uid, out AudioComponent? _))
-                _flagSweep.Add(uid);
-        }
-
-        foreach (var uid in _flagSweep)
-        {
-            _ownedNoOcclusion.Remove(uid);
-        }
+        var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
+        var ray = new CollisionRay(listener.Position, delta / distance, _sharedAudio.OcclusionCollisionMask);
+        return _physics.IntersectRayPenetration(listener.MapId, ray, rayLength, ignoredEnt);
     }
 
     /// <summary>Allocates the per-root field and shared heap arrays for the current radius.</summary>
@@ -474,46 +549,24 @@ public sealed class PathSoundSystem : EntitySystem
     }
 
     /// <summary>Applies path-based occlusion and volume to managed audio streams.</summary>
-    private void ProcessSounds(TransformComponent playerXform, EntityUid gridUid, MapGridComponent grid, float recvAx, float recvAy)
+    private void ProcessSounds(EntityUid gridUid, MapGridComponent grid)
     {
-        var listenerPos = _transform.GetWorldPosition(playerXform);
-        var mapId = playerXform.MapID;
+        var listener = _audio.GetListenerCoordinates();
         var tileSize = grid.TileSize;
         var maxDist = _fieldRadius * tileSize;
-        var radius = _fieldRadius;
-        var size = radius * 2 + 1;
-        var count = size * size;
-        var baseTile = _baseTile;
 
         _candidates.Clear();
-
-        SweepOwnedFlags();
 
         var query = AllEntityQuery<AudioComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var comp, out var xform))
         {
-            if (comp.Global)
-            {
-                UnflagIfOwned(uid, comp);
+            if (comp.Global || xform.MapID != listener.MapId || xform.GridUid != gridUid)
                 continue;
-            }
-
-            if ((comp.Flags & AudioFlags.NoOcclusion) != 0 && !_ownedNoOcclusion.Contains(uid))
-                continue;
-
-            if (xform.MapID != mapId || xform.GridUid != gridUid)
-            {
-                UnflagIfOwned(uid, comp);
-                continue;
-            }
 
             var sourcePos = _transform.GetWorldPosition(xform);
-            var distance = (sourcePos - listenerPos).Length();
+            var distance = (sourcePos - listener.Position).Length();
             if (distance > maxDist)
-            {
-                UnflagIfOwned(uid, comp);
                 continue;
-            }
 
             _candidates.Add(new SoundCandidate(uid, comp, xform, sourcePos.X, sourcePos.Y, distance));
         }
@@ -521,12 +574,6 @@ public sealed class PathSoundSystem : EntitySystem
         if (_candidates.Count > _maxSources)
         {
             _candidates.Sort(SortByDistance);
-
-            for (var i = _maxSources; i < _candidates.Count; i++)
-            {
-                UnflagIfOwned(_candidates[i].Uid, _candidates[i].Comp);
-            }
-
             _candidates.RemoveRange(_maxSources, _candidates.Count - _maxSources);
         }
 
@@ -535,72 +582,11 @@ public sealed class PathSoundSystem : EntitySystem
         foreach (var candidate in _candidates)
         {
             var comp = candidate.Comp;
-            if ((comp.Flags & AudioFlags.NoOcclusion) == 0)
-            {
-                comp.Flags |= AudioFlags.NoOcclusion;
-                _ownedNoOcclusion.Add(candidate.Uid);
-            }
 
-            var srcLocal = _map.LocalToGrid(gridUid, grid, candidate.Xform.Coordinates);
-            var sfracX = srcLocal.X / tileSize;
-            var sfracY = srcLocal.Y / tileSize;
-            var srcFloorX = (int) MathF.Floor(sfracX);
-            var srcFloorY = (int) MathF.Floor(sfracY);
-            var sax = sfracX - srcFloorX;
-            var say = sfracY - srcFloorY;
-
-            var rootSumW = 0f;
-            var rootSumH = 0f;
-            var rootWeightSum = 0f;
-
-            for (var root = 0; root < RootCount; root++)
-            {
-                var rootDx = root & 1;
-                var rootDy = root >> 1;
-                var rootWeight = (rootDx == 0 ? 1f - recvAx : recvAx) * (rootDy == 0 ? 1f - recvAy : recvAy);
-
-                var cornerSumW = 0f;
-                var cornerSumH = 0f;
-                var cornerWeightSum = 0f;
-
-                for (var corner = 0; corner < RootCount; corner++)
-                {
-                    var cdx = corner & 1;
-                    var cdy = corner >> 1;
-                    var cornerX = srcFloorX + cdx;
-                    var cornerY = srcFloorY + cdy;
-                    var offsetX = cornerX - baseTile.X - rootDx;
-                    var offsetY = cornerY - baseTile.Y - rootDy;
-
-                    if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
-                        continue;
-
-                    if (!_map.TryGetTile(grid, new Vector2i(cornerX, cornerY), out _))
-                        continue;
-
-                    var weight = (cdx == 0 ? 1f - sax : sax) * (cdy == 0 ? 1f - say : say);
-                    var idx = root * count + (offsetX + radius) + size * (offsetY + radius);
-
-                    cornerSumW += weight * _sumW[idx];
-                    cornerSumH += weight * _hops[idx];
-                    cornerWeightSum += weight;
-                }
-
-                if (cornerWeightSum <= 0f)
-                    continue;
-
-                rootSumW += rootWeight * (cornerSumW / cornerWeightSum);
-                rootSumH += rootWeight * (cornerSumH / cornerWeightSum);
-                rootWeightSum += rootWeight;
-            }
-
-            if (rootWeightSum <= 0f)
+            if (!TryGetPath(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var interpSumW, out var interpHops))
                 continue;
 
-            var interpSumW = rootSumW / rootWeightSum;
-            var interpHops = rootSumH / rootWeightSum;
-
-            var delta = interpHops - (MathF.Abs(candidate.SourceX - listenerPos.X) + MathF.Abs(candidate.SourceY - listenerPos.Y)) / tileSize;
+            var delta = interpHops - (MathF.Abs(candidate.SourceX - listener.Position.X) + MathF.Abs(candidate.SourceY - listener.Position.Y)) / tileSize;
             if (interpSumW < 0.01f && delta < 0.5f)
             {
                 _debug[candidate.Uid] = new DebugEntry(interpSumW, interpHops, delta, 0f, comp.Params.Volume, false);
