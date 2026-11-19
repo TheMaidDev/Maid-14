@@ -48,7 +48,7 @@ public sealed class PathSoundSystem : EntitySystem
     private const int RootCount = 4;
 
     /// <summary>Number of smoothing slots for the occlusion override.</summary>
-    private const int SmoothSlots = 128;
+    private const int SmoothSlots = 512;
 
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
@@ -395,7 +395,7 @@ public sealed class PathSoundSystem : EntitySystem
     }
 
     /// <summary>Computes the blended occlusion and volume change from the four fields for a sound at the given world position.</summary>
-    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float volDb, out float dbgSumW, out float dbgHops, out float dbgPast)
+    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float volDb, out float dbgSumW, out float dbgHops, out float dbgPast, bool clampToField = false)
     {
         occlusion = 0f;
         volDb = 0f;
@@ -433,6 +433,14 @@ public sealed class PathSoundSystem : EntitySystem
         var baseTile = _baseTile;
         var nearSrc = Math.Abs(srcBx - baseTile.X) <= 1 && Math.Abs(srcBy - baseTile.Y) <= 1;
 
+        var queryTile = srcTile;
+        if (clampToField)
+        {
+            var clampX = Math.Clamp(srcBx, baseTile.X - radius, baseTile.X + radius);
+            var clampY = Math.Clamp(srcBy, baseTile.Y - radius, baseTile.Y + radius);
+            queryTile = new Vector2i(clampX, clampY);
+        }
+
         var rootCutoff = 0f;
         var rootVolDb = 0f;
         var rootSumW = 0f;
@@ -446,20 +454,20 @@ public sealed class PathSoundSystem : EntitySystem
             var rootDy = root >> 1;
             var rootWeight = (rootDx == 0 ? 1f - recvAx : recvAx) * (rootDy == 0 ? 1f - recvAy : recvAy);
 
-            var offsetX = srcBx - baseTile.X - rootDx;
-            var offsetY = srcBy - baseTile.Y - rootDy;
+            var offsetX = queryTile.X - baseTile.X - rootDx;
+            var offsetY = queryTile.Y - baseTile.Y - rootDy;
 
             if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
                 continue;
 
-            if (!_map.TryGetTile(grid, srcTile, out _))
+            if (!_map.TryGetTile(grid, queryTile, out _))
                 continue;
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
             if (float.IsPositiveInfinity(_dist[idx]))
                 continue;
 
-            var selfW = nearSrc ? TileWeight(gridUid, grid, srcTile, idx) : 0f;
+            var selfW = nearSrc && queryTile == srcTile ? TileWeight(gridUid, grid, queryTile, idx) : 0f;
             var occlR = MathF.Max(0f, _sumW[idx] - selfW);
             var pastR = _sumW[idx] > 0f ? _past[idx] : 0;
             occlR = MathF.Max(0f, occlR - _occlDecay * pastR);
@@ -483,7 +491,7 @@ public sealed class PathSoundSystem : EntitySystem
         return true;
     }
 
-    /// <summary>Engine occlusion override: smoothed field value for sounds inside the field, engine raycast otherwise.</summary>
+    /// <summary>Engine occlusion override: smoothed field value for sounds inside the field, field-edge value plus a raycast for the rest beyond it, engine raycast when there is no field.</summary>
     private float OnGetOcclusionOverride(MapCoordinates listener, Vector2 delta, float distance, EntityUid? ignoredEnt)
     {
         if (distance <= 0.1f)
@@ -494,9 +502,25 @@ public sealed class PathSoundSystem : EntitySystem
         if (TryGetAudio(listener, sourcePos, out var occlusion, out _, out _, out _, out _))
             return SmoothOverride(sourcePos, occlusion);
 
-        var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
         var mask = _sharedAudio.OcclusionCollisionMask | (int) CollisionGroup.GlassAirlockLayer;
-        var ray = new CollisionRay(listener.Position, delta / distance, mask);
+        var dir = delta / distance;
+
+        // Beyond the field: keep the occlusion accumulated to the field edge along the ray and raycast only the rest.
+        var edgeDist = _fieldRadius;
+        if (_fieldGrid is { } edgeGrid && TryComp(edgeGrid, out MapGridComponent? edgeGridComp))
+            edgeDist = _fieldRadius * edgeGridComp.TileSize;
+
+        if (distance > edgeDist && TryGetAudio(listener, sourcePos, out var edgeOccl, out _, out _, out _, out _, true))
+        {
+            var restLength = MathF.Min(distance - edgeDist, _cfg.GetCVar(CVars.AudioRaycastLength));
+            var origin = listener.Position + dir * edgeDist;
+            var edgeRay = new CollisionRay(origin, dir, mask);
+            var pen = _physics.IntersectRayPenetration(listener.MapId, edgeRay, restLength, ignoredEnt);
+            return SmoothOverride(sourcePos, edgeOccl + pen);
+        }
+
+        var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
+        var ray = new CollisionRay(listener.Position, dir, mask);
         return _physics.IntersectRayPenetration(listener.MapId, ray, rayLength, ignoredEnt);
     }
 
@@ -746,12 +770,8 @@ public sealed class PathSoundSystem : EntitySystem
             float past;
             bool written;
 
-            if (TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out volDb, out sumW, out pathLen, out past))
-            {
-                occl = occlusion;
-                written = true;
-            }
-            else
+            if (!TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out volDb, out sumW, out pathLen, out past)
+                && !TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out occlusion, out volDb, out sumW, out pathLen, out past, true))
             {
                 var tiles = candidate.Distance / tileSize;
                 volDb = -_lossDbPerTile * tiles;
@@ -760,6 +780,12 @@ public sealed class PathSoundSystem : EntitySystem
                 occl = -1f;
                 past = 0f;
                 written = false;
+            }
+            else
+            {
+                occl = occlusion;
+                written = true;
+                volDb -= _lossDbPerTile * MathF.Max(0f, candidate.Distance / tileSize - pathLen);
             }
 
             var target = MathF.Max(comp.Params.Volume + volDb, comp.Params.Volume - 60f);
