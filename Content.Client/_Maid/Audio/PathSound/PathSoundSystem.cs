@@ -329,7 +329,7 @@ public sealed class PathSoundSystem : EntitySystem
 
     private void OnBlockerChanged(ref AnchorStateChangedEvent args) => _dirty = true;
 
-    private void OnBlockerChanged(TileChangedEvent args) => _dirty = true;
+    private void OnBlockerChanged(ref TileChangedEvent args) => _dirty = true;
 
     /// <summary>Rebuilds the fields when needed and runs the managed-sound post-pass at the engine audio tick rate.</summary>
     public override void FrameUpdate(float frameTime)
