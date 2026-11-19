@@ -327,8 +327,7 @@ public sealed class PathSoundSystem : EntitySystem
         var srcFy = srcLocal.Y / tileSize;
         var srcBx = (int) MathF.Floor(srcFx);
         var srcBy = (int) MathF.Floor(srcFy);
-        var sax = srcFx - srcBx;
-        var say = srcFy - srcBy;
+        var srcTile = new Vector2i(srcBx, srcBy);
 
         var radius = _fieldRadius;
         var size = radius * 2 + 1;
@@ -344,38 +343,19 @@ public sealed class PathSoundSystem : EntitySystem
             var rootDy = root >> 1;
             var rootWeight = (rootDx == 0 ? 1f - recvAx : recvAx) * (rootDy == 0 ? 1f - recvAy : recvAy);
 
-            var cornerSumW = 0f;
-            var cornerSumH = 0f;
-            var cornerWeightSum = 0f;
+            var offsetX = srcBx - baseTile.X - rootDx;
+            var offsetY = srcBy - baseTile.Y - rootDy;
 
-            for (var corner = 0; corner < RootCount; corner++)
-            {
-                var cdx = corner & 1;
-                var cdy = corner >> 1;
-                var cornerX = srcBx + cdx;
-                var cornerY = srcBy + cdy;
-                var offsetX = cornerX - baseTile.X - rootDx;
-                var offsetY = cornerY - baseTile.Y - rootDy;
-
-                if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
-                    continue;
-
-                if (!_map.TryGetTile(grid, new Vector2i(cornerX, cornerY), out _))
-                    continue;
-
-                var weight = (cdx == 0 ? 1f - sax : sax) * (cdy == 0 ? 1f - say : say);
-                var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
-
-                cornerSumW += weight * _sumW[idx];
-                cornerSumH += weight * _hops[idx];
-                cornerWeightSum += weight;
-            }
-
-            if (cornerWeightSum <= 0f)
+            if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
                 continue;
 
-            rootSumW += rootWeight * (cornerSumW / cornerWeightSum);
-            rootSumH += rootWeight * (cornerSumH / cornerWeightSum);
+            if (!_map.TryGetTile(grid, srcTile, out _))
+                continue;
+
+            var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
+
+            rootSumW += rootWeight * MathF.Max(0f, _sumW[idx] - TileWeight(gridUid, grid, srcTile, idx));
+            rootSumH += rootWeight * _hops[idx];
             rootWeightSum += rootWeight;
         }
 
