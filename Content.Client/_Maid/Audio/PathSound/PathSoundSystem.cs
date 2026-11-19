@@ -15,6 +15,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
 using AudioComponent = Robust.Shared.Audio.Components.AudioComponent;
@@ -292,6 +293,7 @@ public sealed class PathSoundSystem : EntitySystem
         SubscribeLocalEvent<DoorStateChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<AnchorStateChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<TileChangedEvent>(OnBlockerChanged);
+        SubscribeLocalEvent<CollisionChangeEvent>(OnBlockerChanged);
 
         _weightQuery = GetEntityQuery<SoundPathWeightComponent>();
 
@@ -330,6 +332,8 @@ public sealed class PathSoundSystem : EntitySystem
     private void OnBlockerChanged(ref AnchorStateChangedEvent args) => _dirty = true;
 
     private void OnBlockerChanged(ref TileChangedEvent args) => _dirty = true;
+
+    private void OnBlockerChanged(ref CollisionChangeEvent args) => _dirty = true;
 
     /// <summary>Rebuilds the fields when needed and runs the managed-sound post-pass at the engine audio tick rate.</summary>
     public override void FrameUpdate(float frameTime)
@@ -773,7 +777,7 @@ public sealed class PathSoundSystem : EntitySystem
 
             _smoothVol[candidate.Uid] = applied;
             comp.Volume = applied;
-            _debug[candidate.Uid] = new DebugEntry(sumW, pathLen, occl, applied, volDb, past, written);
+            _debug[candidate.Uid] = new DebugEntry(sumW, pathLen, occl, applied, applied - comp.Params.Volume, past, written);
         }
     }
 
