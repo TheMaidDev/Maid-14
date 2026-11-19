@@ -76,6 +76,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Occlusion faded per tile of path past the last blocker.</summary>
     private float _occlDecay;
 
+    /// <summary>Volume lost in dB per unit of applied occlusion.</summary>
+    private float _occlLossDb;
+
     /// <summary>Heuristic weight for opaque blockers.</summary>
     private float _weightOpaque;
 
@@ -217,11 +220,14 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Occlusion added per unit of blocking weight.</summary>
     public float OcclusionPerWeight => _occlusionPerWeight;
 
-    /// <summary>Volume loss in dB per tile of path detour.</summary>
+    /// <summary>Volume loss in dB per tile of sound path.</summary>
     public float LossDbPerTile => _lossDbPerTile;
 
     /// <summary>Occlusion faded per tile of path past the last blocker.</summary>
     public float OcclusionDecayPerTile => _occlDecay;
+
+    /// <summary>Volume lost in dB per unit of applied occlusion.</summary>
+    public float OcclusionLossDb => _occlLossDb;
 
     /// <summary>Fraction of the target values applied per update.</summary>
     public float Smoothing => _smoothing;
@@ -265,6 +271,7 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionPerWeight, v => _occlusionPerWeight = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathLossDbPerTile, v => _lossDbPerTile = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionDecayPerTile, v => _occlDecay = v, true);
+        Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionLossDb, v => _occlLossDb = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightOpaque, v => _weightOpaque = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightGlass, v => _weightGlass = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathCacheTtl, v => _ttl = MathF.Max(0.25f, v), true);
@@ -392,8 +399,6 @@ public sealed class PathSoundSystem : EntitySystem
         var srcBy = (int) MathF.Floor(srcFy);
         var srcTile = new Vector2i(srcBx, srcBy);
 
-        var manhattan = (MathF.Abs(sourcePos.X - listener.Position.X) + MathF.Abs(sourcePos.Y - listener.Position.Y)) / tileSize;
-
         var radius = _fieldRadius;
         var size = radius * 2 + 1;
         var baseTile = _baseTile;
@@ -426,10 +431,9 @@ public sealed class PathSoundSystem : EntitySystem
             var occlR = MathF.Max(0f, _sumW[idx] - selfW);
             var pastR = _sumW[idx] > 0f ? _past[idx] : 0;
             occlR = MathF.Max(0f, occlR - _occlDecay * pastR);
-            var deltaR = MathF.Max(0f, _hops[idx] - manhattan);
 
             rootCutoff += rootWeight * MathF.Exp(-occlR);
-            rootVolDb += rootWeight * (-_lossDbPerTile * (deltaR + pastR));
+            rootVolDb += rootWeight * (-_lossDbPerTile * (_hops[idx] + pastR));
             rootSumW += rootWeight * occlR;
             rootHops += rootWeight * _hops[idx];
             rootPast += rootWeight * pastR;
@@ -440,7 +444,7 @@ public sealed class PathSoundSystem : EntitySystem
             return false;
 
         occlusion = -MathF.Log(MathF.Max(rootCutoff / rootWeightSum, 1e-9f));
-        volDb = rootVolDb / rootWeightSum;
+        volDb = rootVolDb / rootWeightSum - _occlLossDb * occlusion;
         dbgSumW = rootSumW / rootWeightSum;
         dbgHops = rootHops / rootWeightSum;
         dbgPast = rootPast / rootWeightSum;

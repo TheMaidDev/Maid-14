@@ -79,6 +79,12 @@ public sealed class MaidCVars
         CVarDef.Create("maidsound.path_loss_db_per_tile", 1.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
+    /// Volume loss in decibels per unit of sound path occlusion.
+    /// </summary>
+    public static readonly CVarDef<float> SoundPathOcclusionLossDb =
+        CVarDef.Create("maidsound.path_occlusion_loss_db", 4.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
     /// Occlusion faded per tile of sound path past the last blocker.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionDecayPerTile =
