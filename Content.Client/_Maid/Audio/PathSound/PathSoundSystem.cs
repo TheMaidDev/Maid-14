@@ -152,6 +152,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Reused candidate list for the post-pass.</summary>
     private readonly List<SoundCandidate> _candidates = new();
 
+    /// <summary>Reused kept-sounds list for the post-pass cap.</summary>
+    private readonly List<SoundCandidate> _kept = new();
+
     /// <summary>Last applied per-sound values for the soundpathdebug dump command and the overlay markers.</summary>
     private readonly Dictionary<EntityUid, DebugEntry> _debug = new();
 
@@ -431,6 +434,9 @@ public sealed class PathSoundSystem : EntitySystem
                 continue;
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
+            if (float.IsPositiveInfinity(_dist[idx]))
+                continue;
+
             var selfW = nearSrc ? TileWeight(gridUid, grid, srcTile, idx) : 0f;
             var occlR = MathF.Max(0f, _sumW[idx] - selfW);
             var pastR = _sumW[idx] > 0f ? _past[idx] : 0;
@@ -668,7 +674,8 @@ public sealed class PathSoundSystem : EntitySystem
     {
         var listener = _audio.GetListenerCoordinates();
         var tileSize = grid.TileSize;
-        var maxDist = _volumeRange * tileSize;
+        var enterDist = _volumeRange * tileSize;
+        var releaseDist = enterDist + 4f * tileSize;
 
         SweepSmoothVol();
         _candidates.Clear();
@@ -681,17 +688,29 @@ public sealed class PathSoundSystem : EntitySystem
 
             var sourcePos = _transform.GetWorldPosition(xform);
             var distance = (sourcePos - listener.Position).Length();
-            if (distance > maxDist)
+            if (distance > (_smoothVol.ContainsKey(uid) ? releaseDist : enterDist))
                 continue;
 
             _candidates.Add(new SoundCandidate(uid, comp, xform, sourcePos.X, sourcePos.Y, distance));
         }
 
-        if (_candidates.Count > _maxSources)
+        _candidates.Sort(SortByDistance);
+        _kept.Clear();
+        var fresh = 0;
+        foreach (var candidate in _candidates)
         {
-            _candidates.Sort(SortByDistance);
-            _candidates.RemoveRange(_maxSources, _candidates.Count - _maxSources);
+            var managed = _smoothVol.ContainsKey(candidate.Uid);
+            if (!managed && fresh >= _maxSources)
+                continue;
+
+            if (!managed)
+                fresh++;
+
+            _kept.Add(candidate);
         }
+
+        _candidates.Clear();
+        _candidates.AddRange(_kept);
 
         _debug.Clear();
 
@@ -722,9 +741,8 @@ public sealed class PathSoundSystem : EntitySystem
             }
 
             var target = MathF.Max(comp.Params.Volume + volDb, comp.Params.Volume - 60f);
-            var applied = _smoothVol.TryGetValue(candidate.Uid, out var prev)
-                ? prev + (target - prev) * _smoothing
-                : target;
+            var prev = _smoothVol.TryGetValue(candidate.Uid, out var prevVol) ? prevVol : comp.Volume;
+            var applied = prev + (target - prev) * _smoothing;
 
             _smoothVol[candidate.Uid] = applied;
             comp.Volume = applied;

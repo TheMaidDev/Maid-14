@@ -61,7 +61,7 @@ public sealed class MaidCVars
         CVarDef.Create("maidsound.path_radius", 20, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
-    /// Maximum number of sound sources processed per update.
+    /// Maximum number of new sound sources managed per update.
     /// </summary>
     public static readonly CVarDef<int> SoundPathMaxSources =
         CVarDef.Create("maidsound.path_max_sources", 96, CVar.CLIENTONLY | CVar.ARCHIVE);
