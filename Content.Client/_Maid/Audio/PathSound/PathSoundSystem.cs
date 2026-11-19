@@ -102,7 +102,7 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Path cost per root field tile, indexed root*count + (x+R) + W*(y+R).</summary>
     private float[] _dist = Array.Empty<float>();
 
-    /// <summary>Accumulated blocking weight per root field tile.</summary>
+    /// <summary>Accumulated blocking occlusion per root field tile.</summary>
     private float[] _sumW = Array.Empty<float>();
 
     /// <summary>Path hop count per root field tile.</summary>
@@ -111,7 +111,7 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Dijkstra settled flag per root field tile.</summary>
     private bool[] _settled = Array.Empty<bool>();
 
-    /// <summary>Cached tile weight per root field tile, -1 while unset.</summary>
+    /// <summary>Cached tile occlusion per root field tile, -1 while unset.</summary>
     private float[] _tileW = Array.Empty<float>();
 
     private int[] _heapIdx = Array.Empty<int>();
@@ -158,7 +158,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         foreach (var (uid, entry) in _debug)
         {
-            sb.AppendLine($"{uid} sumW={entry.SumWeight:0.00} path={entry.PathLen:0.0} occl={entry.Occlusion:0.00} vol={entry.Volume:0.0} written={entry.Written}");
+            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} occl={entry.Occlusion:0.00} vol={entry.Volume:0.0} written={entry.Written}");
         }
 
         return sb.ToString();
@@ -219,8 +219,8 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Last post-pass snapshot of managed sounds.</summary>
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
-    /// <summary>Returns the blocking weight and hop count for a grid tile in root 0, if covered and reachable.</summary>
-    public bool TryGetTile(Vector2i tile, out float sumWeight, out int pathLen)
+    /// <summary>Returns the summed blocking occlusion and hop count for a grid tile in root 0, if covered and reachable.</summary>
+    public bool TryGetTile(Vector2i tile, out float sumOcclusion, out int pathLen)
     {
         if (_fieldGrid != null
             && Math.Abs(tile.X - _baseTile.X) <= _fieldRadius
@@ -230,13 +230,13 @@ public sealed class PathSoundSystem : EntitySystem
             var idx = (tile.X - _baseTile.X + _fieldRadius) + size * (tile.Y - _baseTile.Y + _fieldRadius);
             if (!float.IsPositiveInfinity(_dist[idx]))
             {
-                sumWeight = _sumW[idx];
+                sumOcclusion = _sumW[idx];
                 pathLen = _hops[idx];
                 return true;
             }
         }
 
-        sumWeight = 0f;
+        sumOcclusion = 0f;
         pathLen = 0;
         return false;
     }
@@ -406,12 +406,12 @@ public sealed class PathSoundSystem : EntitySystem
                 continue;
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
-            var sumWr = MathF.Max(0f, _sumW[idx] - TileWeight(gridUid, grid, srcTile, idx));
+            var occlR = MathF.Max(0f, _sumW[idx] - TileWeight(gridUid, grid, srcTile, idx));
             var deltaR = MathF.Max(0f, _hops[idx] - manhattan);
 
-            rootCutoff += rootWeight * MathF.Exp(-_occlusionPerWeight * sumWr);
+            rootCutoff += rootWeight * MathF.Exp(-occlR);
             rootVolDb += rootWeight * (-_lossDbPerTile * deltaR);
-            rootSumW += rootWeight * sumWr;
+            rootSumW += rootWeight * occlR;
             rootHops += rootWeight * _hops[idx];
             rootWeightSum += rootWeight;
         }
@@ -556,7 +556,7 @@ public sealed class PathSoundSystem : EntitySystem
         Push(idx, dist);
     }
 
-    /// <summary>Returns the blocking weight of a tile, cached per root build.</summary>
+    /// <summary>Returns the blocking occlusion of a tile, cached per root build.</summary>
     private float TileWeight(EntityUid gridUid, MapGridComponent grid, Vector2i tile, int idx)
     {
         var cached = _tileW[idx];
@@ -568,7 +568,7 @@ public sealed class PathSoundSystem : EntitySystem
         return weight;
     }
 
-    /// <summary>Computes the blocking weight of a tile from its anchored entities' hard impassable fixtures.</summary>
+    /// <summary>Computes the blocking occlusion of a tile from its anchored entities' hard impassable fixtures.</summary>
     private float ComputeTileWeight(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
     {
         if (!_map.TryGetTile(grid, tile, out var tileData) || tileData.IsEmpty)
@@ -593,21 +593,27 @@ public sealed class PathSoundSystem : EntitySystem
             if (layer == 0)
                 continue;
 
-            float weight;
+            float occl;
             if (_weightQuery.TryGetComponent(ent.Value, out var weightComp))
-                weight = weightComp.Weight;
+                occl = OcclFromMuffle(weightComp.Muffle);
             else if ((layer & OpaqueMask) != 0)
-                weight = _weightOpaque;
+                occl = _occlusionPerWeight * _weightOpaque;
             else if ((layer & GlassMask) != 0)
-                weight = _weightGlass;
+                occl = _occlusionPerWeight * _weightGlass;
             else
-                weight = _weightOpaque;
+                occl = _occlusionPerWeight * _weightOpaque;
 
-            if (weight > best)
-                best = weight;
+            if (occl > best)
+                best = occl;
         }
 
         return best;
+    }
+
+    /// <summary>Converts a muffling percent to occlusion units: 90 -> ~2.3 (a tenth of highs passes).</summary>
+    private static float OcclFromMuffle(float muffle)
+    {
+        return -MathF.Log(1f - Math.Clamp(muffle, 0f, 99.9f) / 100f);
     }
 
     /// <summary>Applies smoothed path-based volume to managed audio streams and snapshots values for the debug tools.</summary>

@@ -57,9 +57,9 @@ public sealed class PathSoundOverlay : Overlay
     }
 
     /// <summary>Audibility score of a tile: lowpass cutoff times linear volume fraction, 0..1.</summary>
-    private float Audibility(float sumWeight, int pathLen, Vector2i tile, Vector2i seed)
+    private float Audibility(float sumOcclusion, int pathLen, Vector2i tile, Vector2i seed)
     {
-        var cutoff = MathF.Exp(-_system.OcclusionPerWeight * sumWeight);
+        var cutoff = MathF.Exp(-sumOcclusion);
         var manhattan = Math.Abs(tile.X - seed.X) + Math.Abs(tile.Y - seed.Y);
         var lossDb = _system.LossDbPerTile * MathF.Max(0f, pathLen - manhattan);
         return Math.Clamp(cutoff * MathF.Pow(10f, -lossDb / 20f), 0f, 1f);
@@ -227,7 +227,7 @@ public sealed class PathSoundOverlay : Overlay
         handle.DrawString(
             _font,
             pos + new Vector2(0f, 4f),
-            $"occ/w {_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  smooth {_system.Smoothing:0.00}  r {_system.Radius}",
+            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  smooth {_system.Smoothing:0.00}  r {_system.Radius}",
             Color.LightGray);
     }
 
