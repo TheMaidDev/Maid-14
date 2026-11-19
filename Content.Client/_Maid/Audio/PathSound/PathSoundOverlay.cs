@@ -60,8 +60,9 @@ public sealed class PathSoundOverlay : Overlay
     private float Audibility(float sumOcclusion, int pathLen, int past)
     {
         var pastDb = sumOcclusion > 0f ? past : 0;
-        var cutoff = MathF.Exp(-MathF.Max(0f, sumOcclusion - _system.OcclusionDecayPerTile * pastDb));
-        var lossDb = _system.LossDbPerTile * (pathLen + pastDb) + _system.OcclusionLossDb * sumOcclusion;
+        var applied = MathF.Max(0f, sumOcclusion - _system.OcclusionDecayPerTile * pastDb);
+        var cutoff = MathF.Exp(-applied);
+        var lossDb = _system.LossDbPerTile * (pathLen + pastDb) + _system.OcclusionLossDb * applied;
         return Math.Clamp(cutoff * MathF.Pow(10f, -lossDb / 20f), 0f, 1f);
     }
 
@@ -154,12 +155,8 @@ public sealed class PathSoundOverlay : Overlay
             if (!args.WorldAABB.Enlarged(1f).Contains(pos))
                 continue;
 
-            var s = Math.Clamp(
-                MathF.Exp(-entry.Occlusion) * MathF.Pow(10f, entry.VolumeDelta / 20f),
-                0f,
-                1f);
-            var color = entry.Written ? AudibilityColor(s) : Color.LightGray;
-            worldHandle.DrawCircle(pos, 0.45f, color.WithAlpha(0.9f), filled: false);
+            var s = Math.Clamp(MathF.Exp(-entry.Smoothed), 0f, 1f);
+            worldHandle.DrawCircle(pos, 0.45f, AudibilityColor(s).WithAlpha(0.9f), filled: false);
         }
 
         worldHandle.SetTransform(Matrix3x2.Identity);
@@ -293,8 +290,7 @@ public sealed class PathSoundOverlay : Overlay
                 continue;
 
             var screen = args.ViewportControl!.WorldToScreen(pos);
-            var color = entry.Written ? Color.White : Color.LightGray;
-            handle.DrawString(_font, screen + new Vector2(10f, -6f), $"o:{entry.Occlusion:0.00} v:{entry.VolumeDelta:+0.0;-0.0}dB", color.WithAlpha(0.9f));
+            handle.DrawString(_font, screen + new Vector2(10f, -6f), $"o:{entry.Occlusion:0.00} f:{entry.Smoothed:0.0}", Color.White.WithAlpha(0.9f));
         }
     }
 

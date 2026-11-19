@@ -36,7 +36,7 @@ public sealed class MaidCVars
     /// Default volume setting of TTS sound
     /// </summary>
     public static readonly CVarDef<float> TTSVolume =
-        CVarDef.Create("tts.volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("tts.volume", 1f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Count of in-memory cached tts voice lines.
@@ -52,73 +52,61 @@ public sealed class MaidCVars
     /// Whether tile-based sound path muffling is enabled.
     /// </summary>
     public static readonly CVarDef<bool> SoundPathEnabled =
-        CVarDef.Create("maidsound.path_enabled", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_enabled", true, CVar.CLIENTONLY);
 
     /// <summary>
     /// Maximum radius in tiles to search sound paths in.
     /// </summary>
     public static readonly CVarDef<int> SoundPathRadius =
-        CVarDef.Create("maidsound.path_radius", 20, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-    /// <summary>
-    /// Maximum number of new sound sources managed per update.
-    /// </summary>
-    public static readonly CVarDef<int> SoundPathMaxSources =
-        CVarDef.Create("maidsound.path_max_sources", 96, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-    /// <summary>
-    /// Maximum range in tiles to manage sound volumes in.
-    /// </summary>
-    public static readonly CVarDef<int> SoundPathVolumeRange =
-        CVarDef.Create("maidsound.path_volume_range", 40, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_radius", 25, CVar.CLIENTONLY);
 
     /// <summary>
     /// Occlusion added per unit of sound path weight.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionPerWeight =
-        CVarDef.Create("maidsound.path_occlusion_per_weight", 0.6f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_occlusion_per_weight", 15f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Volume loss in decibels per tile of sound path length.
     /// </summary>
     public static readonly CVarDef<float> SoundPathLossDbPerTile =
-        CVarDef.Create("maidsound.path_loss_db_per_tile", 1.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_loss_db_per_tile", 1.5f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Volume loss in decibels per unit of sound path occlusion.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionLossDb =
-        CVarDef.Create("maidsound.path_occlusion_loss_db", 4.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_occlusion_loss_db", 15f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Occlusion faded per tile of sound path past the last blocker.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionDecayPerTile =
-        CVarDef.Create("maidsound.path_occlusion_decay_per_tile", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_occlusion_decay_per_tile", 0.3f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Sound path weight of opaque tiles.
     /// </summary>
     public static readonly CVarDef<float> SoundPathWeightOpaque =
-        CVarDef.Create("maidsound.weight_opaque", 1.0f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.weight_opaque", 8f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Sound path weight of glass.
     /// </summary>
     public static readonly CVarDef<float> SoundPathWeightGlass =
-        CVarDef.Create("maidsound.weight_glass", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.weight_glass", 0.3f, CVar.CLIENTONLY);
 
     /// <summary>
     /// Lifetime in seconds of cached sound paths.
     /// </summary>
     public static readonly CVarDef<float> SoundPathCacheTtl =
-        CVarDef.Create("maidsound.path_cache_ttl", 2f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_cache_ttl", 2f, CVar.CLIENTONLY);
 
     /// <summary>
-    /// Fraction of the target occlusion and volume applied per audio tick; 1 disables smoothing.
+    /// Fraction of the gap between current and target volume closed per audio tick at 30 TPS; 1 disables smoothing.
     /// </summary>
     public static readonly CVarDef<float> SoundPathSmoothing =
-        CVarDef.Create("maidsound.path_smoothing", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_smoothing", 0.3f, CVar.CLIENTONLY);
 
     #endregion
 
@@ -229,25 +217,25 @@ public sealed class MaidCVars
     ///     Show the give item indicator next to the cursor while offering an item.
     /// </summary>
     public static readonly CVarDef<bool> OfferModeIndicatorsPointShow =
-        CVarDef.Create("maid.offer_mode_indicators_point_show", true, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.offer_mode_indicators_point_show", true, CVar.CLIENTONLY);
 
     /// <summary>
     ///     Draw the glow around light fixtures.
     /// </summary>
     public static readonly CVarDef<bool> EnableLightsGlowing =
-        CVarDef.Create("maid.enable_lights_glowing", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.enable_lights_glowing", false, CVar.CLIENTONLY);
 
     /// <summary>
     ///     Draw a film grain effect over the screen.
     /// </summary>
     public static readonly CVarDef<bool> GrainEnabled =
-        CVarDef.Create("maid.grain_enabled", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.grain_enabled", false, CVar.CLIENTONLY);
 
     /// <summary>
     ///     Film grain strength multiplier, 1 is the default look.
     /// </summary>
     public static readonly CVarDef<float> GrainStrength =
-        CVarDef.Create("maid.grain_strength", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.grain_strength", 1f, CVar.CLIENTONLY);
 
     /// <summary>
     ///     Automatically get up when the knockdown ends.
@@ -259,7 +247,7 @@ public sealed class MaidCVars
     ///     If true, the look up key has to be held to aim through a telescope; otherwise it toggles.
     /// </summary>
     public static readonly CVarDef<bool> HoldLookUp =
-        CVarDef.Create("maid.hold_look_up", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.hold_look_up", false, CVar.CLIENTONLY);
 
     /// <summary>
     ///     If true, an admin's dead chat messages are sent as admin messages with their username;
@@ -272,7 +260,7 @@ public sealed class MaidCVars
     ///     Volume of the ahelp sound for admins, as a gain from 0 to 1.
     /// </summary>
     public static readonly CVarDef<float> AhelpVolume =
-        CVarDef.Create("maid.admin.ahelp_volume", 1f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maid.admin.ahelp_volume", 1f, CVar.CLIENTONLY);
 
     #endregion
 

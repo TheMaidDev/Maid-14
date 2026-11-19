@@ -1,14 +1,18 @@
+using System.Collections.Concurrent;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
 using Content.Shared.Doors;
+using Content.Shared.Doors.Components;
 using Content.Shared.Physics;
 using Robust.Client.Audio;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared;
 using Robust.Shared.Audio;
+using Robust.Shared.Audio.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
@@ -23,9 +27,10 @@ using AudioComponent = Robust.Shared.Audio.Components.AudioComponent;
 namespace Content.Client._Maid.Audio.PathSound;
 
 /// <summary>
-///     Replaces the engine's single-raycast occlusion with four weighted Dijkstra tile fields rooted
-///     around the local player's position; per-root results are blended in the gain domain and smoothed
-///     over time before reaching the engine's lowpass filter and volume.
+///     Replaces the engine's single-raycast occlusion — and its whole stream processing — with four
+///     weighted Dijkstra tile fields rooted around the local player's position. All loudness shaping
+///     (muffling, blocker loss, distance fade) is folded into one occlusion scalar that the engine
+///     lowpass carries, so a sound is born at its final loudness and stream volume is never touched.
 /// </summary>
 public sealed class PathSoundSystem : EntitySystem
 {
@@ -47,9 +52,6 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Number of Dijkstra fields rooted around the receiver's tile corners.</summary>
     private const int RootCount = 4;
 
-    /// <summary>Number of smoothing slots for the occlusion override.</summary>
-    private const int SmoothSlots = 512;
-
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
@@ -60,19 +62,19 @@ public sealed class PathSoundSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _sharedAudio = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
 
+    /// <summary>Broadband attenuation of the engine lowpass per occlusion unit: 20/ln(10) / 10 = 0.8686 dB.</summary>
+    private const float OcclDbPerUnit = 0.8686f;
+
     /// <summary>Whether the feature cvar is enabled.</summary>
     private bool _enabled = true;
 
     /// <summary>Clamped field radius in tiles.</summary>
     private int _radius = MinRadius;
 
-    /// <summary>Maximum number of sounds managed per pass.</summary>
-    private int _maxSources;
-
     /// <summary>Occlusion added per unit of blocking weight.</summary>
     private float _occlusionPerWeight;
 
-    /// <summary>Volume loss in dB per tile of path detour.</summary>
+    /// <summary>Volume loss in dB per tile of path length.</summary>
     private float _lossDbPerTile;
 
     /// <summary>Occlusion faded per tile of path past the last blocker.</summary>
@@ -80,9 +82,6 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Volume lost in dB per unit of applied occlusion.</summary>
     private float _occlLossDb;
-
-    /// <summary>Range in tiles the volume post-pass manages sources in.</summary>
-    private int _volumeRange;
 
     /// <summary>Heuristic weight for opaque blockers.</summary>
     private float _weightOpaque;
@@ -93,17 +92,14 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Seconds before the field is rebuilt.</summary>
     private float _ttl;
 
-    /// <summary>Fraction of the target values applied per update.</summary>
+    /// <summary>Fraction of the gap to the raw filter value closed per smoothing call.</summary>
     private float _smoothing;
-
-    /// <summary>Interval between post-passes in seconds, synced to the engine audio tick.</summary>
-    private float _updateInterval = 1f / 30f;
-
-    /// <summary>Accumulated frame time towards the next post-pass.</summary>
-    private float _accum;
 
     /// <summary>Whether a blocker event requested a field rebuild.</summary>
     private bool _dirty;
+
+    /// <summary>Whether a door event requested a field rebuild without the dirty throttle.</summary>
+    private bool _doorDirty;
 
     private bool _overlayAdded;
     private PathSoundOverlayMode _overlayMode;
@@ -136,57 +132,43 @@ public sealed class PathSoundSystem : EntitySystem
     private float[] _heapKey = Array.Empty<float>();
     private int _heapCount;
 
-    /// <summary>Whether the engine occlusion override has been registered by this instance.</summary>
+    /// <summary>Whether the stream-processing override has been registered by this instance.</summary>
     private bool _overrideSubscribed;
 
-    /// <summary>Quantized source positions already seen by the occlusion override.</summary>
-    private readonly Vector2[] _smoothPos = new Vector2[SmoothSlots];
+    /// <summary>Smoothed filter occlusion per audio stream, written from the audio job threads (benign races).</summary>
+    private readonly ConcurrentDictionary<EntityUid, SmoothEntry> _smoothed = new();
 
-    /// <summary>Smoothed occlusion value per override slot.</summary>
-    private readonly float[] _smoothOcc = new float[SmoothSlots];
+    /// <summary>Last filter values per audio stream for the soundpathdebug dump command and the overlay markers.</summary>
+    private readonly ConcurrentDictionary<EntityUid, DebugEntry> _debug = new();
 
-    /// <summary>Round-robin cursor for override smoothing slot allocation.</summary>
-    private int _smoothNext;
-
-    /// <summary>Smoothed applied volume per managed audio stream.</summary>
-    private readonly Dictionary<EntityUid, float> _smoothVol = new();
-
-    /// <summary>Reused removal buffer for dead volume-smoothing entries.</summary>
-    private readonly List<EntityUid> _volSweep = new();
-
-    /// <summary>Reused candidate list for the post-pass.</summary>
-    private readonly List<SoundCandidate> _candidates = new();
-
-    /// <summary>Reused kept-sounds list for the post-pass cap.</summary>
-    private readonly List<SoundCandidate> _kept = new();
-
-    /// <summary>Last applied per-sound values for the soundpathdebug dump command and the overlay markers.</summary>
-    private readonly Dictionary<EntityUid, DebugEntry> _debug = new();
+    /// <summary>Monotonic per-call counter stamping smoothed-entry freshness.</summary>
+    private long _tickCounter;
 
     private EntityQuery<SoundPathWeightComponent> _weightQuery;
 
-    /// <summary>One candidate audio stream for the post-pass.</summary>
-    private readonly record struct SoundCandidate(EntityUid Uid, AudioComponent Comp, TransformComponent Xform, float SourceX, float SourceY, float Distance);
+    private EntityQuery<DoorComponent> _doorQuery;
 
-    /// <summary>Snapshot of one managed sound's applied values for the debug dump and overlay.</summary>
-    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Volume, float VolumeDelta, float Past, bool Written);
+    private EntityQuery<PhysicsComponent> _physicsQuery;
 
-    /// <summary>Formats the last post-pass values of managed sounds for the soundpathdebug command.</summary>
+    /// <summary>Smoothed filter occlusion of one audio stream and the call stamp it was last touched at.</summary>
+    private readonly record struct SmoothEntry(float Occl, long LastCall);
+
+    /// <summary>Snapshot of one sound's filter values for the debug dump and overlay.</summary>
+    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past);
+
+    /// <summary>Formats the last filter values per sound for the soundpathdebug command.</summary>
     public string DumpDebug()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"managed sounds: {_debug.Count}, radius: {_fieldRadius}, grid: {_fieldGrid}, seed: {_baseTile}, enabled: {_enabled}, smooth: {_smoothing:0.00}");
+        sb.AppendLine($"smoothed sounds: {_debug.Count}, radius: {_fieldRadius}, grid: {_fieldGrid}, seed: {_baseTile}, enabled: {_enabled}, smooth: {_smoothing:0.00}");
 
         foreach (var (uid, entry) in _debug)
         {
-            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} vol={entry.Volume:0.0} delta={entry.VolumeDelta:+0.0;-0.0} written={entry.Written}");
+            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} filter={entry.Smoothed:0.00}");
         }
 
         return sb.ToString();
     }
-
-    /// <summary>Distance comparison for candidate sorting.</summary>
-    private static readonly Comparison<SoundCandidate> SortByDistance = (a, b) => a.Distance.CompareTo(b.Distance);
 
     /// <summary>Current overlay display mode.</summary>
     public PathSoundOverlayMode OverlayMode
@@ -243,7 +225,7 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Fraction of the target values applied per update.</summary>
     public float Smoothing => _smoothing;
 
-    /// <summary>Last post-pass snapshot of managed sounds.</summary>
+    /// <summary>Last filter values per sound for the overlay markers.</summary>
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
     /// <summary>Returns the summed blocking occlusion, hop count and past-blocker distance for a grid tile in root 0, if covered and reachable.</summary>
@@ -274,21 +256,16 @@ public sealed class PathSoundSystem : EntitySystem
     {
         base.Initialize();
 
-        UpdatesAfter.Add(typeof(AudioSystem));
-
-        Subs.CVar(_cfg, MaidCVars.SoundPathEnabled, v => _enabled = v, true);
+        Subs.CVar(_cfg, MaidCVars.SoundPathEnabled, SetEnabled, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathRadius, v => _radius = Math.Clamp(v, MinRadius, MaxRadius), true);
-        Subs.CVar(_cfg, MaidCVars.SoundPathMaxSources, v => _maxSources = Math.Max(0, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionPerWeight, v => _occlusionPerWeight = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathLossDbPerTile, v => _lossDbPerTile = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionDecayPerTile, v => _occlDecay = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionLossDb, v => _occlLossDb = v, true);
-        Subs.CVar(_cfg, MaidCVars.SoundPathVolumeRange, v => _volumeRange = Math.Max(4, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightOpaque, v => _weightOpaque = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightGlass, v => _weightGlass = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathCacheTtl, v => _ttl = MathF.Max(0.25f, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathSmoothing, v => _smoothing = Math.Clamp(v, 0.01f, 1f), true);
-        Subs.CVar(_cfg, CVars.AudioTickRate, v => _updateInterval = v > 0 ? 1f / v : 1f / 30f, true);
 
         SubscribeLocalEvent<DoorStateChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<AnchorStateChangedEvent>(OnBlockerChanged);
@@ -296,14 +273,29 @@ public sealed class PathSoundSystem : EntitySystem
         SubscribeLocalEvent<CollisionChangeEvent>(OnBlockerChanged);
 
         _weightQuery = GetEntityQuery<SoundPathWeightComponent>();
+        _doorQuery = GetEntityQuery<DoorComponent>();
+        _physicsQuery = GetEntityQuery<PhysicsComponent>();
 
-        if (!_overrideSubscribed)
-        {
-            _audio.GetOcclusionOverride += OnGetOcclusionOverride;
-            _overrideSubscribed = true;
-        }
+        SetEnabled(_enabled);
 
         _overlay = new PathSoundOverlay(this);
+    }
+
+    /// <summary>Registers or releases the stream-processing override; the engine body runs untouched while disabled.</summary>
+    private void SetEnabled(bool value)
+    {
+        _enabled = value;
+
+        if (value && !_overrideSubscribed)
+        {
+            _audio.ProcessStreamOverride += OnProcessStream;
+            _overrideSubscribed = true;
+        }
+        else if (!value && _overrideSubscribed)
+        {
+            _audio.ProcessStreamOverride -= OnProcessStream;
+            _overrideSubscribed = false;
+        }
     }
 
     public override void Shutdown()
@@ -314,20 +306,42 @@ public sealed class PathSoundSystem : EntitySystem
 
         if (_overrideSubscribed)
         {
-            _audio.GetOcclusionOverride -= OnGetOcclusionOverride;
+            _audio.ProcessStreamOverride -= OnProcessStream;
             _overrideSubscribed = false;
         }
 
-        _smoothVol.Clear();
+        _smoothed.Clear();
         _debug.Clear();
-        Array.Clear(_smoothOcc);
-        _smoothNext = 0;
         _fieldGrid = null;
         _dirty = false;
+        _doorDirty = false;
     }
 
-    /// <summary>Marks the fields stale after a blocker changed; the rebuild itself runs on the next frame update.</summary>
-    private void OnBlockerChanged(DoorStateChangedEvent args) => _dirty = true;
+    /// <summary>Rebuilds the fields the moment a door changes state: predicted door sounds spawn in the same tick and the engine starts them before the next frame update.</summary>
+    private void OnBlockerChanged(DoorStateChangedEvent args)
+    {
+        _doorDirty = true;
+        RebuildNow();
+    }
+
+    /// <summary>Rebuilds the fields immediately on the main thread when a player grid is available; the frame update handles the rest.</summary>
+    private void RebuildNow()
+    {
+        if (_player.LocalEntity is not { } player
+            || !TryComp(player, out TransformComponent? playerXform)
+            || playerXform.GridUid is not { } gridUid
+            || !TryComp(gridUid, out MapGridComponent? grid))
+        {
+            return;
+        }
+
+        var tileSize = grid.TileSize;
+        var local = _map.LocalToGrid(gridUid, grid, playerXform.Coordinates);
+        var baseTile = new Vector2i((int) MathF.Floor(local.X / tileSize), (int) MathF.Floor(local.Y / tileSize));
+        RebuildField(gridUid, grid, baseTile);
+        _dirty = false;
+        _doorDirty = false;
+    }
 
     private void OnBlockerChanged(ref AnchorStateChangedEvent args) => _dirty = true;
 
@@ -335,7 +349,7 @@ public sealed class PathSoundSystem : EntitySystem
 
     private void OnBlockerChanged(ref CollisionChangeEvent args) => _dirty = true;
 
-    /// <summary>Rebuilds the fields when needed and runs the managed-sound post-pass at the engine audio tick rate.</summary>
+    /// <summary>Rebuilds the fields when needed and sweeps stale smoothed entries.</summary>
     public override void FrameUpdate(float frameTime)
     {
         if (!_enabled)
@@ -366,22 +380,16 @@ public sealed class PathSoundSystem : EntitySystem
         if (_fieldGrid != gridUid
             || _baseTile != baseTile
             || _fieldRadius != _radius
+            || _doorDirty
             || _dirty && (float) (_timing.CurTime - _fieldTime).TotalSeconds > 0.05f
             || (float) (_timing.CurTime - _fieldTime).TotalSeconds > _ttl)
         {
             RebuildField(gridUid, grid, baseTile);
             _dirty = false;
+            _doorDirty = false;
         }
 
-        _accum += frameTime;
-        if (_accum < _updateInterval)
-            return;
-
-        _accum -= _updateInterval;
-        if (_accum > _updateInterval)
-            _accum = 0f;
-
-        ProcessSounds(gridUid, grid);
+        SweepSmoothed();
     }
 
     /// <summary>Tears the fields down; field values are only meaningful on the grid they were built on.</summary>
@@ -391,14 +399,24 @@ public sealed class PathSoundSystem : EntitySystem
             return;
 
         _fieldGrid = null;
-        _accum = 0f;
     }
 
-    /// <summary>Computes the blended occlusion and volume change from the four fields for a sound at the given world position.</summary>
-    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float volDb, out float dbgSumW, out float dbgHops, out float dbgPast, bool clampToField = false)
+    /// <summary>Drops smoothed entries whose stream died or went untouched for several seconds.</summary>
+    private void SweepSmoothed()
+    {
+        var cutoff = _tickCounter - 300;
+
+        foreach (var (uid, entry) in _smoothed)
+        {
+            if (!Exists(uid) || entry.LastCall < cutoff)
+                _smoothed.TryRemove(uid, out _);
+        }
+    }
+
+    /// <summary>Computes the blended occlusion from the four fields for a sound at the given world position, interpolated across the receiver's tile corners.</summary>
+    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, bool clampToField = false)
     {
         occlusion = 0f;
-        volDb = 0f;
         dbgSumW = 0f;
         dbgHops = 0f;
         dbgPast = 0f;
@@ -429,120 +447,207 @@ public sealed class PathSoundSystem : EntitySystem
         var srcTile = new Vector2i(srcBx, srcBy);
 
         var radius = _fieldRadius;
+        if (clampToField)
+        {
+            var clampX = Math.Clamp(srcBx, _baseTile.X - radius, _baseTile.X + radius);
+            var clampY = Math.Clamp(srcBy, _baseTile.Y - radius, _baseTile.Y + radius);
+            srcTile = new Vector2i(clampX, clampY);
+        }
+
         var size = radius * 2 + 1;
         var baseTile = _baseTile;
         var nearSrc = Math.Abs(srcBx - baseTile.X) <= 1 && Math.Abs(srcBy - baseTile.Y) <= 1;
 
-        var queryTile = srcTile;
-        if (clampToField)
-        {
-            var clampX = Math.Clamp(srcBx, baseTile.X - radius, baseTile.X + radius);
-            var clampY = Math.Clamp(srcBy, baseTile.Y - radius, baseTile.Y + radius);
-            queryTile = new Vector2i(clampX, clampY);
-        }
-
-        var rootCutoff = 0f;
-        var rootVolDb = 0f;
-        var rootSumW = 0f;
-        var rootHops = 0f;
-        var rootPast = 0f;
-        var rootWeightSum = 0f;
+        var totalWeight = 0f;
+        var cutoffSum = 0f;
+        var sumWSum = 0f;
+        var hopsSum = 0f;
+        var pastSum = 0f;
 
         for (var root = 0; root < RootCount; root++)
         {
             var rootDx = root & 1;
             var rootDy = root >> 1;
             var rootWeight = (rootDx == 0 ? 1f - recvAx : recvAx) * (rootDy == 0 ? 1f - recvAy : recvAy);
+            if (rootWeight <= 0f)
+                continue;
 
-            var offsetX = queryTile.X - baseTile.X - rootDx;
-            var offsetY = queryTile.Y - baseTile.Y - rootDy;
+            var offsetX = srcTile.X - baseTile.X - rootDx;
+            var offsetY = srcTile.Y - baseTile.Y - rootDy;
 
             if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
                 continue;
 
-            if (!_map.TryGetTile(grid, queryTile, out _))
+            if (!_map.TryGetTile(grid, srcTile, out _))
                 continue;
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
             if (float.IsPositiveInfinity(_dist[idx]))
                 continue;
 
-            var selfW = nearSrc && queryTile == srcTile ? TileWeight(gridUid, grid, queryTile, idx) : 0f;
+            var selfW = nearSrc && srcTile.X == srcBx && srcTile.Y == srcBy
+                ? ComputeTileWeight(gridUid, grid, srcTile)
+                : 0f;
             var occlR = MathF.Max(0f, _sumW[idx] - selfW);
             var pastR = _sumW[idx] > 0f ? _past[idx] : 0;
             occlR = MathF.Max(0f, occlR - _occlDecay * pastR);
 
-            rootCutoff += rootWeight * MathF.Exp(-occlR);
-            rootVolDb += rootWeight * (-_lossDbPerTile * (_hops[idx] + pastR));
-            rootSumW += rootWeight * occlR;
-            rootHops += rootWeight * _hops[idx];
-            rootPast += rootWeight * pastR;
-            rootWeightSum += rootWeight;
+            totalWeight += rootWeight;
+            cutoffSum += rootWeight * MathF.Exp(-occlR);
+            sumWSum += rootWeight * occlR;
+            hopsSum += rootWeight * _hops[idx];
+            pastSum += rootWeight * pastR;
         }
 
-        if (rootWeightSum <= 0f)
+        if (totalWeight <= 0f)
             return false;
 
-        occlusion = -MathF.Log(MathF.Max(rootCutoff / rootWeightSum, 1e-9f));
-        volDb = rootVolDb / rootWeightSum - _occlLossDb * occlusion;
-        dbgSumW = rootSumW / rootWeightSum;
-        dbgHops = rootHops / rootWeightSum;
-        dbgPast = rootPast / rootWeightSum;
+        occlusion = -MathF.Log(MathF.Max(cutoffSum / totalWeight, 1e-9f));
+        dbgSumW = sumWSum / totalWeight;
+        dbgHops = hopsSum / totalWeight;
+        dbgPast = pastSum / totalWeight;
         return true;
     }
 
-    /// <summary>Engine occlusion override: smoothed field value for sounds inside the field, field-edge value plus a raycast for the rest beyond it, engine raycast when there is no field.</summary>
-    private float OnGetOcclusionOverride(MapCoordinates listener, Vector2 delta, float distance, EntityUid? ignoredEnt)
+    /// <summary>Replaces the engine's whole stream processing: same muting, volume reset, max-distance clip, position and velocity as the engine body, but the filter occlusion carries the full path model.</summary>
+    private void OnProcessStream(EntityUid entity, AudioComponent component, TransformComponent xform, MapCoordinates listener)
     {
-        if (distance <= 0.1f)
-            return 0f;
-
-        var sourcePos = listener.Position + delta;
-
-        if (TryGetAudio(listener, sourcePos, out var occlusion, out _, out _, out _, out _))
-            return SmoothOverride(sourcePos, occlusion);
-
-        var mask = _sharedAudio.OcclusionCollisionMask | (int) CollisionGroup.GlassAirlockLayer;
-        var dir = delta / distance;
-
-        // Beyond the field: keep the occlusion accumulated to the field edge along the ray and raycast only the rest.
-        var edgeDist = _fieldRadius;
-        if (_fieldGrid is { } edgeGrid && TryComp(edgeGrid, out MapGridComponent? edgeGridComp))
-            edgeDist = _fieldRadius * edgeGridComp.TileSize;
-
-        if (distance > edgeDist && TryGetAudio(listener, sourcePos, out var edgeOccl, out _, out _, out _, out _, true))
+        if (!component.Started)
         {
-            var restLength = MathF.Min(distance - edgeDist, _cfg.GetCVar(CVars.AudioRaycastLength));
-            var origin = listener.Position + dir * edgeDist;
-            var edgeRay = new CollisionRay(origin, dir, mask);
-            var pen = _physics.IntersectRayPenetration(listener.MapId, edgeRay, restLength, ignoredEnt);
-            return SmoothOverride(sourcePos, edgeOccl + pen);
+            component.Started = true;
+            component.StartPlaying();
         }
 
-        var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
-        var ray = new CollisionRay(listener.Position, dir, mask);
-        return _physics.IntersectRayPenetration(listener.MapId, ray, rayLength, ignoredEnt);
+        // Global but on another map: stop playing it.
+        if (component.Global)
+        {
+            if (xform.MapID != MapId.Nullspace && listener.MapId != xform.MapID)
+            {
+                component.Gain = 0f;
+                return;
+            }
+
+            component.Volume = component.Params.Volume;
+            return;
+        }
+
+        // Non-global sounds on another map.
+        if (listener.MapId != xform.MapID)
+        {
+            component.Gain = 0f;
+            return;
+        }
+
+        var parentUid = xform.ParentUid;
+        Vector2 worldPos;
+        component.Volume = component.Params.Volume;
+
+        if ((component.Flags & AudioFlags.GridAudio) != 0)
+            worldPos = _transform.GetWorldPosition(parentUid);
+        else
+            worldPos = _transform.GetWorldPosition(xform);
+
+        var delta = worldPos - listener.Position;
+        var distance = delta.Length();
+
+        var zOffset = _cfg.GetCVar(CVars.AudioZOffset);
+        if (MathF.Sqrt(distance * distance + zOffset * zOffset) > component.MaxDistance)
+        {
+            component.Gain = 0f;
+            return;
+        }
+
+        if (distance > 0f && distance < 0.01f)
+        {
+            worldPos = listener.Position;
+            delta = Vector2.Zero;
+            distance = 0f;
+        }
+
+        if ((component.Flags & AudioFlags.NoOcclusion) == AudioFlags.NoOcclusion)
+        {
+            component.Occlusion = 0f;
+        }
+        else
+        {
+            component.Occlusion = GetPathOcclusion(entity, xform, listener, delta, distance);
+        }
+
+        component.Position = worldPos;
+
+        if (_physicsQuery.TryGetComponent(parentUid, out var physicsComp))
+        {
+            var velocity = _physics.GetMapLinearVelocity(parentUid, physicsComp);
+            component.Velocity = velocity;
+        }
     }
 
-    /// <summary>Glides the field occlusion towards its target in a per-position slot; same-position sounds share a slot.</summary>
-    private float SmoothOverride(Vector2 sourcePos, float target)
+    /// <summary>Computes the filter occlusion carrying the whole model: path muffling, blocker loudness loss and the distance fade, all folded into occlusion units.</summary>
+    private float GetPathOcclusion(EntityUid entity, TransformComponent xform, MapCoordinates listener, Vector2 delta, float distance)
     {
-        var quantized = new Vector2(MathF.Round(sourcePos.X), MathF.Round(sourcePos.Y));
+        var sourcePos = listener.Position + delta;
+        var crossGrid = xform.GridUid != _fieldGrid;
+        var mask = _sharedAudio.OcclusionCollisionMask | (int) CollisionGroup.GlassAirlockLayer;
+        var dir = distance > 0f ? delta / distance : Vector2.Zero;
 
-        for (var i = 0; i < SmoothSlots; i++)
+        float occl = 0f;
+        float len = 0f;
+        float past = 0f;
+        float sumW = 0f;
+        var modelled = false;
+        var clamped = false;
+
+        if (!crossGrid && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past))
         {
-            if (( _smoothPos[i] - quantized).LengthSquared() > 0.01f)
-                continue;
+            modelled = true;
+        }
+        else
+        {
+            // Beyond the field: keep the occlusion accumulated to the field edge along the ray and raycast only the rest.
+            var edgeDist = _fieldRadius;
+            if (_fieldGrid is { } edgeGrid && TryComp(edgeGrid, out MapGridComponent? edgeGridComp))
+                edgeDist = _fieldRadius * edgeGridComp.TileSize;
 
-            _smoothOcc[i] += (target - _smoothOcc[i]) * _smoothing;
-            return _smoothOcc[i];
+            if (!crossGrid && distance > edgeDist && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, true))
+            {
+                modelled = true;
+                clamped = true;
+            }
+            else
+            {
+                var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
+                var ray = new CollisionRay(listener.Position, dir, mask);
+                occl = OcclFromPen(_physics.IntersectRayPenetration(listener.MapId, ray, rayLength, entity));
+            }
         }
 
-        var slot = _smoothNext;
-        _smoothNext = (_smoothNext + 1) % SmoothSlots;
-        _smoothPos[slot] = quantized;
-        _smoothOcc[slot] = target;
-        return target;
+        // The engine lowpass attenuates 0.8686 dB per occlusion unit, so the loudness-loss terms fold straight in.
+        var tileSize = 1f;
+        if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
+            tileSize = gridComp.TileSize;
+
+        var occlValue = occl * (1f + _occlLossDb / OcclDbPerUnit)
+            + (len + past) * _lossDbPerTile / OcclDbPerUnit
+            + MathF.Max(0f, distance / tileSize - len) * _lossDbPerTile / OcclDbPerUnit;
+
+        // Smooth per stream: rebuild steps fade over a few ticks instead of snapping the filter.
+        var tick = Interlocked.Increment(ref _tickCounter);
+        var smoothed = _smoothed.AddOrUpdate(entity,
+            new SmoothEntry(occlValue, tick),
+            (_, old) => new SmoothEntry(old.Occl + (occlValue - old.Occl) * _smoothing, tick)).Occl;
+
+        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past);
+        return MathF.Min(smoothed, 400f);
+    }
+
+    /// <summary>Converts raycast wall penetration in meters into field occlusion units: one wall per tile of penetration, scaled like a heuristic wall tile.</summary>
+    private float OcclFromPen(float pen)
+    {
+        var tileSize = 1f;
+        if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? comp))
+            tileSize = comp.TileSize;
+
+        return MathF.Round(pen / tileSize) * _occlusionPerWeight * _weightOpaque;
     }
 
     /// <summary>Allocates the per-root field and shared heap arrays for the current radius.</summary>
@@ -665,7 +770,15 @@ public sealed class PathSoundSystem : EntitySystem
         {
             float occl;
 
-            if (!TryComp(ent.Value, out PhysicsComponent? phys) || !phys.CanCollide)
+            var blocked = TryComp(ent.Value, out PhysicsComponent? phys) && phys.CanCollide;
+            if (!blocked && _doorQuery.TryGetComponent(ent.Value, out var door)
+                && door.State is DoorState.Closing or DoorState.Opening)
+            {
+                // A door mid-animation still blocks its tile even before its collision flips.
+                blocked = true;
+            }
+
+            if (!blocked)
                 continue;
 
             if (_weightQuery.TryGetComponent(ent.Value, out var weightComp))
@@ -713,118 +826,6 @@ public sealed class PathSoundSystem : EntitySystem
     private static float OcclFromMuffle(float muffle)
     {
         return -MathF.Log(1f - Math.Clamp(muffle, 0f, 99.9f) / 100f);
-    }
-
-    /// <summary>Applies smoothed path-based volume to managed audio streams and snapshots values for the debug tools.</summary>
-    private void ProcessSounds(EntityUid gridUid, MapGridComponent grid)
-    {
-        var listener = _audio.GetListenerCoordinates();
-        var tileSize = grid.TileSize;
-        var enterDist = _volumeRange * tileSize;
-        var releaseDist = enterDist + 4f * tileSize;
-
-        SweepSmoothVol();
-        _candidates.Clear();
-
-        var query = AllEntityQuery<AudioComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out var comp, out var xform))
-        {
-            if (comp.Global || xform.MapID != listener.MapId || xform.GridUid != gridUid)
-                continue;
-
-            var sourcePos = _transform.GetWorldPosition(xform);
-            var distance = (sourcePos - listener.Position).Length();
-            if (distance > (_smoothVol.ContainsKey(uid) ? releaseDist : enterDist))
-                continue;
-
-            _candidates.Add(new SoundCandidate(uid, comp, xform, sourcePos.X, sourcePos.Y, distance));
-        }
-
-        _candidates.Sort(SortByDistance);
-        _kept.Clear();
-        var fresh = 0;
-        foreach (var candidate in _candidates)
-        {
-            var managed = _smoothVol.ContainsKey(candidate.Uid);
-            if (!managed && fresh >= _maxSources)
-                continue;
-
-            if (!managed)
-                fresh++;
-
-            _kept.Add(candidate);
-        }
-
-        _candidates.Clear();
-        _candidates.AddRange(_kept);
-
-        _debug.Clear();
-
-        foreach (var candidate in _candidates)
-        {
-            var comp = candidate.Comp;
-            float volDb;
-            float sumW;
-            float pathLen;
-            float occl;
-            float past;
-            bool written;
-
-            if (!TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out volDb, out sumW, out pathLen, out past)
-                && !TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out occlusion, out volDb, out sumW, out pathLen, out past, true))
-            {
-                var tiles = candidate.Distance / tileSize;
-                volDb = -_lossDbPerTile * tiles;
-                sumW = 0f;
-                pathLen = tiles;
-                occl = -1f;
-                past = 0f;
-                written = false;
-            }
-            else
-            {
-                occl = occlusion;
-                written = true;
-                volDb -= _lossDbPerTile * MathF.Max(0f, candidate.Distance / tileSize - pathLen);
-            }
-
-            var target = MathF.Max(comp.Params.Volume + volDb, comp.Params.Volume - 60f);
-            if (!float.IsFinite(target))
-                continue;
-
-            var applied = target;
-            if (_smoothVol.TryGetValue(candidate.Uid, out var prev) && float.IsFinite(prev))
-                applied = prev + (target - prev) * _smoothing;
-            else if (float.IsFinite(comp.Volume))
-                applied = comp.Volume + (target - comp.Volume) * _smoothing;
-
-            if (!float.IsFinite(applied))
-                continue;
-
-            _smoothVol[candidate.Uid] = applied;
-            comp.Volume = applied;
-            _debug[candidate.Uid] = new DebugEntry(sumW, pathLen, occl, applied, applied - comp.Params.Volume, past, written);
-        }
-    }
-
-    /// <summary>Removes deleted or compless audio streams from the volume-smoothing set.</summary>
-    private void SweepSmoothVol()
-    {
-        if (_smoothVol.Count == 0)
-            return;
-
-        _volSweep.Clear();
-
-        foreach (var uid in _smoothVol.Keys)
-        {
-            if (!Exists(uid) || !TryComp(uid, out AudioComponent? _) || !float.IsFinite(_smoothVol[uid]))
-                _volSweep.Add(uid);
-        }
-
-        foreach (var uid in _volSweep)
-        {
-            _smoothVol.Remove(uid);
-        }
     }
 
     /// <summary>Pushes a node onto the preallocated min-heap.</summary>
