@@ -64,7 +64,13 @@ public sealed class MaidCVars
     /// Maximum number of sound sources processed per update.
     /// </summary>
     public static readonly CVarDef<int> SoundPathMaxSources =
-        CVarDef.Create("maidsound.path_max_sources", 24, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_max_sources", 96, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    /// Maximum range in tiles to manage sound volumes in.
+    /// </summary>
+    public static readonly CVarDef<int> SoundPathVolumeRange =
+        CVarDef.Create("maidsound.path_volume_range", 40, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Occlusion added per unit of sound path weight.

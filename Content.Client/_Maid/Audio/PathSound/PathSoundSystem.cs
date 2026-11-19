@@ -79,6 +79,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Volume lost in dB per unit of applied occlusion.</summary>
     private float _occlLossDb;
 
+    /// <summary>Range in tiles the volume post-pass manages sources in.</summary>
+    private int _volumeRange;
+
     /// <summary>Heuristic weight for opaque blockers.</summary>
     private float _weightOpaque;
 
@@ -272,6 +275,7 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathLossDbPerTile, v => _lossDbPerTile = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionDecayPerTile, v => _occlDecay = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathOcclusionLossDb, v => _occlLossDb = v, true);
+        Subs.CVar(_cfg, MaidCVars.SoundPathVolumeRange, v => _volumeRange = Math.Max(4, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightOpaque, v => _weightOpaque = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightGlass, v => _weightGlass = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathCacheTtl, v => _ttl = MathF.Max(0.25f, v), true);
@@ -664,7 +668,7 @@ public sealed class PathSoundSystem : EntitySystem
     {
         var listener = _audio.GetListenerCoordinates();
         var tileSize = grid.TileSize;
-        var maxDist = _fieldRadius * tileSize;
+        var maxDist = _volumeRange * tileSize;
 
         SweepSmoothVol();
         _candidates.Clear();
@@ -694,18 +698,37 @@ public sealed class PathSoundSystem : EntitySystem
         foreach (var candidate in _candidates)
         {
             var comp = candidate.Comp;
+            float volDb;
+            float sumW;
+            float pathLen;
+            float occl;
+            float past;
+            bool written;
 
-            if (!TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out var volDb, out var dbgSumW, out var dbgHops, out var dbgPast))
-                continue;
+            if (TryGetAudio(listener, new Vector2(candidate.SourceX, candidate.SourceY), out var occlusion, out volDb, out sumW, out pathLen, out past))
+            {
+                occl = occlusion;
+                written = true;
+            }
+            else
+            {
+                var tiles = candidate.Distance / tileSize;
+                volDb = -_lossDbPerTile * tiles;
+                sumW = 0f;
+                pathLen = tiles;
+                occl = -1f;
+                past = 0f;
+                written = false;
+            }
 
-            var target = comp.Params.Volume + volDb;
+            var target = MathF.Max(comp.Params.Volume + volDb, comp.Params.Volume - 60f);
             var applied = _smoothVol.TryGetValue(candidate.Uid, out var prev)
                 ? prev + (target - prev) * _smoothing
                 : target;
 
             _smoothVol[candidate.Uid] = applied;
             comp.Volume = applied;
-            _debug[candidate.Uid] = new DebugEntry(dbgSumW, dbgHops, occlusion, applied, volDb, dbgPast, true);
+            _debug[candidate.Uid] = new DebugEntry(sumW, pathLen, occl, applied, volDb, past, written);
         }
     }
 
