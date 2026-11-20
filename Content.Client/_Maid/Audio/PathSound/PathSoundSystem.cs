@@ -456,7 +456,6 @@ public sealed class PathSoundSystem : EntitySystem
 
         var size = radius * 2 + 1;
         var baseTile = _baseTile;
-        var nearSrc = Math.Abs(srcBx - baseTile.X) <= 1 && Math.Abs(srcBy - baseTile.Y) <= 1;
 
         var totalWeight = 0f;
         var cutoffSum = 0f;
@@ -485,7 +484,9 @@ public sealed class PathSoundSystem : EntitySystem
             if (float.IsPositiveInfinity(_dist[idx]))
                 continue;
 
-            var selfW = nearSrc && srcTile.X == srcBx && srcTile.Y == srcBy
+            // A blocker belongs to the path a sound crosses, not to the tile it is born on: the source tile's
+            // own weight never muffles that sound, while every blocker the route crosses still does.
+            var selfW = srcTile.X == srcBx && srcTile.Y == srcBy
                 ? ComputeTileWeight(gridUid, grid, srcTile)
                 : 0f;
             var occlR = MathF.Max(0f, _sumW[idx] - selfW);
