@@ -228,6 +228,25 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Last filter values per sound for the overlay markers.</summary>
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
+    /// <summary>Test and debug read of the model: raw path occlusion and the folded filter value for a world position, without smoothing.</summary>
+    public bool TryGetModelOcclusion(MapCoordinates listener, Vector2 sourcePos, out float occl, out float pathLen, out float past, out float filterOccl)
+    {
+        filterOccl = 0f;
+
+        if (!TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past)
+            && !TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, true))
+            return false;
+
+        var tileSize = 1f;
+        if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
+            tileSize = gridComp.TileSize;
+
+        filterOccl = occl * (1f + _occlLossDb / OcclDbPerUnit)
+            + (pathLen + past) * _lossDbPerTile / OcclDbPerUnit
+            + MathF.Max(0f, (sourcePos - listener.Position).Length() / tileSize - pathLen) * _lossDbPerTile / OcclDbPerUnit;
+        return true;
+    }
+
     /// <summary>Returns the summed blocking occlusion, hop count and past-blocker distance for a grid tile in root 0, if covered and reachable.</summary>
     public bool TryGetTile(Vector2i tile, out float sumOcclusion, out int pathLen, out int past)
     {
