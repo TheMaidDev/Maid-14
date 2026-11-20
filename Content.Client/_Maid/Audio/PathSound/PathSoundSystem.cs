@@ -43,6 +43,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Layer bit that marks a blocker as glass-like.</summary>
     private const int GlassMask = (int) CollisionGroup.GlassLayer;
 
+    /// <summary>Gain share of the detour path when its folded value is strictly better.</summary>
+    private const float DetourShare = 0.5f;
+
     /// <summary>Minimum field radius in tiles.</summary>
     private const int MinRadius = 4;
 
@@ -95,6 +98,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Fraction of the gap to the raw filter value closed per smoothing call.</summary>
     private float _smoothing;
 
+    /// <summary>Blocker occlusion multiplier of the detour pass; 0 disables detours.</summary>
+    private float _detourWeight;
+
     /// <summary>Whether a blocker event requested a field rebuild.</summary>
     private bool _dirty;
 
@@ -121,6 +127,18 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Path tiles past the last blocker per root field tile.</summary>
     private int[] _past = Array.Empty<int>();
+
+    /// <summary>Path cost per root field tile on the detour pass, indexed like <see cref="_dist"/>.</summary>
+    private float[] _dist2 = Array.Empty<float>();
+
+    /// <summary>Accumulated blocking occlusion per root field tile on the detour pass.</summary>
+    private float[] _sumW2 = Array.Empty<float>();
+
+    /// <summary>Path hop count per root field tile on the detour pass.</summary>
+    private int[] _hops2 = Array.Empty<int>();
+
+    /// <summary>Path tiles past the last blocker per root field tile on the detour pass.</summary>
+    private int[] _past2 = Array.Empty<int>();
 
     /// <summary>Dijkstra settled flag per root field tile.</summary>
     private bool[] _settled = Array.Empty<bool>();
@@ -154,7 +172,7 @@ public sealed class PathSoundSystem : EntitySystem
     private readonly record struct SmoothEntry(float Occl, long LastCall);
 
     /// <summary>Snapshot of one sound's filter values for the debug dump and overlay.</summary>
-    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past);
+    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past, bool Detoured);
 
     /// <summary>Formats the last filter values per sound for the soundpathdebug command.</summary>
     public string DumpDebug()
@@ -164,7 +182,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         foreach (var (uid, entry) in _debug)
         {
-            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} filter={entry.Smoothed:0.00}");
+            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} filter={entry.Smoothed:0.00}{(entry.Detoured ? " *detour" : "")}");
         }
 
         return sb.ToString();
@@ -225,6 +243,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Fraction of the target values applied per update.</summary>
     public float Smoothing => _smoothing;
 
+    /// <summary>Blocker occlusion multiplier of the detour pass; 0 disables detours.</summary>
+    public float DetourWeight => _detourWeight;
+
     /// <summary>Last filter values per sound for the overlay markers.</summary>
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
@@ -233,8 +254,8 @@ public sealed class PathSoundSystem : EntitySystem
     {
         filterOccl = 0f;
 
-        if (!TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past)
-            && !TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, true))
+        if (!TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, out _)
+            && !TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, out _, true))
             return false;
 
         var tileSize = 1f;
@@ -271,6 +292,101 @@ public sealed class PathSoundSystem : EntitySystem
         return false;
     }
 
+    /// <summary>Reconstructs the shortest and detour routes from a sound's tile to the dominant field root, for the route overlay.</summary>
+    public bool TryGetRoute(EntityUid sound, List<Vector2i> primary, List<Vector2i> detour)
+    {
+        primary.Clear();
+        detour.Clear();
+
+        if (_fieldGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
+            return false;
+
+        if (!TryComp(sound, out TransformComponent? xform) || xform.GridUid != gridUid)
+            return false;
+
+        var tileSize = grid.TileSize;
+        var local = _map.LocalToGrid(gridUid, grid, xform.Coordinates);
+        var fx = local.X / tileSize;
+        var fy = local.Y / tileSize;
+        var srcTile = new Vector2i((int) MathF.Floor(fx), (int) MathF.Floor(fy));
+
+        // The dominant root is the field corner nearest the listener's fractional position.
+        var recvAx = 0.5f;
+        var recvAy = 0.5f;
+        if (_player.LocalEntity is { } player && TryComp(player, out TransformComponent? playerXform)
+            && playerXform.GridUid == gridUid)
+        {
+            var pLocal = _map.LocalToGrid(gridUid, grid, playerXform.Coordinates);
+            recvAx = Math.Clamp(pLocal.X / tileSize - MathF.Floor(pLocal.X / tileSize), 0f, 1f);
+            recvAy = Math.Clamp(pLocal.Y / tileSize - MathF.Floor(pLocal.Y / tileSize), 0f, 1f);
+        }
+
+        var rootDx = recvAx >= 0.5f ? 1 : 0;
+        var rootDy = recvAy >= 0.5f ? 1 : 0;
+        var size = _fieldRadius * 2 + 1;
+        var baseIdx = (rootDx + rootDy * 2) * size * size;
+
+        var offsetX = srcTile.X - _baseTile.X - rootDx;
+        var offsetY = srcTile.Y - _baseTile.Y - rootDy;
+        if (Math.Abs(offsetX) > _fieldRadius || Math.Abs(offsetY) > _fieldRadius)
+            return false;
+
+        var idx = baseIdx + (offsetX + _fieldRadius) + size * (offsetY + _fieldRadius);
+        if (float.IsPositiveInfinity(_dist[idx]))
+            return false;
+
+        Descend(primary, idx, baseIdx, size, false);
+        if (_detourWeight > 0f && _debug.TryGetValue(sound, out var entry) && entry.Detoured)
+            Descend(detour, idx, baseIdx, size, true);
+
+        return primary.Count > 0;
+    }
+
+    /// <summary>Walks the precomputed field downhill from a tile to its root seed; the parent always has a strictly smaller cost.</summary>
+    private void Descend(List<Vector2i> route, int idx, int baseIdx, int size, bool detour)
+    {
+        var root = baseIdx / (size * size);
+        var rootDx = root & 1;
+        var rootDy = root >> 1;
+        var radius = _fieldRadius;
+        var dist = detour ? _dist2 : _dist;
+
+        route.Clear();
+        var guard = radius * 2 + 2;
+
+        while (true)
+        {
+            var x = (idx - baseIdx) % size - radius;
+            var y = (idx - baseIdx) / size - radius;
+            route.Add(new Vector2i(_baseTile.X + rootDx + x, _baseTile.Y + rootDy + y));
+
+            if (dist[idx] <= 0f || guard-- <= 0)
+                break;
+
+            var best = -1;
+            var bestDist = dist[idx];
+            for (var dir = 0; dir < 4; dir++)
+            {
+                var nx = x + (dir == 0 ? 1 : dir == 1 ? -1 : 0);
+                var ny = y + (dir == 2 ? 1 : dir == 3 ? -1 : 0);
+                if (nx < -radius || nx > radius || ny < -radius || ny > radius)
+                    continue;
+
+                var nIdx = baseIdx + (nx + radius) + size * (ny + radius);
+                if (dist[nIdx] < bestDist)
+                {
+                    bestDist = dist[nIdx];
+                    best = nIdx;
+                }
+            }
+
+            if (best < 0)
+                break;
+
+            idx = best;
+        }
+    }
+
     public override void Initialize()
     {
         base.Initialize();
@@ -285,6 +401,7 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathWeightGlass, v => _weightGlass = v, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathCacheTtl, v => _ttl = MathF.Max(0.25f, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathSmoothing, v => _smoothing = Math.Clamp(v, 0.01f, 1f), true);
+        Subs.CVar(_cfg, MaidCVars.SoundPathDetourWeight, OnDetourWeight, true);
 
         SubscribeLocalEvent<DoorStateChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<AnchorStateChangedEvent>(OnBlockerChanged);
@@ -298,6 +415,13 @@ public sealed class PathSoundSystem : EntitySystem
         SetEnabled(_enabled);
 
         _overlay = new PathSoundOverlay(this);
+    }
+
+    /// <summary>Applies the detour weight cvar and schedules a field rebuild.</summary>
+    private void OnDetourWeight(float value)
+    {
+        _detourWeight = value;
+        _dirty = true;
     }
 
     /// <summary>Registers or releases the stream-processing override; the engine body runs untouched while disabled.</summary>
@@ -433,12 +557,13 @@ public sealed class PathSoundSystem : EntitySystem
     }
 
     /// <summary>Computes the blended occlusion from the four fields for a sound at the given world position, interpolated across the receiver's tile corners.</summary>
-    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, bool clampToField = false)
+    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, out bool detoured, bool clampToField = false)
     {
         occlusion = 0f;
         dbgSumW = 0f;
         dbgHops = 0f;
         dbgPast = 0f;
+        detoured = false;
 
         if (_fieldGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
             return false;
@@ -482,6 +607,10 @@ public sealed class PathSoundSystem : EntitySystem
         var hopsSum = 0f;
         var pastSum = 0f;
 
+        var dTiles = Vector2.Distance(new Vector2(srcFx, srcFy), new Vector2(recvFx, recvFy));
+        var kOccl = 1f + _occlLossDb / OcclDbPerUnit;
+        var kLoss = _lossDbPerTile / OcclDbPerUnit;
+
         for (var root = 0; root < RootCount; root++)
         {
             var rootDx = root & 1;
@@ -508,15 +637,47 @@ public sealed class PathSoundSystem : EntitySystem
             var selfW = srcTile.X == srcBx && srcTile.Y == srcBy
                 ? ComputeTileWeight(gridUid, grid, srcTile)
                 : 0f;
-            var occlR = MathF.Max(0f, _sumW[idx] - selfW);
-            var pastR = _sumW[idx] > 0f ? _past[idx] : 0;
-            occlR = MathF.Max(0f, occlR - _occlDecay * pastR);
+            var occlR1 = MathF.Max(0f, _sumW[idx] - selfW);
+            var pastR1 = _sumW[idx] > 0f ? _past[idx] : 0;
+            occlR1 = MathF.Max(0f, occlR1 - _occlDecay * pastR1);
+            var hopsR1 = _hops[idx];
+
+            var share = 0f;
+            var occlR2 = 0f;
+            var pastR2 = 0;
+            var hopsR2 = 0;
+
+            if (_detourWeight > 0f && !float.IsPositiveInfinity(_dist2[idx]))
+            {
+                occlR2 = MathF.Max(0f, _sumW2[idx] - selfW);
+                pastR2 = _sumW2[idx] > 0f ? _past2[idx] : 0;
+                occlR2 = MathF.Max(0f, occlR2 - _occlDecay * pastR2);
+                hopsR2 = _hops2[idx];
+
+                // Blend only when the detour is strictly better over the full folded value, so clean
+                // corridors (both paths equally clean) and sealed rooms (no detour) stay untouched.
+                var f1 = occlR1 * kOccl + (hopsR1 + pastR1) * kLoss + MathF.Max(0f, dTiles - hopsR1) * kLoss;
+                var f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
+                if (f2 < f1 - 1e-3f)
+                    share = DetourShare;
+            }
 
             totalWeight += rootWeight;
-            cutoffSum += rootWeight * MathF.Exp(-occlR);
-            sumWSum += rootWeight * occlR;
-            hopsSum += rootWeight * _hops[idx];
-            pastSum += rootWeight * pastR;
+            if (share > 0f)
+            {
+                cutoffSum += rootWeight * ((1f - share) * MathF.Exp(-occlR1) + share * MathF.Exp(-occlR2));
+                sumWSum += rootWeight * ((1f - share) * occlR1 + share * occlR2);
+                hopsSum += rootWeight * ((1f - share) * hopsR1 + share * hopsR2);
+                pastSum += rootWeight * ((1f - share) * pastR1 + share * pastR2);
+                detoured = true;
+            }
+            else
+            {
+                cutoffSum += rootWeight * MathF.Exp(-occlR1);
+                sumWSum += rootWeight * occlR1;
+                hopsSum += rootWeight * hopsR1;
+                pastSum += rootWeight * pastR1;
+            }
         }
 
         if (totalWeight <= 0f)
@@ -616,8 +777,9 @@ public sealed class PathSoundSystem : EntitySystem
         float sumW = 0f;
         var modelled = false;
         var clamped = false;
+        var detoured = false;
 
-        if (!crossGrid && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past))
+        if (!crossGrid && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured))
         {
             modelled = true;
         }
@@ -628,7 +790,7 @@ public sealed class PathSoundSystem : EntitySystem
             if (_fieldGrid is { } edgeGrid && TryComp(edgeGrid, out MapGridComponent? edgeGridComp))
                 edgeDist = _fieldRadius * edgeGridComp.TileSize;
 
-            if (!crossGrid && distance > edgeDist && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, true))
+            if (!crossGrid && distance > edgeDist && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured, true))
             {
                 modelled = true;
                 clamped = true;
@@ -656,7 +818,7 @@ public sealed class PathSoundSystem : EntitySystem
             new SmoothEntry(occlValue, tick),
             (_, old) => new SmoothEntry(old.Occl + (occlValue - old.Occl) * _smoothing, tick)).Occl;
 
-        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past);
+        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past, detoured);
         return MathF.Min(smoothed, 400f);
     }
 
@@ -680,6 +842,10 @@ public sealed class PathSoundSystem : EntitySystem
         _sumW = new float[count * RootCount];
         _hops = new int[count * RootCount];
         _past = new int[count * RootCount];
+        _dist2 = new float[count * RootCount];
+        _sumW2 = new float[count * RootCount];
+        _hops2 = new int[count * RootCount];
+        _past2 = new int[count * RootCount];
         _settled = new bool[count * RootCount];
         _tileW = new float[count * RootCount];
         _heapIdx = new int[count * 4];
@@ -708,7 +874,7 @@ public sealed class PathSoundSystem : EntitySystem
         }
     }
 
-    /// <summary>Builds one Dijkstra field rooted at the given seed tile.</summary>
+    /// <summary>Builds one Dijkstra field rooted at the given seed tile: the shortest path pass plus, when enabled, the detour pass biased toward clean tiles.</summary>
     private void BuildRoot(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int radius)
     {
         var count = size * size;
@@ -719,10 +885,31 @@ public sealed class PathSoundSystem : EntitySystem
         Array.Fill(_past, 0, baseIdx, count);
         Array.Fill(_settled, false, baseIdx, count);
         Array.Fill(_tileW, -1f, baseIdx, count);
+
+        RunDijkstra(gridUid, grid, seed, baseIdx, size, radius, false);
+
+        if (_detourWeight <= 0f)
+            return;
+
+        Array.Fill(_dist2, float.PositiveInfinity, baseIdx, count);
+        Array.Fill(_sumW2, 0f, baseIdx, count);
+        Array.Fill(_hops2, 0, baseIdx, count);
+        Array.Fill(_past2, 0, baseIdx, count);
+        Array.Fill(_settled, false, baseIdx, count);
+
+        RunDijkstra(gridUid, grid, seed, baseIdx, size, radius, true);
+    }
+
+    /// <summary>Runs the Dijkstra heap loop over the primary or detour field arrays.</summary>
+    private void RunDijkstra(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int radius, bool detour)
+    {
         _heapCount = 0;
 
         var seedIdx = baseIdx + radius + size * radius;
-        _dist[seedIdx] = 0f;
+        if (detour)
+            _dist2[seedIdx] = 0f;
+        else
+            _dist[seedIdx] = 0f;
         Push(seedIdx, 0f);
 
         while (_heapCount > 0)
@@ -736,15 +923,15 @@ public sealed class PathSoundSystem : EntitySystem
             var x = (idx - baseIdx) % size - radius;
             var y = (idx - baseIdx) / size - radius;
 
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x + 1, y);
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x - 1, y);
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x, y + 1);
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x, y - 1);
+            Relax(gridUid, grid, seed, baseIdx, size, idx, x + 1, y, detour);
+            Relax(gridUid, grid, seed, baseIdx, size, idx, x - 1, y, detour);
+            Relax(gridUid, grid, seed, baseIdx, size, idx, x, y + 1, detour);
+            Relax(gridUid, grid, seed, baseIdx, size, idx, x, y - 1, detour);
         }
     }
 
-    /// <summary>Relaxes one neighbor tile of a settled node.</summary>
-    private void Relax(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int parentIdx, int nx, int ny)
+    /// <summary>Relaxes one neighbor tile of a settled node on the primary or detour pass.</summary>
+    private void Relax(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int parentIdx, int nx, int ny, bool detour)
     {
         var radius = _fieldRadius;
         if (nx < -radius || nx > radius || ny < -radius || ny > radius)
@@ -754,16 +941,38 @@ public sealed class PathSoundSystem : EntitySystem
         if (_settled[idx])
             return;
 
-        var weight = TileWeight(gridUid, grid, new Vector2i(seed.X + nx, seed.Y + ny), idx);
-        var dist = _dist[parentIdx] + 1f + weight;
-        if (dist >= _dist[idx])
+        var tile = new Vector2i(seed.X + nx, seed.Y + ny);
+
+        // Vacuum carries no detour: the clean-route pass excludes empty tiles, so it can never
+        // circumvent blockers through space the way the shortest pass is allowed to.
+        if (detour && _map.TryGetTile(grid, tile, out var tileData) && tileData.IsEmpty)
             return;
 
-        _dist[idx] = dist;
-        _hops[idx] = _hops[parentIdx] + 1;
-        _sumW[idx] = _sumW[parentIdx] + weight;
-        _past[idx] = weight > 0f ? 0 : _past[parentIdx] + 1;
-        Push(idx, dist);
+        var weight = TileWeight(gridUid, grid, tile, idx);
+        if (detour)
+        {
+            var dist2 = _dist2[parentIdx] + 1f + weight * _detourWeight;
+            if (dist2 >= _dist2[idx])
+                return;
+
+            _dist2[idx] = dist2;
+            _hops2[idx] = _hops2[parentIdx] + 1;
+            _sumW2[idx] = _sumW2[parentIdx] + weight;
+            _past2[idx] = weight > 0f ? 0 : _past2[parentIdx] + 1;
+        }
+        else
+        {
+            var dist = _dist[parentIdx] + 1f + weight;
+            if (dist >= _dist[idx])
+                return;
+
+            _dist[idx] = dist;
+            _hops[idx] = _hops[parentIdx] + 1;
+            _sumW[idx] = _sumW[parentIdx] + weight;
+            _past[idx] = weight > 0f ? 0 : _past[parentIdx] + 1;
+        }
+
+        Push(idx, detour ? _dist2[idx] : _dist[idx]);
     }
 
     /// <summary>Returns the blocking occlusion of a tile, cached per root build.</summary>

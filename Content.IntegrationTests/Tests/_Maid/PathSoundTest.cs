@@ -4,6 +4,7 @@ using System.Linq;
 using Content.Client._Maid.Audio.PathSound;
 using Content.Client.Doors;
 using Content.IntegrationTests.Pair;
+using Content.Shared._Maid.CVars;
 using Content.Shared.Doors.Components;
 using Content.Shared.Doors.Systems;
 
@@ -15,6 +16,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Configuration;
 using Robust.UnitTesting;
 using NUnit.Framework;
 
@@ -383,6 +385,68 @@ public sealed class PathSoundTest
 
         // The source sits inside the sealed room: the route crosses its wall (120 occl units raw).
         await AssertFilter(scene, 10, Expected(scene, 15f * 8f, 10, 9), 40f, "sealed room");
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task DetourAroundBlockerRaisesAudibility()
+    {
+        var scene = await SetupScene(12);
+        await using var pair = scene.Pair;
+
+        await Place(scene, 5, "Airlock");
+
+        // Gates in the north wall row far from the airlock plus a real floor strip behind them open a
+        // clean detour the primary pass rejects (13+ hops beats nothing against the 8.3-cost airlock
+        // crossing) while the detour pass takes it (the airlock costs 14.8 there). Vacuum stays shut:
+        // the detour pass excludes empty tiles, and the vacuum approach to the strip is longer than the
+        // airlock for the primary.
+        await scene.Server.WaitPost(() =>
+        {
+            var maps = scene.Server.System<SharedMapSystem>();
+            var grid = scene.Server.EntMan.GetComponent<MapGridComponent>(scene.Grid);
+            var tiles = scene.Server.ResolveDependency<ITileDefinitionManager>();
+            var plating = new Tile(tiles["Plating"].TileId);
+
+            foreach (var x in new[] { 2, 3, 4, 5, 6, 7, 8 })
+                maps.SetTile(scene.Grid, grid, new Vector2i(x, 2), plating);
+
+            foreach (var gate in new[] { new Vector2i(2, 1), new Vector2i(8, 1) })
+            {
+                var toDelete = new List<EntityUid>();
+                var anchored = maps.GetAnchoredEntitiesEnumerator(scene.Grid, grid, gate);
+                while (anchored.MoveNext(out var ent))
+                    toDelete.Add(ent.Value);
+
+                foreach (var ent in toDelete)
+                    scene.Server.EntMan.DeleteEntity(ent);
+            }
+        });
+        await scene.Pair.RunTicksSync(30);
+
+        // The shortest route crosses the airlock one tile back; the clean detour must lift the filter past it.
+        var primaryExpected = Expected(scene, AirlockOccl(AirlockMuffle), 6, 5);
+        await scene.Client.WaitAssertion(() =>
+        {
+            var sourcePos = scene.Listener.Position + new Vector2(6f * scene.TileSize, 0f);
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out _, out _, out _, out var filter),
+                Is.True, "field read failed");
+            Assert.That(filter, Is.LessThan(primaryExpected - 5f),
+                $"the detour must lift audibility: filter {filter:0.00} vs primary {primaryExpected:0.00}");
+        });
+
+        // Disabling detours restores the exact primary-route contract.
+        await scene.Client.WaitPost(() =>
+            scene.Client.ResolveDependency<IConfigurationManager>().SetCVar(MaidCVars.SoundPathDetourWeight.Name, 0f));
+        await scene.Pair.RunTicksSync(60);
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(scene.System.DetourWeight, Is.EqualTo(0f),
+                "the detour cvar flip must reach the client system");
+        });
+        await AssertFilter(scene, 6, primaryExpected, 1.5f, "detours disabled");
 
         await pair.CleanReturnAsync();
     }

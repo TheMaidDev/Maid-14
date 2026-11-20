@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
@@ -28,6 +29,11 @@ public sealed class PathSoundOverlay : Overlay
     private readonly SharedTransformSystem _transform;
     private readonly SharedMapSystem _mapSystem;
     private readonly Font _font;
+    private readonly List<Vector2i> _routePrimary = new();
+    private readonly List<Vector2i> _routeDetour = new();
+
+    private static readonly Color RoutePrimaryColor = new(1f, 0.55f, 0.1f);
+    private static readonly Color RouteDetourColor = new(0.25f, 0.9f, 1f);
 
     public override OverlaySpace Space => OverlaySpace.WorldSpace | OverlaySpace.ScreenSpace;
 
@@ -64,6 +70,23 @@ public sealed class PathSoundOverlay : Overlay
         var cutoff = MathF.Exp(-applied);
         var lossDb = _system.LossDbPerTile * (pathLen + pastDb) + _system.OcclusionLossDb * applied;
         return Math.Clamp(cutoff * MathF.Pow(10f, -lossDb / 20f), 0f, 1f);
+    }
+
+    /// <summary>Highlights one reconstructed route: translucent tile rects plus a polyline through the tile centers.</summary>
+    private void DrawRoute(DrawingHandleWorld handle, float tileSize, List<Vector2i> route, Color color, Vector2 sourceLocal, Vector2 listenerLocal)
+    {
+        foreach (var tile in route)
+            handle.DrawRect(new Box2(tile * tileSize, (tile + Vector2i.One) * tileSize), color.WithAlpha(0.3f));
+
+        var from = sourceLocal;
+        foreach (var tile in route)
+        {
+            var to = (tile + new Vector2(0.5f, 0.5f)) * tileSize;
+            handle.DrawLine(from, to, color);
+            from = to;
+        }
+
+        handle.DrawLine(from, listenerLocal, color);
     }
 
     /// <summary>Bucket color for an audibility score.</summary>
@@ -105,9 +128,10 @@ public sealed class PathSoundOverlay : Overlay
         worldHandle.SetTransform(_transform.GetWorldMatrix(uid));
 
         var showTiles = mode is PathSoundOverlayMode.Field or PathSoundOverlayMode.All;
+        var showRoutes = mode is PathSoundOverlayMode.Field or PathSoundOverlayMode.All;
+        var inv = _transform.GetInvWorldMatrix(uid);
         if (showTiles)
         {
-            var inv = _transform.GetInvWorldMatrix(uid);
             var aabb = args.WorldAABB;
             var cornerL = Vector2.Transform(aabb.BottomLeft, inv) / tileSize;
             var cornerR = Vector2.Transform(aabb.TopRight, inv) / tileSize;
@@ -157,6 +181,16 @@ public sealed class PathSoundOverlay : Overlay
 
             var s = Math.Clamp(MathF.Exp(-entry.Smoothed), 0f, 1f);
             worldHandle.DrawCircle(pos, 0.45f, AudibilityColor(s).WithAlpha(0.9f), filled: false);
+
+            if (showRoutes && _system.TryGetRoute(srcUid, _routePrimary, _routeDetour))
+            {
+                var sourceLocal = Vector2.Transform(pos, inv);
+                var listenerLocal = Vector2.Transform(_transform.GetWorldPosition(playerXform), inv);
+                DrawRoute(worldHandle, tileSize, _routePrimary, RoutePrimaryColor, sourceLocal, listenerLocal);
+
+                if (_routeDetour.Count > 0)
+                    DrawRoute(worldHandle, tileSize, _routeDetour, RouteDetourColor, sourceLocal, listenerLocal);
+            }
         }
 
         worldHandle.SetTransform(Matrix3x2.Identity);
@@ -204,6 +238,8 @@ public sealed class PathSoundOverlay : Overlay
             (new Color(1f, 0.9f, 0.1f), "muffled (30-70%)"),
             (new Color(1f, 0.15f, 0.1f), "barely (<30%)"),
             (Color.DarkGray, "no path"),
+            (RoutePrimaryColor, "route (shortest)"),
+            (RouteDetourColor, "route (detour)"),
         };
 
         var pos = origin;
@@ -224,7 +260,7 @@ public sealed class PathSoundOverlay : Overlay
         handle.DrawString(
             _font,
             pos + new Vector2(0f, 4f),
-            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  fade {_system.OcclusionDecayPerTile:0.0}/t  occl -{_system.OcclusionLossDb:0.#}db  smooth {_system.Smoothing:0.00}  r {_system.Radius}",
+            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  fade {_system.OcclusionDecayPerTile:0.0}/t  occl -{_system.OcclusionLossDb:0.#}db  smooth {_system.Smoothing:0.00}  detour x{_system.DetourWeight:0.#}  r {_system.Radius}",
             Color.LightGray);
     }
 
