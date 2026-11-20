@@ -103,10 +103,10 @@ public sealed class MaidCVars
         CVarDef.Create("maidsound.path_cache_ttl", 2f, CVar.CLIENTONLY);
 
     /// <summary>
-    /// Fraction of the gap between current and target volume closed per audio tick at 30 TPS; 1 disables smoothing.
+    /// Fraction of the gap between current and target filter value closed per audio tick at 30 TPS; 1 disables smoothing.
     /// </summary>
     public static readonly CVarDef<float> SoundPathSmoothing =
-        CVarDef.Create("maidsound.path_smoothing", 0.3f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_smoothing", 0.15f, CVar.CLIENTONLY);
 
     #endregion
 
