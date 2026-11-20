@@ -186,7 +186,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         public int HeapCount;
         public bool DetourValid;
-        public volatile bool Ready;
+        public bool Ready;
         public bool Busy;
         public bool Stale;
         public Vector2i BaseTile;
