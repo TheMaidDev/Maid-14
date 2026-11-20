@@ -79,12 +79,6 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components
 
                         foreach (var component in components.Cast<YamlMappingNode>())
                         {
-                            // MAID BEGIN partial component removal
-                            // "- !Remove type: Foo" in partial prototypes tags the "type" key, so GetNode("type") can't find it
-                            if (component.Children.Keys.Any(k => k is YamlScalarNode { Value: "type", Tag: { IsEmpty: false, IsNonSpecific: false } tag } && tag.Value == "!Remove"))
-                                continue;
-                            // MAID END partial component removal
-
                             componentsValidated++;
 
                             var componentType = component.GetNode("type").AsString();
