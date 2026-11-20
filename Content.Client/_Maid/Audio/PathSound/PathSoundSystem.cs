@@ -46,7 +46,10 @@ public sealed class PathSoundSystem : EntitySystem
     private const int GlassMask = (int) CollisionGroup.GlassLayer;
 
     /// <summary>Gain share of the detour path when its folded value is strictly better.</summary>
-    private const float DetourShare = 0.5f;
+    private const float DetourShare = 0.15f;
+
+    /// <summary>Extra hops a detour must take past the direct route before it may lift a blocker's muffle; short bypasses never defeat closed doors.</summary>
+    private const int MinDetourExtraHops = 4;
 
     /// <summary>Minimum field radius in tiles.</summary>
     private const int MinRadius = 4;
@@ -795,11 +798,13 @@ public sealed class PathSoundSystem : EntitySystem
                 occlR2 = MathF.Max(0f, occlR2 - _occlDecay * pastR2);
                 hopsR2 = live.Hops2[idx];
 
-                // Blend only when the detour is strictly better over the full folded value, so clean
-                // corridors (both paths equally clean) and sealed rooms (no detour) stay untouched.
+                // Blend only when the detour is strictly better over the full folded value AND takes at
+                // least a few extra hops: clean corridors (both paths equally clean), sealed rooms (no
+                // detour) and short bypasses through neighboring open doors never lift a closed blocker.
                 var f1 = occlR1 * kOccl + (hopsR1 + pastR1) * kLoss + MathF.Max(0f, dTiles - hopsR1) * kLoss;
                 var f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
-                if (f2 < f1 - 1e-3f)
+                if (f2 < f1 - 1e-3f
+                    && hopsR2 + pastR2 - (hopsR1 + pastR1) >= MinDetourExtraHops)
                     share = DetourShare;
             }
 
