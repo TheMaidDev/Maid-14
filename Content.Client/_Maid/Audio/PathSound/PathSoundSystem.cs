@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
 using Content.Shared.Doors;
@@ -54,6 +56,9 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Number of Dijkstra fields rooted around the receiver's tile corners.</summary>
     private const int RootCount = 4;
+
+    /// <summary>Empty-tile sentinel in the weight caches: vacuum carries no detour and no primary weight.</summary>
+    private const float TileEmptyWeight = -2f;
 
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
@@ -116,39 +121,28 @@ public sealed class PathSoundSystem : EntitySystem
     private int _fieldRadius;
     private TimeSpan _fieldTime;
 
-    /// <summary>Path cost per root field tile, indexed root*count + (x+R) + W*(y+R).</summary>
-    private float[] _dist = Array.Empty<float>();
+    /// <summary>Live field arrays of the current build; background rebuilds fill a scratch bundle that is copied over.</summary>
+    private FieldBuffers _live = null!;
 
-    /// <summary>Accumulated blocking occlusion per root field tile.</summary>
-    private float[] _sumW = Array.Empty<float>();
+    /// <summary>Scratch bundles for background builds; two cover one draining build plus one in flight.</summary>
+    private readonly FieldBuffers[] _scratch = new FieldBuffers[2];
 
-    /// <summary>Path hop count per root field tile.</summary>
-    private int[] _hops = Array.Empty<int>();
+    private bool _buildInFlight;
+    private FieldBuffers? _pendingBuild;
+    private readonly System.Diagnostics.Stopwatch _rebuildWatch = new();
+    private float _lastRebuildMs;
 
-    /// <summary>Path tiles past the last blocker per root field tile.</summary>
-    private int[] _past = Array.Empty<int>();
+    /// <summary>Blocking occlusion per grid tile, persistent across rebuilds; TileEmptyWeight marks vacuum.</summary>
+    private readonly Dictionary<Vector2i, float> _tileWeightCache = new();
 
-    /// <summary>Path cost per root field tile on the detour pass, indexed like <see cref="_dist"/>.</summary>
-    private float[] _dist2 = Array.Empty<float>();
+    /// <summary>Grid tiles whose blocking weight may have changed since the last build.</summary>
+    private readonly HashSet<Vector2i> _dirtyWeightTiles = new();
 
-    /// <summary>Accumulated blocking occlusion per root field tile on the detour pass.</summary>
-    private float[] _sumW2 = Array.Empty<float>();
+    /// <summary>Grid the weight cache belongs to.</summary>
+    private EntityUid? _weightCacheGrid;
 
-    /// <summary>Path hop count per root field tile on the detour pass.</summary>
-    private int[] _hops2 = Array.Empty<int>();
-
-    /// <summary>Path tiles past the last blocker per root field tile on the detour pass.</summary>
-    private int[] _past2 = Array.Empty<int>();
-
-    /// <summary>Dijkstra settled flag per root field tile.</summary>
-    private bool[] _settled = Array.Empty<bool>();
-
-    /// <summary>Cached tile occlusion per root field tile, -1 while unset.</summary>
-    private float[] _tileW = Array.Empty<float>();
-
-    private int[] _heapIdx = Array.Empty<int>();
-    private float[] _heapKey = Array.Empty<float>();
-    private int _heapCount;
+    /// <summary>Time of the last full weight-cache refresh.</summary>
+    private TimeSpan _weightRefreshTime;
 
     /// <summary>Whether the stream-processing override has been registered by this instance.</summary>
     private bool _overrideSubscribed;
@@ -174,11 +168,53 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Snapshot of one sound's filter values for the debug dump and overlay.</summary>
     public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past, bool Detoured);
 
+    /// <summary>Array set of one field build: the live field or a scratch buffer of a background rebuild.</summary>
+    private sealed class FieldBuffers
+    {
+        public readonly float[] Dist;
+        public readonly float[] SumW;
+        public readonly int[] Hops;
+        public readonly int[] Past;
+        public readonly float[] Dist2;
+        public readonly float[] SumW2;
+        public readonly int[] Hops2;
+        public readonly int[] Past2;
+        public readonly bool[] Settled;
+        public readonly int[] HeapIdx;
+        public readonly float[] HeapKey;
+        public readonly float[] Window;
+
+        public int HeapCount;
+        public bool DetourValid;
+        public volatile bool Ready;
+        public bool Busy;
+        public bool Stale;
+        public Vector2i BaseTile;
+        public TimeSpan Time;
+        public float BuildMs;
+
+        public FieldBuffers(int fieldCount, int heapCount, int window)
+        {
+            Dist = new float[fieldCount];
+            SumW = new float[fieldCount];
+            Hops = new int[fieldCount];
+            Past = new int[fieldCount];
+            Dist2 = new float[fieldCount];
+            SumW2 = new float[fieldCount];
+            Hops2 = new int[fieldCount];
+            Past2 = new int[fieldCount];
+            Settled = new bool[fieldCount];
+            HeapIdx = new int[heapCount];
+            HeapKey = new float[heapCount];
+            Window = new float[window];
+        }
+    }
+
     /// <summary>Formats the last filter values per sound for the soundpathdebug command.</summary>
     public string DumpDebug()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"smoothed sounds: {_debug.Count}, radius: {_fieldRadius}, grid: {_fieldGrid}, seed: {_baseTile}, enabled: {_enabled}, smooth: {_smoothing:0.00}");
+        sb.AppendLine($"smoothed sounds: {_debug.Count}, radius: {_fieldRadius}, grid: {_fieldGrid}, seed: {_baseTile}, enabled: {_enabled}, smooth: {_smoothing:0.00}, rebuild: {_lastRebuildMs:0.0} ms, async: {_buildInFlight}");
 
         foreach (var (uid, entry) in _debug)
         {
@@ -271,17 +307,18 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Returns the summed blocking occlusion, hop count and past-blocker distance for a grid tile in root 0, if covered and reachable.</summary>
     public bool TryGetTile(Vector2i tile, out float sumOcclusion, out int pathLen, out int past)
     {
+        var live = _live;
         if (_fieldGrid != null
             && Math.Abs(tile.X - _baseTile.X) <= _fieldRadius
             && Math.Abs(tile.Y - _baseTile.Y) <= _fieldRadius)
         {
             var size = _fieldRadius * 2 + 1;
             var idx = (tile.X - _baseTile.X + _fieldRadius) + size * (tile.Y - _baseTile.Y + _fieldRadius);
-            if (!float.IsPositiveInfinity(_dist[idx]))
+            if (!float.IsPositiveInfinity(live.Dist[idx]))
             {
-                sumOcclusion = _sumW[idx];
-                pathLen = _hops[idx];
-                past = _past[idx];
+                sumOcclusion = live.SumW[idx];
+                pathLen = live.Hops[idx];
+                past = live.Past[idx];
                 return true;
             }
         }
@@ -331,25 +368,26 @@ public sealed class PathSoundSystem : EntitySystem
         if (Math.Abs(offsetX) > _fieldRadius || Math.Abs(offsetY) > _fieldRadius)
             return false;
 
+        var live = _live;
         var idx = baseIdx + (offsetX + _fieldRadius) + size * (offsetY + _fieldRadius);
-        if (float.IsPositiveInfinity(_dist[idx]))
+        if (float.IsPositiveInfinity(live.Dist[idx]))
             return false;
 
-        Descend(primary, idx, baseIdx, size, false);
-        if (_detourWeight > 0f && _debug.TryGetValue(sound, out var entry) && entry.Detoured)
-            Descend(detour, idx, baseIdx, size, true);
+        Descend(live, primary, idx, baseIdx, size, false);
+        if (_detourWeight > 0f && live.DetourValid && _debug.TryGetValue(sound, out var entry) && entry.Detoured)
+            Descend(live, detour, idx, baseIdx, size, true);
 
         return primary.Count > 0;
     }
 
     /// <summary>Walks the precomputed field downhill from a tile to its root seed; the parent always has a strictly smaller cost.</summary>
-    private void Descend(List<Vector2i> route, int idx, int baseIdx, int size, bool detour)
+    private void Descend(FieldBuffers live, List<Vector2i> route, int idx, int baseIdx, int size, bool detour)
     {
         var root = baseIdx / (size * size);
         var rootDx = root & 1;
         var rootDy = root >> 1;
         var radius = _fieldRadius;
-        var dist = detour ? _dist2 : _dist;
+        var dist = detour ? live.Dist2 : live.Dist;
 
         route.Clear();
         var guard = radius * 2 + 2;
@@ -458,13 +496,80 @@ public sealed class PathSoundSystem : EntitySystem
         _fieldGrid = null;
         _dirty = false;
         _doorDirty = false;
+        _tileWeightCache.Clear();
+        _dirtyWeightTiles.Clear();
+        _weightCacheGrid = null;
+        _buildInFlight = false;
+        _pendingBuild = null;
     }
 
-    /// <summary>Rebuilds the fields the moment a door changes state: predicted door sounds spawn in the same tick and the engine starts them before the next frame update.</summary>
+    /// <summary>Rebuilds the fields the moment a door state change alters a door tile's blocking weight: predicted door sounds spawn in the same tick.</summary>
     private void OnBlockerChanged(DoorStateChangedEvent args)
     {
+        if (DoorWeightsUnchanged())
+            return;
+
         _doorDirty = true;
         RebuildNow();
+    }
+
+    /// <summary>Checks whether any door tile's cached weight moved with this state change; the directed event carries no entity.</summary>
+    private bool DoorWeightsUnchanged()
+    {
+        if (_weightCacheGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
+            return false;
+
+        var query = EntityQueryEnumerator<DoorComponent, TransformComponent>();
+        while (query.MoveNext(out _, out _, out var xform))
+        {
+            if (xform.GridUid != gridUid)
+                continue;
+
+            var local = _map.LocalToGrid(gridUid, grid, xform.Coordinates);
+            var tile = new Vector2i((int) MathF.Floor(local.X / grid.TileSize), (int) MathF.Floor(local.Y / grid.TileSize));
+
+            if (!_tileWeightCache.TryGetValue(tile, out var cached))
+                return false;
+
+            var fresh = TileWeightUncached(gridUid, grid, tile);
+            if (cached == TileEmptyWeight ? fresh != 0f : cached != fresh)
+            {
+                _dirtyWeightTiles.Add(tile);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Computes a tile's blocking weight straight from the world, empty tiles included.</summary>
+    private float TileWeightUncached(EntityUid gridUid, MapGridComponent grid, Vector2i tile)
+    {
+        if (!_map.TryGetTile(grid, tile, out var tileData) || tileData.IsEmpty)
+            return 0f;
+
+        return ComputeTileWeight(gridUid, grid, tile);
+    }
+
+    /// <summary>Marks the tile of an entity whose blocking state changed for a weight recompute.</summary>
+    private void MarkWeightDirty(EntityUid entity)
+    {
+        if (_weightCacheGrid is not { } gridUid
+            || !TryComp(gridUid, out MapGridComponent? grid)
+            || !TryComp(entity, out TransformComponent? xform)
+            || xform.GridUid != gridUid)
+            return;
+
+        var local = _map.LocalToGrid(gridUid, grid, xform.Coordinates);
+        _dirtyWeightTiles.Add(new((int) MathF.Floor(local.X / grid.TileSize), (int) MathF.Floor(local.Y / grid.TileSize)));
+    }
+
+    private void MarkWeightDirty(Entity<MapGridComponent> grid, Vector2i tile)
+    {
+        if (_weightCacheGrid != grid.Owner)
+            return;
+
+        _dirtyWeightTiles.Add(tile);
     }
 
     /// <summary>Rebuilds the fields immediately on the main thread when a player grid is available; the frame update handles the rest.</summary>
@@ -486,11 +591,25 @@ public sealed class PathSoundSystem : EntitySystem
         _doorDirty = false;
     }
 
-    private void OnBlockerChanged(ref AnchorStateChangedEvent args) => _dirty = true;
+    private void OnBlockerChanged(ref AnchorStateChangedEvent args)
+    {
+        MarkWeightDirty(args.Entity);
+        _dirty = true;
+    }
 
-    private void OnBlockerChanged(ref TileChangedEvent args) => _dirty = true;
+    private void OnBlockerChanged(ref TileChangedEvent args)
+    {
+        foreach (var change in args.Changes)
+            MarkWeightDirty(args.Entity, change.GridIndices);
 
-    private void OnBlockerChanged(ref CollisionChangeEvent args) => _dirty = true;
+        _dirty = true;
+    }
+
+    private void OnBlockerChanged(ref CollisionChangeEvent args)
+    {
+        MarkWeightDirty(args.BodyUid);
+        _dirty = true;
+    }
 
     /// <summary>Rebuilds the fields when needed and sweeps stale smoothed entries.</summary>
     public override void FrameUpdate(float frameTime)
@@ -520,16 +639,36 @@ public sealed class PathSoundSystem : EntitySystem
         var fracY = local.Y / tileSize;
         var baseTile = new Vector2i((int) MathF.Floor(fracX), (int) MathF.Floor(fracY));
 
-        if (_fieldGrid != gridUid
-            || _baseTile != baseTile
+        // Adopt a finished background build before anything reads the field this frame.
+        if (_buildInFlight && _pendingBuild is { Ready: true } pending)
+        {
+            if (pending.Stale)
+                DiscardPending();
+            else
+                SwapBuild(pending);
+        }
+
+        if (_fieldGrid == null
+            || _fieldGrid != gridUid
             || _fieldRadius != _radius
-            || _doorDirty
-            || _dirty && (float) (_timing.CurTime - _fieldTime).TotalSeconds > 0.05f
-            || (float) (_timing.CurTime - _fieldTime).TotalSeconds > _ttl)
+            || _doorDirty)
         {
             RebuildField(gridUid, grid, baseTile);
             _dirty = false;
             _doorDirty = false;
+        }
+        else if (_baseTile != baseTile
+            || (_dirty && (float) (_timing.CurTime - _fieldTime).TotalSeconds > 0.1f)
+            || (float) (_timing.CurTime - _fieldTime).TotalSeconds > _ttl)
+        {
+            // Tile steps and world events rebuild off the main thread; only grid, radius and door
+            // changes rebuild synchronously (door sounds spawn the same tick and must see fresh fields).
+            if (!_buildInFlight)
+            {
+                RefreshTileWeights(gridUid, grid, baseTile);
+                PostBuild(baseTile);
+                _dirty = false;
+            }
         }
 
         SweepSmoothed();
@@ -567,6 +706,8 @@ public sealed class PathSoundSystem : EntitySystem
 
         if (_fieldGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
             return false;
+
+        var live = _live;
 
         var gridXform = Transform(gridUid);
         if (gridXform.MapID != listener.MapId)
@@ -629,7 +770,7 @@ public sealed class PathSoundSystem : EntitySystem
                 continue;
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
-            if (float.IsPositiveInfinity(_dist[idx]))
+            if (float.IsPositiveInfinity(live.Dist[idx]))
                 continue;
 
             // A blocker belongs to the path a sound crosses, not to the tile it is born on: the source tile's
@@ -637,22 +778,22 @@ public sealed class PathSoundSystem : EntitySystem
             var selfW = srcTile.X == srcBx && srcTile.Y == srcBy
                 ? ComputeTileWeight(gridUid, grid, srcTile)
                 : 0f;
-            var occlR1 = MathF.Max(0f, _sumW[idx] - selfW);
-            var pastR1 = _sumW[idx] > 0f ? _past[idx] : 0;
+            var occlR1 = MathF.Max(0f, live.SumW[idx] - selfW);
+            var pastR1 = live.SumW[idx] > 0f ? live.Past[idx] : 0;
             occlR1 = MathF.Max(0f, occlR1 - _occlDecay * pastR1);
-            var hopsR1 = _hops[idx];
+            var hopsR1 = live.Hops[idx];
 
             var share = 0f;
             var occlR2 = 0f;
             var pastR2 = 0;
             var hopsR2 = 0;
 
-            if (_detourWeight > 0f && !float.IsPositiveInfinity(_dist2[idx]))
+            if (_detourWeight > 0f && live.DetourValid && !float.IsPositiveInfinity(live.Dist2[idx]))
             {
-                occlR2 = MathF.Max(0f, _sumW2[idx] - selfW);
-                pastR2 = _sumW2[idx] > 0f ? _past2[idx] : 0;
+                occlR2 = MathF.Max(0f, live.SumW2[idx] - selfW);
+                pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
                 occlR2 = MathF.Max(0f, occlR2 - _occlDecay * pastR2);
-                hopsR2 = _hops2[idx];
+                hopsR2 = live.Hops2[idx];
 
                 // Blend only when the detour is strictly better over the full folded value, so clean
                 // corridors (both paths equally clean) and sealed rooms (no detour) stay untouched.
@@ -832,159 +973,405 @@ public sealed class PathSoundSystem : EntitySystem
         return MathF.Round(pen / tileSize) * _occlusionPerWeight * _weightOpaque;
     }
 
-    /// <summary>Allocates the per-root field and shared heap arrays for the current radius.</summary>
+    /// <summary>Allocates the live and scratch field bundles for the current radius; any background build is abandoned.</summary>
     private void AllocateField(int radius)
     {
         var size = radius * 2 + 1;
         var count = size * size;
+        var fieldCount = count * RootCount;
+        var window = (radius * 2 + 3) * (radius * 2 + 3);
 
-        _dist = new float[count * RootCount];
-        _sumW = new float[count * RootCount];
-        _hops = new int[count * RootCount];
-        _past = new int[count * RootCount];
-        _dist2 = new float[count * RootCount];
-        _sumW2 = new float[count * RootCount];
-        _hops2 = new int[count * RootCount];
-        _past2 = new int[count * RootCount];
-        _settled = new bool[count * RootCount];
-        _tileW = new float[count * RootCount];
-        _heapIdx = new int[count * 4];
-        _heapKey = new float[count * 4];
+        _live = new FieldBuffers(fieldCount, count * 4, window);
+        for (var i = 0; i < _scratch.Length; i++)
+            _scratch[i] = new FieldBuffers(fieldCount, count * 4, window);
+
+        _buildInFlight = false;
+        _pendingBuild = null;
         _fieldRadius = radius;
     }
 
-    /// <summary>Builds the four weighted Dijkstra fields rooted at the tiles around the receiver's base tile.</summary>
+    /// <summary>Builds the four weighted Dijkstra fields synchronously into the live buffers: grid, radius and door changes need fields within the same tick.</summary>
     private void RebuildField(EntityUid gridUid, MapGridComponent grid, Vector2i baseTile)
     {
+        _rebuildWatch.Restart();
+
         if (_fieldRadius != _radius)
             AllocateField(_radius);
 
         var radius = _fieldRadius;
         var size = radius * 2 + 1;
-        var count = size * size;
 
         _fieldGrid = gridUid;
         _baseTile = baseTile;
         _fieldTime = _timing.CurTime;
 
+        DropPendingBuilds();
+        RefreshTileWeights(gridUid, grid, baseTile);
+
         for (var root = 0; root < RootCount; root++)
         {
             var seed = new Vector2i(baseTile.X + (root & 1), baseTile.Y + (root >> 1));
-            BuildRoot(gridUid, grid, seed, root * count, size, radius);
+            BuildRootPrimary(_live, seed, baseTile, root * size * size, size, radius);
+        }
+
+        _live.DetourValid = false;
+        if (_detourWeight > 0f && WindowHasBlockers(_live))
+        {
+            for (var root = 0; root < RootCount; root++)
+            {
+                var seed = new Vector2i(baseTile.X + (root & 1), baseTile.Y + (root >> 1));
+                BuildRootDetour(_live, seed, baseTile, root * size * size, size, radius);
+            }
+
+            _live.DetourValid = true;
+        }
+
+        _rebuildWatch.Stop();
+        _lastRebuildMs = (float) _rebuildWatch.Elapsed.TotalMilliseconds;
+    }
+
+    /// <summary>Runs the Dijkstra passes into a buffer; pure array math, safe off the main thread.</summary>
+    private void BuildField(FieldBuffers buffers, Vector2i baseTile, int radius, float detourWeight)
+    {
+        var size = radius * 2 + 1;
+
+        for (var root = 0; root < RootCount; root++)
+        {
+            var seed = new Vector2i(baseTile.X + (root & 1), baseTile.Y + (root >> 1));
+            BuildRootPrimary(buffers, seed, baseTile, root * size * size, size, radius);
+        }
+
+        buffers.DetourValid = false;
+        if (detourWeight > 0f && WindowHasBlockers(buffers))
+        {
+            for (var root = 0; root < RootCount; root++)
+            {
+                var seed = new Vector2i(baseTile.X + (root & 1), baseTile.Y + (root >> 1));
+                BuildRootDetour(buffers, seed, baseTile, root * size * size, size, radius);
+            }
+
+            buffers.DetourValid = true;
         }
     }
 
-    /// <summary>Builds one Dijkstra field rooted at the given seed tile: the shortest path pass plus, when enabled, the detour pass biased toward clean tiles.</summary>
-    private void BuildRoot(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int radius)
+    /// <summary>Refreshes the persistent tile-weight cache (full on grid change or TTL, dirty tiles otherwise) and fills the live window array.</summary>
+    private void RefreshTileWeights(EntityUid gridUid, MapGridComponent grid, Vector2i baseTile)
+    {
+        if (_weightCacheGrid != gridUid
+            || (float) (_timing.CurTime - _weightRefreshTime).TotalSeconds > _ttl)
+        {
+            _tileWeightCache.Clear();
+            _dirtyWeightTiles.Clear();
+            _weightCacheGrid = gridUid;
+        }
+
+        _weightRefreshTime = _timing.CurTime;
+
+        foreach (var tile in _dirtyWeightTiles)
+            _tileWeightCache.Remove(tile);
+        _dirtyWeightTiles.Clear();
+
+        var radius = _fieldRadius;
+        var w = radius * 2 + 3;
+
+        for (var gx = -radius - 1; gx <= radius + 1; gx++)
+        {
+            for (var gy = -radius - 1; gy <= radius + 1; gy++)
+            {
+                var tile = new Vector2i(baseTile.X + gx, baseTile.Y + gy);
+                if (!_tileWeightCache.TryGetValue(tile, out var weight))
+                {
+                    if (!_map.TryGetTile(grid, tile, out var tileData) || tileData.IsEmpty)
+                        weight = TileEmptyWeight;
+                    else
+                        weight = ComputeTileWeight(gridUid, grid, tile);
+
+                    _tileWeightCache[tile] = weight;
+                }
+
+                _live.Window[(gx + radius + 1) + w * (gy + radius + 1)] = weight;
+            }
+        }
+    }
+
+    /// <summary>Posts a background field build into a free scratch buffer; the worker only touches arrays.</summary>
+    private void PostBuild(Vector2i baseTile)
+    {
+        FieldBuffers? target = null;
+        foreach (var scratch in _scratch)
+        {
+            if (scratch.Busy)
+                continue;
+            target = scratch;
+            break;
+        }
+
+        if (target == null)
+            return;
+
+        var radius = _fieldRadius;
+        var detourWeight = _detourWeight;
+
+        target.Busy = true;
+        target.Stale = false;
+        target.Ready = false;
+        target.BaseTile = baseTile;
+        target.Time = _timing.CurTime;
+        Array.Copy(_live.Window, target.Window, _live.Window.Length);
+        _pendingBuild = target;
+        _buildInFlight = true;
+
+        Task.Run(() =>
+        {
+            try
+            {
+                var start = System.Diagnostics.Stopwatch.GetTimestamp();
+                BuildField(target, baseTile, radius, detourWeight);
+                target.BuildMs = (float) ((System.Diagnostics.Stopwatch.GetTimestamp() - start) * 1000.0 / System.Diagnostics.Stopwatch.Frequency);
+                target.Ready = true;
+            }
+            catch
+            {
+                target.Ready = false;
+                target.Busy = false;
+                if (_pendingBuild == target)
+                {
+                    _buildInFlight = false;
+                    _pendingBuild = null;
+                }
+            }
+        });
+    }
+
+    /// <summary>Adopts a finished background build into the live buffers.</summary>
+    private void SwapBuild(FieldBuffers pending)
+    {
+        Array.Copy(pending.Dist, _live.Dist, pending.Dist.Length);
+        Array.Copy(pending.SumW, _live.SumW, pending.SumW.Length);
+        Array.Copy(pending.Hops, _live.Hops, pending.Hops.Length);
+        Array.Copy(pending.Past, _live.Past, pending.Past.Length);
+        Array.Copy(pending.Dist2, _live.Dist2, pending.Dist2.Length);
+        Array.Copy(pending.SumW2, _live.SumW2, pending.SumW2.Length);
+        Array.Copy(pending.Hops2, _live.Hops2, pending.Hops2.Length);
+        Array.Copy(pending.Past2, _live.Past2, pending.Past2.Length);
+        _live.DetourValid = pending.DetourValid;
+        _baseTile = pending.BaseTile;
+        _fieldTime = pending.Time;
+        _lastRebuildMs = pending.BuildMs;
+
+        _buildInFlight = false;
+        _pendingBuild = null;
+        pending.Ready = false;
+        pending.Busy = false;
+        pending.Stale = false;
+    }
+
+    /// <summary>Drops a finished-but-stale background build.</summary>
+    private void DiscardPending()
+    {
+        if (_pendingBuild is not { } pending)
+            return;
+
+        _buildInFlight = false;
+        _pendingBuild = null;
+        pending.Ready = false;
+        pending.Busy = false;
+        pending.Stale = false;
+    }
+
+    /// <summary>Abandons any background build; its scratch stays busy until the worker drains.</summary>
+    private void DropPendingBuilds()
+    {
+        if (!_buildInFlight)
+            return;
+
+        _buildInFlight = false;
+        if (_pendingBuild is { } pending)
+            pending.Stale = true;
+        _pendingBuild = null;
+    }
+
+    /// <summary>Builds the shortest-path field of one root into the given buffers.</summary>
+    private void BuildRootPrimary(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius)
     {
         var count = size * size;
 
-        Array.Fill(_dist, float.PositiveInfinity, baseIdx, count);
-        Array.Fill(_sumW, 0f, baseIdx, count);
-        Array.Fill(_hops, 0, baseIdx, count);
-        Array.Fill(_past, 0, baseIdx, count);
-        Array.Fill(_settled, false, baseIdx, count);
-        Array.Fill(_tileW, -1f, baseIdx, count);
+        Array.Fill(buffers.Dist, float.PositiveInfinity, baseIdx, count);
+        Array.Fill(buffers.SumW, 0f, baseIdx, count);
+        Array.Fill(buffers.Hops, 0, baseIdx, count);
+        Array.Fill(buffers.Past, 0, baseIdx, count);
+        Array.Fill(buffers.Settled, false, baseIdx, count);
 
-        RunDijkstra(gridUid, grid, seed, baseIdx, size, radius, false);
+        RunDijkstra(buffers, seed, baseTile, baseIdx, size, radius, false);
+    }
 
-        if (_detourWeight <= 0f)
-            return;
+    /// <summary>Builds the detour field of one root into the given buffers.</summary>
+    private void BuildRootDetour(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius)
+    {
+        var count = size * size;
 
-        Array.Fill(_dist2, float.PositiveInfinity, baseIdx, count);
-        Array.Fill(_sumW2, 0f, baseIdx, count);
-        Array.Fill(_hops2, 0, baseIdx, count);
-        Array.Fill(_past2, 0, baseIdx, count);
-        Array.Fill(_settled, false, baseIdx, count);
+        Array.Fill(buffers.Dist2, float.PositiveInfinity, baseIdx, count);
+        Array.Fill(buffers.SumW2, 0f, baseIdx, count);
+        Array.Fill(buffers.Hops2, 0, baseIdx, count);
+        Array.Fill(buffers.Past2, 0, baseIdx, count);
+        Array.Fill(buffers.Settled, false, baseIdx, count);
 
-        RunDijkstra(gridUid, grid, seed, baseIdx, size, radius, true);
+        RunDijkstra(buffers, seed, baseTile, baseIdx, size, radius, true);
     }
 
     /// <summary>Runs the Dijkstra heap loop over the primary or detour field arrays.</summary>
-    private void RunDijkstra(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int radius, bool detour)
+    private void RunDijkstra(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, bool detour)
     {
-        _heapCount = 0;
+        buffers.HeapCount = 0;
 
         var seedIdx = baseIdx + radius + size * radius;
         if (detour)
-            _dist2[seedIdx] = 0f;
+            buffers.Dist2[seedIdx] = 0f;
         else
-            _dist[seedIdx] = 0f;
-        Push(seedIdx, 0f);
+            buffers.Dist[seedIdx] = 0f;
+        Push(buffers, seedIdx, 0f);
 
-        while (_heapCount > 0)
+        while (buffers.HeapCount > 0)
         {
-            var idx = PopMin();
-            if (_settled[idx])
+            var idx = PopMin(buffers);
+            if (buffers.Settled[idx])
                 continue;
 
-            _settled[idx] = true;
+            buffers.Settled[idx] = true;
 
             var x = (idx - baseIdx) % size - radius;
             var y = (idx - baseIdx) / size - radius;
 
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x + 1, y, detour);
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x - 1, y, detour);
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x, y + 1, detour);
-            Relax(gridUid, grid, seed, baseIdx, size, idx, x, y - 1, detour);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x + 1, y, detour);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x - 1, y, detour);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x, y + 1, detour);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x, y - 1, detour);
         }
     }
 
     /// <summary>Relaxes one neighbor tile of a settled node on the primary or detour pass.</summary>
-    private void Relax(EntityUid gridUid, MapGridComponent grid, Vector2i seed, int baseIdx, int size, int parentIdx, int nx, int ny, bool detour)
+    private void Relax(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, int parentIdx, int nx, int ny, bool detour)
     {
-        var radius = _fieldRadius;
         if (nx < -radius || nx > radius || ny < -radius || ny > radius)
             return;
 
         var idx = baseIdx + (nx + radius) + size * (ny + radius);
-        if (_settled[idx])
+        if (buffers.Settled[idx])
             return;
 
         var tile = new Vector2i(seed.X + nx, seed.Y + ny);
+        var wIdx = WeightIndex(tile, baseTile, radius);
 
         // Vacuum carries no detour: the clean-route pass excludes empty tiles, so it can never
         // circumvent blockers through space the way the shortest pass is allowed to.
-        if (detour && _map.TryGetTile(grid, tile, out var tileData) && tileData.IsEmpty)
+        if (detour && buffers.Window[wIdx] == TileEmptyWeight)
             return;
 
-        var weight = TileWeight(gridUid, grid, tile, idx);
+        var weight = TileWeight(buffers, wIdx);
         if (detour)
         {
-            var dist2 = _dist2[parentIdx] + 1f + weight * _detourWeight;
-            if (dist2 >= _dist2[idx])
+            var dist2 = buffers.Dist2[parentIdx] + 1f + weight * _detourWeight;
+            if (dist2 >= buffers.Dist2[idx])
                 return;
 
-            _dist2[idx] = dist2;
-            _hops2[idx] = _hops2[parentIdx] + 1;
-            _sumW2[idx] = _sumW2[parentIdx] + weight;
-            _past2[idx] = weight > 0f ? 0 : _past2[parentIdx] + 1;
+            buffers.Dist2[idx] = dist2;
+            buffers.Hops2[idx] = buffers.Hops2[parentIdx] + 1;
+            buffers.SumW2[idx] = buffers.SumW2[parentIdx] + weight;
+            buffers.Past2[idx] = weight > 0f ? 0 : buffers.Past2[parentIdx] + 1;
         }
         else
         {
-            var dist = _dist[parentIdx] + 1f + weight;
-            if (dist >= _dist[idx])
+            var dist = buffers.Dist[parentIdx] + 1f + weight;
+            if (dist >= buffers.Dist[idx])
                 return;
 
-            _dist[idx] = dist;
-            _hops[idx] = _hops[parentIdx] + 1;
-            _sumW[idx] = _sumW[parentIdx] + weight;
-            _past[idx] = weight > 0f ? 0 : _past[parentIdx] + 1;
+            buffers.Dist[idx] = dist;
+            buffers.Hops[idx] = buffers.Hops[parentIdx] + 1;
+            buffers.SumW[idx] = buffers.SumW[parentIdx] + weight;
+            buffers.Past[idx] = weight > 0f ? 0 : buffers.Past[parentIdx] + 1;
         }
 
-        Push(idx, detour ? _dist2[idx] : _dist[idx]);
+        Push(buffers, idx, detour ? buffers.Dist2[idx] : buffers.Dist[idx]);
     }
 
-    /// <summary>Returns the blocking occlusion of a tile, cached per root build.</summary>
-    private float TileWeight(EntityUid gridUid, MapGridComponent grid, Vector2i tile, int idx)
+    /// <summary>Returns the blocking occlusion of a tile from the buffer's window cache; vacuum weighs zero.</summary>
+    private float TileWeight(FieldBuffers buffers, int wIdx)
     {
-        var cached = _tileW[idx];
-        if (cached >= 0f)
-            return cached;
+        var weight = buffers.Window[wIdx];
+        return weight >= 0f ? weight : 0f;
+    }
 
-        var weight = ComputeTileWeight(gridUid, grid, tile);
-        _tileW[idx] = weight;
-        return weight;
+    /// <summary>Index of a grid tile in the shared window array centered on the given base tile.</summary>
+    private int WeightIndex(Vector2i tile, Vector2i baseTile, int radius)
+    {
+        var w = radius * 2 + 3;
+        return tile.X - baseTile.X + radius + 1 + w * (tile.Y - baseTile.Y + radius + 1);
+    }
+
+    /// <summary>Checks whether the tile window contains any blocker at all; blocker-free fields skip the detour passes.</summary>
+    private static bool WindowHasBlockers(FieldBuffers buffers)
+    {
+        foreach (var weight in buffers.Window)
+        {
+            if (weight > 0f)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Pushes a node onto the buffer's preallocated min-heap.</summary>
+    private void Push(FieldBuffers buffers, int idx, float key)
+    {
+        var i = buffers.HeapCount++;
+        buffers.HeapIdx[i] = idx;
+        buffers.HeapKey[i] = key;
+
+        while (i > 0)
+        {
+            var parent = (i - 1) / 2;
+            if (buffers.HeapKey[parent] <= buffers.HeapKey[i])
+                break;
+
+            (buffers.HeapKey[parent], buffers.HeapKey[i]) = (buffers.HeapKey[i], buffers.HeapKey[parent]);
+            (buffers.HeapIdx[parent], buffers.HeapIdx[i]) = (buffers.HeapIdx[i], buffers.HeapIdx[parent]);
+            i = parent;
+        }
+    }
+
+    /// <summary>Pops the minimum-key node from the buffer's preallocated min-heap.</summary>
+    private int PopMin(FieldBuffers buffers)
+    {
+        var top = buffers.HeapIdx[0];
+        buffers.HeapCount--;
+
+        if (buffers.HeapCount > 0)
+        {
+            buffers.HeapIdx[0] = buffers.HeapIdx[buffers.HeapCount];
+            buffers.HeapKey[0] = buffers.HeapKey[buffers.HeapCount];
+
+            var i = 0;
+            while (true)
+            {
+                var left = 2 * i + 1;
+                if (left >= buffers.HeapCount)
+                    break;
+
+                var child = left;
+                var right = left + 1;
+                if (right < buffers.HeapCount && buffers.HeapKey[right] < buffers.HeapKey[left])
+                    child = right;
+
+                if (buffers.HeapKey[i] <= buffers.HeapKey[child])
+                    break;
+
+                (buffers.HeapKey[i], buffers.HeapKey[child]) = (buffers.HeapKey[child], buffers.HeapKey[i]);
+                (buffers.HeapIdx[i], buffers.HeapIdx[child]) = (buffers.HeapIdx[child], buffers.HeapIdx[i]);
+                i = child;
+            }
+        }
+
+        return top;
     }
 
     /// <summary>Computes the blocking occlusion of a tile from its anchored entities: component entities use their muffle percent, static blockers use heuristics.</summary>
@@ -1055,59 +1442,5 @@ public sealed class PathSoundSystem : EntitySystem
     private static float OcclFromMuffle(float muffle)
     {
         return -MathF.Log(1f - Math.Clamp(muffle, 0f, 99.9f) / 100f);
-    }
-
-    /// <summary>Pushes a node onto the preallocated min-heap.</summary>
-    private void Push(int idx, float key)
-    {
-        var i = _heapCount++;
-        _heapIdx[i] = idx;
-        _heapKey[i] = key;
-
-        while (i > 0)
-        {
-            var parent = (i - 1) / 2;
-            if (_heapKey[parent] <= _heapKey[i])
-                break;
-
-            (_heapKey[parent], _heapKey[i]) = (_heapKey[i], _heapKey[parent]);
-            (_heapIdx[parent], _heapIdx[i]) = (_heapIdx[i], _heapIdx[parent]);
-            i = parent;
-        }
-    }
-
-    /// <summary>Pops the minimum-key node from the preallocated min-heap.</summary>
-    private int PopMin()
-    {
-        var top = _heapIdx[0];
-        _heapCount--;
-
-        if (_heapCount > 0)
-        {
-            _heapIdx[0] = _heapIdx[_heapCount];
-            _heapKey[0] = _heapKey[_heapCount];
-
-            var i = 0;
-            while (true)
-            {
-                var left = 2 * i + 1;
-                if (left >= _heapCount)
-                    break;
-
-                var child = left;
-                var right = left + 1;
-                if (right < _heapCount && _heapKey[right] < _heapKey[left])
-                    child = right;
-
-                if (_heapKey[i] <= _heapKey[child])
-                    break;
-
-                (_heapKey[i], _heapKey[child]) = (_heapKey[child], _heapKey[i]);
-                (_heapIdx[i], _heapIdx[child]) = (_heapIdx[child], _heapIdx[i]);
-                i = child;
-            }
-        }
-
-        return top;
     }
 }
