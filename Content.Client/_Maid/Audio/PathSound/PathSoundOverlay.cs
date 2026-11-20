@@ -180,7 +180,8 @@ public sealed class PathSoundOverlay : Overlay
                 continue;
 
             var s = Math.Clamp(MathF.Exp(-entry.Smoothed), 0f, 1f);
-            worldHandle.DrawCircle(pos, 0.45f, AudibilityColor(s).WithAlpha(0.9f), filled: false);
+            var clipped = entry.Mode == PathSoundSystem.PathSoundModelMode.MaxDistanceClip;
+            worldHandle.DrawCircle(pos, 0.45f, (clipped ? Color.Red : AudibilityColor(s)).WithAlpha(0.9f), filled: false);
 
             if (showRoutes && _system.TryGetRoute(srcUid, _routePrimary, _routeDetour))
             {
@@ -240,6 +241,7 @@ public sealed class PathSoundOverlay : Overlay
             (Color.DarkGray, "no path"),
             (RoutePrimaryColor, "route (shortest)"),
             (RouteDetourColor, "route (detour)"),
+            (Color.Red, "MD: engine mute past the sound's own MaxDistance"),
         };
 
         var pos = origin;
@@ -262,6 +264,11 @@ public sealed class PathSoundOverlay : Overlay
             pos + new Vector2(0f, 4f),
             $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  fade {_system.OcclusionDecayPerTile:0.0}/t  occl -{_system.OcclusionLossDb:0.#}db  smooth {_system.Smoothing:0.00}  detour x{_system.DetourWeight:0.#}  r {_system.Radius}",
             Color.LightGray);
+        handle.DrawString(
+            _font,
+            pos + new Vector2(0f, 20f),
+            "tiles, % and o:/f: show the model only; source volume, rolloff and MaxDistance apply on top",
+            Color.DarkGray);
     }
 
     private void DrawNumbers(in OverlayDrawArgs args, EntityUid gridUid, MapGridComponent grid, Vector2i seed, int tileSize)
@@ -326,7 +333,11 @@ public sealed class PathSoundOverlay : Overlay
                 continue;
 
             var screen = args.ViewportControl!.WorldToScreen(pos);
-            handle.DrawString(_font, screen + new Vector2(10f, -6f), $"o:{entry.Occlusion:0.00} f:{entry.Smoothed:0.0}", Color.White.WithAlpha(0.9f));
+            var clipped = entry.Mode == PathSoundSystem.PathSoundModelMode.MaxDistanceClip;
+            var label = clipped
+                ? $"MD d:{entry.Distance:0.#}>{entry.MaxDistance:0.#} v:{entry.BaseVolumeDb:0.#}"
+                : $"o:{entry.Occlusion:0.00} f:{entry.Smoothed:0.0} v:{entry.BaseVolumeDb:0.#}";
+            handle.DrawString(_font, screen + new Vector2(10f, -6f), label, clipped ? Color.Red : Color.White.WithAlpha(0.9f));
         }
     }
 

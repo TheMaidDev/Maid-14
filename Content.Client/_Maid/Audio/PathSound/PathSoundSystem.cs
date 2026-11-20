@@ -1,7 +1,10 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Shared._Maid.Audio;
@@ -17,6 +20,7 @@ using Robust.Shared.Audio;
 using Robust.Shared.Audio.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
+using Robust.Shared.ContentPack;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
@@ -24,6 +28,7 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 using AudioComponent = Robust.Shared.Audio.Components.AudioComponent;
 
 namespace Content.Client._Maid.Audio.PathSound;
@@ -36,6 +41,15 @@ namespace Content.Client._Maid.Audio.PathSound;
 /// </summary>
 public sealed class PathSoundSystem : EntitySystem
 {
+    /// <summary>Which branch produced a stream's last filter value.</summary>
+    public enum PathSoundModelMode : byte
+    {
+        Field = 0,
+        ClampedField = 1,
+        Raycast = 2,
+        MaxDistanceClip = 3,
+    }
+
     /// <summary>Fixture mask matching the engine occlusion raycast (audio occlusion mask is Impassable).</summary>
     private const int ImpassableMask = (int) CollisionGroup.Impassable;
 
@@ -63,10 +77,14 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Empty-tile sentinel in the weight caches: vacuum carries no detour and no primary weight.</summary>
     private const float TileEmptyWeight = -2f;
 
+    /// <summary>User-data directory the snapshot files are written to.</summary>
+    private const string SnapshotDir = "/soundpath";
+
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IResourceManager _resMan = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
@@ -156,6 +174,11 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Last filter values per audio stream for the soundpathdebug dump command and the overlay markers.</summary>
     private readonly ConcurrentDictionary<EntityUid, DebugEntry> _debug = new();
 
+    /// <summary>Ring of the most recent per-stream model decisions, for catching birth-time transients in snapshots.</summary>
+    private readonly RingEntry[] _ring = new RingEntry[128];
+
+    private int _ringIndex;
+
     /// <summary>Monotonic per-call counter stamping smoothed-entry freshness.</summary>
     private long _tickCounter;
 
@@ -169,7 +192,19 @@ public sealed class PathSoundSystem : EntitySystem
     private readonly record struct SmoothEntry(float Occl, long LastCall);
 
     /// <summary>Snapshot of one sound's filter values for the debug dump and overlay.</summary>
-    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past, bool Detoured);
+    public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past, bool Detoured, float Raw, float Distance, float MaxDistance, float BaseVolumeDb, float Rolloff, float RefDistance, PathSoundModelMode Mode, string FileName, long LastTick);
+
+    /// <summary>Per-root breakdown of one model evaluation for the snapshot.</summary>
+    public readonly record struct RootBreak(int Root, float RootWeight, float Occl1, int Hops1, int Past1, float Occl2, int Hops2, int Past2, float Share, float F1, float F2, bool Skipped);
+
+    /// <summary>One recent per-stream model decision.</summary>
+    private readonly record struct RingEntry(long Tick, EntityUid Uid, float Raw, float Smoothed, float Distance, float MaxDistance, PathSoundModelMode Mode);
+
+    private void PushRing(long tick, EntityUid uid, float raw, float smoothed, float distance, float maxDistance, PathSoundModelMode mode)
+    {
+        var slot = (int) (Interlocked.Increment(ref _ringIndex) - 1) % _ring.Length;
+        _ring[slot] = new RingEntry(tick, uid, raw, smoothed, distance, maxDistance, mode);
+    }
 
     /// <summary>Array set of one field build: the live field or a scratch buffer of a background rebuild.</summary>
     private sealed class FieldBuffers
@@ -221,10 +256,314 @@ public sealed class PathSoundSystem : EntitySystem
 
         foreach (var (uid, entry) in _debug)
         {
-            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} filter={entry.Smoothed:0.00}{(entry.Detoured ? " *detour" : "")}");
+            var extra = entry.Mode switch
+            {
+                PathSoundModelMode.ClampedField => " *clamped",
+                PathSoundModelMode.Raycast => " *raycast",
+                PathSoundModelMode.MaxDistanceClip => $" *MD {entry.Distance:0.#}>{entry.MaxDistance:0.#}",
+                _ => "",
+            };
+            sb.AppendLine($"{uid} occlSum={entry.SumWeight:0.00} path={entry.PathLen:0.0} past={entry.Past:0} occl={entry.Occlusion:0.00} filter={entry.Smoothed:0.00} base={entry.BaseVolumeDb:0.#}dB{(entry.Detoured ? " *detour" : "")}{extra}");
         }
 
         return sb.ToString();
+    }
+
+    /// <summary>Writes a JSON snapshot of the whole model state (cvars, listener, fields, tile weights, streams, routes, recent decisions) into the user data dir.</summary>
+    public string WriteSnapshot(string? suffix = null)
+    {
+        var name = $"snap-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
+
+        if (!string.IsNullOrWhiteSpace(suffix))
+        {
+            foreach (var c in Path.GetInvalidFileNameChars())
+                suffix = suffix.Replace(c, '_');
+            name = $"{name}-{suffix.Trim()}";
+        }
+
+        var json = JsonSerializer.Serialize(BuildSnapshot(), new JsonSerializerOptions { WriteIndented = true });
+        var dir = new ResPath(SnapshotDir);
+        var path = dir / $"{name}.json";
+
+        _resMan.UserData.CreateDir(dir);
+        using (var file = _resMan.UserData.Open(path, FileMode.Create, FileAccess.Write, FileShare.None))
+        using (var writer = new StreamWriter(file))
+        {
+            writer.Write(json);
+        }
+
+        return _resMan.UserData.RootDir is { } root ? $"{path} ({root})" : path.ToString();
+    }
+
+    private object BuildSnapshot()
+    {
+        var zOffset = _cfg.GetCVar(CVars.AudioZOffset);
+        var masterGain = _cfg.GetCVar(CVars.AudioMasterVolume);
+
+        object listener;
+        Vector2 listenerPos = default;
+        MapId listenerMap = MapId.Nullspace;
+
+        if (_player.LocalEntity is { } player && TryComp(player, out TransformComponent? playerXform))
+        {
+            listenerPos = _transform.GetWorldPosition(playerXform);
+            listenerMap = playerXform.MapID;
+            listener = new
+            {
+                uid = player.Id,
+                world = Pair(listenerPos),
+                mapId = (int) listenerMap,
+                grid = playerXform.GridUid?.Id,
+            };
+        }
+        else
+        {
+            listener = new { uid = (int?) null };
+        }
+
+        object field = new { active = false, grid = (int?) null };
+        object? weights = null;
+        object? roots = null;
+
+        if (_fieldGrid is { } fieldGrid && _live != null)
+        {
+            var blockers = 0;
+            foreach (var w in _live.Window)
+            {
+                if (w > 0f)
+                    blockers++;
+            }
+
+            field = new
+            {
+                active = FieldReady,
+                grid = fieldGrid.Id,
+                baseTile = Pair(_baseTile),
+                fieldRadius = _fieldRadius,
+                radiusCvar = _radius,
+                ageSec = (float) (_timing.CurTime - _fieldTime).TotalSeconds,
+                ttl = _ttl,
+                detourValid = _live.DetourValid,
+                buildInFlight = _buildInFlight,
+                lastRebuildMs = _lastRebuildMs,
+                windowBlockers = blockers,
+            };
+
+            var tileList = new List<object[]>(_tileWeightCache.Count);
+            foreach (var (tile, weight) in _tileWeightCache)
+                tileList.Add(new object[] { tile.X, tile.Y, weight });
+            weights = new { grid = _weightCacheGrid?.Id, count = tileList.Count, tiles = tileList };
+
+            var radius = _fieldRadius;
+            var size = radius * 2 + 1;
+            var perRoot = new List<object?[]>[RootCount];
+            for (var root = 0; root < RootCount; root++)
+            {
+                var rootDx = root & 1;
+                var rootDy = root >> 1;
+                var list = new List<object?[]>(size * size);
+                var baseIdx = root * size * size;
+
+                for (var x = -radius; x <= radius; x++)
+                {
+                    for (var y = -radius; y <= radius; y++)
+                    {
+                        var idx = baseIdx + (x + radius) + size * (y + radius);
+                        if (float.IsPositiveInfinity(_live.Dist[idx]))
+                            continue;
+
+                        var detour = float.IsPositiveInfinity(_live.Dist2[idx]);
+                        list.Add(new object?[]
+                        {
+                            _baseTile.X + rootDx + x,
+                            _baseTile.Y + rootDy + y,
+                            _live.Dist[idx],
+                            _live.SumW[idx],
+                            _live.Hops[idx],
+                            _live.Past[idx],
+                            detour ? null : _live.Dist2[idx],
+                            detour ? null : _live.SumW2[idx],
+                            detour ? null : _live.Hops2[idx],
+                            detour ? null : _live.Past2[idx],
+                        });
+                    }
+                }
+
+                perRoot[root] = list;
+            }
+
+            roots = new { radius, size, r0 = perRoot[0], r1 = perRoot[1], r2 = perRoot[2], r3 = perRoot[3] };
+        }
+
+        var listenerCoords = new MapCoordinates(listenerPos, listenerMap);
+        var sounds = new List<object>();
+        var query = EntityQueryEnumerator<AudioComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var comp, out var sx))
+        {
+            var global = comp.Global;
+            var worldPos = global || sx.MapID != listenerMap ? Vector2.Zero : _transform.GetWorldPosition(sx);
+            var distance = global ? 0f : (worldPos - listenerPos).Length();
+            var clipped = !global && MathF.Sqrt(distance * distance + zOffset * zOffset) > comp.MaxDistance;
+
+            Vector2i? tile = null;
+            if (!global && sx.GridUid is { } sGrid && TryComp(sGrid, out MapGridComponent? sGridComp))
+            {
+                var local = _map.LocalToGrid(sGrid, sGridComp, sx.Coordinates);
+                tile = new((int) MathF.Floor(local.X / sGridComp.TileSize), (int) MathF.Floor(local.Y / sGridComp.TileSize));
+            }
+
+            var modelled = _debug.TryGetValue(uid, out var entry);
+            var smoothed = modelled ? entry.Smoothed : 0f;
+            var gainEst = global || clipped ? 0f : AttenuationGain(distance, comp.RolloffFactor, comp.ReferenceDistance, comp.MaxDistance);
+            var estDb = comp.Params.Volume + 20f * MathF.Log10(MathF.Max(gainEst, 1e-6f)) - OcclDbPerUnit * smoothed;
+
+            List<int[]>? routeP = null;
+            List<int[]>? routeD = null;
+            List<object>? breakdown = null;
+
+            if (!global && _fieldGrid is { } rGrid && sx.GridUid == rGrid && modelled)
+            {
+                var primary = new List<Vector2i>();
+                var detour = new List<Vector2i>();
+                if (TryGetRoute(uid, primary, detour))
+                {
+                    routeP = primary.Select(t => new[] { t.X, t.Y }).ToList();
+                    routeD = detour.Select(t => new[] { t.X, t.Y }).ToList();
+                }
+
+                var breaks = new List<RootBreak>();
+                if (TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks)
+                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks))
+                {
+                    breakdown = breaks.Select(b => (object) new
+                    {
+                        root = b.Root,
+                        weight = b.RootWeight,
+                        occl1 = b.Occl1,
+                        hops1 = b.Hops1,
+                        past1 = b.Past1,
+                        occl2 = b.Occl2,
+                        hops2 = b.Hops2,
+                        past2 = b.Past2,
+                        share = b.Share,
+                        f1 = b.F1,
+                        f2 = b.F2,
+                        skipped = b.Skipped,
+                    }).ToList();
+                }
+            }
+
+            object? route = null;
+            if (routeP != null)
+                route = new { primary = routeP, detour = routeD };
+
+            sounds.Add(new
+            {
+                uid = uid.Id,
+                file = comp.FileName,
+                playing = comp.Playing,
+                state = (byte) comp.State,
+                global,
+                flags = (byte) comp.Flags,
+                started = comp.Started,
+                world = Pair(worldPos),
+                tile = tile is { } t ? new[] { t.X, t.Y } : null,
+                distance,
+                baseVolumeDb = comp.Params.Volume,
+                appliedVolumeDb = comp.Volume,
+                gain = comp.Gain,
+                maxDistance = comp.MaxDistance,
+                rolloff = comp.RolloffFactor,
+                refDistance = comp.ReferenceDistance,
+                clipped,
+                engineGainEst = gainEst,
+                estLoudnessDb = estDb,
+                masterGain,
+                model = modelled
+                    ? new
+                    {
+                        sumW = entry.SumWeight,
+                        pathLen = entry.PathLen,
+                        past = entry.Past,
+                        occl = entry.Occlusion,
+                        raw = entry.Raw,
+                        smoothed = entry.Smoothed,
+                        detoured = entry.Detoured,
+                        mode = (byte) entry.Mode,
+                        lastTick = entry.LastTick,
+                    }
+                    : null,
+                route,
+                breakdown,
+            });
+        }
+
+        var recent = new List<(long Tick, object Body)>(_ring.Length);
+        foreach (var e in _ring)
+        {
+            if (e.Tick == 0)
+                continue;
+
+            recent.Add((e.Tick, (object) new
+            {
+                tick = e.Tick,
+                uid = e.Uid.Id,
+                raw = e.Raw,
+                smoothed = e.Smoothed,
+                distance = e.Distance,
+                maxDistance = e.MaxDistance,
+                mode = (byte) e.Mode,
+            }));
+        }
+
+        recent.Sort((a, b) => a.Tick.CompareTo(b.Tick));
+
+        return new
+        {
+            version = 1,
+            timeUtc = DateTime.UtcNow,
+            tick = (long) _timing.CurTick.Value,
+            cvars = new
+            {
+                enabled = _enabled,
+                radius = _radius,
+                occlusionPerWeight = _occlusionPerWeight,
+                lossDbPerTile = _lossDbPerTile,
+                occlDecayPerTile = _occlDecay,
+                occlLossDb = _occlLossDb,
+                weightOpaque = _weightOpaque,
+                weightGlass = _weightGlass,
+                cacheTtl = _ttl,
+                smoothing = _smoothing,
+                detourWeight = _detourWeight,
+                zOffset,
+                raycastLength = _cfg.GetCVar(CVars.AudioRaycastLength),
+                occlusionMask = _sharedAudio.OcclusionCollisionMask,
+                masterGain,
+                attenuation = _cfg.GetCVar(CVars.AudioAttenuation),
+            },
+            listener,
+            field,
+            weights,
+            roots,
+            sounds,
+            recent = recent.Select(r => r.Body).ToList(),
+        };
+    }
+
+    /// <summary>Mirrors the engine's LinearDistanceClamped attenuation for loudness estimates.</summary>
+    private static float AttenuationGain(float distance, float rolloff, float reference, float maxDistance)
+    {
+        if (maxDistance - reference <= 0f)
+            return 1f;
+
+        var d = Math.Clamp(distance, reference, maxDistance);
+        return MathF.Max(0f, 1f - rolloff * (d - reference) / (maxDistance - reference));
+    }
+
+    private static float[] Pair(Vector2 v)
+    {
+        return new[] { v.X, v.Y };
     }
 
     /// <summary>Current overlay display mode.</summary>
@@ -696,10 +1035,16 @@ public sealed class PathSoundSystem : EntitySystem
             if (!Exists(uid) || entry.LastCall < cutoff)
                 _smoothed.TryRemove(uid, out _);
         }
+
+        foreach (var (uid, entry) in _debug)
+        {
+            if (!Exists(uid))
+                _debug.TryRemove(uid, out _);
+        }
     }
 
     /// <summary>Computes the blended occlusion from the four fields for a sound at the given world position, interpolated across the receiver's tile corners.</summary>
-    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, out bool detoured, bool clampToField = false)
+    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, out bool detoured, bool clampToField = false, List<RootBreak>? breakdown = null)
     {
         occlusion = 0f;
         dbgSumW = 0f;
@@ -767,14 +1112,23 @@ public sealed class PathSoundSystem : EntitySystem
             var offsetY = srcTile.Y - baseTile.Y - rootDy;
 
             if (offsetX < -radius || offsetX > radius || offsetY < -radius || offsetY > radius)
+            {
+                breakdown?.Add(new RootBreak(root, rootWeight, 0f, 0, 0, 0f, 0, 0, 0f, 0f, 0f, true));
                 continue;
+            }
 
             if (!_map.TryGetTile(grid, srcTile, out _))
+            {
+                breakdown?.Add(new RootBreak(root, rootWeight, 0f, 0, 0, 0f, 0, 0, 0f, 0f, 0f, true));
                 continue;
+            }
 
             var idx = root * size * size + (offsetX + radius) + size * (offsetY + radius);
             if (float.IsPositiveInfinity(live.Dist[idx]))
+            {
+                breakdown?.Add(new RootBreak(root, rootWeight, 0f, 0, 0, 0f, 0, 0, 0f, 0f, 0f, true));
                 continue;
+            }
 
             // A blocker belongs to the path a sound crosses, not to the tile it is born on: the source tile's
             // own weight never muffles that sound, while every blocker the route crosses still does.
@@ -790,6 +1144,8 @@ public sealed class PathSoundSystem : EntitySystem
             var occlR2 = 0f;
             var pastR2 = 0;
             var hopsR2 = 0;
+            var f2 = 0f;
+            var f1 = occlR1 * kOccl + (hopsR1 + pastR1) * kLoss + MathF.Max(0f, dTiles - hopsR1) * kLoss;
 
             if (_detourWeight > 0f && live.DetourValid && !float.IsPositiveInfinity(live.Dist2[idx]))
             {
@@ -801,12 +1157,13 @@ public sealed class PathSoundSystem : EntitySystem
                 // Blend only when the detour is strictly better over the full folded value AND takes at
                 // least a few extra hops: clean corridors (both paths equally clean), sealed rooms (no
                 // detour) and short bypasses through neighboring open doors never lift a closed blocker.
-                var f1 = occlR1 * kOccl + (hopsR1 + pastR1) * kLoss + MathF.Max(0f, dTiles - hopsR1) * kLoss;
-                var f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
+                f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
                 if (f2 < f1 - 1e-3f
                     && hopsR2 + pastR2 - (hopsR1 + pastR1) >= MinDetourExtraHops)
                     share = DetourShare;
             }
+
+            breakdown?.Add(new RootBreak(root, rootWeight, occlR1, hopsR1, pastR1, occlR2, hopsR2, pastR2, share, f1, f2, false));
 
             totalWeight += rootWeight;
             if (share > 0f)
@@ -881,6 +1238,14 @@ public sealed class PathSoundSystem : EntitySystem
         if (MathF.Sqrt(distance * distance + zOffset * zOffset) > component.MaxDistance)
         {
             component.Gain = 0f;
+
+            // Record the clip so markers and snapshots see the engine mute instead of a stale model value.
+            var clipTick = Interlocked.Increment(ref _tickCounter);
+            var prev = _debug.TryGetValue(entity, out var prevEntry) ? prevEntry : default;
+            _debug[entity] = new DebugEntry(prev.SumWeight, prev.PathLen, prev.Occlusion, prev.Smoothed, prev.Past, prev.Detoured,
+                prev.Raw, distance, component.MaxDistance, component.Params.Volume, component.RolloffFactor, component.ReferenceDistance,
+                PathSoundModelMode.MaxDistanceClip, component.FileName, clipTick);
+            PushRing(clipTick, entity, prev.Raw, prev.Smoothed, distance, component.MaxDistance, PathSoundModelMode.MaxDistanceClip);
             return;
         }
 
@@ -897,7 +1262,7 @@ public sealed class PathSoundSystem : EntitySystem
         }
         else
         {
-            component.Occlusion = GetPathOcclusion(entity, xform, listener, delta, distance);
+            component.Occlusion = GetPathOcclusion(entity, component, xform, listener, delta, distance);
         }
 
         component.Position = worldPos;
@@ -910,7 +1275,7 @@ public sealed class PathSoundSystem : EntitySystem
     }
 
     /// <summary>Computes the filter occlusion carrying the whole model: path muffling, blocker loudness loss and the distance fade, all folded into occlusion units.</summary>
-    private float GetPathOcclusion(EntityUid entity, TransformComponent xform, MapCoordinates listener, Vector2 delta, float distance)
+    private float GetPathOcclusion(EntityUid entity, AudioComponent component, TransformComponent xform, MapCoordinates listener, Vector2 delta, float distance)
     {
         var sourcePos = listener.Position + delta;
         var crossGrid = xform.GridUid != _fieldGrid;
@@ -964,7 +1329,10 @@ public sealed class PathSoundSystem : EntitySystem
             new SmoothEntry(occlValue, tick),
             (_, old) => new SmoothEntry(old.Occl + (occlValue - old.Occl) * _smoothing, tick)).Occl;
 
-        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past, detoured);
+        var mode = modelled ? (clamped ? PathSoundModelMode.ClampedField : PathSoundModelMode.Field) : PathSoundModelMode.Raycast;
+        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past, detoured, occlValue, distance, component.MaxDistance,
+            component.Params.Volume, component.RolloffFactor, component.ReferenceDistance, mode, component.FileName, tick);
+        PushRing(tick, entity, occlValue, smoothed, distance, component.MaxDistance, mode);
         return MathF.Min(smoothed, 400f);
     }
 
