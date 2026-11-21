@@ -780,30 +780,6 @@ public sealed class PathSoundSystem : EntitySystem
         return MathF.Max(0f, 1f - rolloff * (d - reference) / (maxDistance - reference));
     }
 
-    /// <summary>Largest field sum among the downhill neighbors of a tile — what the field's route paid before entering it; −1 when the tile is a seed.</summary>
-    private float PredEntrySumW(FieldBuffers live, int idx, int offsetX, int offsetY, int radius, int size, float[] dist, float[] sumW)
-    {
-        var best = -1f;
-        var baseIdx = idx - (offsetX + radius) - size * (offsetY + radius);
-
-        for (var dir = 0; dir < 4; dir++)
-        {
-            var nx = offsetX + (dir == 0 ? 1 : dir == 1 ? -1 : 0);
-            var ny = offsetY + (dir == 2 ? 1 : dir == 3 ? -1 : 0);
-            if (nx < -radius || nx > radius || ny < -radius || ny > radius)
-                continue;
-
-            var nIdx = baseIdx + (nx + radius) + size * (ny + radius);
-            if (float.IsPositiveInfinity(dist[nIdx]) || dist[nIdx] >= dist[idx])
-                continue;
-
-            if (sumW[nIdx] > best)
-                best = sumW[nIdx];
-        }
-
-        return best;
-    }
-
     /// <summary>Current overlay display mode.</summary>
     public PathSoundOverlayMode OverlayMode
     {
@@ -1383,26 +1359,15 @@ public sealed class PathSoundSystem : EntitySystem
             }
 
             // A blocker belongs to the path a sound crosses, not to the tile it is born on: the source tile's
-            // own field price never muffles that sound. That price is recovered from the richest downhill
-            // neighbor — the field's own entry into this tile — instead of the live world weight: a door-state
-            // flip can leave the field one frame behind the world, and subtracting the live weight then leaks
-            // the tile's stale field price into the blend as a loudness spike on the door's own sound.
-            float occlR1;
-            int pastR1;
+            // own field price never muffles that sound. That price comes from the field's window — not from
+            // the live world, which a door-state flip can leave one frame ahead of the field (subtracting the
+            // live weight then leaks the tile's stale field price as a loudness spike on the door's own sound)
+            // — and not from a downhill neighbor, which in an airlock bank picks the most-blocked neighbor and
+            // muffles the door's own sound with a door the route never crosses.
+            var srcWeight = MathF.Max(0f, live.Window[WeightIndex(srcTile, baseTile, radius)]);
+            var occlR1 = MathF.Max(0f, live.SumW[idx] - srcWeight - _occlDecay * live.Past[idx]);
+            var pastR1 = live.SumW[idx] > 0f ? live.Past[idx] : 0;
             var hopsR1 = live.Hops[idx];
-            if (srcIsSeed)
-            {
-                occlR1 = 0f;
-                pastR1 = 0;
-            }
-            else
-            {
-                var predW1 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist, live.SumW);
-                if (predW1 < 0f)
-                    predW1 = live.SumW[idx];
-                occlR1 = MathF.Max(0f, predW1 - _occlDecay * live.Past[idx]);
-                pastR1 = live.SumW[idx] > 0f ? live.Past[idx] : 0;
-            }
 
             var share = 0f;
             var occlR2 = 0f;
@@ -1413,19 +1378,8 @@ public sealed class PathSoundSystem : EntitySystem
 
             if (_detourWeight > 0f && live.DetourValid && !float.IsPositiveInfinity(live.Dist2[idx]))
             {
-                if (srcIsSeed)
-                {
-                    occlR2 = 0f;
-                    pastR2 = 0;
-                }
-                else
-                {
-                    var predW2 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist2, live.SumW2);
-                    if (predW2 < 0f)
-                        predW2 = live.SumW2[idx];
-                    occlR2 = MathF.Max(0f, predW2 - _occlDecay * live.Past2[idx]);
-                    pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
-                }
+                occlR2 = MathF.Max(0f, live.SumW2[idx] - srcWeight - _occlDecay * live.Past2[idx]);
+                pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
                 hopsR2 = live.Hops2[idx];
 
                 // Blend only when the detour is strictly better over the full folded value AND takes at

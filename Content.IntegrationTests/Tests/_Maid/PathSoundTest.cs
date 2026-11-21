@@ -151,6 +151,122 @@ public sealed class PathSoundTest
             1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
     }
 
+    /// <summary>A sound born on an airlock tile inside a bank must stay audible: its own tile is exempt and the bank neighbors are not on the direct corridor route. The PredEntrySumW regression leaked a neighbor's muffle here and pushed the filter past 30.</summary>
+    [Test]
+    public async Task BankOwnSoundStaysAudible()
+    {
+        var scene = await SetupBankScene();
+        await using var pair = scene.Pair;
+
+        await AssertFilterBelow(scene, 3, 1, 12f, "bank own sound at (3,1)");
+        await AssertFilterBelow(scene, 5, 1, 15f, "bank own sound at (5,1)");
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>Bank scene: the north wall row carries a glass-airlock bank at x=2..5 instead of walls; the listener starts mid-corridor south of the bank.</summary>
+    private static async Task<Scene> SetupBankScene()
+    {
+        var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        var server = pair.Server;
+        var client = pair.Client;
+        var cSys = client.System<PathSoundSystem>();
+
+        var map = await pair.CreateTestMap();
+
+        EntityUid player = default;
+        await server.WaitPost(() =>
+        {
+            var sEntMan = server.EntMan;
+            var sPlayers = server.ResolveDependency<Robust.Server.Player.IPlayerManager>();
+            player = sPlayers.Sessions.Single().AttachedEntity!.Value;
+            sEntMan.GetComponent<TransformComponent>(player).Coordinates = new EntityCoordinates(map.Grid, 0.5f, 0.5f);
+        });
+
+        var cPlayerEarly = pair.ToClientUid(player);
+        await client.WaitPost(() =>
+        {
+            client.EntMan.GetComponent<TransformComponent>(cPlayerEarly).Coordinates = new EntityCoordinates(map.CGridUid, 0.5f, 0.5f);
+        });
+
+        var doors = new Dictionary<int, EntityUid>();
+        await server.WaitPost(() =>
+        {
+            var maps = server.System<SharedMapSystem>();
+            var tiles = server.ResolveDependency<ITileDefinitionManager>();
+            var plating = new Tile(tiles["Plating"].TileId);
+            var grid = map.Grid;
+
+            for (var x = -1; x <= 16; x++)
+            {
+                for (var y = -1; y <= 1; y++)
+                    maps.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), plating);
+
+                // South wall row is solid; the north row carries a gap at x=2..5 filled by the bank.
+                server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, x + 0.5f, -0.5f));
+                if (x < 2 || x > 5)
+                    server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, x + 0.5f, 1.5f));
+            }
+
+            for (var x = 2; x <= 5; x++)
+                doors[x] = server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(grid, x + 0.5f, 1.5f));
+        });
+
+        await pair.RunTicksSync(30);
+
+        MapCoordinates listener = default;
+        var cPlayer = pair.ToClientUid(player);
+        await client.WaitAssertion(() =>
+        {
+            var xform = client.EntMan.GetComponent<TransformComponent>(cPlayer);
+            var transform = client.System<SharedTransformSystem>();
+            listener = xform.Coordinates.ToMap(client.EntMan, transform);
+        });
+
+        for (var i = 0; i < 120; i++)
+        {
+            var ok = false;
+            await client.WaitAssertion(() =>
+            {
+                var xform = client.EntMan.GetComponent<TransformComponent>(cPlayer);
+                var local = xform.Coordinates.Position;
+                ok = cSys.FieldReady
+                    && cSys.FieldSeed == new Vector2i(0, 0)
+                    && MathF.Abs(local.X - 0.5f) < 0.1f
+                    && MathF.Abs(local.Y - 0.5f) < 0.1f;
+            });
+
+            if (ok)
+                break;
+
+            await pair.RunTicksSync(5);
+        }
+
+        await client.WaitAssertion(() =>
+        {
+            Assert.That(cSys.FieldSeed, Is.EqualTo(new Vector2i(0, 0)),
+                $"client field was built around a stale player position: {cSys.FieldSeed}");
+            Assert.That(cSys.FieldReady, Is.True, "client field was never built");
+        });
+
+        return new Scene(pair, server, client, cSys, player, listener, map.Grid, doors,
+            1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
+    }
+
+    /// <summary>Asserts the folded filter of a source at (dx, dy) tiles from the listener stays under the cap, dumping the value on failure.</summary>
+    private static async Task AssertFilterBelow(Scene scene, int dx, int dy, float maxFilter, string message)
+    {
+        var sourcePos = scene.Listener.Position + new Vector2(dx * scene.TileSize, dy * scene.TileSize);
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out _, out _, out _, out var filter),
+                Is.True, $"{message}: field read failed");
+
+            Assert.That(filter, Is.LessThan(maxFilter),
+                $"{message}: filter {filter:0.00} must stay under {maxFilter:0.0}");
+        });
+    }
+
     /// <summary>Spawns a blocker on the corridor tile and stores it for door-state driving.</summary>
     private static async Task Place(Scene scene, int x, string proto)
     {
