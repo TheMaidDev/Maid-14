@@ -143,6 +143,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Live field arrays of the current build; background rebuilds fill a scratch bundle that is copied over.</summary>
     private FieldBuffers _live = null!;
 
+    /// <summary>Fresh tile weights land here first; the live window only adopts them when the matching field swaps in.</summary>
+    private float[] _stagingWindow = new float[0];
+
     /// <summary>Scratch bundles for background builds; two cover one draining build plus one in flight.</summary>
     private readonly FieldBuffers[] _scratch = new FieldBuffers[2];
 
@@ -1592,6 +1595,7 @@ public sealed class PathSoundSystem : EntitySystem
         var window = (radius * 2 + 3) * (radius * 2 + 3);
 
         _live = new FieldBuffers(fieldCount, count * 4, window);
+        _stagingWindow = new float[window];
         for (var i = 0; i < _scratch.Length; i++)
             _scratch[i] = new FieldBuffers(fieldCount, count * 4, window);
 
@@ -1617,6 +1621,7 @@ public sealed class PathSoundSystem : EntitySystem
 
         DropPendingBuilds();
         RefreshTileWeights(gridUid, grid, baseTile);
+        Array.Copy(_stagingWindow, _live.Window, _stagingWindow.Length);
 
         for (var root = 0; root < RootCount; root++)
         {
@@ -1696,12 +1701,12 @@ public sealed class PathSoundSystem : EntitySystem
                     else
                         weight = ComputeTileWeight(gridUid, grid, tile);
 
-                    _tileWeightCache[tile] = weight;
-                }
-
-                _live.Window[(gx + radius + 1) + w * (gy + radius + 1)] = weight;
+                _tileWeightCache[tile] = weight;
             }
+
+            _stagingWindow[(gx + radius + 1) + w * (gy + radius + 1)] = weight;
         }
+    }
     }
 
     /// <summary>Posts a background field build into a free scratch buffer; the worker only touches arrays.</summary>
@@ -1727,7 +1732,7 @@ public sealed class PathSoundSystem : EntitySystem
         target.Ready = false;
         target.BaseTile = baseTile;
         target.Time = _timing.CurTime;
-        Array.Copy(_live.Window, target.Window, _live.Window.Length);
+        Array.Copy(_stagingWindow, target.Window, _stagingWindow.Length);
         _pendingBuild = target;
         _buildInFlight = true;
 
@@ -1756,6 +1761,7 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Adopts a finished background build into the live buffers.</summary>
     private void SwapBuild(FieldBuffers pending)
     {
+        Array.Copy(pending.Window, _live.Window, pending.Window.Length);
         Array.Copy(pending.Dist, _live.Dist, pending.Dist.Length);
         Array.Copy(pending.SumW, _live.SumW, pending.SumW.Length);
         Array.Copy(pending.Hops, _live.Hops, pending.Hops.Length);
