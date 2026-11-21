@@ -112,7 +112,7 @@ public sealed class MaidCVars
     /// How strongly detour routes prefer clean tiles over short ones: blocker occlusion is scaled by this on the detour pass; 0 disables detours.
     /// </summary>
     public static readonly CVarDef<float> SoundPathDetourWeight =
-        CVarDef.Create("maidsound.path_detour_weight", 6f, CVar.CLIENTONLY | CVar.ARCHIVE);
+        CVarDef.Create("maidsound.path_detour_weight", 12f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     #endregion
 
