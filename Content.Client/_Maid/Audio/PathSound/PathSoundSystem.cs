@@ -60,8 +60,14 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Gain share of the detour path when its folded value is strictly better.</summary>
     private const float DetourShare = 0.15f;
 
+    /// <summary>Gain share of a blocker-free detour: the sound's dominant path physically goes around the wall, not through it.</summary>
+    private const float PureDetourShare = 0.7f;
+
     /// <summary>Extra hops a detour must take past the direct route before it may lift a blocker's muffle; short bypasses never defeat closed doors.</summary>
     private const int MinDetourExtraHops = 4;
+
+    /// <summary>Residual weight of an open door's tile: marks the tile as a doorway so detour purity can tell an around-the-wall bypass from one crossing open doors.</summary>
+    private const float OpenDoorTileWeight = 0.005f;
 
     /// <summary>Minimum field radius in tiles.</summary>
     private const int MinRadius = 4;
@@ -1331,7 +1337,7 @@ public sealed class PathSoundSystem : EntitySystem
             // that blocker and would report routes through it for free — such a root only speaks for a
             // sound born on its own seed tile.
             var seedTile = new Vector2i(baseTile.X + rootDx, baseTile.Y + rootDy);
-            var seedBlocked = live.Window[WeightIndex(seedTile, baseTile, radius)] > 0f;
+            var seedBlocked = live.Window[WeightIndex(seedTile, baseTile, radius)] > OpenDoorTileWeight;
             var srcIsSeed = srcTile == seedTile;
             if (seedBlocked && !srcIsSeed)
             {
@@ -1388,12 +1394,16 @@ public sealed class PathSoundSystem : EntitySystem
                 // Blend only when the detour is strictly better over the full folded value AND takes at
                 // least a few extra hops: clean corridors (both paths equally clean), sealed rooms (no
                 // detour) and short bypasses through neighboring open doors never lift a closed blocker.
-                // A door's own sound is the exception: its primary route crosses its wall row's other
-                // doors, so the clean bypass takes the whole root instead of a share.
+                // Two exceptions: a door's own sound takes its best route outright (the primary crosses
+                // its wall row's other doors), and a detour crossing no door tile at all — around a
+                // wall row's open end — carries the sound's dominant path and takes the big share.
                 f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
+                var pure = live.SumW2[idx] - srcWeight <= OpenDoorTileWeight * 0.5f;
+                var requiredExtra = doorSource ? 1 : (pure ? 1 : MinDetourExtraHops);
+                var detourShare = doorSource ? 1f : (pure ? PureDetourShare : DetourShare);
                 if (f2 < f1 - 1e-3f
-                    && hopsR2 + pastR2 - (hopsR1 + pastR1) >= (doorSource ? 1 : MinDetourExtraHops))
-                    share = doorSource ? 1f : DetourShare;
+                    && hopsR2 + pastR2 - (hopsR1 + pastR1) >= requiredExtra)
+                    share = detourShare;
             }
 
             breakdown?.Add(new RootBreak(root, rootWeight, occlR1, hopsR1, pastR1, occlR2, hopsR2, pastR2, share, f1, f2, false));
@@ -1932,7 +1942,7 @@ public sealed class PathSoundSystem : EntitySystem
     {
         foreach (var weight in buffers.Window)
         {
-            if (weight > 0f)
+            if (weight > OpenDoorTileWeight)
                 return true;
         }
 
@@ -2000,17 +2010,21 @@ public sealed class PathSoundSystem : EntitySystem
             return 0f;
 
         var best = 0f;
+        var hasDoor = false;
         var anchored = _map.GetAnchoredEntitiesEnumerator(gridUid, grid, tile);
         while (anchored.MoveNext(out var ent))
         {
             float occl;
 
             var blocked = TryComp(ent.Value, out PhysicsComponent? phys) && phys.CanCollide;
-            if (!blocked && _doorQuery.TryGetComponent(ent.Value, out var door)
-                && door.State == DoorState.Closing)
+            if (!blocked && _doorQuery.TryGetComponent(ent.Value, out var door))
             {
-                // A closing door blocks its tile from the start of its animation, before its collision flips back on.
-                blocked = true;
+                hasDoor = true;
+                if (door.State == DoorState.Closing)
+                {
+                    // A closing door blocks its tile from the start of its animation, before its collision flips back on.
+                    blocked = true;
+                }
             }
 
             if (!blocked)
@@ -2054,7 +2068,10 @@ public sealed class PathSoundSystem : EntitySystem
                 best = occl;
         }
 
-        return best;
+        if (best > 0f)
+            return best;
+
+        return hasDoor ? OpenDoorTileWeight : 0f;
     }
 
     /// <summary>Converts a muffling percent to occlusion units: 90 -> ~2.3 (a tenth of highs passes).</summary>
