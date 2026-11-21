@@ -52,67 +52,67 @@ public sealed class MaidCVars
     /// Whether tile-based sound path muffling is enabled.
     /// </summary>
     public static readonly CVarDef<bool> SoundPathEnabled =
-        CVarDef.Create("maidsound.path_enabled", true, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_enabled", true, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Maximum radius in tiles to search sound paths in.
     /// </summary>
     public static readonly CVarDef<int> SoundPathRadius =
-        CVarDef.Create("maidsound.path_radius", 25, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_radius", 25, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Occlusion added per unit of sound path weight.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionPerWeight =
-        CVarDef.Create("maidsound.path_occlusion_per_weight", 15f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_occlusion_per_weight", 15f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Volume loss in decibels per tile of sound path length.
     /// </summary>
     public static readonly CVarDef<float> SoundPathLossDbPerTile =
-        CVarDef.Create("maidsound.path_loss_db_per_tile", 1.5f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_loss_db_per_tile", 1.5f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Volume loss in decibels per unit of sound path occlusion.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionLossDb =
-        CVarDef.Create("maidsound.path_occlusion_loss_db", 15f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_occlusion_loss_db", 15f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Occlusion faded per tile of sound path past the last blocker.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionDecayPerTile =
-        CVarDef.Create("maidsound.path_occlusion_decay_per_tile", 0.3f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_occlusion_decay_per_tile", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Sound path weight of opaque tiles.
     /// </summary>
     public static readonly CVarDef<float> SoundPathWeightOpaque =
-        CVarDef.Create("maidsound.weight_opaque", 8f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.weight_opaque", 8f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Sound path weight of glass.
     /// </summary>
     public static readonly CVarDef<float> SoundPathWeightGlass =
-        CVarDef.Create("maidsound.weight_glass", 0.3f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.weight_glass", 0.3f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Lifetime in seconds of cached sound paths.
     /// </summary>
     public static readonly CVarDef<float> SoundPathCacheTtl =
-        CVarDef.Create("maidsound.path_cache_ttl", 2f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_cache_ttl", 2f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// Fraction of the gap between current and target filter value closed per audio tick at 30 TPS; 1 disables smoothing.
     /// </summary>
     public static readonly CVarDef<float> SoundPathSmoothing =
-        CVarDef.Create("maidsound.path_smoothing", 0.15f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_smoothing", 0.15f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
     /// How strongly detour routes prefer clean tiles over short ones: blocker occlusion is scaled by this on the detour pass; 0 disables detours.
     /// </summary>
     public static readonly CVarDef<float> SoundPathDetourWeight =
-        CVarDef.Create("maidsound.path_detour_weight", 6f, CVar.CLIENTONLY);
+        CVarDef.Create("maidsound.path_detour_weight", 6f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     #endregion
 
