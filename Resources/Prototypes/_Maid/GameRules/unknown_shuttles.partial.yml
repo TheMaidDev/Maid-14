@@ -1,0 +1,9 @@
+- type: !PartialOnly entity
+  id: UnknownShuttleSyndieEvacPod
+  components:
+  - type: BlockCentcommFTL
+
+- type: !PartialOnly entity
+  id: UnknownShuttleInstigator
+  components:
+  - type: BlockCentcommFTL

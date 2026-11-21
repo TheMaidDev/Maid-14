@@ -20,6 +20,11 @@ public sealed partial class FTLDestinationComponent : Component
     [ViewVariables(VVAccess.ReadWrite), DataField, AutoNetworkedField]
     public EntityWhitelist? Whitelist;
 
+    // MAID BEGIN ftl-centcomm
+    [DataField, AutoNetworkedField]
+    public EntityWhitelist? Blacklist;
+    // MAID END ftl-centcomm
+
     /// <summary>
     /// Is this destination visible but available to be warped to?
     /// </summary>

@@ -51,6 +51,7 @@ public static partial class PoolManager
         (CCVars.InteractionRateLimitPeriod.Name, "0.1"),
         (CCVars.MovementMobPushing.Name, "false"),
         (CCVars.LavalandEnabled.Name, "false"), // Lavaland Change
+        (CCVars.SpaceWind.Name, "false"), // MAID space-wind: у нас space_wind=true по умолчанию, в тестах отключаем
     };
 
     public static async Task SetupCVars(RobustIntegrationTest.IntegrationInstance instance, PoolSettings settings)

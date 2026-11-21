@@ -1,0 +1,5 @@
+- type: !PartialOnly entity
+  id: SalvageMagnet
+  components:
+  - type: SalvageMagnetData
+    offerCount: 1

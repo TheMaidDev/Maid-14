@@ -37,6 +37,7 @@ using Content.Server.Atmos.Components;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Humanoid;
+using Content.Shared.Mobs.Components; // MAID space-wind
 using Content.Shared.Physics;
 using Robust.Shared.Audio;
 using Robust.Shared.Map;
@@ -265,6 +266,8 @@ namespace Content.Server.Atmos.EntitySystems
             if (!Resolve(uid, ref xform))
                 return;
 
+            // MAID BEGIN space-wind
+            /*
             if (physics.BodyType != BodyType.Static
                 && !float.IsPositiveInfinity(component.MoveResist))
             {
@@ -291,6 +294,61 @@ namespace Content.Server.Atmos.EntitySystems
                     component.LastHighPressureMovementAirCycle = cycle;
                 }
             }
+            */
+            // MAID space-wind: линейная шкала по документации CVar
+            var maxForce = pressureDifference * 2.25f;
+            var moveProb = 100f;
+
+            if (component.PressureResistance > 0)
+            {
+                moveProb = MathF.Abs(pressureDifference / component.PressureResistance * MovedByPressureComponent.ProbabilityBasePercent
+                                     - MovedByPressureComponent.ProbabilityOffset);
+            }
+
+            var canMove = physics.BodyType == BodyType.Static
+                ? maxForce >= component.MoveResist * MovedByPressureComponent.MoveForceForcePushRatio
+                : moveProb > MovedByPressureComponent.ProbabilityOffset
+                  && _random.Prob(MathF.Min(moveProb / 100f, 1f))
+                  && !float.IsPositiveInfinity(component.MoveResist)
+                  && maxForce >= component.MoveResist * MovedByPressureComponent.MoveForcePushRatio;
+
+            if (!canMove)
+                return;
+
+            // MAID space-wind: регистрируем InAir только если импульс реально будет применён,
+            // иначе повторное давление будет бесконечно сбрасывать таймаут без движения
+            if (maxForce <= MovedByPressureComponent.ThrowForce)
+                return;
+
+            if (HasComp<MobStateComponent>(uid))
+                AddMobMovedByPressure(uid, component, physics);
+
+            var moveForce = maxForce / (throwTarget != EntityCoordinates.Invalid
+                ? SpaceWindPressureForceDivisorThrow
+                : SpaceWindPressureForceDivisorPush);
+            moveForce *= MathHelper.Clamp(moveProb, 0, 100);
+            moveForce = MathF.Min(moveForce, SpaceWindMaxVelocity * physics.Mass);
+
+            var dirVec = (direction.ToAngle() + gridWorldRotation).ToWorldVec();
+
+            if (throwTarget != EntityCoordinates.Invalid)
+            {
+                var targetDir = _transformSystem.ToMapCoordinates(throwTarget).Position - _transformSystem.GetWorldPosition(xform);
+                var pos = targetDir.LengthSquared() > 0.0001f ? targetDir.Normalized() + dirVec : dirVec;
+
+                if (pos.LengthSquared() < 0.0001f)
+                    pos = dirVec;
+
+                _physics.ApplyLinearImpulse(uid, pos.Normalized() * moveForce, body: physics);
+            }
+            else
+            {
+                moveForce = MathF.Min(moveForce, SpaceWindMaxPushForce);
+                _physics.ApplyLinearImpulse(uid, dirVec * moveForce, body: physics);
+            }
+
+            component.LastHighPressureMovementAirCycle = cycle;
+            // MAID END space-wind
         }
     }
 }

@@ -350,6 +350,10 @@ public sealed partial class SupermatterComponent : Component
 
     public bool DelamAnnounced = false;
 
+    // MAID sm-delam: тип деламинации фиксируется при старте отсчёта, чтобы анонс и алерт совпадали с исходом
+    [ViewVariables(VVAccess.ReadOnly)]
+    public SharedSupermatterSystem.DelamType DelamType = SharedSupermatterSystem.DelamType.Explosion;
+
     /// <summary>
     /// The point at which we delamm
     /// </summary>

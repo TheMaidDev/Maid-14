@@ -99,6 +99,8 @@
       baseWeight: 10
     - id: GiftsVendingRestock
       baseWeight: 10
+    - id: AdaptiveImmovableRodSpawn
+      baseWeight: 2
     - id: AdaptiveIonStorm
       baseWeight: 10
     - id: AdaptiveKingRatMigration
