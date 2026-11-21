@@ -1348,6 +1348,18 @@ public sealed class PathSoundSystem : EntitySystem
             if (rootWeight <= 0f)
                 continue;
 
+            // A root seeded on a blocker tile (a listener corner hugging a wall or airlock) starts past
+            // that blocker and would report routes through it for free — such a root only speaks for a
+            // sound born on its own seed tile.
+            var seedTile = new Vector2i(baseTile.X + rootDx, baseTile.Y + rootDy);
+            var seedBlocked = live.Window[WeightIndex(seedTile, baseTile, radius)] > 0f;
+            var srcIsSeed = srcTile == seedTile;
+            if (seedBlocked && !srcIsSeed)
+            {
+                breakdown?.Add(new RootBreak(root, rootWeight, 0f, 0, 0, 0f, 0, 0, 0f, 0f, 0f, true));
+                continue;
+            }
+
             var offsetX = srcTile.X - baseTile.X - rootDx;
             var offsetY = srcTile.Y - baseTile.Y - rootDy;
 
@@ -1375,12 +1387,22 @@ public sealed class PathSoundSystem : EntitySystem
             // neighbor — the field's own entry into this tile — instead of the live world weight: a door-state
             // flip can leave the field one frame behind the world, and subtracting the live weight then leaks
             // the tile's stale field price into the blend as a loudness spike on the door's own sound.
-            var predW1 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist, live.SumW);
-            if (predW1 < 0f)
-                predW1 = live.SumW[idx];
-            var occlR1 = MathF.Max(0f, predW1 - _occlDecay * live.Past[idx]);
-            var pastR1 = live.SumW[idx] > 0f ? live.Past[idx] : 0;
+            float occlR1;
+            int pastR1;
             var hopsR1 = live.Hops[idx];
+            if (srcIsSeed)
+            {
+                occlR1 = 0f;
+                pastR1 = 0;
+            }
+            else
+            {
+                var predW1 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist, live.SumW);
+                if (predW1 < 0f)
+                    predW1 = live.SumW[idx];
+                occlR1 = MathF.Max(0f, predW1 - _occlDecay * live.Past[idx]);
+                pastR1 = live.SumW[idx] > 0f ? live.Past[idx] : 0;
+            }
 
             var share = 0f;
             var occlR2 = 0f;
@@ -1391,11 +1413,19 @@ public sealed class PathSoundSystem : EntitySystem
 
             if (_detourWeight > 0f && live.DetourValid && !float.IsPositiveInfinity(live.Dist2[idx]))
             {
-                var predW2 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist2, live.SumW2);
-                if (predW2 < 0f)
-                    predW2 = live.SumW2[idx];
-                occlR2 = MathF.Max(0f, predW2 - _occlDecay * live.Past2[idx]);
-                pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
+                if (srcIsSeed)
+                {
+                    occlR2 = 0f;
+                    pastR2 = 0;
+                }
+                else
+                {
+                    var predW2 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist2, live.SumW2);
+                    if (predW2 < 0f)
+                        predW2 = live.SumW2[idx];
+                    occlR2 = MathF.Max(0f, predW2 - _occlDecay * live.Past2[idx]);
+                    pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
+                }
                 hopsR2 = live.Hops2[idx];
 
                 // Blend only when the detour is strictly better over the full folded value AND takes at
