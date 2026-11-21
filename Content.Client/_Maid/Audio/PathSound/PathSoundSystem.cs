@@ -530,8 +530,8 @@ public sealed class PathSoundSystem : EntitySystem
             var haveBreaks = false;
             if (haveListener && !global && _fieldGrid != null)
             {
-                haveBreaks = TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks)
-                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks);
+                haveBreaks = TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks, doorSource: _doorQuery.HasComp(uid))
+                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks, _doorQuery.HasComp(uid));
             }
 
             if (haveBreaks)
@@ -1263,7 +1263,7 @@ public sealed class PathSoundSystem : EntitySystem
     }
 
     /// <summary>Computes the blended occlusion from the four fields for a sound at the given world position, interpolated across the receiver's tile corners.</summary>
-    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, out bool detoured, bool clampToField = false, List<RootBreak>? breakdown = null)
+    private bool TryGetAudio(MapCoordinates listener, Vector2 sourcePos, out float occlusion, out float dbgSumW, out float dbgHops, out float dbgPast, out bool detoured, bool clampToField = false, List<RootBreak>? breakdown = null, bool doorSource = false)
     {
         occlusion = 0f;
         dbgSumW = 0f;
@@ -1388,10 +1388,12 @@ public sealed class PathSoundSystem : EntitySystem
                 // Blend only when the detour is strictly better over the full folded value AND takes at
                 // least a few extra hops: clean corridors (both paths equally clean), sealed rooms (no
                 // detour) and short bypasses through neighboring open doors never lift a closed blocker.
+                // A door's own sound is the exception: its primary route crosses its wall row's other
+                // doors, so the clean bypass takes the whole root instead of a share.
                 f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
                 if (f2 < f1 - 1e-3f
-                    && hopsR2 + pastR2 - (hopsR1 + pastR1) >= MinDetourExtraHops)
-                    share = DetourShare;
+                    && hopsR2 + pastR2 - (hopsR1 + pastR1) >= (doorSource ? 1 : MinDetourExtraHops))
+                    share = doorSource ? 1f : DetourShare;
             }
 
             breakdown?.Add(new RootBreak(root, rootWeight, occlR1, hopsR1, pastR1, occlR2, hopsR2, pastR2, share, f1, f2, false));
@@ -1525,8 +1527,9 @@ public sealed class PathSoundSystem : EntitySystem
         var modelled = false;
         var clamped = false;
         var detoured = false;
+        var doorSource = _doorQuery.HasComp(entity);
 
-        if (!crossGrid && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured))
+        if (!crossGrid && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured, false, null, doorSource))
         {
             modelled = true;
         }
@@ -1537,7 +1540,7 @@ public sealed class PathSoundSystem : EntitySystem
             if (_fieldGrid is { } edgeGrid && TryComp(edgeGrid, out MapGridComponent? edgeGridComp))
                 edgeDist = _fieldRadius * edgeGridComp.TileSize;
 
-            if (!crossGrid && distance > edgeDist && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured, true))
+            if (!crossGrid && distance > edgeDist && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured, true, null, doorSource))
             {
                 modelled = true;
                 clamped = true;
