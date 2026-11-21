@@ -780,18 +780,10 @@ public sealed class PathSoundSystem : EntitySystem
         return MathF.Max(0f, 1f - rolloff * (d - reference) / (maxDistance - reference));
     }
 
-    /// <summary>Route-length slack before a route counts as grossly distorted by a transient source-tile overprice.</summary>
-    private const float DirectEntrySlack = 4f;
-
-    /// <summary>Lets a sound enter its own tile from its best downhill neighbor: a transient overprice of that tile at a door-state flip must not send its route the long way around.</summary>
-    private void DirectEntry(FieldBuffers live, int idx, int offsetX, int offsetY, int radius, int size,
-        float[] dist, float[] sumW, int[] hops, int[] past,
-        float selfW, float kOccl, float kLoss, float dTiles, ref float occl, ref int len, ref int pastOut, ref float fold)
+    /// <summary>Largest field sum among the downhill neighbors of a tile — what the field's route paid before entering it; −1 when the tile is a seed.</summary>
+    private float PredEntrySumW(FieldBuffers live, int idx, int offsetX, int offsetY, int radius, int size, float[] dist, float[] sumW)
     {
-        if (len - dTiles <= DirectEntrySlack)
-            return;
-
-        var best = fold;
+        var best = -1f;
         var baseIdx = idx - (offsetX + radius) - size * (offsetY + radius);
 
         for (var dir = 0; dir < 4; dir++)
@@ -805,20 +797,11 @@ public sealed class PathSoundSystem : EntitySystem
             if (float.IsPositiveInfinity(dist[nIdx]) || dist[nIdx] >= dist[idx])
                 continue;
 
-            var candLen = hops[nIdx] + 1;
-            var candPast = selfW > 0f ? 0 : sumW[nIdx] > 0f ? past[nIdx] + 1 : 0;
-            var candOccl = MathF.Max(0f, sumW[nIdx] - _occlDecay * candPast);
-            var f = candOccl * kOccl + (candLen + candPast) * kLoss + MathF.Max(0f, dTiles - candLen) * kLoss;
-            if (f < best - 1e-3f)
-            {
-                best = f;
-                occl = candOccl;
-                len = candLen;
-                pastOut = candPast;
-            }
+            if (sumW[nIdx] > best)
+                best = sumW[nIdx];
         }
 
-        fold = best;
+        return best;
     }
 
     /// <summary>Current overlay display mode.</summary>
@@ -1388,13 +1371,15 @@ public sealed class PathSoundSystem : EntitySystem
             }
 
             // A blocker belongs to the path a sound crosses, not to the tile it is born on: the source tile's
-            // own weight never muffles that sound, while every blocker the route crosses still does.
-            var selfW = srcTile.X == srcBx && srcTile.Y == srcBy
-                ? ComputeTileWeight(gridUid, grid, srcTile)
-                : 0f;
-            var occlR1 = MathF.Max(0f, live.SumW[idx] - selfW);
+            // own field price never muffles that sound. That price is recovered from the richest downhill
+            // neighbor — the field's own entry into this tile — instead of the live world weight: a door-state
+            // flip can leave the field one frame behind the world, and subtracting the live weight then leaks
+            // the tile's stale field price into the blend as a loudness spike on the door's own sound.
+            var predW1 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist, live.SumW);
+            if (predW1 < 0f)
+                predW1 = live.SumW[idx];
+            var occlR1 = MathF.Max(0f, predW1 - _occlDecay * live.Past[idx]);
             var pastR1 = live.SumW[idx] > 0f ? live.Past[idx] : 0;
-            occlR1 = MathF.Max(0f, occlR1 - _occlDecay * pastR1);
             var hopsR1 = live.Hops[idx];
 
             var share = 0f;
@@ -1403,22 +1388,20 @@ public sealed class PathSoundSystem : EntitySystem
             var hopsR2 = 0;
             var f2 = 0f;
             var f1 = occlR1 * kOccl + (hopsR1 + pastR1) * kLoss + MathF.Max(0f, dTiles - hopsR1) * kLoss;
-            DirectEntry(live, idx, offsetX, offsetY, radius, size, live.Dist, live.SumW, live.Hops, live.Past,
-                selfW, kOccl, kLoss, dTiles, ref occlR1, ref hopsR1, ref pastR1, ref f1);
 
             if (_detourWeight > 0f && live.DetourValid && !float.IsPositiveInfinity(live.Dist2[idx]))
             {
-                occlR2 = MathF.Max(0f, live.SumW2[idx] - selfW);
+                var predW2 = PredEntrySumW(live, idx, offsetX, offsetY, radius, size, live.Dist2, live.SumW2);
+                if (predW2 < 0f)
+                    predW2 = live.SumW2[idx];
+                occlR2 = MathF.Max(0f, predW2 - _occlDecay * live.Past2[idx]);
                 pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
-                occlR2 = MathF.Max(0f, occlR2 - _occlDecay * pastR2);
                 hopsR2 = live.Hops2[idx];
 
                 // Blend only when the detour is strictly better over the full folded value AND takes at
                 // least a few extra hops: clean corridors (both paths equally clean), sealed rooms (no
                 // detour) and short bypasses through neighboring open doors never lift a closed blocker.
                 f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
-                DirectEntry(live, idx, offsetX, offsetY, radius, size, live.Dist2, live.SumW2, live.Hops2, live.Past2,
-                    selfW, kOccl, kLoss, dTiles, ref occlR2, ref hopsR2, ref pastR2, ref f2);
                 if (f2 < f1 - 1e-3f
                     && hopsR2 + pastR2 - (hopsR1 + pastR1) >= MinDetourExtraHops)
                     share = DetourShare;
