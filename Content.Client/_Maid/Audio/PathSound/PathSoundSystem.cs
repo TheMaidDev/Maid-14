@@ -1998,9 +1998,9 @@ public sealed class PathSoundSystem : EntitySystem
 
             var blocked = TryComp(ent.Value, out PhysicsComponent? phys) && phys.CanCollide;
             if (!blocked && _doorQuery.TryGetComponent(ent.Value, out var door)
-                && door.State is DoorState.Closing or DoorState.Opening)
+                && door.State == DoorState.Closing)
             {
-                // A door mid-animation still blocks its tile even before its collision flips.
+                // A closing door blocks its tile from the start of its animation, before its collision flips back on.
                 blocked = true;
             }
 
