@@ -12,7 +12,7 @@
 
 Фиксы/инструменты (коммит кода + коммит доков): маркеры с `v:` (базовая громкость) и красным `MD`; легенда с кавеатом «tiles/%/o:/f: = model only»; свип мёртвых записей `_debug`; ring 128 последних решений per-stream; **`soundpathsnap [label]`** — JSON в юзер-дату (`soundpath/snap-*.json`, абсолютный путь печатается): все квары (вкл. z_offset/raycast/master), listener, состояние поля, кеш весов тайлов, 4 корневых поля (только достижимые; детур null), КАЖДЫЙ живой AudioComponent (FileName, base/applied volume, gain, MaxDistance, rolloff, refDist, verdict клипа, зеркальный `engineGainEst` LinearDistanceClamped, `estLoudnessDb = base + 20log10(gain) − 0.8686·smoothed`), модельный вердикт, per-root breakdown (occl/hops/past обеих Дейкстр, share, f1/f2), маршруты, ring. Этим файлом декодируется любая «слышу/не слышу» ситуация без плейтеста.
 
-`EntityUid` в этом RT — поле `Id` (int), НЕ `Value`; `MathF.Clamp` не существует (Math.Clamp); System.Text.Json в клиентском контенте впервые — собралось и тесты прошли; если при загрузке клиента вдруг TypeCheckFailedException —sandbox не любитель STJ (не воспроизвелось), fallback = ручной StringBuilder-JSON.
+`EntityUid` в этом RT — поле `Id` (int), НЕ `Value`; `MathF.Clamp` не существует (Math.Clamp); ⚠️ **System.Text.Json в клиентском контенте ЗАПРЕЩЁН sandbox type-check'ом** (подтверждено живьём: `Sandbox violation: Access to type not allowed: JsonSerializer/JsonSerializerOptions` + `System.IO.Path` → TypeCheckFailedException → клиент падал при загрузке модулей). Переписано на ручной `JsonBuilder` (StringBuilder, float через `ToString("0.####").Replace(',', '.')` — локале-стойкий десятичный разделитель); `FileMode`/`StreamWriter`/`ResPath` whitelist проходят. Коммит 8808df1db8, suite 10/10, клиент перезапущен — typecheck чист.
 
 ## Раунд 24 (21.11): multi-path + визуализация — 10/10
 
@@ -56,7 +56,7 @@
 
 ## Состояние и план продолжения (следующий топик)
 
-Состояние: раунды 21-28 закоммичены (`48a6067301` selfW → `f07d82b995` smoothing → `7452530612` тесты → `24ab62c985`+`0c8e16b04e` multi-path/визуализация → `f63dff26af`+`c7296459a1` перф → `e4c46a75c1` банк-обход → раунд-28 снапшоты/MD), suite 10/10, Content.Client + Content.Goobstation.Server собраны DebugOpt в bin. Для следующего плейтеста — запустить `bin/Content.Server/Content.Server.exe` + `bin/Content.Client/Content.Client.exe` из worktree (перед ребилдом — taskkill игровых процессов, MSB3027).
+Состояние: раунды 21-28 закоммичены (`48a6067301` selfW → `f07d82b995` smoothing → `7452530612` тесты → `24ab62c985`+`0c8e16b04e` multi-path/визуализация → `f63dff26af`+`c7296459a1` перф → `e4c46a75c1` банк-обход → раунд-28 снапшоты/MD → `8808df1db8` снапшот без STJ), suite 10/10, всё собрано DebugOpt, сервер+клиент запущены из worktree. Пересборка при запущенной игре = сначала taskkill (MSB3027).
 
 **Плейтест-чеклист юзера (за юзером, в следующем топике):**
 1. ФПС: ходьба по станции, двери, толпа — фризов быть не должно; `soundpathdebug` показывает `rebuild: X.X ms` (это worker-время, main платит ~0.5 мс). Для замеров ФПС оверлей выключать (`showsoundpath` off) — numbers-режим рисует сотни DrawString за кадр.
