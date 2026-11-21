@@ -173,7 +173,7 @@ public sealed class PathSoundSystem : EntitySystem
     private readonly ConcurrentDictionary<EntityUid, DebugEntry> _debug = new();
 
     /// <summary>Ring of the most recent per-stream model decisions, for catching birth-time transients in snapshots.</summary>
-    private readonly RingEntry[] _ring = new RingEntry[128];
+    private readonly RingEntry[] _ring = new RingEntry[1024];
 
     private int _ringIndex;
 
@@ -1244,9 +1244,11 @@ public sealed class PathSoundSystem : EntitySystem
                 _smoothed.TryRemove(uid, out _);
         }
 
+        var deadCutoff = _tickCounter - 1500;
+
         foreach (var (uid, entry) in _debug)
         {
-            if (!Exists(uid))
+            if (!Exists(uid) && entry.LastTick < deadCutoff)
                 _debug.TryRemove(uid, out _);
         }
     }
