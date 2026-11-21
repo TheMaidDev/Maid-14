@@ -1,10 +1,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Shared._Maid.Audio;
@@ -276,12 +274,12 @@ public sealed class PathSoundSystem : EntitySystem
 
         if (!string.IsNullOrWhiteSpace(suffix))
         {
-            foreach (var c in Path.GetInvalidFileNameChars())
-                suffix = suffix.Replace(c, '_');
-            name = $"{name}-{suffix.Trim()}";
+            var cleaned = SanitizeName(suffix.Trim());
+            if (cleaned.Length > 0)
+                name = $"{name}-{cleaned}";
         }
 
-        var json = JsonSerializer.Serialize(BuildSnapshot(), new JsonSerializerOptions { WriteIndented = true });
+        var json = BuildSnapshotJson();
         var dir = new ResPath(SnapshotDir);
         var path = dir / $"{name}.json";
 
@@ -295,35 +293,57 @@ public sealed class PathSoundSystem : EntitySystem
         return _resMan.UserData.RootDir is { } root ? $"{path} ({root})" : path.ToString();
     }
 
-    private object BuildSnapshot()
+    private string BuildSnapshotJson()
     {
+        var j = new JsonBuilder();
         var zOffset = _cfg.GetCVar(CVars.AudioZOffset);
         var masterGain = _cfg.GetCVar(CVars.AudioMasterVolume);
 
-        object listener;
-        Vector2 listenerPos = default;
-        MapId listenerMap = MapId.Nullspace;
+        var haveListener = false;
+        var listenerPos = Vector2.Zero;
+        var listenerMap = MapId.Nullspace;
+
+        j.BeginObject();
+        j.Key("version").Value(1);
+        j.Key("timeUtc").Value(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+        j.Key("tick").Value((long) _timing.CurTick.Value);
+
+        j.Key("cvars").BeginObject();
+        j.Key("enabled").Value(_enabled);
+        j.Key("radius").Value(_radius);
+        j.Key("occlusionPerWeight").Value(_occlusionPerWeight);
+        j.Key("lossDbPerTile").Value(_lossDbPerTile);
+        j.Key("occlDecayPerTile").Value(_occlDecay);
+        j.Key("occlLossDb").Value(_occlLossDb);
+        j.Key("weightOpaque").Value(_weightOpaque);
+        j.Key("weightGlass").Value(_weightGlass);
+        j.Key("cacheTtl").Value(_ttl);
+        j.Key("smoothing").Value(_smoothing);
+        j.Key("detourWeight").Value(_detourWeight);
+        j.Key("zOffset").Value(zOffset);
+        j.Key("raycastLength").Value(_cfg.GetCVar(CVars.AudioRaycastLength));
+        j.Key("occlusionMask").Value(_sharedAudio.OcclusionCollisionMask);
+        j.Key("masterGain").Value(masterGain);
+        j.Key("attenuation").Value(_cfg.GetCVar(CVars.AudioAttenuation));
+        j.EndObject();
 
         if (_player.LocalEntity is { } player && TryComp(player, out TransformComponent? playerXform))
         {
+            haveListener = true;
             listenerPos = _transform.GetWorldPosition(playerXform);
             listenerMap = playerXform.MapID;
-            listener = new
-            {
-                uid = player.Id,
-                world = Pair(listenerPos),
-                mapId = (int) listenerMap,
-                grid = playerXform.GridUid?.Id,
-            };
+
+            j.Key("listener").BeginObject();
+            j.Key("uid").Value(player.Id);
+            j.Key("world").BeginArray().Value(listenerPos.X).Value(listenerPos.Y).EndArray();
+            j.Key("mapId").Value((int) listenerMap);
+            j.Key("grid").Value(playerXform.GridUid?.Id);
+            j.EndObject();
         }
         else
         {
-            listener = new { uid = (int?) null };
+            j.Key("listener").Null();
         }
-
-        object field = new { active = false, grid = (int?) null };
-        object? weights = null;
-        object? roots = null;
 
         if (_fieldGrid is { } fieldGrid && _live != null)
         {
@@ -334,36 +354,42 @@ public sealed class PathSoundSystem : EntitySystem
                     blockers++;
             }
 
-            field = new
-            {
-                active = FieldReady,
-                grid = fieldGrid.Id,
-                baseTile = Pair(_baseTile),
-                fieldRadius = _fieldRadius,
-                radiusCvar = _radius,
-                ageSec = (float) (_timing.CurTime - _fieldTime).TotalSeconds,
-                ttl = _ttl,
-                detourValid = _live.DetourValid,
-                buildInFlight = _buildInFlight,
-                lastRebuildMs = _lastRebuildMs,
-                windowBlockers = blockers,
-            };
+            j.Key("field").BeginObject();
+            j.Key("active").Value(FieldReady);
+            j.Key("grid").Value(fieldGrid.Id);
+            j.Key("baseTile").BeginArray().Value(_baseTile.X).Value(_baseTile.Y).EndArray();
+            j.Key("fieldRadius").Value(_fieldRadius);
+            j.Key("radiusCvar").Value(_radius);
+            j.Key("ageSec").Value((float) (_timing.CurTime - _fieldTime).TotalSeconds);
+            j.Key("ttl").Value(_ttl);
+            j.Key("detourValid").Value(_live.DetourValid);
+            j.Key("buildInFlight").Value(_buildInFlight);
+            j.Key("lastRebuildMs").Value(_lastRebuildMs);
+            j.Key("windowBlockers").Value(blockers);
+            j.EndObject();
 
-            var tileList = new List<object[]>(_tileWeightCache.Count);
+            j.Key("weights").BeginObject();
+            j.Key("grid").Value(_weightCacheGrid?.Id);
+            j.Key("count").Value(_tileWeightCache.Count);
+            j.Key("tiles").BeginArray();
             foreach (var (tile, weight) in _tileWeightCache)
-                tileList.Add(new object[] { tile.X, tile.Y, weight });
-            weights = new { grid = _weightCacheGrid?.Id, count = tileList.Count, tiles = tileList };
+                j.BeginArray().Value(tile.X).Value(tile.Y).Value(weight).EndArray();
+            j.EndArray();
+            j.EndObject();
 
             var radius = _fieldRadius;
             var size = radius * 2 + 1;
-            var perRoot = new List<object?[]>[RootCount];
+
+            j.Key("roots").BeginObject();
+            j.Key("radius").Value(radius);
+            j.Key("size").Value(size);
             for (var root = 0; root < RootCount; root++)
             {
                 var rootDx = root & 1;
                 var rootDy = root >> 1;
-                var list = new List<object?[]>(size * size);
                 var baseIdx = root * size * size;
 
+                j.Key($"r{root}").BeginArray();
                 for (var x = -radius; x <= radius; x++)
                 {
                     for (var y = -radius; y <= radius; y++)
@@ -372,183 +398,370 @@ public sealed class PathSoundSystem : EntitySystem
                         if (float.IsPositiveInfinity(_live.Dist[idx]))
                             continue;
 
-                        var detour = float.IsPositiveInfinity(_live.Dist2[idx]);
-                        list.Add(new object?[]
-                        {
-                            _baseTile.X + rootDx + x,
-                            _baseTile.Y + rootDy + y,
-                            _live.Dist[idx],
-                            _live.SumW[idx],
-                            _live.Hops[idx],
-                            _live.Past[idx],
-                            detour ? null : _live.Dist2[idx],
-                            detour ? null : _live.SumW2[idx],
-                            detour ? null : _live.Hops2[idx],
-                            detour ? null : _live.Past2[idx],
-                        });
+                        var noDetour = float.IsPositiveInfinity(_live.Dist2[idx]);
+                        j.BeginArray();
+                        j.Value(_baseTile.X + rootDx + x);
+                        j.Value(_baseTile.Y + rootDy + y);
+                        j.Value(_live.Dist[idx]);
+                        j.Value(_live.SumW[idx]);
+                        j.Value(_live.Hops[idx]);
+                        j.Value(_live.Past[idx]);
+                        if (noDetour)
+                            j.Null().Null().Null().Null();
+                        else
+                            j.Value(_live.Dist2[idx]).Value(_live.SumW2[idx]).Value(_live.Hops2[idx]).Value(_live.Past2[idx]);
+                        j.EndArray();
                     }
                 }
-
-                perRoot[root] = list;
+                j.EndArray();
             }
-
-            roots = new { radius, size, r0 = perRoot[0], r1 = perRoot[1], r2 = perRoot[2], r3 = perRoot[3] };
+            j.EndObject();
+        }
+        else
+        {
+            j.Key("field").Null();
+            j.Key("weights").Null();
+            j.Key("roots").Null();
         }
 
         var listenerCoords = new MapCoordinates(listenerPos, listenerMap);
-        var sounds = new List<object>();
+
+        j.Key("sounds").BeginArray();
         var query = EntityQueryEnumerator<AudioComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var comp, out var sx))
         {
             var global = comp.Global;
             var worldPos = global || sx.MapID != listenerMap ? Vector2.Zero : _transform.GetWorldPosition(sx);
             var distance = global ? 0f : (worldPos - listenerPos).Length();
-            var clipped = !global && MathF.Sqrt(distance * distance + zOffset * zOffset) > comp.MaxDistance;
-
-            Vector2i? tile = null;
-            if (!global && sx.GridUid is { } sGrid && TryComp(sGrid, out MapGridComponent? sGridComp))
-            {
-                var local = _map.LocalToGrid(sGrid, sGridComp, sx.Coordinates);
-                tile = new((int) MathF.Floor(local.X / sGridComp.TileSize), (int) MathF.Floor(local.Y / sGridComp.TileSize));
-            }
+            var clipped = haveListener && !global && MathF.Sqrt(distance * distance + zOffset * zOffset) > comp.MaxDistance;
 
             var modelled = _debug.TryGetValue(uid, out var entry);
             var smoothed = modelled ? entry.Smoothed : 0f;
             var gainEst = global || clipped ? 0f : AttenuationGain(distance, comp.RolloffFactor, comp.ReferenceDistance, comp.MaxDistance);
             var estDb = comp.Params.Volume + 20f * MathF.Log10(MathF.Max(gainEst, 1e-6f)) - OcclDbPerUnit * smoothed;
 
-            List<int[]>? routeP = null;
-            List<int[]>? routeD = null;
-            List<object>? breakdown = null;
+            j.BeginObject();
+            j.Key("uid").Value(uid.Id);
+            j.Key("file").Value(comp.FileName);
+            j.Key("playing").Value(comp.Playing);
+            j.Key("state").Value((int) comp.State);
+            j.Key("global").Value(global);
+            j.Key("flags").Value((int) comp.Flags);
+            j.Key("started").Value(comp.Started);
+            j.Key("world").BeginArray().Value(worldPos.X).Value(worldPos.Y).EndArray();
 
+            if (!global && sx.GridUid is { } sGrid && TryComp(sGrid, out MapGridComponent? sGridComp))
+            {
+                var local = _map.LocalToGrid(sGrid, sGridComp, sx.Coordinates);
+                j.Key("tile").BeginArray()
+                    .Value((int) MathF.Floor(local.X / sGridComp.TileSize))
+                    .Value((int) MathF.Floor(local.Y / sGridComp.TileSize))
+                    .EndArray();
+            }
+            else
+            {
+                j.Key("tile").Null();
+            }
+
+            j.Key("distance").Value(distance);
+            j.Key("baseVolumeDb").Value(comp.Params.Volume);
+            j.Key("appliedVolumeDb").Value(comp.Volume);
+            j.Key("gain").Value(comp.Gain);
+            j.Key("maxDistance").Value(comp.MaxDistance);
+            j.Key("rolloff").Value(comp.RolloffFactor);
+            j.Key("refDistance").Value(comp.ReferenceDistance);
+            j.Key("clipped").Value(clipped);
+            j.Key("engineGainEst").Value(gainEst);
+            j.Key("estLoudnessDb").Value(estDb);
+            j.Key("masterGain").Value(masterGain);
+
+            if (modelled)
+            {
+                j.Key("model").BeginObject();
+                j.Key("sumW").Value(entry.SumWeight);
+                j.Key("pathLen").Value(entry.PathLen);
+                j.Key("past").Value(entry.Past);
+                j.Key("occl").Value(entry.Occlusion);
+                j.Key("raw").Value(entry.Raw);
+                j.Key("smoothed").Value(entry.Smoothed);
+                j.Key("detoured").Value(entry.Detoured);
+                j.Key("mode").Value((int) entry.Mode);
+                j.Key("lastTick").Value(entry.LastTick);
+                j.EndObject();
+            }
+            else
+            {
+                j.Key("model").Null();
+            }
+
+            var haveRoute = false;
+            List<Vector2i>? primary = null;
+            List<Vector2i>? detour = null;
             if (!global && _fieldGrid is { } rGrid && sx.GridUid == rGrid && modelled)
             {
-                var primary = new List<Vector2i>();
-                var detour = new List<Vector2i>();
-                if (TryGetRoute(uid, primary, detour))
-                {
-                    routeP = primary.Select(t => new[] { t.X, t.Y }).ToList();
-                    routeD = detour.Select(t => new[] { t.X, t.Y }).ToList();
-                }
+                primary = new List<Vector2i>();
+                detour = new List<Vector2i>();
+                haveRoute = TryGetRoute(uid, primary, detour);
+            }
 
-                var breaks = new List<RootBreak>();
-                if (TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks)
-                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks))
+            if (haveRoute)
+            {
+                j.Key("route").BeginObject();
+                j.Key("primary").BeginArray();
+                foreach (var t in primary!)
+                    j.BeginArray().Value(t.X).Value(t.Y).EndArray();
+                j.EndArray();
+                j.Key("detour").BeginArray();
+                foreach (var t in detour!)
+                    j.BeginArray().Value(t.X).Value(t.Y).EndArray();
+                j.EndArray();
+                j.EndObject();
+            }
+            else
+            {
+                j.Key("route").Null();
+            }
+
+            var breaks = new List<RootBreak>();
+            var haveBreaks = false;
+            if (haveListener && !global && _fieldGrid != null)
+            {
+                haveBreaks = TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks)
+                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks);
+            }
+
+            if (haveBreaks)
+            {
+                j.Key("breakdown").BeginArray();
+                foreach (var b in breaks)
                 {
-                    breakdown = breaks.Select(b => (object) new
-                    {
-                        root = b.Root,
-                        weight = b.RootWeight,
-                        occl1 = b.Occl1,
-                        hops1 = b.Hops1,
-                        past1 = b.Past1,
-                        occl2 = b.Occl2,
-                        hops2 = b.Hops2,
-                        past2 = b.Past2,
-                        share = b.Share,
-                        f1 = b.F1,
-                        f2 = b.F2,
-                        skipped = b.Skipped,
-                    }).ToList();
+                    j.BeginObject();
+                    j.Key("root").Value(b.Root);
+                    j.Key("weight").Value(b.RootWeight);
+                    j.Key("occl1").Value(b.Occl1);
+                    j.Key("hops1").Value(b.Hops1);
+                    j.Key("past1").Value(b.Past1);
+                    j.Key("occl2").Value(b.Occl2);
+                    j.Key("hops2").Value(b.Hops2);
+                    j.Key("past2").Value(b.Past2);
+                    j.Key("share").Value(b.Share);
+                    j.Key("f1").Value(b.F1);
+                    j.Key("f2").Value(b.F2);
+                    j.Key("skipped").Value(b.Skipped);
+                    j.EndObject();
+                }
+                j.EndArray();
+            }
+            else
+            {
+                j.Key("breakdown").Null();
+            }
+
+            j.EndObject();
+        }
+        j.EndArray();
+
+        var recent = new List<RingEntry>();
+        foreach (var e in _ring)
+        {
+            if (e.Tick != 0)
+                recent.Add(e);
+        }
+        recent.Sort((a, b) => a.Tick.CompareTo(b.Tick));
+
+        j.Key("recent").BeginArray();
+        foreach (var e in recent)
+        {
+            j.BeginObject();
+            j.Key("tick").Value(e.Tick);
+            j.Key("uid").Value(e.Uid.Id);
+            j.Key("raw").Value(e.Raw);
+            j.Key("smoothed").Value(e.Smoothed);
+            j.Key("distance").Value(e.Distance);
+            j.Key("maxDistance").Value(e.MaxDistance);
+            j.Key("mode").Value((int) e.Mode);
+            j.EndObject();
+        }
+        j.EndArray();
+
+        j.EndObject();
+        return j.ToString();
+    }
+
+    /// <summary>Minimal JSON writer: the sandbox forbids System.Text.Json in content assemblies.</summary>
+    private sealed class JsonBuilder
+    {
+        private readonly StringBuilder _sb = new();
+        private readonly List<int> _state = new();
+        private bool _expectValue;
+
+        public JsonBuilder BeginObject()
+        {
+            ValueStart();
+            _sb.Append('{');
+            _state.Add(0);
+            return this;
+        }
+
+        public JsonBuilder BeginArray()
+        {
+            ValueStart();
+            _sb.Append('[');
+            _state.Add(0);
+            return this;
+        }
+
+        public JsonBuilder EndObject()
+        {
+            _sb.Append('}');
+            Close();
+            return this;
+        }
+
+        public JsonBuilder EndArray()
+        {
+            _sb.Append(']');
+            Close();
+            return this;
+        }
+
+        public JsonBuilder Key(string name)
+        {
+            BeforeValue();
+            _sb.Append('"').Append(Escape(name)).Append("\":");
+            _expectValue = true;
+            return this;
+        }
+
+        public JsonBuilder Null()
+        {
+            ValueStart();
+            _sb.Append("null");
+            return this;
+        }
+
+        public JsonBuilder Value(bool v)
+        {
+            ValueStart();
+            _sb.Append(v ? "true" : "false");
+            return this;
+        }
+
+        public JsonBuilder Value(int v)
+        {
+            ValueStart();
+            _sb.Append(v);
+            return this;
+        }
+
+        public JsonBuilder Value(long v)
+        {
+            ValueStart();
+            _sb.Append(v);
+            return this;
+        }
+
+        public JsonBuilder Value(int? v)
+        {
+            return v is { } x ? Value(x) : Null();
+        }
+
+        public JsonBuilder Value(float v)
+        {
+            ValueStart();
+            if (float.IsFinite(v))
+                _sb.Append(v.ToString("0.####").Replace(',', '.'));
+            else
+                _sb.Append("null");
+            return this;
+        }
+
+        public JsonBuilder Value(string v)
+        {
+            ValueStart();
+            _sb.Append('"').Append(Escape(v)).Append('"');
+            return this;
+        }
+
+        public override string ToString()
+        {
+            return _sb.ToString();
+        }
+
+        private void Close()
+        {
+            _state.RemoveAt(_state.Count - 1);
+        }
+
+        private void ValueStart()
+        {
+            if (_expectValue)
+            {
+                _expectValue = false;
+                return;
+            }
+
+            BeforeValue();
+        }
+
+        private void BeforeValue()
+        {
+            if (_state.Count == 0)
+                return;
+
+            if (_state[^1] == 0)
+                _state[^1] = 1;
+            else
+                _sb.Append(',');
+        }
+
+        private static string Escape(string s)
+        {
+            var sb = new StringBuilder(s.Length);
+            foreach (var c in s)
+            {
+                switch (c)
+                {
+                    case '"':
+                        sb.Append("\\\"");
+                        break;
+                    case '\\':
+                        sb.Append("\\\\");
+                        break;
+                    case '\n':
+                        sb.Append("\\n");
+                        break;
+                    case '\r':
+                        sb.Append("\\r");
+                        break;
+                    case '\t':
+                        sb.Append("\\t");
+                        break;
+                    default:
+                        if (c < ' ')
+                            sb.Append("\\u").Append(((int) c).ToString("x4"));
+                        else
+                            sb.Append(c);
+                        break;
                 }
             }
 
-            object? route = null;
-            if (routeP != null)
-                route = new { primary = routeP, detour = routeD };
+            return sb.ToString();
+        }
+    }
 
-            sounds.Add(new
-            {
-                uid = uid.Id,
-                file = comp.FileName,
-                playing = comp.Playing,
-                state = (byte) comp.State,
-                global,
-                flags = (byte) comp.Flags,
-                started = comp.Started,
-                world = Pair(worldPos),
-                tile = tile is { } t ? new[] { t.X, t.Y } : null,
-                distance,
-                baseVolumeDb = comp.Params.Volume,
-                appliedVolumeDb = comp.Volume,
-                gain = comp.Gain,
-                maxDistance = comp.MaxDistance,
-                rolloff = comp.RolloffFactor,
-                refDistance = comp.ReferenceDistance,
-                clipped,
-                engineGainEst = gainEst,
-                estLoudnessDb = estDb,
-                masterGain,
-                model = modelled
-                    ? new
-                    {
-                        sumW = entry.SumWeight,
-                        pathLen = entry.PathLen,
-                        past = entry.Past,
-                        occl = entry.Occlusion,
-                        raw = entry.Raw,
-                        smoothed = entry.Smoothed,
-                        detoured = entry.Detoured,
-                        mode = (byte) entry.Mode,
-                        lastTick = entry.LastTick,
-                    }
-                    : null,
-                route,
-                breakdown,
-            });
+    private static string SanitizeName(string s)
+    {
+        var sb = new StringBuilder(s.Length);
+        foreach (var c in s)
+        {
+            if (char.IsLetterOrDigit(c) || c == '-' || c == '_')
+                sb.Append(c);
+            else
+                sb.Append('_');
         }
 
-        var recent = new List<(long Tick, object Body)>(_ring.Length);
-        foreach (var e in _ring)
-        {
-            if (e.Tick == 0)
-                continue;
-
-            recent.Add((e.Tick, (object) new
-            {
-                tick = e.Tick,
-                uid = e.Uid.Id,
-                raw = e.Raw,
-                smoothed = e.Smoothed,
-                distance = e.Distance,
-                maxDistance = e.MaxDistance,
-                mode = (byte) e.Mode,
-            }));
-        }
-
-        recent.Sort((a, b) => a.Tick.CompareTo(b.Tick));
-
-        return new
-        {
-            version = 1,
-            timeUtc = DateTime.UtcNow,
-            tick = (long) _timing.CurTick.Value,
-            cvars = new
-            {
-                enabled = _enabled,
-                radius = _radius,
-                occlusionPerWeight = _occlusionPerWeight,
-                lossDbPerTile = _lossDbPerTile,
-                occlDecayPerTile = _occlDecay,
-                occlLossDb = _occlLossDb,
-                weightOpaque = _weightOpaque,
-                weightGlass = _weightGlass,
-                cacheTtl = _ttl,
-                smoothing = _smoothing,
-                detourWeight = _detourWeight,
-                zOffset,
-                raycastLength = _cfg.GetCVar(CVars.AudioRaycastLength),
-                occlusionMask = _sharedAudio.OcclusionCollisionMask,
-                masterGain,
-                attenuation = _cfg.GetCVar(CVars.AudioAttenuation),
-            },
-            listener,
-            field,
-            weights,
-            roots,
-            sounds,
-            recent = recent.Select(r => r.Body).ToList(),
-        };
+        return sb.ToString();
     }
 
     /// <summary>Mirrors the engine's LinearDistanceClamped attenuation for loudness estimates.</summary>
@@ -559,11 +772,6 @@ public sealed class PathSoundSystem : EntitySystem
 
         var d = Math.Clamp(distance, reference, maxDistance);
         return MathF.Max(0f, 1f - rolloff * (d - reference) / (maxDistance - reference));
-    }
-
-    private static float[] Pair(Vector2 v)
-    {
-        return new[] { v.X, v.Y };
     }
 
     /// <summary>Current overlay display mode.</summary>
