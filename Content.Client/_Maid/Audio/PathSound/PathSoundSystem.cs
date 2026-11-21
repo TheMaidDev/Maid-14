@@ -196,12 +196,13 @@ public sealed class PathSoundSystem : EntitySystem
     public readonly record struct RootBreak(int Root, float RootWeight, float Occl1, int Hops1, int Past1, float Occl2, int Hops2, int Past2, float Share, float F1, float F2, bool Skipped);
 
     /// <summary>One recent per-stream model decision.</summary>
-    private readonly record struct RingEntry(long Tick, EntityUid Uid, float Raw, float Smoothed, float Distance, float MaxDistance, PathSoundModelMode Mode);
+    private readonly record struct RingEntry(long Tick, EntityUid Uid, float Raw, float Smoothed, float Distance, float MaxDistance, PathSoundModelMode Mode, float Occl, float SumW, float Len, float Past, bool Detoured, bool Repaired);
 
-    private void PushRing(long tick, EntityUid uid, float raw, float smoothed, float distance, float maxDistance, PathSoundModelMode mode)
+    private void PushRing(long tick, EntityUid uid, float raw, float smoothed, float distance, float maxDistance, PathSoundModelMode mode,
+        float occl = 0f, float sumW = 0f, float len = 0f, float past = 0f, bool detoured = false, bool repaired = false)
     {
         var slot = (int) (Interlocked.Increment(ref _ringIndex) - 1) % _ring.Length;
-        _ring[slot] = new RingEntry(tick, uid, raw, smoothed, distance, maxDistance, mode);
+        _ring[slot] = new RingEntry(tick, uid, raw, smoothed, distance, maxDistance, mode, occl, sumW, len, past, detoured, repaired);
     }
 
     /// <summary>Array set of one field build: the live field or a scratch buffer of a background rebuild.</summary>
@@ -580,6 +581,11 @@ public sealed class PathSoundSystem : EntitySystem
             j.Key("distance").Value(e.Distance);
             j.Key("maxDistance").Value(e.MaxDistance);
             j.Key("mode").Value((int) e.Mode);
+            j.Key("occl").Value(e.Occl);
+            j.Key("sumW").Value(e.SumW);
+            j.Key("len").Value(e.Len);
+            j.Key("past").Value(e.Past);
+            j.Key("detoured").Value(e.Detoured);
             j.EndObject();
         }
         j.EndArray();
@@ -777,7 +783,7 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Route-length slack before a route counts as grossly distorted by a transient source-tile overprice.</summary>
     private const float DirectEntrySlack = 4f;
 
-    /// <summary>Lets a sound enter its own tile from its best neighbor: a transient overprice of that tile at a door-state flip must not send its route the long way around.</summary>
+    /// <summary>Lets a sound enter its own tile from its best downhill neighbor: a transient overprice of that tile at a door-state flip must not send its route the long way around.</summary>
     private void DirectEntry(FieldBuffers live, int idx, int offsetX, int offsetY, int radius, int size,
         float[] dist, float[] sumW, int[] hops, int[] past,
         float selfW, float kOccl, float kLoss, float dTiles, ref float occl, ref int len, ref int pastOut, ref float fold)
@@ -1587,7 +1593,7 @@ public sealed class PathSoundSystem : EntitySystem
         var mode = modelled ? (clamped ? PathSoundModelMode.ClampedField : PathSoundModelMode.Field) : PathSoundModelMode.Raycast;
         _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past, detoured, occlValue, distance, component.MaxDistance,
             component.Params.Volume, component.RolloffFactor, component.ReferenceDistance, mode, component.FileName, tick);
-        PushRing(tick, entity, occlValue, smoothed, distance, component.MaxDistance, mode);
+        PushRing(tick, entity, occlValue, smoothed, distance, component.MaxDistance, mode, occl, sumW, len, past, detoured);
         return MathF.Min(smoothed, 400f);
     }
 
