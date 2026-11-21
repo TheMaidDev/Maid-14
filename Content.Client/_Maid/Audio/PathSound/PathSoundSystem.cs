@@ -186,8 +186,8 @@ public sealed class PathSoundSystem : EntitySystem
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
 
-    /// <summary>Smoothed filter occlusion of one audio stream and the call stamp it was last touched at.</summary>
-    private readonly record struct SmoothEntry(float Occl, long LastCall);
+    /// <summary>Smoothed blocker occlusion and distance fade (dB) of one audio stream, and the call stamp it was last touched at.</summary>
+    private readonly record struct SmoothEntry(float Occl, float FadeDb, long LastCall);
 
     /// <summary>Snapshot of one sound's filter values for the debug dump and overlay.</summary>
     public readonly record struct DebugEntry(float SumWeight, float PathLen, float Occlusion, float Smoothed, float Past, bool Detoured, float Raw, float Distance, float MaxDistance, float BaseVolumeDb, float Rolloff, float RefDistance, PathSoundModelMode Mode, string FileName, long LastTick);
@@ -1490,7 +1490,12 @@ public sealed class PathSoundSystem : EntitySystem
         }
         else
         {
-            component.Occlusion = GetPathOcclusion(entity, component, xform, listener, delta, distance);
+            // The distance fade rides the stream volume (broadband) and only the blockers ride the
+            // lowpass: folding distance into occlusion drove the engine's high-frequency gain to
+            // e^-occl, wiping mid-frequency sounds (beeps) far beyond the audible broadband fade.
+            var fade = 0f;
+            component.Occlusion = GetPathOcclusion(entity, component, xform, listener, delta, distance, out fade);
+            component.Volume = component.Params.Volume + fade;
         }
 
         component.Position = worldPos;
@@ -1502,8 +1507,8 @@ public sealed class PathSoundSystem : EntitySystem
         }
     }
 
-    /// <summary>Computes the filter occlusion carrying the whole model: path muffling, blocker loudness loss and the distance fade, all folded into occlusion units.</summary>
-    private float GetPathOcclusion(EntityUid entity, AudioComponent component, TransformComponent xform, MapCoordinates listener, Vector2 delta, float distance)
+    /// <summary>Computes the blocker occlusion for the engine lowpass and the distance fade in dB for the stream volume.</summary>
+    private float GetPathOcclusion(EntityUid entity, AudioComponent component, TransformComponent xform, MapCoordinates listener, Vector2 delta, float distance, out float distFade)
     {
         var sourcePos = listener.Position + delta;
         var crossGrid = xform.GridUid != _fieldGrid;
@@ -1542,26 +1547,30 @@ public sealed class PathSoundSystem : EntitySystem
             }
         }
 
-        // The engine lowpass attenuates 0.8686 dB per occlusion unit, so the loudness-loss terms fold straight in.
+        // Blockers (with their loudness slam) ride the engine lowpass; the distance fade rides the
+        // stream volume — folding distance into the lowpass collapsed its high-frequency gain to
+        // e^-occl and wiped mid-frequency sounds (beeps) well before the broadband fade was audible.
         var tileSize = 1f;
         if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
             tileSize = gridComp.TileSize;
 
-        var occlValue = occl * (1f + _occlLossDb / OcclDbPerUnit)
-            + (len + past) * _lossDbPerTile / OcclDbPerUnit
-            + MathF.Max(0f, distance / tileSize - len) * _lossDbPerTile / OcclDbPerUnit;
+        var engineOccl = occl * (1f + _occlLossDb / OcclDbPerUnit);
+        var distFadeDb = ((len + past) + MathF.Max(0f, distance / tileSize - len)) * _lossDbPerTile;
+        var fold = engineOccl + distFadeDb / OcclDbPerUnit;
 
         // Smooth per stream: rebuild steps fade over a few ticks instead of snapping the filter.
         var tick = Interlocked.Increment(ref _tickCounter);
         var smoothed = _smoothed.AddOrUpdate(entity,
-            new SmoothEntry(occlValue, tick),
-            (_, old) => new SmoothEntry(old.Occl + (occlValue - old.Occl) * _smoothing, tick)).Occl;
+            new SmoothEntry(engineOccl, distFadeDb, tick),
+            (_, old) => new SmoothEntry(old.Occl + (engineOccl - old.Occl) * _smoothing,
+                old.FadeDb + (distFadeDb - old.FadeDb) * _smoothing, tick));
 
         var mode = modelled ? (clamped ? PathSoundModelMode.ClampedField : PathSoundModelMode.Field) : PathSoundModelMode.Raycast;
-        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed, past, detoured, occlValue, distance, component.MaxDistance,
+        _debug[entity] = new DebugEntry(sumW, len, occl, smoothed.Occl, past, detoured, fold, distance, component.MaxDistance,
             component.Params.Volume, component.RolloffFactor, component.ReferenceDistance, mode, component.FileName, tick);
-        PushRing(tick, entity, occlValue, smoothed, distance, component.MaxDistance, mode, occl, sumW, len, past, detoured);
-        return MathF.Min(smoothed, 400f);
+        PushRing(tick, entity, fold, smoothed.Occl, distance, component.MaxDistance, mode, occl, sumW, len, past, detoured);
+        distFade = smoothed.FadeDb;
+        return MathF.Min(smoothed.Occl, 400f);
     }
 
     /// <summary>Converts raycast wall penetration in meters into field occlusion units: one wall per tile of penetration, scaled like a heuristic wall tile.</summary>
