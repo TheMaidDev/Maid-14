@@ -42,9 +42,9 @@
   id: Airlock
   components:
   - type: SoundPathWeight
-    muffle: 90
+    muffle: 99
 - type: entity
   id: AirlockGlass
   components:
   - type: SoundPathWeight
-    muffle: 90
+    muffle: 99

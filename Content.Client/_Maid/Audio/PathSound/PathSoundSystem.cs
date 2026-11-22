@@ -870,8 +870,8 @@ public sealed class PathSoundSystem : EntitySystem
         if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
             tileSize = gridComp.TileSize;
 
-        filterOccl = occl * (1f + _occlLossDb / OcclDbPerUnit)
-            + ((sourcePos - listener.Position).Length() / tileSize + past) * _lossDbPerTile / OcclDbPerUnit;
+        filterOccl = occl
+            + (sourcePos - listener.Position).Length() / tileSize * _lossDbPerTile / OcclDbPerUnit;
         return true;
     }
 
@@ -1584,11 +1584,14 @@ public sealed class PathSoundSystem : EntitySystem
         if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
             tileSize = gridComp.TileSize;
 
-        var engineOccl = occl * (1f + _occlLossDb / OcclDbPerUnit);
-        // The fade tracks straight-line distance plus the walk-out past the last blocker: a clean
-        // detour around a wall row must not punish loudness for hops the path only took to dodge
-        // blockers — the detour's own muffle already carries that cost.
-        var distFadeDb = (distance / tileSize + past) * _lossDbPerTile;
+        // The filter carries the raw path occlusion: every crossed blocker's muffle percent translates
+        // multiplicatively into the EFX cutoff (90% -> 10% highs, 99% -> 1%), and walls silence
+        // themselves at their raw scale. The route-selection folds below still weight occlusion by the
+        // loss cvar — they choose the path, they do not shape the filter.
+        var engineOccl = occl;
+        // The fade tracks the straight-line distance only: the walk-out past the last blocker is
+        // already rewarded by the past-decay inside the occlusion (round-10: no double-counting).
+        var distFadeDb = distance / tileSize * _lossDbPerTile;
         var fold = engineOccl + distFadeDb / OcclDbPerUnit;
 
         // Smooth per stream: rebuild steps fade over a few ticks instead of snapping the filter.
