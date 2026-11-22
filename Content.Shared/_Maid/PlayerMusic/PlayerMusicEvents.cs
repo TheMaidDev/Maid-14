@@ -9,14 +9,48 @@ public enum PlayerMusicUiKey : byte
 }
 
 /// <summary>
-/// Play the track with the given index from the inserted cassette. The expected track id
-/// is included so a cassette swapped since the window was synced cannot start a wrong track.
+/// Play the track with the given index from the inserted cassette, starting at
+/// <paramref name="offsetSeconds"/>. The expected track id is included so a cassette
+/// swapped since the window was synced cannot start a wrong track.
 /// </summary>
 [Serializable, NetSerializable]
-public sealed class PlayerMusicPlayMessage(int track, string trackId) : BoundUserInterfaceMessage
+public sealed class PlayerMusicPlayMessage(int track, string trackId, float offsetSeconds) : BoundUserInterfaceMessage
 {
     public int Track { get; } = track;
     public string TrackId { get; } = trackId;
+    public float OffsetSeconds { get; } = offsetSeconds;
+}
+
+[Serializable, NetSerializable]
+public sealed class PlayerMusicSeekMessage(float position) : BoundUserInterfaceMessage
+{
+    public float Position { get; } = position;
+}
+
+[Serializable, NetSerializable]
+public sealed class PlayerMusicVolumeMessage(float scale) : BoundUserInterfaceMessage
+{
+    public float Scale { get; } = scale;
+}
+
+[Serializable, NetSerializable]
+public sealed class PlayerMusicDeleteTrackMessage(int track, string trackId) : BoundUserInterfaceMessage
+{
+    public int Track { get; } = track;
+    public string TrackId { get; } = trackId;
+}
+
+[Serializable, NetSerializable]
+public sealed class PlayerMusicRecordStatusEvent(
+    NetEntity boombox,
+    string locKey,
+    string text = "",
+    float number = 0f) : EntityEventArgs
+{
+    public NetEntity Boombox { get; } = boombox;
+    public string LocKey { get; } = locKey;
+    public string Text { get; } = text;
+    public float Number { get; } = number;
 }
 
 [Serializable, NetSerializable]
@@ -43,27 +77,6 @@ public static class PlayerMusicLimits
     public const int HardMaxSongBytes = 8_000_000;
     public const int HardMaxSongSeconds = 600;
     public const long HardMaxDecodedBytes = 100_000_000;
-}
-
-/// <summary>
-/// Client -> server. Starts recording a song onto the cassette in the boombox; the data follows in chunks.
-/// </summary>
-[Serializable, NetSerializable]
-public sealed class PlayerMusicUploadStartEvent(NetEntity boombox, string name, int totalBytes) : EntityEventArgs
-{
-    public NetEntity Boombox { get; } = boombox;
-    public string Name { get; } = name;
-    public int TotalBytes { get; } = totalBytes;
-}
-
-/// <summary>
-/// Client -> server. One piece of the song, chunks must arrive in order.
-/// </summary>
-[Serializable, NetSerializable]
-public sealed class PlayerMusicUploadChunkEvent(int index, byte[] data) : EntityEventArgs
-{
-    public int Index { get; } = index;
-    public byte[] Data { get; } = data;
 }
 
 /// <summary>

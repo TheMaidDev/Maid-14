@@ -27,14 +27,14 @@ public sealed partial class PlayerMusicBoomboxComponent : Component
     [DataField, AutoNetworkedField]
     public string? SongId;
 
-    [DataField, AutoNetworkedField]
-    public string? SongName;
-
     /// <summary>
     /// Server time when playback started. Null = stopped.
     /// </summary>
     [DataField, AutoNetworkedField]
     public TimeSpan? StartedAt;
+
+    [DataField, AutoNetworkedField]
+    public TimeSpan SongDuration;
 
     /// <summary>
     /// Loop the current song (on by default, like in the old jukebox).
@@ -49,6 +49,15 @@ public sealed partial class PlayerMusicBoomboxComponent : Component
     [DataField, AutoNetworkedField]
     public int CassetteMaxTracks;
 
+    [DataField, AutoNetworkedField]
+    public int CassetteMaxSongBytes;
+
+    [DataField, AutoNetworkedField]
+    public int CassetteMaxSongSeconds;
+
+    [AutoNetworkedField]
+    public bool CassetteAllowsTrackRemoval;
+
     [AutoNetworkedField]
     public List<PlayerMusicTrack> CassetteTracks = new();
 
@@ -57,6 +66,9 @@ public sealed partial class PlayerMusicBoomboxComponent : Component
 
     [DataField]
     public float Volume = -4f;
+
+    [DataField, AutoNetworkedField]
+    public float VolumeScale = 1f;
 }
 
 /// <summary>
@@ -68,6 +80,15 @@ public sealed partial class PlayerMusicCassetteComponent : Component
 {
     [DataField, AutoNetworkedField]
     public int MaxTracks = 3;
+
+    [DataField]
+    public int MaxSongBytes = 3_500_000;
+
+    [DataField]
+    public int MaxSongSeconds = 240;
+
+    [DataField]
+    public bool AllowTrackRemoval;
 
     [AutoNetworkedField]
     public List<PlayerMusicTrack> Tracks = new();
