@@ -1398,6 +1398,9 @@ public sealed class PathSoundSystem : EntitySystem
                 // its wall row's other doors), and a detour crossing no door tile at all — around a
                 // wall row's open end — carries the sound's dominant path and takes the big share.
                 f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
+                // Purity counts CLOSED blockers only: the detour pass zero-weights open door tiles, so
+                // a bypass through open doors stays pure and takes the big share, while any closed
+                // blocker still gates the blend to the long-hop small share.
                 var pure = live.SumW2[idx] - srcWeight <= OpenDoorTileWeight * 0.5f;
                 var requiredExtra = doorSource ? 1 : (pure ? 1 : MinDetourExtraHops);
                 var detourShare = doorSource ? 1f : (pure ? PureDetourShare : DetourShare);
@@ -1899,14 +1902,18 @@ public sealed class PathSoundSystem : EntitySystem
         var weight = TileWeight(buffers, wIdx);
         if (detour)
         {
-            var dist2 = buffers.Dist2[parentIdx] + 1f + weight * _detourWeight;
+            // An open door tile is floor to the sound: its residual window weight (OpenDoorTileWeight,
+            // kept for the blocker thresholds) must not reach the detour's muffle sum, past tracker or
+            // cost — detour purity counts CLOSED blockers only.
+            var w = weight <= OpenDoorTileWeight ? 0f : weight;
+            var dist2 = buffers.Dist2[parentIdx] + 1f + w * _detourWeight;
             if (dist2 >= buffers.Dist2[idx])
                 return;
 
             buffers.Dist2[idx] = dist2;
             buffers.Hops2[idx] = buffers.Hops2[parentIdx] + 1;
-            buffers.SumW2[idx] = buffers.SumW2[parentIdx] + weight;
-            buffers.Past2[idx] = weight > 0f ? 0 : buffers.Past2[parentIdx] + 1;
+            buffers.SumW2[idx] = buffers.SumW2[parentIdx] + w;
+            buffers.Past2[idx] = w > 0f ? 0 : buffers.Past2[parentIdx] + 1;
         }
         else
         {

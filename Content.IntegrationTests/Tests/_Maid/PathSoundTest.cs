@@ -213,14 +213,18 @@ public sealed class PathSoundTest
                 $"door own sound must take the open-door bypass: occl {occl:0.000} len {len:0.0} past {past:0.0} filter {filter:0.00}; {probe}");
 
             // A foreign source on the same tile: the two roots hugging the east column (seeds (1,0) and
-            // (1,1)) sit on closed glass doors and are excluded, so the west roots blend 50/50 — the
-            // northern one keeps the closed (-1,0) door on its short route (the +2-hop bypass through
-            // the open door tile is not "pure" and misses the 4-hop gate, round-39 contract), the
-            // southern one already routes through the open bypass door in its primary. The source tile
-            // is itself the last blocker, so the past-decay never applies and both pasts are zero.
+            // (1,1)) sit on closed glass doors and are excluded, so the west roots blend. Round-44:
+            // detour purity counts closed tiles only, so the northern root takes the pure bypass
+            // through the open (-1,1) at the 0.7 share (its detour crosses no closed blocker), keeping
+            // the closed (-1,0) door on the remaining 0.3; the southern roots' primaries already route
+            // through the bypass. The source tile is itself the last blocker, so all pasts are zero.
+            const float pureShare = 0.7f;
             var glass = AirlockOccl(GlassAirlockMuffle);
-            var occlForeign = -MathF.Log((MathF.Exp(-glass) + MathF.Exp(-0.005f)) / 2f);
-            var expectedForeign = occlForeign * scene.Fold + 3.5f * scene.PerTile;
+            var gainNorth = (1f - pureShare) * MathF.Exp(-glass) + pureShare;
+            var gainSouth = MathF.Exp(-0.005f);
+            var occlForeign = -MathF.Log((gainNorth + 2f * gainSouth) / 3f);
+            var hopsNorth = (1f - pureShare) * 3 + pureShare * 5;
+            var expectedForeign = occlForeign * scene.Fold + (hopsNorth + 4 + 5) / 3f * scene.PerTile;
 
             var breaks = new List<PathSoundSystem.RootBreak>();
             Assert.That(
