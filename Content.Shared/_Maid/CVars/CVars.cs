@@ -114,6 +114,13 @@ public sealed class MaidCVars
     public static readonly CVarDef<float> SoundPathDetourWeight =
         CVarDef.Create("maidsound.path_detour_weight", 20f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
+    /// <summary>
+    /// Measure detour purity by the surviving (past-decayed) blocker occlusion instead of raw closed blockers:
+    /// doors crossed long before the source decay away and the detour counts as clean.
+    /// </summary>
+    public static readonly CVarDef<bool> SoundPathPurityDecay =
+        CVarDef.Create("maidsound.path_purity_decay", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+
     #endregion
 
     #region Misc

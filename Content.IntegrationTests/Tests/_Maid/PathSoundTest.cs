@@ -793,6 +793,88 @@ public sealed class PathSoundTest
         await pair.CleanReturnAsync();
     }
 
+    /// <summary>
+    /// Round-45 toggle: with the default raw purity a detour crossing a closed airlock stays at the
+    /// small share even when the walk past it decays the muffle away; the purity-decay mode measures
+    /// the surviving occlusion instead and the same detour takes the big share. Scene: a corridor with
+    /// two closed airlocks near the middle, plus a gated floor strip in the north wall carrying one
+    /// glass airlock — the shortest pass crosses the corridor airlocks (recent, undecayed), the detour
+    /// pass takes the strip (its airlock sits 7 tiles before the source and decays to zero).
+    /// </summary>
+    [Test]
+    public async Task DetourPurityDecayToggle()
+    {
+        var scene = await SetupScene(12);
+        await using var pair = scene.Pair;
+
+        await Place(scene, 5, "Airlock");
+        await Place(scene, 6, "Airlock");
+
+        await scene.Server.WaitPost(() =>
+        {
+            var maps = scene.Server.System<SharedMapSystem>();
+            var grid = scene.Server.EntMan.GetComponent<MapGridComponent>(scene.Grid);
+            var tiles = scene.Server.ResolveDependency<ITileDefinitionManager>();
+            var plating = new Tile(tiles["Plating"].TileId);
+
+            foreach (var x in new[] { 2, 3, 4, 5, 6, 7, 8 })
+                maps.SetTile(scene.Grid, grid, new Vector2i(x, 2), plating);
+
+            foreach (var gate in new[] { new Vector2i(2, 1), new Vector2i(8, 1) })
+            {
+                var toDelete = new List<EntityUid>();
+                var anchored = maps.GetAnchoredEntitiesEnumerator(scene.Grid, grid, gate);
+                while (anchored.MoveNext(out var ent))
+                    toDelete.Add(ent.Value);
+
+                foreach (var ent in toDelete)
+                    scene.Server.EntMan.DeleteEntity(ent);
+            }
+
+            scene.Server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(scene.Grid, 5.5f, 2.5f));
+        });
+        await scene.Pair.RunTicksSync(30);
+
+        var sourcePos = scene.Listener.Position + new Vector2(10f * scene.TileSize, 0f);
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlR, out var lenR, out var pastR, out var filterRaw),
+                Is.True, "raw purity: field read failed");
+            Assert.That(filterRaw, Is.EqualTo(57.5f).Within(4f),
+                $"raw purity keeps the small detour share: occl {occlR:0.000} len {lenR:0.0} past {pastR:0.0} filter {filterRaw:0.00}");
+        });
+
+        await scene.Client.WaitPost(() =>
+            scene.Client.ResolveDependency<IConfigurationManager>().SetCVar(MaidCVars.SoundPathPurityDecay.Name, true));
+        await scene.Pair.RunTicksSync(30);
+
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(scene.System.PurityDecay, Is.True, "the purity cvar flip must reach the client system");
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlD, out var lenD, out var pastD, out var filterDecayed),
+                Is.True, "decayed purity: field read failed");
+            Assert.That(filterDecayed, Is.EqualTo(38.9f).Within(4f),
+                $"decayed purity lets the surviving-occlusion detour take the big share: occl {occlD:0.000} len {lenD:0.0} past {pastD:0.0} filter {filterDecayed:0.00}");
+        });
+
+        // Back to raw: the flag is read per call, the verdict must return without a rebuild.
+        await scene.Client.WaitPost(() =>
+            scene.Client.ResolveDependency<IConfigurationManager>().SetCVar(MaidCVars.SoundPathPurityDecay.Name, false));
+        await scene.Pair.RunTicksSync(30);
+
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out _, out _, out _, out var filterBack),
+                Is.True, "reverted purity: field read failed");
+            Assert.That(filterBack, Is.EqualTo(57.5f).Within(4f), "flipping the purity cvar back must restore the raw verdict");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
     [Test]
     public async Task BeyondFieldRadius()
     {

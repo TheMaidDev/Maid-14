@@ -131,6 +131,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Blocker occlusion multiplier of the detour pass; 0 disables detours.</summary>
     private float _detourWeight;
 
+    /// <summary>Measure detour purity by the surviving (past-decayed) blocker occlusion instead of raw closed blockers.</summary>
+    private bool _purityDecay;
+
     /// <summary>Whether a blocker event requested a field rebuild.</summary>
     private bool _dirty;
 
@@ -330,6 +333,7 @@ public sealed class PathSoundSystem : EntitySystem
         j.Key("cacheTtl").Value(_ttl);
         j.Key("smoothing").Value(_smoothing);
         j.Key("detourWeight").Value(_detourWeight);
+        j.Key("purityDecay").Value(_purityDecay);
         j.Key("zOffset").Value(zOffset);
         j.Key("raycastLength").Value(_cfg.GetCVar(CVars.AudioRaycastLength));
         j.Key("occlusionMask").Value(_sharedAudio.OcclusionCollisionMask);
@@ -847,6 +851,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Blocker occlusion multiplier of the detour pass; 0 disables detours.</summary>
     public float DetourWeight => _detourWeight;
 
+    /// <summary>Whether detour purity forgives blockers fully decayed by the walk past them.</summary>
+    public bool PurityDecay => _purityDecay;
+
     /// <summary>Last filter values per sound for the overlay markers.</summary>
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
@@ -1005,6 +1012,7 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathCacheTtl, v => _ttl = MathF.Max(0.25f, v), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathSmoothing, v => _smoothing = Math.Clamp(v, 0.01f, 1f), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathDetourWeight, OnDetourWeight, true);
+        Subs.CVar(_cfg, MaidCVars.SoundPathPurityDecay, v => _purityDecay = v, true);
 
         SubscribeLocalEvent<DoorStateChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<AnchorStateChangedEvent>(OnBlockerChanged);
@@ -1400,8 +1408,12 @@ public sealed class PathSoundSystem : EntitySystem
                 f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
                 // Purity counts CLOSED blockers only: the detour pass zero-weights open door tiles, so
                 // a bypass through open doors stays pure and takes the big share, while any closed
-                // blocker still gates the blend to the long-hop small share.
-                var pure = live.SumW2[idx] - srcWeight <= OpenDoorTileWeight * 0.5f;
+                // blocker still gates the blend to the long-hop small share. The purity-decay mode
+                // measures the blockers after the past-decay instead: doors crossed long before the
+                // source decay away and the detour counts as clean.
+                var pure = _purityDecay
+                    ? occlR2 <= OpenDoorTileWeight * 0.5f
+                    : live.SumW2[idx] - srcWeight <= OpenDoorTileWeight * 0.5f;
                 var requiredExtra = doorSource ? 1 : (pure ? 1 : MinDetourExtraHops);
                 var detourShare = doorSource ? 1f : (pure ? PureDetourShare : DetourShare);
                 if (f2 < f1 - 1e-3f
