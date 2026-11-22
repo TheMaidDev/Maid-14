@@ -69,6 +69,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Residual weight of an open door's tile: marks the tile as a doorway so detour purity can tell an around-the-wall bypass from one crossing open doors.</summary>
     private const float OpenDoorTileWeight = 0.005f;
 
+    /// <summary>A direct route transmitting less than 0.1% of the sound is dead and may be rescued by a detour blend; anything more audible is the transmission table's answer and is never bypassed.</summary>
+    private const float AudibleDirectCeiling = 6.9f;
+
     /// <summary>Minimum field radius in tiles.</summary>
     private const int MinRadius = 4;
 
@@ -1398,12 +1401,13 @@ public sealed class PathSoundSystem : EntitySystem
                 pastR2 = live.SumW2[idx] > 0f ? live.Past2[idx] : 0;
                 hopsR2 = live.Hops2[idx];
 
-                // Blend only when the detour is strictly better over the full folded value AND takes at
-                // least a few extra hops: clean corridors (both paths equally clean), sealed rooms (no
-                // detour) and short bypasses through neighboring open doors never lift a closed blocker.
-                // Two exceptions: a door's own sound takes its best route outright (the primary crosses
-                // its wall row's other doors), and a detour crossing no door tile at all — around a
-                // wall row's open end — carries the sound's dominant path and takes the big share.
+                // Blend only when the direct route is DEAD and the detour is strictly better over the
+                // full folded value AND takes at least a few extra hops. The per-object transmission
+                // table is what the listener hears through objects: an audible direct crossing (a 1%
+                // glass airlock, a window) is the answer even when a clean detour runs far around —
+                // the bypass exists to rescue routes that transmit nothing at all (walls, solid
+                // airlocks, stacked glass). The decay already forgives blockers crossed long before
+                // the source, so a far-away door does not keep the route dead forever.
                 f2 = occlR2 * kOccl + (hopsR2 + pastR2) * kLoss + MathF.Max(0f, dTiles - hopsR2) * kLoss;
                 // Purity counts CLOSED blockers only: the detour pass zero-weights open door tiles, so
                 // a bypass through open doors stays pure and takes the big share, while any closed
@@ -1416,6 +1420,7 @@ public sealed class PathSoundSystem : EntitySystem
                 var requiredExtra = doorSource ? 1 : (pure ? 1 : MinDetourExtraHops);
                 var detourShare = doorSource ? 1f : (pure ? PureDetourShare : DetourShare);
                 if (f2 < f1 - 1e-3f
+                    && occlR1 >= AudibleDirectCeiling
                     && hopsR2 + pastR2 - (hopsR1 + pastR1) >= requiredExtra)
                     share = detourShare;
             }

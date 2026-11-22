@@ -210,13 +210,14 @@ public sealed class PathSoundTest
             var cBypassPhys = scene.Client.EntMan.GetComponent<PhysicsComponent>(cBypass);
             var probe = $"bypass(-1,1) SumW {sBypass:0.000} hops {hBypass} | closed(-1,0) SumW {sClosed:0.000} hops {hClosed} | src(-3,0) SumW {sSrc:0.000} hops {hSrc} past {pSrc} | dw {scene.System.DetourWeight:0.#} | world: state {cBypassComp.State} collide {cBypassPhys.CanCollide}";
 
-            // The door's own sound: the detour through the open bypass door is strictly better and the
-            // door gate accepts +2 extra hops, so every blending root reports a clean route.
+            // The door's own sound: the primary itself short-circuits through the open (-1,1) bypass
+            // (cost 1.005 versus 5.605 through the closed door), so the direct route is clean and the
+            // dead-direct gate keeps every detour blend off — the sound rides the clean bypass route.
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occl, out var len, out var past, out var filter, doorSource: true),
                 Is.True, $"door own sound: field read failed; {probe}");
             Assert.That(filter, Is.LessThan(12f),
-                $"door own sound must take the open-door bypass: occl {occl:0.000} len {len:0.0} past {past:0.0} filter {filter:0.00}; {probe}");
+                $"door own sound must ride the open-door bypass: occl {occl:0.000} len {len:0.0} past {past:0.0} filter {filter:0.00}; {probe}");
 
             // A foreign source on the same tile: with open-door tiles costing 1.005 in the primary
             // (round-44), every live root's shortest path already short-circuits through the open
@@ -790,18 +791,18 @@ public sealed class PathSoundTest
     }
 
     [Test]
-    public async Task DetourAroundBlockerRaisesAudibility()
+    public async Task DetourDoesNotBypassAudibleDirectRoute()
     {
         var scene = await SetupScene(12);
         await using var pair = scene.Pair;
 
         await Place(scene, 5, "AirlockGlass");
 
-        // Gates in the north wall row far from the airlock plus a real floor strip behind them open a
-        // clean detour the primary pass rejects (13+ hops beats nothing against the 8.3-cost airlock
-        // crossing) while the detour pass takes it (the airlock costs 14.8 there). Vacuum stays shut:
-        // the detour pass excludes empty tiles, and the vacuum approach to the strip is longer than the
-        // airlock for the primary.
+        // Gates in the north wall row far from the glass airlock plus a real floor strip behind them
+        // offer a clean ~14-hop detour. The direct crossing transmits 1% (occl 4.605, decayed to 4.305
+        // by its one tile of walk-out) — audible — so the dead-direct gate keeps every detour blend
+        // off: the transmission table is what the listener hears, and a far clean detour never
+        // overrides it.
         await scene.Server.WaitPost(() =>
         {
             var maps = scene.Server.System<SharedMapSystem>();
@@ -825,7 +826,7 @@ public sealed class PathSoundTest
         });
         await scene.Pair.RunTicksSync(30);
 
-        // The shortest route crosses the airlock one tile back; the clean detour must lift the filter past it.
+        // The straight route crosses the glass airlock; the clean detour must NOT lift the filter.
         var primaryExpected = Expected(scene, AirlockOccl(GlassAirlockMuffle), 6, 5);
         await scene.Client.WaitAssertion(() =>
         {
@@ -833,11 +834,11 @@ public sealed class PathSoundTest
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out _, out _, out _, out var filter),
                 Is.True, "field read failed");
-            Assert.That(filter, Is.LessThan(primaryExpected - 3f),
-                $"the detour must lift audibility: filter {filter:0.00} vs primary {primaryExpected:0.00}");
+            Assert.That(filter, Is.EqualTo(primaryExpected).Within(1.5f),
+                $"the audible direct crossing must not be bypassed: filter {filter:0.00} vs primary {primaryExpected:0.00}");
         });
 
-        // Disabling detours restores the exact primary-route contract.
+        // Disabling detours changes nothing — the verdict was already the direct route's.
         await scene.Client.WaitPost(() =>
             scene.Client.ResolveDependency<IConfigurationManager>().SetCVar(MaidCVars.SoundPathDetourWeight.Name, 0f));
         await scene.Pair.RunTicksSync(60);
