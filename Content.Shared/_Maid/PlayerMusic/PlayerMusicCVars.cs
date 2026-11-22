@@ -15,6 +15,12 @@ public sealed class PlayerMusicCVars
     public static readonly CVarDef<int> MaxDecodedBytes =
         CVarDef.Create("maidmusic.max_decoded_bytes", 48_000_000, CVar.SERVER | CVar.REPLICATED);
 
+    // /// <summary>
+    // /// How many different songs one player can record per round.
+    // /// </summary>
+    // public static readonly CVarDef<int> MaxSongsPerPlayer =
+    //     CVarDef.Create("maidmusic.max_songs_per_player", 6, CVar.SERVERONLY);
+
     /// <summary>
     /// Total size of all songs kept in server memory per round.
     /// </summary>

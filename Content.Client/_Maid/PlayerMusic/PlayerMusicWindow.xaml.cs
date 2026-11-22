@@ -196,7 +196,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
         {
             "maid-music-cooldown" => Loc.GetString(locKey, ("seconds", (int) MathF.Ceiling(number))),
             "maid-music-too-big" => Loc.GetString(locKey, ("max", number)),
-            "maid-music-too-long" => Loc.GetString(locKey, ("max", (int) number)),
+            "maid-music-ui-too-long" => Loc.GetString(locKey, ("max", (int) number)),
             "maid-music-recorded" => Loc.GetString(locKey, ("name", text)),
             _ => Loc.GetString(locKey),
         };
@@ -328,7 +328,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
             // Same checks as on the server, so a bad file is not even sent
             if (!PlayerMusicOgg.TryAnalyze(bytes, out var info))
             {
-                RejectFile("maid-music-not-ogg");
+                RejectFile("maid-music-ui-bad-file");
                 return;
             }
 
@@ -341,7 +341,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
             var maxSeconds = _maxSongSeconds;
             if (info.Seconds > maxSeconds)
             {
-                RejectFile("maid-music-too-long", ("max", maxSeconds));
+                RejectFile("maid-music-ui-too-long", ("max", maxSeconds));
                 return;
             }
 
@@ -349,7 +349,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
                 PlayerMusicLimits.HardMaxDecodedBytes);
             if (info.DecodedBytes > maxDecoded)
             {
-                RejectFile("maid-music-too-heavy");
+                RejectFile("maid-music-ui-too-heavy");
                 return;
             }
 
@@ -393,7 +393,7 @@ public sealed partial class PlayerMusicWindow : FancyWindow
         _pending = null;
         NameField.Clear();
         FileLabel.Text = string.Empty;
-        StatusLabel.Text = Loc.GetString("maid-music-ui-recording");
+        StatusLabel.Text = Loc.GetString("maid-music-ui-sent");
         UpdateUploadButton();
     }
 

@@ -44,7 +44,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     private const long MaxCachedBytes = 128_000_000;
 
     /// <summary>
-    /// Upload speed cap in bytes per second, same as the original implementation.
+    /// Upload speed cap in bytes per second, so recording a song never saturates the connection.
     /// </summary>
     private const int UploadBytesPerSecond = 1_000_000;
 

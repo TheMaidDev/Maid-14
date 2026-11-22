@@ -690,7 +690,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         // Whole file is checked here: structure, end of stream, sample rate, channels and length
         if (!PlayerMusicOgg.TryAnalyze(data, out var info))
         {
-            Deny(session, boomboxUid, user, "maid-music-not-ogg");
+            Deny(session, boomboxUid, user, "maid-music-ui-bad-file");
             return;
         }
 
@@ -705,7 +705,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         var maxSeconds = Math.Min(cassette.Comp.MaxSongSeconds, PlayerMusicLimits.HardMaxSongSeconds);
         if (info.Seconds > maxSeconds)
         {
-            Deny(session, boomboxUid, user, "maid-music-too-long", maxSeconds, ("max", maxSeconds));
+            Deny(session, boomboxUid, user, "maid-music-ui-too-long", maxSeconds, ("max", maxSeconds));
             return;
         }
 
@@ -713,12 +713,22 @@ public sealed class PlayerMusicSystem : EntitySystem
         var maxDecoded = Math.Min((long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes), PlayerMusicLimits.HardMaxDecodedBytes);
         if (info.DecodedBytes > maxDecoded)
         {
-            Deny(session, boomboxUid, user, "maid-music-too-heavy");
+            Deny(session, boomboxUid, user, "maid-music-ui-too-heavy");
             return;
         }
 
         var userId = session.UserId;
         var id = Convert.ToHexString(upload.Hash.GetHashAndReset())[..32];
+
+        // The round quota is per player and independent of the song storage: re-recording a song
+        // this player already recorded is always free, and a song somebody else stored still
+        // charges the quota of the player recording it now.
+        // var owned = _owned.GetOrNew(userId);
+        // if (!owned.Contains(id) && owned.Count >= _cfg.GetCVar(PlayerMusicCVars.MaxSongsPerPlayer))
+        // {
+        //     Deny(session, boomboxUid, user, "maid-music-quota");
+        //     return;
+        // }
 
         if (!_songs.ContainsKey(id))
         {
@@ -988,6 +998,11 @@ public sealed class PlayerMusicSystem : EntitySystem
         }
     }
 
+    /// <summary>
+    /// The song must still play near the listener on some boombox: teleports, stopped songs and
+    /// stopped devices cancel the transfer, but another device taking over the same song keeps
+    /// it alive without the client having to re-request it.
+    /// </summary>
     private bool IsWanted(
         ICommonSession session,
         string songId,
