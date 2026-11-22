@@ -87,6 +87,12 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>User-data directory the snapshot files are written to.</summary>
     private const string SnapshotDir = "/soundpath";
 
+    /// <summary>Scratch states: free to post into, owned by a worker, built awaiting adoption, dropped mid-build.</summary>
+    private const int ScratchFree = 0;
+    private const int ScratchBuilding = 1;
+    private const int ScratchReady = 2;
+    private const int ScratchDropped = 3;
+
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
@@ -245,9 +251,8 @@ public sealed class PathSoundSystem : EntitySystem
 
         public int HeapCount;
         public bool DetourValid;
-        public bool Ready;
-        public bool Busy;
-        public bool Stale;
+        /// <summary>Scratch lifecycle, mutated only with Interlocked: Free, Building, Ready, Dropped.</summary>
+        public int State;
         public Vector2i BaseTile;
         public TimeSpan Time;
         public float BuildMs;
@@ -1211,12 +1216,10 @@ public sealed class PathSoundSystem : EntitySystem
         }
 
         // Adopt a finished background build before anything reads the field this frame.
-        if (_buildInFlight && _pendingBuild is { Ready: true } pending)
+        if (_buildInFlight && _pendingBuild is { } pending
+            && Interlocked.CompareExchange(ref pending.State, ScratchFree, ScratchReady) == ScratchReady)
         {
-            if (pending.Stale)
-                DiscardPending();
-            else
-                SwapBuild(pending);
+            SwapBuild(pending);
         }
 
         if (_fieldGrid == null
@@ -1756,10 +1759,11 @@ public sealed class PathSoundSystem : EntitySystem
         FieldBuffers? target = null;
         foreach (var scratch in _scratch)
         {
-            if (scratch.Busy)
-                continue;
-            target = scratch;
-            break;
+            if (Interlocked.CompareExchange(ref scratch.State, ScratchBuilding, ScratchFree) == ScratchFree)
+            {
+                target = scratch;
+                break;
+            }
         }
 
         if (target == null)
@@ -1768,9 +1772,6 @@ public sealed class PathSoundSystem : EntitySystem
         var radius = _fieldRadius;
         var detourWeight = _detourWeight;
 
-        target.Busy = true;
-        target.Stale = false;
-        target.Ready = false;
         target.BaseTile = baseTile;
         target.Time = _timing.CurTime;
         Array.Copy(_stagingWindow, target.Window, _stagingWindow.Length);
@@ -1784,16 +1785,14 @@ public sealed class PathSoundSystem : EntitySystem
                 var start = System.Diagnostics.Stopwatch.GetTimestamp();
                 BuildField(target, baseTile, radius, detourWeight);
                 target.BuildMs = (float) ((System.Diagnostics.Stopwatch.GetTimestamp() - start) * 1000.0 / System.Diagnostics.Stopwatch.Frequency);
-                target.Ready = true;
-                // A drop (synchronous rebuild during flight) orphans this scratch: nothing will
-                // adopt it, so the worker releases it itself once it stops writing the arrays.
-                if (target.Stale)
-                    target.Busy = false;
+                // A finished build either awaits adoption or was already dropped mid-flight: only in
+                // the latter case does the worker release the scratch itself.
+                if (Interlocked.CompareExchange(ref target.State, ScratchReady, ScratchBuilding) != ScratchBuilding)
+                    Interlocked.Exchange(ref target.State, ScratchFree);
             }
             catch
             {
-                target.Ready = false;
-                target.Busy = false;
+                Interlocked.Exchange(ref target.State, ScratchFree);
                 if (_pendingBuild == target)
                 {
                     _buildInFlight = false;
@@ -1824,25 +1823,9 @@ public sealed class PathSoundSystem : EntitySystem
 
         _buildInFlight = false;
         _pendingBuild = null;
-        pending.Ready = false;
-        pending.Busy = false;
-        pending.Stale = false;
     }
 
-    /// <summary>Drops a finished-but-stale background build.</summary>
-    private void DiscardPending()
-    {
-        if (_pendingBuild is not { } pending)
-            return;
-
-        _buildInFlight = false;
-        _pendingBuild = null;
-        pending.Ready = false;
-        pending.Busy = false;
-        pending.Stale = false;
-    }
-
-    /// <summary>Abandons any background build; its scratch stays busy until the worker drains.</summary>
+    /// <summary>Abandons any background build; a building scratch stays claimed until its worker drains, a finished one is released right away.</summary>
     private void DropPendingBuilds()
     {
         if (!_buildInFlight)
@@ -1850,7 +1833,12 @@ public sealed class PathSoundSystem : EntitySystem
 
         _buildInFlight = false;
         if (_pendingBuild is { } pending)
-            pending.Stale = true;
+        {
+            // A build that already finished can never be adopted after the drop, so the scratch is
+            // freed here; one still owned by the worker stays claimed until the worker sees it.
+            if (Interlocked.CompareExchange(ref pending.State, ScratchDropped, ScratchBuilding) != ScratchBuilding)
+                Interlocked.Exchange(ref pending.State, ScratchFree);
+        }
         _pendingBuild = null;
     }
 
