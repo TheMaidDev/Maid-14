@@ -47,4 +47,4 @@
   id: AirlockGlass
   components:
   - type: SoundPathWeight
-    muffle: 80
+    muffle: 90

@@ -37,7 +37,7 @@ public sealed class PathSoundTest
     private const float AirlockMuffle = 90f;
 
     /// <summary>Muffle percent of the shipped GlassAirlock prototype.</summary>
-    private const float GlassAirlockMuffle = 80f;
+    private const float GlassAirlockMuffle = 90f;
 
     /// <summary>Occlusion units of the shipped ReinforcedWindow prototype.</summary>
     private static float WindowOccl => -MathF.Log(1f - 20f / 100f);
@@ -239,13 +239,42 @@ public sealed class PathSoundTest
         // Without the bypass every crossing tile is a closed glass door: the door's own sound falls
         // back to the primary route and stays in the muffled band, never clean.
         await SetColumnDoorState(scene, doors, (-1, 1), DoorState.Closed);
+        var cClosed = pair.ToClientUid(doors[(-1, 1)]);
+        for (var i = 0; i < 40; i++)
+        {
+            var shut = false;
+            await scene.Client.WaitAssertion(() =>
+            {
+                shut = scene.System.TryGetTile(new Vector2i(-1, 1), out var s, out _, out _) && s > 1f;
+            });
+
+            if (shut)
+                break;
+
+            await pair.RunTicksSync(10);
+        }
+
         await scene.Client.WaitAssertion(() =>
         {
+            scene.System.TryGetTile(new Vector2i(-1, 1), out var sB, out var hB, out var pB);
+            var st = scene.Client.EntMan.GetComponent<DoorComponent>(cClosed);
+            var ph = scene.Client.EntMan.GetComponent<PhysicsComponent>(cClosed);
+            var probe = $"bypass(-1,1) SumW {sB:0.000} hops {hB} | world: state {st.State} collide {ph.CanCollide}";
+
+            var breaksC = new List<PathSoundSystem.RootBreak>();
             Assert.That(
-                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlC, out var lenC, out var pastC, out var filterC, doorSource: true),
-                Is.True, "shut bypass: field read failed");
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlC, out var lenC, out var pastC, out var filterC, doorSource: true, breakdown: breaksC),
+                Is.True, $"shut bypass: field read failed; {probe}");
+
+            Assert.That(scene.System.FieldSeed, Is.EqualTo(new Vector2i(0, 0)), "shut phase field seed");
+            foreach (var t in new[] { new Vector2i(0, -1), new Vector2i(-1, -1), new Vector2i(-2, -1), new Vector2i(-3, -1), new Vector2i(0, 6), new Vector2i(-1, 6) })
+            {
+                scene.System.TryGetTile(t, out var sW, out var hW, out var pW);
+                Assert.That(sW, Is.GreaterThan(50f), $"wall tile ({t.X};{t.Y}) must be a wall, SumW {sW:0.0} hops {hW}");
+            }
+
             Assert.That(filterC, Is.GreaterThan(20f),
-                $"shut bypass must keep the door own sound muffled: occl {occlC:0.000} len {lenC:0.0} past {pastC:0.0} filter {filterC:0.00}");
+                $"shut bypass must keep the door own sound muffled: occl {occlC:0.000} len {lenC:0.0} past {pastC:0.0} filter {filterC:0.00}; {probe}");
         });
 
         await pair.CleanReturnAsync();
@@ -380,10 +409,11 @@ public sealed class PathSoundTest
             var plating = new Tile(tiles["Plating"].TileId);
             var grid = map.Grid;
 
-            // Room interior: x -8..16, y 0..5.
-            for (var x = -8; x <= 16; x++)
+            // Room interior plus the wall rows themselves: walls must anchor on existing floor tiles,
+            // a wall on a nonexistent tile is ignored by the field (ComputeTileWeight returns 0 there).
+            for (var x = -9; x <= 17; x++)
             {
-                for (var y = 0; y <= 5; y++)
+                for (var y = -1; y <= 6; y++)
                     maps.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), plating);
             }
 
@@ -799,7 +829,7 @@ public sealed class PathSoundTest
     /// the surviving occlusion instead and the same detour takes the big share. Scene: a corridor with
     /// two closed airlocks near the middle, plus a gated floor strip in the north wall carrying one
     /// glass airlock — the shortest pass crosses the corridor airlocks (recent, undecayed), the detour
-    /// pass takes the strip (its airlock sits 7 tiles before the source and decays to zero).
+    /// pass takes the strip (its airlock sits 8 tiles before the source and decays to zero).
     /// </summary>
     [Test]
     public async Task DetourPurityDecayToggle()
@@ -831,7 +861,7 @@ public sealed class PathSoundTest
                     scene.Server.EntMan.DeleteEntity(ent);
             }
 
-            scene.Server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(scene.Grid, 5.5f, 2.5f));
+            scene.Server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(scene.Grid, 4.5f, 2.5f));
         });
         await scene.Pair.RunTicksSync(30);
 
