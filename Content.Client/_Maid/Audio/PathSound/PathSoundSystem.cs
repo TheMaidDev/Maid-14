@@ -1525,7 +1525,7 @@ public sealed class PathSoundSystem : EntitySystem
             // e^-occl, wiping mid-frequency sounds (beeps) far beyond the audible broadband fade.
             var fade = 0f;
             component.Occlusion = GetPathOcclusion(entity, component, xform, listener, delta, distance, out fade);
-            component.Volume = component.Params.Volume + fade;
+            component.Volume = component.Params.Volume - fade;
         }
 
         component.Position = worldPos;
