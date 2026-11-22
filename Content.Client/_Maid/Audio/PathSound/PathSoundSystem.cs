@@ -69,8 +69,8 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Residual weight of an open door's tile: marks the tile as a doorway so detour purity can tell an around-the-wall bypass from one crossing open doors.</summary>
     private const float OpenDoorTileWeight = 0.005f;
 
-    /// <summary>A direct route transmitting less than 0.1% of the sound is dead and may be rescued by a detour blend; anything more audible is the transmission table's answer and is never bypassed.</summary>
-    private const float AudibleDirectCeiling = 6.9f;
+    /// <summary>A direct route whose transmission underflows to zero (past this occlusion e^-occl cannot even hold a subnormal) is dead and may be rescued by a detour blend; anything more audible is the transmission table's answer and is never bypassed.</summary>
+    private const float AudibleDirectCeiling = 104f;
 
     /// <summary>Minimum field radius in tiles.</summary>
     private const int MinRadius = 4;
@@ -95,6 +95,9 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Occlusion ceiling of a fully dead blend: its exponential underflows to exact zero, like the 100%-muffle ceiling.</summary>
     private const float MaxBlendOcclusion = 400f;
+
+    /// <summary>Engine write scale: the EFX broadband leg falls ten times slower than the cutoff, so scaling the write makes the transmission table the whole truth.</summary>
+    private const float WriteOcclScale = 10f;
 
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
@@ -470,7 +473,7 @@ public sealed class PathSoundSystem : EntitySystem
             var modelled = _debug.TryGetValue(uid, out var entry);
             var smoothed = modelled ? entry.Smoothed : 0f;
             var gainEst = global || clipped ? 0f : AttenuationGain(distance, comp.RolloffFactor, comp.ReferenceDistance, comp.MaxDistance);
-            var estDb = comp.Params.Volume + 20f * MathF.Log10(MathF.Max(gainEst, 1e-6f)) - OcclDbPerUnit * smoothed;
+            var estDb = comp.Params.Volume + 20f * MathF.Log10(MathF.Max(gainEst, 1e-6f)) - OcclDbPerUnit * WriteOcclScale * smoothed;
 
             j.BeginObject();
             j.Key("uid").Value(uid.Id);
@@ -1623,7 +1626,11 @@ public sealed class PathSoundSystem : EntitySystem
             component.Params.Volume, component.RolloffFactor, component.ReferenceDistance, mode, component.FileName, tick);
         PushRing(tick, entity, fold, smoothed.Occl, distance, component.MaxDistance, mode, occl, sumW, len, past, detoured);
         distFade = smoothed.FadeDb;
-        return MathF.Min(smoothed.Occl, 400f);
+        // The EFX lowpass maps one occlusion scalar to two legs: cutoff e^-occl for highs and a
+        // broadband gain e^-occl/10 (0.8686 dB per unit). Writing the model value directly would
+        // keep bass audible through window stacks (three windows = -11.7 dB) while the highs die —
+        // the x10 scale makes the broadband leg equal the multiplicative transmission table.
+        return MathF.Min(smoothed.Occl * WriteOcclScale, MaxBlendOcclusion * WriteOcclScale);
     }
 
     /// <summary>Converts raycast wall penetration in meters into field occlusion units: one wall per tile of penetration, scaled like a heuristic wall tile.</summary>
