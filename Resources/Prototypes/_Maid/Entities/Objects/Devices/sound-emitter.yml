@@ -1,4 +1,5 @@
 - type: entity
+  categories: [ HideSpawnMenu ]
   id: TestSoundEmitter
   name: sound emitter
   description: Emits a beep every 5 seconds. Used to test path sound occlusion.

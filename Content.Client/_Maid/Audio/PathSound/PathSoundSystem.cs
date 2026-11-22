@@ -88,6 +88,7 @@ public sealed class PathSoundSystem : EntitySystem
     private const string SnapshotDir = "/soundpath";
 
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -127,6 +128,12 @@ public sealed class PathSoundSystem : EntitySystem
 
     /// <summary>Seconds before the field is rebuilt.</summary>
     private float _ttl;
+
+    /// <summary>Cached engine listener z-offset (AudioZOffset), read per stream on job threads.</summary>
+    private float _zOffset;
+
+    /// <summary>Cached engine raycast length (AudioRaycastLength), read per stream on job threads.</summary>
+    private float _raycastLength;
 
     /// <summary>Fraction of the gap to the raw filter value closed per smoothing call.</summary>
     private float _smoothing;
@@ -216,7 +223,7 @@ public sealed class PathSoundSystem : EntitySystem
     private void PushRing(long tick, EntityUid uid, float raw, float smoothed, float distance, float maxDistance, PathSoundModelMode mode,
         float occl = 0f, float sumW = 0f, float len = 0f, float past = 0f, bool detoured = false, bool repaired = false)
     {
-        var slot = (int) (Interlocked.Increment(ref _ringIndex) - 1) % _ring.Length;
+        var slot = Interlocked.Increment(ref _ringIndex) & (_ring.Length - 1);
         _ring[slot] = new RingEntry(tick, uid, raw, smoothed, distance, maxDistance, mode, occl, sumW, len, past, detoured, repaired);
     }
 
@@ -312,7 +319,7 @@ public sealed class PathSoundSystem : EntitySystem
     private string BuildSnapshotJson()
     {
         var j = new JsonBuilder();
-        var zOffset = _cfg.GetCVar(CVars.AudioZOffset);
+        var zOffset = _zOffset;
         var masterGain = _cfg.GetCVar(CVars.AudioMasterVolume);
 
         var haveListener = false;
@@ -338,7 +345,7 @@ public sealed class PathSoundSystem : EntitySystem
         j.Key("detourWeight").Value(_detourWeight);
         j.Key("purityDecay").Value(_purityDecay);
         j.Key("zOffset").Value(zOffset);
-        j.Key("raycastLength").Value(_cfg.GetCVar(CVars.AudioRaycastLength));
+        j.Key("raycastLength").Value(_raycastLength);
         j.Key("occlusionMask").Value(_sharedAudio.OcclusionCollisionMask);
         j.Key("masterGain").Value(masterGain);
         j.Key("attenuation").Value(_cfg.GetCVar(CVars.AudioAttenuation));
@@ -543,8 +550,8 @@ public sealed class PathSoundSystem : EntitySystem
             var haveBreaks = false;
             if (haveListener && !global && _fieldGrid != null)
             {
-                haveBreaks = TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks, doorSource: _doorQuery.HasComp(uid))
-                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks, _doorQuery.HasComp(uid));
+                haveBreaks = TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, breakdown: breaks, doorSource: _doorQuery.HasComp(sx.ParentUid))
+                    || TryGetAudio(listenerCoords, worldPos, out _, out _, out _, out _, out _, true, breaks, _doorQuery.HasComp(sx.ParentUid));
             }
 
             if (haveBreaks)
@@ -964,7 +971,7 @@ public sealed class PathSoundSystem : EntitySystem
         var dist = detour ? live.Dist2 : live.Dist;
 
         route.Clear();
-        var guard = radius * 2 + 2;
+        var guard = radius * 4 + 4;
 
         while (true)
         {
@@ -1015,8 +1022,10 @@ public sealed class PathSoundSystem : EntitySystem
         Subs.CVar(_cfg, MaidCVars.SoundPathSmoothing, v => _smoothing = Math.Clamp(v, 0.01f, 1f), true);
         Subs.CVar(_cfg, MaidCVars.SoundPathDetourWeight, OnDetourWeight, true);
         Subs.CVar(_cfg, MaidCVars.SoundPathPurityDecay, v => _purityDecay = v, true);
+        Subs.CVar(_cfg, CVars.AudioZOffset, v => _zOffset = v, true);
+        Subs.CVar(_cfg, CVars.AudioRaycastLength, v => _raycastLength = v, true);
 
-        SubscribeLocalEvent<DoorStateChangedEvent>(OnBlockerChanged);
+        SubscribeLocalEvent<DoorComponent, DoorStateChangedEvent>(OnDoorStateChanged);
         SubscribeLocalEvent<AnchorStateChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<TileChangedEvent>(OnBlockerChanged);
         SubscribeLocalEvent<CollisionChangeEvent>(OnBlockerChanged);
@@ -1078,43 +1087,29 @@ public sealed class PathSoundSystem : EntitySystem
         _pendingBuild = null;
     }
 
-    /// <summary>Rebuilds the fields the moment a door state change alters a door tile's blocking weight: predicted door sounds spawn in the same tick.</summary>
-    private void OnBlockerChanged(DoorStateChangedEvent args)
-    {
-        if (DoorWeightsUnchanged())
-            return;
-
-        _doorDirty = true;
-        RebuildNow();
-    }
-
-    /// <summary>Checks whether any door tile's cached weight moved with this state change; the directed event carries no entity.</summary>
-    private bool DoorWeightsUnchanged()
+    /// <summary>Rebuilds the fields the moment a door state change alters a door tile's blocking weight: predicted door sounds spawn in the same tick. Directed subscription — the handler prices only the changed door's tile; doors outside the field window cannot affect this field.</summary>
+    private void OnDoorStateChanged(Entity<DoorComponent> door, ref DoorStateChangedEvent args)
     {
         if (_weightCacheGrid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
-            return false;
+            return;
 
-        var query = EntityQueryEnumerator<DoorComponent, TransformComponent>();
-        while (query.MoveNext(out _, out _, out var xform))
-        {
-            if (xform.GridUid != gridUid)
-                continue;
+        if (!TryComp(door, out TransformComponent? xform) || xform.GridUid != gridUid)
+            return;
 
-            var local = _map.LocalToGrid(gridUid, grid, xform.Coordinates);
-            var tile = new Vector2i((int) MathF.Floor(local.X / grid.TileSize), (int) MathF.Floor(local.Y / grid.TileSize));
+        var local = _map.LocalToGrid(gridUid, grid, xform.Coordinates);
+        var tile = new Vector2i((int) MathF.Floor(local.X / grid.TileSize), (int) MathF.Floor(local.Y / grid.TileSize));
 
-            if (!_tileWeightCache.TryGetValue(tile, out var cached))
-                return false;
+        if (!_tileWeightCache.TryGetValue(tile, out var cached))
+            return;
 
-            var fresh = TileWeightUncached(gridUid, grid, tile);
-            if (cached == TileEmptyWeight ? fresh != 0f : cached != fresh)
-            {
-                _dirtyWeightTiles.Add(tile);
-                return false;
-            }
-        }
+        var fresh = TileWeightUncached(gridUid, grid, tile);
+        var unchanged = cached == TileEmptyWeight ? fresh == 0f : cached == fresh;
+        if (unchanged)
+            return;
 
-        return true;
+        _dirtyWeightTiles.Add(tile);
+        _doorDirty = true;
+        RebuildNow();
     }
 
     /// <summary>Computes a tile's blocking weight straight from the world, empty tiles included.</summary>
@@ -1147,20 +1142,29 @@ public sealed class PathSoundSystem : EntitySystem
         _dirtyWeightTiles.Add(tile);
     }
 
-    /// <summary>Rebuilds the fields immediately on the main thread when a player grid is available; the frame update handles the rest.</summary>
+    /// <summary>Rebuilds the fields immediately on the main thread when a listener grid is available; the frame update handles the rest.</summary>
+    /// <summary>Resolves the field center from the audio listener (the eye): for a Station AI the eye is the remote hologram, not the core the mob sits in.</summary>
+    private bool TryGetListenerField(out EntityUid gridUid, out MapGridComponent grid, out Vector2i baseTile)
+    {
+        gridUid = default;
+        grid = default!;
+        baseTile = default;
+
+        var listener = _eye.CurrentEye.Position;
+        if (!_map.TryFindGridAt(listener, out var gridId, out var gridComp))
+            return false;
+
+        gridUid = gridId;
+        grid = gridComp;
+        baseTile = _map.CoordinatesToTile(gridId, gridComp, listener);
+        return true;
+    }
+
     private void RebuildNow()
     {
-        if (_player.LocalEntity is not { } player
-            || !TryComp(player, out TransformComponent? playerXform)
-            || playerXform.GridUid is not { } gridUid
-            || !TryComp(gridUid, out MapGridComponent? grid))
-        {
+        if (!TryGetListenerField(out var gridUid, out var grid, out var baseTile))
             return;
-        }
 
-        var tileSize = grid.TileSize;
-        var local = _map.LocalToGrid(gridUid, grid, playerXform.Coordinates);
-        var baseTile = new Vector2i((int) MathF.Floor(local.X / tileSize), (int) MathF.Floor(local.Y / tileSize));
         RebuildField(gridUid, grid, baseTile);
         _dirty = false;
         _doorDirty = false;
@@ -1182,6 +1186,11 @@ public sealed class PathSoundSystem : EntitySystem
 
     private void OnBlockerChanged(ref CollisionChangeEvent args)
     {
+        // Items, projectiles and containers flip collision constantly; only anchored bodies
+        // (walls, doors, windows) are field blockers.
+        if (!TryComp(args.BodyUid, out TransformComponent? bodyXform) || !bodyXform.Anchored)
+            return;
+
         MarkWeightDirty(args.BodyUid);
         _dirty = true;
     }
@@ -1195,24 +1204,11 @@ public sealed class PathSoundSystem : EntitySystem
             return;
         }
 
-        var player = _player.LocalEntity;
-        if (player == null || !TryComp(player.Value, out TransformComponent? playerXform))
+        if (!TryGetListenerField(out var gridUid, out var grid, out var baseTile))
         {
             ResetAll();
             return;
         }
-
-        if (playerXform.GridUid is not { } gridUid || !TryComp(gridUid, out MapGridComponent? grid))
-        {
-            ResetAll();
-            return;
-        }
-
-        var tileSize = grid.TileSize;
-        var local = _map.LocalToGrid(gridUid, grid, playerXform.Coordinates);
-        var fracX = local.X / tileSize;
-        var fracY = local.Y / tileSize;
-        var baseTile = new Vector2i((int) MathF.Floor(fracX), (int) MathF.Floor(fracY));
 
         // Adopt a finished background build before anything reads the field this frame.
         if (_buildInFlight && _pendingBuild is { Ready: true } pending)
@@ -1241,8 +1237,8 @@ public sealed class PathSoundSystem : EntitySystem
             if (!_buildInFlight)
             {
                 RefreshTileWeights(gridUid, grid, baseTile);
-                PostBuild(baseTile);
-                _dirty = false;
+                if (PostBuild(baseTile))
+                    _dirty = false;
             }
         }
 
@@ -1496,7 +1492,7 @@ public sealed class PathSoundSystem : EntitySystem
         var delta = worldPos - listener.Position;
         var distance = delta.Length();
 
-        var zOffset = _cfg.GetCVar(CVars.AudioZOffset);
+        var zOffset = _zOffset;
         if (MathF.Sqrt(distance * distance + zOffset * zOffset) > component.MaxDistance)
         {
             component.Gain = 0f;
@@ -1556,7 +1552,10 @@ public sealed class PathSoundSystem : EntitySystem
         var modelled = false;
         var clamped = false;
         var detoured = false;
-        var doorSource = _doorQuery.HasComp(entity);
+        // Entity sounds play on a separate "Audio" entity parented to the source (Robust.Client
+        // PlayEntity: SetupAudio + SetCoordinates), so the source is the parent, never the audio
+        // entity itself — checking the audio entity's own components made the door branch dead.
+        var doorSource = _doorQuery.HasComp(xform.ParentUid);
 
         if (!crossGrid && TryGetAudio(listener, sourcePos, out occl, out sumW, out len, out past, out detoured, false, null, doorSource))
         {
@@ -1576,9 +1575,10 @@ public sealed class PathSoundSystem : EntitySystem
             }
             else
             {
-                var rayLength = MathF.Min(distance, _cfg.GetCVar(CVars.AudioRaycastLength));
+                var rayLength = MathF.Min(distance, _raycastLength);
                 var ray = new CollisionRay(listener.Position, dir, mask);
-                occl = OcclFromPen(_physics.IntersectRayPenetration(listener.MapId, ray, rayLength, entity));
+                // Ignore the source like the engine does (parentUid), not the fixture-less audio entity.
+                occl = OcclFromPen(_physics.IntersectRayPenetration(listener.MapId, ray, rayLength, xform.ParentUid));
             }
         }
 
@@ -1594,9 +1594,10 @@ public sealed class PathSoundSystem : EntitySystem
         // airlocks and windows 99% (1% of the highs). Every crossing multiplies: the EFX cutoff is
         // e^-occl and the route sum is the product of the crossed transmissions.
         var engineOccl = occl;
-        // The fade tracks straight-line distance plus the walk-out past the last blocker: a clean
-        // detour around a wall row must not punish loudness for hops the path only took to dodge
-        // blockers — the detour's own muffle already carries that cost.
+        // The fade tracks the straight-line distance only: route length and the walk-out past the
+        // last blocker are already rewarded by the past-decay inside the occlusion (round-10: no
+        // double-counting), and a clean detour must not punish loudness for hops taken to dodge
+        // blockers whose muffle the occlusion already carries.
         var distFadeDb = distance / tileSize * _lossDbPerTile;
         var fold = engineOccl + distFadeDb / OcclDbPerUnit;
 
@@ -1674,7 +1675,7 @@ public sealed class PathSoundSystem : EntitySystem
             for (var root = 0; root < RootCount; root++)
             {
                 var seed = new Vector2i(baseTile.X + (root & 1), baseTile.Y + (root >> 1));
-                BuildRootDetour(_live, seed, baseTile, root * size * size, size, radius);
+                BuildRootDetour(_live, seed, baseTile, root * size * size, size, radius, _detourWeight);
             }
 
             _live.DetourValid = true;
@@ -1701,7 +1702,7 @@ public sealed class PathSoundSystem : EntitySystem
             for (var root = 0; root < RootCount; root++)
             {
                 var seed = new Vector2i(baseTile.X + (root & 1), baseTile.Y + (root >> 1));
-                BuildRootDetour(buffers, seed, baseTile, root * size * size, size, radius);
+                BuildRootDetour(buffers, seed, baseTile, root * size * size, size, radius, detourWeight);
             }
 
             buffers.DetourValid = true;
@@ -1717,9 +1718,10 @@ public sealed class PathSoundSystem : EntitySystem
             _tileWeightCache.Clear();
             _dirtyWeightTiles.Clear();
             _weightCacheGrid = gridUid;
+            // Stamp only on an actual full refresh: refreshing the stamp every call would make the
+            // TTL reset unreachable while events keep the rebuilds rolling (round-52 review fix).
+            _weightRefreshTime = _timing.CurTime;
         }
-
-        _weightRefreshTime = _timing.CurTime;
 
         foreach (var tile in _dirtyWeightTiles)
             _tileWeightCache.Remove(tile);
@@ -1748,8 +1750,8 @@ public sealed class PathSoundSystem : EntitySystem
     }
     }
 
-    /// <summary>Posts a background field build into a free scratch buffer; the worker only touches arrays.</summary>
-    private void PostBuild(Vector2i baseTile)
+    /// <summary>Posts a background field build into a free scratch buffer; the worker only touches arrays. Returns false when both scratches are busy.</summary>
+    private bool PostBuild(Vector2i baseTile)
     {
         FieldBuffers? target = null;
         foreach (var scratch in _scratch)
@@ -1761,7 +1763,7 @@ public sealed class PathSoundSystem : EntitySystem
         }
 
         if (target == null)
-            return;
+            return false;
 
         var radius = _fieldRadius;
         var detourWeight = _detourWeight;
@@ -1783,6 +1785,10 @@ public sealed class PathSoundSystem : EntitySystem
                 BuildField(target, baseTile, radius, detourWeight);
                 target.BuildMs = (float) ((System.Diagnostics.Stopwatch.GetTimestamp() - start) * 1000.0 / System.Diagnostics.Stopwatch.Frequency);
                 target.Ready = true;
+                // A drop (synchronous rebuild during flight) orphans this scratch: nothing will
+                // adopt it, so the worker releases it itself once it stops writing the arrays.
+                if (target.Stale)
+                    target.Busy = false;
             }
             catch
             {
@@ -1795,6 +1801,8 @@ public sealed class PathSoundSystem : EntitySystem
                 }
             }
         });
+
+        return true;
     }
 
     /// <summary>Adopts a finished background build into the live buffers.</summary>
@@ -1857,11 +1865,11 @@ public sealed class PathSoundSystem : EntitySystem
         Array.Fill(buffers.Past, 0, baseIdx, count);
         Array.Fill(buffers.Settled, false, baseIdx, count);
 
-        RunDijkstra(buffers, seed, baseTile, baseIdx, size, radius, false);
+        RunDijkstra(buffers, seed, baseTile, baseIdx, size, radius, false, 0f);
     }
 
     /// <summary>Builds the detour field of one root into the given buffers.</summary>
-    private void BuildRootDetour(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius)
+    private void BuildRootDetour(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, float detourWeight)
     {
         var count = size * size;
 
@@ -1871,11 +1879,11 @@ public sealed class PathSoundSystem : EntitySystem
         Array.Fill(buffers.Past2, 0, baseIdx, count);
         Array.Fill(buffers.Settled, false, baseIdx, count);
 
-        RunDijkstra(buffers, seed, baseTile, baseIdx, size, radius, true);
+        RunDijkstra(buffers, seed, baseTile, baseIdx, size, radius, true, detourWeight);
     }
 
     /// <summary>Runs the Dijkstra heap loop over the primary or detour field arrays.</summary>
-    private void RunDijkstra(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, bool detour)
+    private void RunDijkstra(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, bool detour, float detourWeight)
     {
         buffers.HeapCount = 0;
 
@@ -1897,15 +1905,15 @@ public sealed class PathSoundSystem : EntitySystem
             var x = (idx - baseIdx) % size - radius;
             var y = (idx - baseIdx) / size - radius;
 
-            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x + 1, y, detour);
-            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x - 1, y, detour);
-            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x, y + 1, detour);
-            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x, y - 1, detour);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x + 1, y, detour, detourWeight);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x - 1, y, detour, detourWeight);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x, y + 1, detour, detourWeight);
+            Relax(buffers, seed, baseTile, baseIdx, size, radius, idx, x, y - 1, detour, detourWeight);
         }
     }
 
     /// <summary>Relaxes one neighbor tile of a settled node on the primary or detour pass.</summary>
-    private void Relax(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, int parentIdx, int nx, int ny, bool detour)
+    private void Relax(FieldBuffers buffers, Vector2i seed, Vector2i baseTile, int baseIdx, int size, int radius, int parentIdx, int nx, int ny, bool detour, float detourWeight)
     {
         if (nx < -radius || nx > radius || ny < -radius || ny > radius)
             return;
@@ -1929,7 +1937,7 @@ public sealed class PathSoundSystem : EntitySystem
             // kept for the blocker thresholds) must not reach the detour's muffle sum, past tracker or
             // cost — detour purity counts CLOSED blockers only.
             var w = weight <= OpenDoorTileWeight ? 0f : weight;
-            var dist2 = buffers.Dist2[parentIdx] + 1f + w * _detourWeight;
+            var dist2 = buffers.Dist2[parentIdx] + 1f + w * detourWeight;
             if (dist2 >= buffers.Dist2[idx])
                 return;
 

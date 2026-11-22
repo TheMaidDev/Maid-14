@@ -7,7 +7,10 @@ using Content.IntegrationTests.Pair;
 using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
 using Content.Shared.Doors.Components;
+using Content.Shared.Audio;
 using Content.Shared.Doors.Systems;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Components;
 
 // The client and the server door systems have the same name
 using ClientDoorSystem = Content.Client.Doors.DoorSystem;
@@ -949,6 +952,53 @@ public sealed class PathSoundTest
 
         // Source past the field edge: the clamp branch reads the edge tile and folds the straight remainder.
         await AssertFilter(scene, 30, 30f * scene.PerTile, 3f, "beyond field radius");
+
+        await pair.CleanReturnAsync();
+    }
+
+    /// <summary>
+    /// Round-52: entity sounds play on a separate "Audio" entity that the engine PARENTS to the
+    /// source (PlayEntity teleports it via EntityCoordinates on the source); the replicated copy
+    /// keeps the parenting on the client. The doorSource detection (xform.ParentUid) relies on it.
+    /// </summary>
+    [Test]
+    public async Task EntitySoundAudioEntityIsParentedToSource()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        var server = pair.Server;
+        var client = pair.Client;
+        var map = await pair.CreateTestMap();
+
+        EntityUid door = default;
+        await server.WaitPost(() =>
+        {
+            door = server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(map.Grid, 1.5f, 1.5f));
+        });
+        await pair.RunTicksSync(10);
+
+        // The real production path: the server plays an entity sound the way SharedDoorSystem does.
+        await server.WaitPost(() =>
+        {
+            server.System<Robust.Server.Audio.AudioSystem>()
+                .PlayPvs(new ResolvedPathSpecifier("/Audio/Machines/beep.ogg"), door);
+        });
+        await pair.RunTicksSync(30);
+
+        var cDoor = pair.ToClientUid(door);
+        await client.WaitAssertion(() =>
+        {
+            EntityUid? audio = null;
+            var query = client.EntMan.EntityQueryEnumerator<MetaDataComponent>();
+            while (query.MoveNext(out var uid, out var meta))
+            {
+                if (meta.EntityName.Contains("beep"))
+                    audio = uid;
+            }
+
+            Assert.That(audio, Is.Not.Null, "the replicated audio entity never reached the client");
+            var parent = client.EntMan.GetComponent<TransformComponent>(audio!.Value).ParentUid;
+            Assert.That(parent, Is.EqualTo(cDoor), "the audio entity must be parented to the source entity");
+        });
 
         await pair.CleanReturnAsync();
     }

@@ -62,14 +62,13 @@ public sealed class PathSoundOverlay : Overlay
         }
     }
 
-    /// <summary>Audibility score of a tile: lowpass cutoff times linear volume fraction, 0..1.</summary>
-    private float Audibility(float sumOcclusion, int pathLen, int past)
+    /// <summary>Audibility score of a tile, mirroring the heard model: raw occl cutoff times the straight-distance volume fade, 0..1.</summary>
+    private float Audibility(float sumOcclusion, int past, float distTiles)
     {
-        var pastDb = sumOcclusion > 0f ? past : 0;
-        var applied = MathF.Max(0f, sumOcclusion - _system.OcclusionDecayPerTile * pastDb);
+        var applied = MathF.Max(0f, sumOcclusion - _system.OcclusionDecayPerTile * past);
         var cutoff = MathF.Exp(-applied);
-        var lossDb = _system.LossDbPerTile * (pathLen + pastDb) + _system.OcclusionLossDb * applied;
-        return Math.Clamp(cutoff * MathF.Pow(10f, -lossDb / 20f), 0f, 1f);
+        var fadeDb = distTiles * _system.LossDbPerTile;
+        return Math.Clamp(cutoff * MathF.Pow(10f, -fadeDb / 20f), 0f, 1f);
     }
 
     /// <summary>Highlights one reconstructed route: translucent tile rects plus a polyline through the tile centers.</summary>
@@ -158,7 +157,7 @@ public sealed class PathSoundOverlay : Overlay
 
                     if (_system.TryGetTile(indices, out var sumWeight, out var pathLen, out var past))
                     {
-                        var s = Audibility(sumWeight, pathLen, past);
+                        var s = Audibility(sumWeight, past, (indices - _system.FieldSeed).Length);
                         worldHandle.DrawRect(box, AudibilityColor(s).WithAlpha(0.22f + 0.5f * s));
                     }
                     else if (_mapSystem.TryGetTile(gridComp, indices, out var tile) && !tile.IsEmpty)
@@ -306,7 +305,7 @@ public sealed class PathSoundOverlay : Overlay
                 if (!_system.TryGetTile(indices, out var sumWeight, out var pathLen, out var past))
                     continue;
 
-                var s = Audibility(sumWeight, pathLen, past);
+                var s = Audibility(sumWeight, past, (indices - _system.FieldSeed).Length);
                 var center = _mapTileCenterWorld(gridUid, grid, indices);
                 var screen = args.ViewportControl.WorldToScreen(center);
                 handle.DrawString(_font, screen, $"{s * 100f:0}%", AudibilityColor(s).WithAlpha(0.95f));

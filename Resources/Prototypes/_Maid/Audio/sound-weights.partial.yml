@@ -48,3 +48,23 @@
   components:
   - type: SoundPathWeight
     muffle: 99
+- type: entity
+  id: BaseFirelock
+  components:
+  - type: SoundPathWeight
+    muffle: 100
+- type: entity
+  id: FirelockGlass
+  components:
+  - type: SoundPathWeight
+    muffle: 99
+- type: entity
+  id: BaseShutter
+  components:
+  - type: SoundPathWeight
+    muffle: 100
+- type: entity
+  id: BaseWindoor
+  components:
+  - type: SoundPathWeight
+    muffle: 99
