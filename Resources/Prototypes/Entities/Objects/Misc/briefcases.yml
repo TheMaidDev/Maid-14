@@ -45,10 +45,10 @@
   name: brown briefcase
   components:
   - type: Sprite
-    sprite: Objects/Storage/Briefcases/briefcase_brown.rsi
+    sprite: _Maid/Objects/Storage/Briefcases/briefcase_brown.rsi #Maid changes
     state: icon
   - type: Item
-    sprite: Objects/Storage/Briefcases/briefcase_brown.rsi
+    sprite: _Maid/Objects/Storage/Briefcases/briefcase_brown.rsi #Maid changes
 
 - type: entity
   parent: BriefcaseBrown
@@ -56,5 +56,6 @@
   suffix: Syndicate, Empty
   components:
   - type: Item
+    sprite: Objects/Storage/Briefcases/briefcase_brown.rsi
     size: Huge
   - type: HideContrabandContent #Goobstation-Contraband detector

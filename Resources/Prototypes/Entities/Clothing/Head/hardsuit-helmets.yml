@@ -525,6 +525,7 @@
     sprite: _Maid/Clothing/Head/Hardsuits/capspace.rsi #Maid
   - type: Clothing
     sprite: _Maid/Clothing/Head/Hardsuits/capspace.rsi #Maid
+    equippedState: equipped-HELMET
   - type: PressureProtection
     highPressureMultiplier: 0.3
     lowPressureMultiplier: 1000

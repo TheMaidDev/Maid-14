@@ -359,6 +359,7 @@
   description: The pilot seat of a prestigious ship.
   components:
   - type: Sprite
+    sprite: _Maid/Structures/Furniture/chairs.rsi #Maid changes
     state: shuttle
   - type: Construction
     graph: Seat
