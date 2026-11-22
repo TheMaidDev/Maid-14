@@ -212,19 +212,12 @@ public sealed class PathSoundTest
             Assert.That(filter, Is.LessThan(12f),
                 $"door own sound must take the open-door bypass: occl {occl:0.000} len {len:0.0} past {past:0.0} filter {filter:0.00}; {probe}");
 
-            // A foreign source on the same tile: the two roots hugging the east column (seeds (1,0) and
-            // (1,1)) sit on closed glass doors and are excluded, so the west roots blend. Round-44:
-            // detour purity counts closed tiles only, so the northern root takes the pure bypass
-            // through the open (-1,1) at the 0.7 share (its detour crosses no closed blocker), keeping
-            // the closed (-1,0) door on the remaining 0.3; the southern roots' primaries already route
-            // through the bypass. The source tile is itself the last blocker, so all pasts are zero.
-            const float pureShare = 0.7f;
-            var glass = AirlockOccl(GlassAirlockMuffle);
-            var gainNorth = (1f - pureShare) * MathF.Exp(-glass) + pureShare;
-            var gainSouth = MathF.Exp(-0.005f);
-            var occlForeign = -MathF.Log((gainNorth + 2f * gainSouth) / 3f);
-            var hopsNorth = (1f - pureShare) * 3 + pureShare * 5;
-            var expectedForeign = occlForeign * scene.Fold + (hopsNorth + 4 + 5) / 3f * scene.PerTile;
+            // A foreign source on the same tile: with open-door tiles costing 1.005 in the primary
+            // (round-44), every live root's shortest path already short-circuits through the open
+            // (-1,1) bypass — no detour blend fires and the only occlusion left is the bypass tiles'
+            // residual epsilon (SumW 2.308 minus the exempted self tile 2.303). Round-48 folds the
+            // distance fade from the straight line: 3 tiles, past 0.
+            var expectedForeign = 0.005f * scene.Fold + 3f * scene.PerTile;
 
             var breaks = new List<PathSoundSystem.RootBreak>();
             Assert.That(

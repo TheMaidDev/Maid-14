@@ -871,8 +871,7 @@ public sealed class PathSoundSystem : EntitySystem
             tileSize = gridComp.TileSize;
 
         filterOccl = occl * (1f + _occlLossDb / OcclDbPerUnit)
-            + (pathLen + past) * _lossDbPerTile / OcclDbPerUnit
-            + MathF.Max(0f, (sourcePos - listener.Position).Length() / tileSize - pathLen) * _lossDbPerTile / OcclDbPerUnit;
+            + ((sourcePos - listener.Position).Length() / tileSize + past) * _lossDbPerTile / OcclDbPerUnit;
         return true;
     }
 
@@ -1586,7 +1585,10 @@ public sealed class PathSoundSystem : EntitySystem
             tileSize = gridComp.TileSize;
 
         var engineOccl = occl * (1f + _occlLossDb / OcclDbPerUnit);
-        var distFadeDb = ((len + past) + MathF.Max(0f, distance / tileSize - len)) * _lossDbPerTile;
+        // The fade tracks straight-line distance plus the walk-out past the last blocker: a clean
+        // detour around a wall row must not punish loudness for hops the path only took to dodge
+        // blockers — the detour's own muffle already carries that cost.
+        var distFadeDb = (distance / tileSize + past) * _lossDbPerTile;
         var fold = engineOccl + distFadeDb / OcclDbPerUnit;
 
         // Smooth per stream: rebuild steps fade over a few ticks instead of snapping the filter.
