@@ -34,7 +34,7 @@ Rough hand bands (defaults): occl < 1 clean; 4.6 = 1% highs (−4 dB broadband);
 
 ## Knobs
 
-- `AudibleDirectCeiling` 104 — the dead-direct threshold: the occlusion past which `e^-occl` underflows to exact zero, so only walls and solid airlocks (literal zero transmission) are rescuable; the transmission table governs every audible crossing.
+- `AudibleDirectCeiling` 6.9 — the dead-direct threshold (−ln(0.001)).
 - `MinDetourExtraHops` 4 / `PureDetourShare` 0.7 / `DetourShare` 0.15 — the detour ladder: a pure detour takes 0.7 at 1 extra hop, an impure one 0.15 at 4 extra hops; both only behind a dead direct route.
 - `maidsound.path_purity_decay` — purity measured on past-decayed occlusion instead of raw closed tiles; instant toggle, shown in the overlay legend and snapshots.
 - `maidsound.path_detour_weight` 20 — blocker cost multiplier of the detour pass; 0 disables detours.
