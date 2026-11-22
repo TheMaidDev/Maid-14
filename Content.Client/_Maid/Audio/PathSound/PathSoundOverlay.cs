@@ -262,7 +262,7 @@ public sealed class PathSoundOverlay : Overlay
         handle.DrawString(
             _font,
             pos + new Vector2(0f, 4f),
-            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  fade {_system.OcclusionDecayPerTile:0.0}/t  route occl x{_system.OcclusionLossDb / 0.8686f:0.#}  smooth {_system.Smoothing:0.00}  detour x{_system.DetourWeight:0.#}  purity {(_system.PurityDecay ? "decayed" : "raw")}  r {_system.Radius}",
+            $"wall occl x{_system.OcclusionPerWeight:0.0}  db/tile {_system.LossDbPerTile:0.0}  fade {_system.OcclusionDecayPerTile:0.0}/t  occl -{_system.OcclusionLossDb:0.#}db  smooth {_system.Smoothing:0.00}  detour x{_system.DetourWeight:0.#}  purity {(_system.PurityDecay ? "decayed" : "raw")}  r {_system.Radius}",
             Color.LightGray);
         handle.DrawString(
             _font,

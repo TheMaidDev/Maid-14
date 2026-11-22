@@ -73,9 +73,7 @@ public sealed class MaidCVars
         CVarDef.Create("maidsound.path_loss_db_per_tile", 1.5f, CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
-    /// Scales how strongly blocker occlusion deters the route-selection folds (closed blockers look
-    /// expensive, so clean detours win the blend). Does not shape the filter itself: the filter carries
-    /// the raw muffle percent.
+    /// Volume loss in decibels per unit of sound path occlusion.
     /// </summary>
     public static readonly CVarDef<float> SoundPathOcclusionLossDb =
         CVarDef.Create("maidsound.path_occlusion_loss_db", 15f, CVar.CLIENTONLY | CVar.ARCHIVE);

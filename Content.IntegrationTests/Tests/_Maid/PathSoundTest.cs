@@ -4,7 +4,6 @@ using System.Linq;
 using Content.Client._Maid.Audio.PathSound;
 using Content.Client.Doors;
 using Content.IntegrationTests.Pair;
-using Content.Shared._Maid.Audio;
 using Content.Shared._Maid.CVars;
 using Content.Shared.Doors.Components;
 using Content.Shared.Doors.Systems;
@@ -35,10 +34,10 @@ public sealed class PathSoundTest
     private const float OcclDbPerUnit = 0.8686f;
 
     /// <summary>Muffle percent of the shipped Airlock prototype.</summary>
-    private const float AirlockMuffle = 99f;
+    private const float AirlockMuffle = 90f;
 
     /// <summary>Muffle percent of the shipped GlassAirlock prototype.</summary>
-    private const float GlassAirlockMuffle = 99f;
+    private const float GlassAirlockMuffle = 90f;
 
     /// <summary>Occlusion units of the shipped ReinforcedWindow prototype.</summary>
     private static float WindowOccl => -MathF.Log(1f - 20f / 100f);
@@ -97,7 +96,7 @@ public sealed class PathSoundTest
             var plating = new Tile(tiles["Plating"].TileId);
             var grid = map.Grid;
 
-            for (var x = -8; x <= corridorLength + 2; x++)
+            for (var x = -1; x <= corridorLength + 2; x++)
             {
                 for (var y = -1; y <= 1; y++)
                     maps.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), plating);
@@ -149,7 +148,7 @@ public sealed class PathSoundTest
         });
 
         return new Scene(pair, server, client, cSys, player, listener, map.Grid, new Dictionary<int, EntityUid>(),
-            1f, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
+            1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
     }
 
     /// <summary>A sound born on an airlock tile inside a bank must stay audible: its own tile is exempt and the bank neighbors are not on the direct corridor route. The PredEntrySumW regression leaked a neighbor's muffle here and pushed the filter past 30.</summary>
@@ -267,7 +266,7 @@ public sealed class PathSoundTest
                 Assert.That(sW, Is.GreaterThan(50f), $"wall tile ({t.X};{t.Y}) must be a wall, SumW {sW:0.0} hops {hW}");
             }
 
-            Assert.That(filterC, Is.GreaterThan(8f),
+            Assert.That(filterC, Is.GreaterThan(20f),
                 $"shut bypass must keep the door own sound muffled: occl {occlC:0.000} len {lenC:0.0} past {pastC:0.0} filter {filterC:0.00}; {probe}");
         });
 
@@ -360,7 +359,7 @@ public sealed class PathSoundTest
         });
 
         return new Scene(pair, server, client, cSys, player, listener, map.Grid, doors,
-            1f, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
+            1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
     }
 
     /// <summary>
@@ -468,7 +467,7 @@ public sealed class PathSoundTest
         });
 
         return (new Scene(pair, server, client, cSys, player, listener, map.Grid, new Dictionary<int, EntityUid>(),
-            1f, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize), doors);
+            1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize), doors);
     }
 
     /// <summary>Drives a column-bank door into the state on both sides, flipping collision like the real actuation flow does mid-animation: the server value is networked and clobbers a client-only flip.</summary>
@@ -608,7 +607,7 @@ public sealed class PathSoundTest
         var past = lastBlockerX >= 0 ? sourceX - lastBlockerX : 0;
         var occlR = MathF.Max(0f, blockersOccl - scene.System.OcclusionDecayPerTile * past);
         occlR = MathF.Min(occlR, -MathF.Log(1e-9f));
-        return occlR * scene.Fold + sourceX * scene.PerTile;
+        return occlR * scene.Fold + (sourceX + past) * scene.PerTile;
     }
 
     [Test]
@@ -651,7 +650,7 @@ public sealed class PathSoundTest
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, scene.Listener.Position + new Vector2(12f * scene.TileSize, 0f), out _, out _, out _, out var filter),
                 Is.True);
-            Assert.That(filter, Is.GreaterThan(30f), "five airlocks must silence the route");
+            Assert.That(filter, Is.GreaterThan(150f), "five airlocks must silence the route");
         });
 
         await pair.CleanReturnAsync();
@@ -768,7 +767,6 @@ public sealed class PathSoundTest
         // crossing) while the detour pass takes it (the airlock costs 14.8 there). Vacuum stays shut:
         // the detour pass excludes empty tiles, and the vacuum approach to the strip is longer than the
         // airlock for the primary.
-        EntityUid? stripGate = null;
         await scene.Server.WaitPost(() =>
         {
             var maps = scene.Server.System<SharedMapSystem>();
@@ -800,7 +798,7 @@ public sealed class PathSoundTest
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out _, out _, out _, out var filter),
                 Is.True, "field read failed");
-            Assert.That(filter, Is.LessThan(primaryExpected - 3f),
+            Assert.That(filter, Is.LessThan(primaryExpected - 5f),
                 $"the detour must lift audibility: filter {filter:0.00} vs primary {primaryExpected:0.00}");
         });
 
@@ -835,7 +833,6 @@ public sealed class PathSoundTest
         await Place(scene, 5, "Airlock");
         await Place(scene, 6, "Airlock");
 
-        EntityUid? stripGate = null;
         await scene.Server.WaitPost(() =>
         {
             var maps = scene.Server.System<SharedMapSystem>();
@@ -857,13 +854,7 @@ public sealed class PathSoundTest
                     scene.Server.EntMan.DeleteEntity(ent);
             }
 
-            stripGate = scene.Server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(scene.Grid, 4.5f, 2.5f));
-        });
-        // 99% muffle (4.605 occl units) needs a 16-tile walk-out to decay away; the strip offers 8.
-        // Hold the gate at 90% (2.303 units) so the decayed-purity phase can forgive it.
-        await scene.Server.WaitPost(() =>
-        {
-            scene.Server.EntMan.GetComponent<SoundPathWeightComponent>(stripGate.Value).Muffle = 90f;
+            scene.Server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(scene.Grid, 4.5f, 2.5f));
         });
         await scene.Pair.RunTicksSync(30);
 
@@ -873,7 +864,7 @@ public sealed class PathSoundTest
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlR, out var lenR, out var pastR, out var filterRaw),
                 Is.True, "raw purity: field read failed");
-            Assert.That(filterRaw, Is.EqualTo(19.2f).Within(3f),
+            Assert.That(filterRaw, Is.EqualTo(57.5f).Within(4f),
                 $"raw purity keeps the small detour share: occl {occlR:0.000} len {lenR:0.0} past {pastR:0.0} filter {filterRaw:0.00}");
         });
 
@@ -887,7 +878,7 @@ public sealed class PathSoundTest
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlD, out var lenD, out var pastD, out var filterDecayed),
                 Is.True, "decayed purity: field read failed");
-            Assert.That(filterDecayed, Is.EqualTo(17.6f).Within(3f),
+            Assert.That(filterDecayed, Is.EqualTo(38.9f).Within(4f),
                 $"decayed purity lets the surviving-occlusion detour take the big share: occl {occlD:0.000} len {lenD:0.0} past {pastD:0.0} filter {filterDecayed:0.00}");
         });
 
@@ -901,7 +892,7 @@ public sealed class PathSoundTest
             Assert.That(
                 scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out _, out _, out _, out var filterBack),
                 Is.True, "reverted purity: field read failed");
-            Assert.That(filterBack, Is.EqualTo(19.2f).Within(3f), "flipping the purity cvar back must restore the raw verdict");
+            Assert.That(filterBack, Is.EqualTo(57.5f).Within(4f), "flipping the purity cvar back must restore the raw verdict");
         });
 
         await pair.CleanReturnAsync();
