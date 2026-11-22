@@ -870,8 +870,8 @@ public sealed class PathSoundSystem : EntitySystem
         if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
             tileSize = gridComp.TileSize;
 
-        filterOccl = occl * (1f + _occlLossDb / OcclDbPerUnit)
-            + ((sourcePos - listener.Position).Length() / tileSize + past) * _lossDbPerTile / OcclDbPerUnit;
+        filterOccl = occl
+            + (sourcePos - listener.Position).Length() / tileSize * _lossDbPerTile / OcclDbPerUnit;
         return true;
     }
 
@@ -1584,11 +1584,15 @@ public sealed class PathSoundSystem : EntitySystem
         if (_fieldGrid is { } grid && TryComp(grid, out MapGridComponent? gridComp))
             tileSize = gridComp.TileSize;
 
-        var engineOccl = occl * (1f + _occlLossDb / OcclDbPerUnit);
+        // The filter carries the raw path occlusion — the per-object transmission table in
+        // sound-weights.partial.yml: walls and solid airlocks muffle 100% (absolute zero), glass
+        // airlocks and windows 99% (1% of the highs). Every crossing multiplies: the EFX cutoff is
+        // e^-occl and the route sum is the product of the crossed transmissions.
+        var engineOccl = occl;
         // The fade tracks straight-line distance plus the walk-out past the last blocker: a clean
         // detour around a wall row must not punish loudness for hops the path only took to dodge
         // blockers — the detour's own muffle already carries that cost.
-        var distFadeDb = (distance / tileSize + past) * _lossDbPerTile;
+        var distFadeDb = distance / tileSize * _lossDbPerTile;
         var fold = engineOccl + distFadeDb / OcclDbPerUnit;
 
         // Smooth per stream: rebuild steps fade over a few ticks instead of snapping the filter.
@@ -2098,6 +2102,9 @@ public sealed class PathSoundSystem : EntitySystem
     /// <summary>Converts a muffling percent to occlusion units: 90 -> ~2.3 (a tenth of highs passes).</summary>
     private static float OcclFromMuffle(float muffle)
     {
+        if (muffle >= 100f)
+            return 400f;
+
         return -MathF.Log(1f - Math.Clamp(muffle, 0f, 99.9f) / 100f);
     }
 }

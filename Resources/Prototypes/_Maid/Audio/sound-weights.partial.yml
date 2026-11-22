@@ -2,49 +2,49 @@
   id: Window
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: WindowDirectional
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: WindowDiagonal
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: WindowFrostedDirectional
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: ReinforcedWindow
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: PlasmaWindow
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: UraniumWindow
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: PlastitaniumWindowBase
   components:
   - type: SoundPathWeight
-    muffle: 20
+    muffle: 99
 - type: entity
   id: Airlock
   components:
   - type: SoundPathWeight
-    muffle: 90
+    muffle: 100
 - type: entity
   id: AirlockGlass
   components:
   - type: SoundPathWeight
-    muffle: 90
+    muffle: 99
