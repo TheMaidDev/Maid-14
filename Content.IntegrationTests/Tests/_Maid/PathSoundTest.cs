@@ -611,12 +611,11 @@ public sealed class PathSoundTest
     }
 
 
-    /// <summary>Analytic filter value: route blockers minus the past-decay, folded, plus the per-tile distance fade. The model clamps the occl at -ln(1e-9) like TryGetAudio does.</summary>
+    /// <summary>Analytic filter value: route blockers minus the past-decay, folded, plus the per-tile distance fade. Only for audible routes — zero-transmission scenes assert silence bands instead.</summary>
     private float Expected(Scene scene, float blockersOccl, int sourceX, int lastBlockerX)
     {
         var past = lastBlockerX >= 0 ? sourceX - lastBlockerX : 0;
         var occlR = MathF.Max(0f, blockersOccl - scene.System.OcclusionDecayPerTile * past);
-        occlR = MathF.Min(occlR, -MathF.Log(1e-9f));
         return occlR * scene.Fold + sourceX * scene.PerTile;
     }
 
@@ -787,8 +786,15 @@ public sealed class PathSoundTest
         });
         await scene.Pair.RunTicksSync(30);
 
-        // The source sits inside the sealed room: the route crosses its wall (120 occl units raw).
-        await AssertFilter(scene, 10, Expected(scene, 15f * 8f, 10, 9), 40f, "sealed room");
+        // The source sits inside the sealed room: the route crosses its wall (120 occl units raw),
+        // every route transmits nothing, so the blend takes the dead-blend ceiling — a silence band.
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, scene.Listener.Position + new Vector2(10f * scene.TileSize, 0f), out _, out _, out _, out var filter),
+                Is.True, "field read failed");
+            Assert.That(filter, Is.GreaterThan(30f), "the sealed room must silence the route");
+        });
 
         await pair.CleanReturnAsync();
     }

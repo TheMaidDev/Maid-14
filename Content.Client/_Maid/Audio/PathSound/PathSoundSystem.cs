@@ -93,6 +93,9 @@ public sealed class PathSoundSystem : EntitySystem
     private const int ScratchReady = 2;
     private const int ScratchDropped = 3;
 
+    /// <summary>Occlusion ceiling of a fully dead blend: its exponential underflows to exact zero, like the 100%-muffle ceiling.</summary>
+    private const float MaxBlendOcclusion = 400f;
+
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
@@ -1447,7 +1450,11 @@ public sealed class PathSoundSystem : EntitySystem
         if (totalWeight <= 0f)
             return false;
 
-        occlusion = -MathF.Log(MathF.Max(cutoffSum / totalWeight, 1e-9f));
+        // Every e^-occl underflows to zero once the routes transmit nothing (walls, solid airlocks),
+        // and -ln(0) is infinite: the dead blend takes the 400 ceiling, whose exponential underflows
+        // to exact zero at the engine. Clamping the exponent at -ln(1e-9) instead would floor every
+        // dead route at -18 dB of broadband bass, audible through any number of walls.
+        occlusion = cutoffSum > 0f ? -MathF.Log(cutoffSum / totalWeight) : MaxBlendOcclusion;
         dbgSumW = sumWSum / totalWeight;
         dbgHops = hopsSum / totalWeight;
         dbgPast = pastSum / totalWeight;
