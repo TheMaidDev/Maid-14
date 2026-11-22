@@ -4,7 +4,7 @@ Integration tests live in `Content.IntegrationTests/Tests/_Maid/PathSoundTest.cs
 
 ## Scenes
 
-- `SetupScene(corridorLength)` — a sealed one-tile corridor east of the listener: floor and flanking wall rows span x=−2..len+3, with end-cap walls on the last columns. The mouths are capped because with 0%-transmission doors the primary pass would otherwise leak clean through an open end into space (vacuum hops cost 1 in the primary; the detour pass excludes vacuum). Every wall tile has floor under it — walls spawned on missing tiles are invisible to the field (`ComputeTileWeight` early-returns 0 for them).
+- `SetupScene(corridorLength)` — a sealed one-tile corridor east of the listener: floor and flanking wall rows span x=−2..len+3, with end-cap walls on the last columns. The mouths are capped — belt and braces since vacuum tiles became unreachable on both passes (they predate that fix, when the primary's vacuum hops leaked clean through an open end into space). Every wall tile has floor under it — walls spawned on missing tiles are invisible to the field (`ComputeTileWeight` early-returns 0 for them).
 - `SetupBankScene` — a glass-airlock bank (x=2..5) embedded in the north wall row; sounds are born on bank tiles. Perimeter wall probes (SumW > 50) guard against invisible walls.
 - `SetupColumnBankScene` — three glass-airlock columns (x=−3/−1/+1, y=0..5) floor-to-ceiling; the source is the sounding door itself at (−3,0), a closed glass door sits between it and the listener, and the middle column's door opens as a bypass.
 - Blockers are placed via `Place(scene, x, proto)`; door states are driven by `SetColumnDoorState`/`SetDoorState`, which set the state and flip collision on BOTH sides.
@@ -29,7 +29,7 @@ Rough hand bands (defaults): occl < 1 clean; 4.6 = 1% highs (−4 dB broadband);
 - The volume fade is straight-line distance only. Route length lives in the route-selection folds (`f1`/`f2`), not in loudness: a clean detour never punishes loudness for hops taken only to dodge blockers whose muffle the occlusion already carries.
 - Past-decay is asymmetric by design: the muffle decays over the open walk between the last blocker and the source, so a door adjacent to the listener barely muffles a far source while the same door adjacent to the source muffles fully.
 - Root interpolation is 4-corner bilinear anchored at tile edges — a listener at a tile center blends four roots equally. Deliberate smoothness choice.
-- The primary pass may route through vacuum (space hops cost 1); the detour pass excludes vacuum. Consequence: a corridor with an open end into space leaks sound cleanly around 0% blockers; vacuum exclusion from the primary is a known unfixed gap.
+- Vacuum tiles are unreachable on both passes; a source with no non-vacuum route (space sources) falls back to the raycast. Before the exclusion the primary's free vacuum hops leaked clean around 0% blockers through any open end into space.
 - The transmission table (walls and solid doors 0%, glass airlocks/windows/windoors 1%, firelocks 0%/glass firelocks 1%) is the whole truth for audible direct crossings — the detour blend fires only when the direct route transmits ≤ 0.1% (`AudibleDirectCeiling`).
 
 ## Knobs

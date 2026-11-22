@@ -1920,9 +1920,9 @@ public sealed class PathSoundSystem : EntitySystem
         var tile = new Vector2i(seed.X + nx, seed.Y + ny);
         var wIdx = WeightIndex(tile, baseTile, radius);
 
-        // Vacuum carries no detour: the clean-route pass excludes empty tiles, so it can never
-        // circumvent blockers through space the way the shortest pass is allowed to.
-        if (detour && buffers.Window[wIdx] == TileEmptyWeight)
+        // Vacuum carries no sound on either pass: an empty tile would give the shortest pass a free
+        // hop around any blocker through open space, and the detour pass never routes through it.
+        if (buffers.Window[wIdx] == TileEmptyWeight)
             return;
 
         var weight = TileWeight(buffers, wIdx);
