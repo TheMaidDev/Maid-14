@@ -40,7 +40,7 @@ public sealed class PlayerMusicBoundUserInterface : BoundUserInterface
     protected override void Dispose(bool disposing)
     {
         if (disposing)
-            EntMan.System<PlayerMusicSystem>().CancelUpload();
+            EntMan.System<PlayerMusicSystem>().CancelUpload(EntMan.GetNetEntity(Owner));
 
         base.Dispose(disposing);
     }

@@ -313,8 +313,13 @@ public sealed class PlayerMusicSystem : EntitySystem
         _uploadBudget = 0f;
     }
 
-    public void CancelUpload()
+    public void CancelUpload(NetEntity boombox)
     {
+        // Only the window of the device being recorded to may cancel: closing any other
+        // player window must not silently kill an upload that is still in flight
+        if (boombox != _uploadBoombox)
+            return;
+
         if (_uploadStartPending)
         {
             ResetUpload();
