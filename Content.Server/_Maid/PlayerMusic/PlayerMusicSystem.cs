@@ -63,6 +63,12 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// </summary>
     private static readonly TimeSpan UiActionThrottle = TimeSpan.FromSeconds(0.25);
 
+    /// <summary>
+    /// Throttle for volume changes: slider drags send a stream of updates, so the cap is tighter
+    /// than the play throttle to keep the drags live while a raw client still cannot spam them.
+    /// </summary>
+    private static readonly TimeSpan VolumeThrottle = TimeSpan.FromSeconds(0.1);
+
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(0.5);
 
     /// <summary>
@@ -119,6 +125,7 @@ public sealed class PlayerMusicSystem : EntitySystem
     private readonly Dictionary<NetUserId, PendingUpload> _pending = new();
     private readonly Dictionary<NetUserId, Transfer> _transfers = new();
     private readonly Dictionary<(EntityUid, EntityUid), TimeSpan> _lastUiAction = new();
+    private readonly Dictionary<(EntityUid, EntityUid), TimeSpan> _lastVolumeChange = new();
     private int _sendCursor;
     private TimeSpan _nextCheck;
     private long _totalBytes;
@@ -154,6 +161,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         _lastUploadStart.Clear();
         _lastRequest.Clear();
         _lastUiAction.Clear();
+        _lastVolumeChange.Clear();
         foreach (var upload in _pending.Values)
             upload.Dispose();
         _pending.Clear();
@@ -255,6 +263,12 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private void OnSeek(Entity<PlayerMusicBoomboxComponent> ent, ref PlayerMusicSeekMessage args)
     {
+        if (!_cfg.GetCVar(PlayerMusicCVars.Enabled))
+            return;
+
+        if (IsThrottled(ent, args.Actor))
+            return;
+
         if (ent.Comp.StartedAt == null ||
             ent.Comp.SongId is not { } songId ||
             !_songs.TryGetValue(songId, out var song) ||
@@ -263,6 +277,8 @@ public sealed class PlayerMusicSystem : EntitySystem
         {
             return;
         }
+
+        _lastUiAction[(ent.Owner, args.Actor)] = _timing.CurTime;
 
         var maxOffset = Math.Max(0f, (float) song.Duration.TotalSeconds - 0.25f);
         var position = Math.Clamp(args.Position, 0f, maxOffset);
@@ -279,6 +295,15 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (Math.Abs(ent.Comp.VolumeScale - scale) < 0.001f)
             return;
 
+        // The marker stays out of _lastUiAction on purpose: a slider drag must not
+        // throttle a play or repeat click that follows right after it
+        if (_lastVolumeChange.TryGetValue((ent.Owner, args.Actor), out var last) &&
+            _timing.CurTime - last < VolumeThrottle)
+        {
+            return;
+        }
+
+        _lastVolumeChange[(ent.Owner, args.Actor)] = _timing.CurTime;
         ent.Comp.VolumeScale = scale;
         Dirty(ent);
     }

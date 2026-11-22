@@ -154,6 +154,10 @@ public sealed class PlayerMusicTest
             Assert.That(boomboxComp.SongId, Is.EqualTo(songId));
         });
 
+        // The seek shares the play throttle: wait it out, and once more before the repeat
+        // toggle below so it does not fall into the seek's throttle window
+        await pair.RunTicksSync(20);
+
         await client.WaitAssertion(() =>
         {
             Assert.That(
@@ -161,7 +165,16 @@ public sealed class PlayerMusicTest
                 Is.True);
             bui!.SendMessage(new PlayerMusicSeekMessage(3f));
             bui.SendMessage(new PlayerMusicVolumeMessage(1.5f));
-            bui.SendMessage(new PlayerMusicRepeatMessage(false));
+        });
+
+        await pair.RunTicksSync(20);
+
+        await client.WaitAssertion(() =>
+        {
+            Assert.That(
+                cUi.TryGetOpenUi<PlayerMusicBoundUserInterface>(cBoombox, PlayerMusicUiKey.Key, out var bui),
+                Is.True);
+            bui!.SendMessage(new PlayerMusicRepeatMessage(false));
         });
 
         await pair.RunTicksSync(5);
