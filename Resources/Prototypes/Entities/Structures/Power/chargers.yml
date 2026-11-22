@@ -124,7 +124,7 @@
   name: cell recharger
   components:
   - type: Sprite
-    sprite: Structures/Power/cell_recharger.rsi
+    sprite: _Maid/Structures/Power/cell_recharger.rsi
     layers:
     - map: ["enum.PowerChargerVisualLayers.Base"]
       state: "empty"
