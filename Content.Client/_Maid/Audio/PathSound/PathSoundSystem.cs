@@ -851,12 +851,12 @@ public sealed class PathSoundSystem : EntitySystem
     public IReadOnlyDictionary<EntityUid, DebugEntry> DebugEntries => _debug;
 
     /// <summary>Test and debug read of the model: raw path occlusion and the folded filter value for a world position, without smoothing.</summary>
-    public bool TryGetModelOcclusion(MapCoordinates listener, Vector2 sourcePos, out float occl, out float pathLen, out float past, out float filterOccl)
+    public bool TryGetModelOcclusion(MapCoordinates listener, Vector2 sourcePos, out float occl, out float pathLen, out float past, out float filterOccl, bool doorSource = false, List<RootBreak>? breakdown = null)
     {
         filterOccl = 0f;
 
-        if (!TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, out _)
-            && !TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, out _, true))
+        if (!TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, out _, false, breakdown, doorSource)
+            && !TryGetAudio(listener, sourcePos, out occl, out _, out pathLen, out past, out _, true, breakdown, doorSource))
             return false;
 
         var tileSize = 1f;

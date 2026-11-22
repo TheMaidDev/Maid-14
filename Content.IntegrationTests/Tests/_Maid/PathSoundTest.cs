@@ -163,6 +163,90 @@ public sealed class PathSoundTest
         await pair.CleanReturnAsync();
     }
 
+    /// <summary>
+    /// Round-43 user scene: the sounding glass airlock at (-3,0) is one closed glass door west of the
+    /// listener, and the middle column's open door (-1,1) two tiles south forms a near-clean bypass.
+    /// The door's own sound must take the bypass outright (round-38 rule: gate 1 hop, full share), and
+    /// a foreign source keeps the round-39 contract: a bypass crossing an open door tile is not "pure",
+    /// so the +2-hop side step must not lift the closed door and stays in the muffled blend band.
+    /// </summary>
+    [Test]
+    public async Task GlassColumnBankOpenBypass()
+    {
+        var (scene, doors) = await SetupColumnBankScene();
+        await using var pair = scene.Pair;
+
+        await SetColumnDoorState(scene, doors, (-1, 1), DoorState.Open);
+
+        // The field must catch up with the opened bypass tile; poll a while, then report world vs field.
+        var cBypass = pair.ToClientUid(doors[(-1, 1)]);
+        for (var i = 0; i < 40; i++)
+        {
+            var fresh = false;
+            await scene.Client.WaitAssertion(() =>
+            {
+                fresh = scene.System.TryGetTile(new Vector2i(-1, 1), out var s, out _, out _) && s < 0.5f;
+            });
+
+            if (fresh)
+                break;
+
+            await pair.RunTicksSync(10);
+        }
+
+        var sourcePos = scene.Listener.Position + new Vector2(-3f * scene.TileSize, 0f);
+        await scene.Client.WaitAssertion(() =>
+        {
+            scene.System.TryGetTile(new Vector2i(-1, 1), out var sBypass, out var hBypass, out var pBypass);
+            scene.System.TryGetTile(new Vector2i(-1, 0), out var sClosed, out var hClosed, out var pClosed);
+            scene.System.TryGetTile(new Vector2i(-3, 0), out var sSrc, out var hSrc, out var pSrc);
+            var cBypassComp = scene.Client.EntMan.GetComponent<DoorComponent>(cBypass);
+            var cBypassPhys = scene.Client.EntMan.GetComponent<PhysicsComponent>(cBypass);
+            var probe = $"bypass(-1,1) SumW {sBypass:0.000} hops {hBypass} | closed(-1,0) SumW {sClosed:0.000} hops {hClosed} | src(-3,0) SumW {sSrc:0.000} hops {hSrc} past {pSrc} | dw {scene.System.DetourWeight:0.#} | world: state {cBypassComp.State} collide {cBypassPhys.CanCollide}";
+
+            // The door's own sound: the detour through the open bypass door is strictly better and the
+            // door gate accepts +2 extra hops, so every blending root reports a clean route.
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occl, out var len, out var past, out var filter, doorSource: true),
+                Is.True, $"door own sound: field read failed; {probe}");
+            Assert.That(filter, Is.LessThan(12f),
+                $"door own sound must take the open-door bypass: occl {occl:0.000} len {len:0.0} past {past:0.0} filter {filter:0.00}; {probe}");
+
+            // A foreign source on the same tile: the two roots hugging the east column (seeds (1,0) and
+            // (1,1)) sit on closed glass doors and are excluded, so the west roots blend 50/50 — the
+            // northern one keeps the closed (-1,0) door on its short route (the +2-hop bypass through
+            // the open door tile is not "pure" and misses the 4-hop gate, round-39 contract), the
+            // southern one already routes through the open bypass door in its primary. The source tile
+            // is itself the last blocker, so the past-decay never applies and both pasts are zero.
+            var glass = AirlockOccl(GlassAirlockMuffle);
+            var occlForeign = -MathF.Log((MathF.Exp(-glass) + MathF.Exp(-0.005f)) / 2f);
+            var expectedForeign = occlForeign * scene.Fold + 3.5f * scene.PerTile;
+
+            var breaks = new List<PathSoundSystem.RootBreak>();
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlF, out var lenF, out var pastF, out var filterF, breakdown: breaks),
+                Is.True, "foreign sound: field read failed");
+            var rootDump = string.Join(" | ", breaks.Select(b =>
+                $"r{b.Root} w{b.RootWeight:0.00} o1 {b.Occl1:0.000} h1 {b.Hops1} p1 {b.Past1} o2 {b.Occl2:0.000} h2 {b.Hops2} share {b.Share:0.0} f1 {b.F1:0.0} f2 {b.F2:0.0}{(b.Skipped ? " SKIP" : "")}"));
+            Assert.That(filterF, Is.EqualTo(expectedForeign).Within(2f),
+                $"foreign sound blend: occl {occlF:0.000} len {lenF:0.0} past {pastF:0.0} filter {filterF:0.00} vs expected {expectedForeign:0.00}; {probe}; roots: {rootDump}");
+        });
+
+        // Without the bypass every crossing tile is a closed glass door: the door's own sound falls
+        // back to the primary route and stays in the muffled band, never clean.
+        await SetColumnDoorState(scene, doors, (-1, 1), DoorState.Closed);
+        await scene.Client.WaitAssertion(() =>
+        {
+            Assert.That(
+                scene.System.TryGetModelOcclusion(scene.Listener, sourcePos, out var occlC, out var lenC, out var pastC, out var filterC, doorSource: true),
+                Is.True, "shut bypass: field read failed");
+            Assert.That(filterC, Is.GreaterThan(20f),
+                $"shut bypass must keep the door own sound muffled: occl {occlC:0.000} len {lenC:0.0} past {pastC:0.0} filter {filterC:0.00}");
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
     /// <summary>Bank scene: the north wall row carries a glass-airlock bank at x=2..5 instead of walls; the listener starts mid-corridor south of the bank.</summary>
     private static async Task<Scene> SetupBankScene()
     {
@@ -250,6 +334,144 @@ public sealed class PathSoundTest
 
         return new Scene(pair, server, client, cSys, player, listener, map.Grid, doors,
             1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize);
+    }
+
+    /// <summary>
+    /// User-reported scene (round-43 scheme, shifted so the listener tile is (0,0)): a sealed room split
+    /// by three floor-to-ceiling glass-airlock columns, the sounding airlock at (-3,0) two tiles west of
+    /// the listener behind one closed glass door (-1,0), and the middle column's door (-1,1) open as a
+    /// bypass. The columns are sealed against both wall rows, so trimming them to six tiles keeps the
+    /// route topology (and every model value) of the full 22-tile report scene. Scheme mapping:
+    /// listener (14,1) -> (0,0), source (11,1) -> (-3,0), bypass (13,2) -> (-1,1).
+    /// </summary>
+    private static async Task<(Scene Scene, Dictionary<(int, int), EntityUid> Doors)> SetupColumnBankScene()
+    {
+        var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        var server = pair.Server;
+        var client = pair.Client;
+        var cSys = client.System<PathSoundSystem>();
+
+        var map = await pair.CreateTestMap();
+
+        EntityUid player = default;
+        await server.WaitPost(() =>
+        {
+            var sEntMan = server.EntMan;
+            var sPlayers = server.ResolveDependency<Robust.Server.Player.IPlayerManager>();
+            player = sPlayers.Sessions.Single().AttachedEntity!.Value;
+            sEntMan.GetComponent<TransformComponent>(player).Coordinates = new EntityCoordinates(map.Grid, 0.5f, 0.5f);
+        });
+
+        var cPlayerEarly = pair.ToClientUid(player);
+        await client.WaitPost(() =>
+        {
+            client.EntMan.GetComponent<TransformComponent>(cPlayerEarly).Coordinates = new EntityCoordinates(map.CGridUid, 0.5f, 0.5f);
+        });
+
+        var doors = new Dictionary<(int, int), EntityUid>();
+        await server.WaitPost(() =>
+        {
+            var maps = server.System<SharedMapSystem>();
+            var tiles = server.ResolveDependency<ITileDefinitionManager>();
+            var plating = new Tile(tiles["Plating"].TileId);
+            var grid = map.Grid;
+
+            // Room interior: x -8..16, y 0..5.
+            for (var x = -8; x <= 16; x++)
+            {
+                for (var y = 0; y <= 5; y++)
+                    maps.SetTile(grid.Owner, grid.Comp, new Vector2i(x, y), plating);
+            }
+
+            // Sealing wall rows: top y=-1, bottom y=6, sides x=-9 and x=17.
+            for (var x = -9; x <= 17; x++)
+                server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, x + 0.5f, -0.5f));
+            for (var x = -8; x <= 17; x++)
+                server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, x + 0.5f, 6.5f));
+            for (var y = 0; y <= 6; y++)
+            {
+                server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, -8.5f, y + 0.5f));
+                server.EntMan.SpawnEntity("WallSolid", new EntityCoordinates(grid, 17.5f, y + 0.5f));
+            }
+
+            // Three glass-airlock columns at x=-3, -1, +1, floor to ceiling (y 0..5).
+            foreach (var x in new[] { -3, -1, 1 })
+            {
+                for (var y = 0; y <= 5; y++)
+                    doors[(x, y)] = server.EntMan.SpawnEntity("AirlockGlass", new EntityCoordinates(grid, x + 0.5f, y + 0.5f));
+            }
+        });
+
+        await pair.RunTicksSync(30);
+
+        MapCoordinates listener = default;
+        var cPlayer = pair.ToClientUid(player);
+        await client.WaitAssertion(() =>
+        {
+            var xform = client.EntMan.GetComponent<TransformComponent>(cPlayer);
+            var transform = client.System<SharedTransformSystem>();
+            listener = xform.Coordinates.ToMap(client.EntMan, transform);
+        });
+
+        for (var i = 0; i < 120; i++)
+        {
+            var ok = false;
+            await client.WaitAssertion(() =>
+            {
+                var xform = client.EntMan.GetComponent<TransformComponent>(cPlayer);
+                var local = xform.Coordinates.Position;
+                ok = cSys.FieldReady
+                    && cSys.FieldSeed == new Vector2i(0, 0)
+                    && MathF.Abs(local.X - 0.5f) < 0.1f
+                    && MathF.Abs(local.Y - 0.5f) < 0.1f;
+            });
+
+            if (ok)
+                break;
+
+            await pair.RunTicksSync(5);
+        }
+
+        await client.WaitAssertion(() =>
+        {
+            Assert.That(cSys.FieldSeed, Is.EqualTo(new Vector2i(0, 0)),
+                $"client field was built around a stale player position: {cSys.FieldSeed}");
+            Assert.That(cSys.FieldReady, Is.True, "client field was never built");
+        });
+
+        return (new Scene(pair, server, client, cSys, player, listener, map.Grid, new Dictionary<int, EntityUid>(),
+            1f + cSys.OcclusionLossDb / OcclDbPerUnit, cSys.LossDbPerTile / OcclDbPerUnit, map.Grid.Comp.TileSize), doors);
+    }
+
+    /// <summary>Drives a column-bank door into the state on both sides, flipping collision like the real actuation flow does mid-animation: the server value is networked and clobbers a client-only flip.</summary>
+    private static async Task SetColumnDoorState(
+        Scene scene, Dictionary<(int, int), EntityUid> doors, (int, int) tile, DoorState state)
+    {
+        var door = doors[tile];
+        var cDoor = scene.Pair.ToClientUid(door);
+        await scene.Server.WaitPost(() =>
+        {
+            scene.Server.System<ServerDoorSystem>().SetState(door, state);
+            scene.Server.System<Robust.Shared.Physics.Systems.SharedPhysicsSystem>()
+                .SetCanCollide(door, state != DoorState.Open);
+            if (state == DoorState.Open)
+            {
+                var doorComp = scene.Server.EntMan.GetComponent<DoorComponent>(door);
+                doorComp.NextStateChange = null;
+                scene.Server.EntMan.Dirty(door, doorComp);
+            }
+        });
+        await scene.Client.WaitPost(() =>
+        {
+            scene.Client.System<ClientDoorSystem>().SetState(cDoor, state);
+            scene.Client.System<Robust.Shared.Physics.Systems.SharedPhysicsSystem>()
+                .SetCanCollide(cDoor, state != DoorState.Open);
+        });
+        await scene.Pair.RunTicksSync(30);
+
+        // Airlocks auto-close a couple seconds after opening; the tests need the state to stick, and
+        // the TTL rebuild guarantees the field has caught up with the collision flip either way.
+        await scene.Pair.RunSeconds(2.5f);
     }
 
     /// <summary>Asserts the folded filter of a source at (dx, dy) tiles from the listener stays under the cap, dumping the value on failure.</summary>
