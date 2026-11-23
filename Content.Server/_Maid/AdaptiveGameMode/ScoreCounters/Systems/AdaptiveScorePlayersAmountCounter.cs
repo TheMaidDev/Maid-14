@@ -15,8 +15,8 @@ public sealed class AdaptiveScorePlayersAmountCounter : EntitySystem, IAdaptiveB
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedStationSystem _station = default!;
 
-    private const float ChaosContribution = -2f;
-    private const float CombatContribution = -2f;
+    private const float ChaosContribution = -1.25f;
+    private const float CombatContribution = -1.25f;
 
     public override void Initialize()
     {
