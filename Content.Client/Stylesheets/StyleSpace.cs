@@ -44,6 +44,7 @@ namespace Content.Client.Stylesheets
             (
                 new []
                 {
+                    "/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Regular.ttf", // Maid-Tweak
                     "/Fonts/NotoSans/NotoSans-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
@@ -54,6 +55,7 @@ namespace Content.Client.Stylesheets
             (
                 new []
                 {
+                    "/Fonts/_Maid/IBMPlexMono/IBMPlexMono-Bold.ttf", // Maid-Tweak
                     "/Fonts/NotoSans/NotoSans-Bold.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
                     "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
