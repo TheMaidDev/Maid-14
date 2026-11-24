@@ -3,8 +3,8 @@
   components:
   - type: GasTank
     ruptureSound:
-      path: /Audio/Effects/spray.ogg
+      path: /Audio/_Maid/Override/Effects/spray.ogg
     connectSound:
-      path: /Audio/Effects/internals.ogg
+      path: /Audio/_Maid/Override/Effects/internals.ogg
       params:
         volume: 5

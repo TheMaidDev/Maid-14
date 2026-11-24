@@ -10,3 +10,7 @@
   license: CC-BY-SA-3.0
   copyright: tgstation
   source: https://github.com/tgstation/tgstation/commit/906fb0682bab6a0975b45036001c54f021f58ae7
+- files: [ internals.ogg ]
+  license: CC-BY-SA-3.0
+  copyright: '"internals.ogg" by CEV-Eris. Edited by metalgearsloth to amplify volume.'
+  source: https://github.com/discordia-space/CEV-Eris/blob/f02a6e2c29b41c28b1cf4d8f897cb8f090f43552/sound/effects/internals.ogg
