@@ -138,7 +138,17 @@ public static class ClientPackaging
         };
         dropSvgPass.AddDependency(graph.Input).AddBefore(graph.PresetPasses);
 
+        // MAID BEGIN partial prototypes packaging
+        var keepPartialsPass = new _Maid.AssetPassKeepPartialPrototypes { Name = "MaidKeepPartialPrototypes" };
+        keepPartialsPass.AddDependency(graph.PresetPasses).AddBefore(graph.MergePrototypeDirectories);
+        graph.NormalizeText.AddDependency(keepPartialsPass).AddBefore(graph.Output);
+        graph.Output.AddDependency(keepPartialsPass);
+
+        AssetGraph.CalculateGraph([pass, dropSvgPass, keepPartialsPass, ..graph.AllPasses], logger);
+        /*
         AssetGraph.CalculateGraph([pass, dropSvgPass, ..graph.AllPasses], logger);
+        */
+        // MAID END partial prototypes packaging
 
         var inputPass = graph.Input;
 

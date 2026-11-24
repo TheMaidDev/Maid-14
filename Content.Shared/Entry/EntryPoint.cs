@@ -191,10 +191,11 @@ namespace Content.Shared.Entry
         // MAID BEGIN partial prototypes
         private void MarkPartialPrototypes()
         {
+            var prototypes = new ResPath("/Prototypes");
             Content.Shared._Maid.Prototypes.MaidPartialPrototypes.Mark(
                 _prototypeManager,
-                new ResPath("/Prototypes"),
-                _resMan.ContentFindFiles(new ResPath("/")));
+                prototypes,
+                _resMan.ContentFindFiles(prototypes));
         }
         // MAID END partial prototypes
 
