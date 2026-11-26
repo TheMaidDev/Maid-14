@@ -78,6 +78,9 @@ public sealed class SupermatterSystem : SharedSupermatterSystem
     [Dependency] private readonly DoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
+
+    private DelamType _delamType = DelamType.Explosion;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -416,7 +419,7 @@ public sealed class SupermatterSystem : SharedSupermatterSystem
             var loc = string.Empty;
             var alertLevel = "yellow";
 
-            switch (sm.DelamType) // MAID sm-delam: было _delamType
+            switch (_delamType)
             {
                 case DelamType.Explosion:
                 default:
@@ -509,12 +512,8 @@ public sealed class SupermatterSystem : SharedSupermatterSystem
             // var absorbedGas = mix.Remove(sm.GasEfficiency * mix.TotalMoles);
             var moles = mix.TotalMoles;
 
-            // MAID BEGIN sm-delam
-            /*
             if (moles >= sm.MolePenaltyThreshold)
                 return DelamType.Singulo;
-            */
-            // MAID END sm-delam
         }
 
         if (sm.Power >= sm.PowerPenaltyThreshold)
@@ -532,11 +531,11 @@ public sealed class SupermatterSystem : SharedSupermatterSystem
     {
         var xform = Transform(uid);
 
+        _delamType = ChooseDelamType(uid, sm);
+
         if (!sm.Delamming)
         {
             sm.Delamming = true;
-            // MAID sm-delam: фиксируем тип при старте отсчёта, чтобы анонс и алерт совпадали с исходом. было: пересчёт каждый тик в _delamType.
-            sm.DelamType = ChooseDelamType(uid, sm);
             HandleAnnouncements(uid, sm);
         }
         if (sm.Damage < sm.DelaminationPoint && sm.Delamming)
@@ -550,7 +549,7 @@ public sealed class SupermatterSystem : SharedSupermatterSystem
         if (sm.DelamTimer > sm.DelamTimerAccumulator)
             return;
 
-        switch (sm.DelamType) // MAID sm-delam: было _delamType
+        switch (_delamType)
         {
             case DelamType.Explosion:
             default:

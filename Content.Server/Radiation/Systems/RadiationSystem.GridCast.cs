@@ -42,7 +42,6 @@ public partial class RadiationSystem
         // goobstation
         public float TerminalDecaySlope => Entity.Comp1.TerminalDecaySlope;
         public float TerminalDecayDistance => Entity.Comp1.TerminalDecayDistance;
-        public float? Slope => Entity.Comp1.Slope; // MAID singularity
     }
 
     private void UpdateGridcast()
@@ -165,17 +164,9 @@ public partial class RadiationSystem
         // Ray enters terminal decay if the distance between source->receiver >TerminalDecayDistance.
         // Decays at an additional linear rate of TerminalDecaySlope rads per tile past TerminalDecayDistance ontop of the existing hyperbolic function.
         // Hyperbolic function
-        // MAID BEGIN singularity
-        /*
         var rads = source.Intensity / (dist)
         // Terminal decay function
         - (dist - source.TerminalDecayDistance > 0 ? (source.TerminalDecaySlope * (dist - source.TerminalDecayDistance)) : 0);
-        */
-        var rads = source.Slope is { } slope
-            ? source.Intensity - slope * dir.Length()
-            : source.Intensity / dist
-              - (dist - source.TerminalDecayDistance > 0 ? source.TerminalDecaySlope * (dist - source.TerminalDecayDistance) : 0);
-        // MAID END singularity
 
         if (rads < 0.01)
             return null;

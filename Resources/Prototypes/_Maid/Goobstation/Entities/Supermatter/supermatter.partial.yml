@@ -1,6 +1,0 @@
-- type: !PartialOnly entity
-  id: Supermatter
-  components:
-  - type: Explosive
-    intensitySlope: 10
-    totalIntensity: 500000

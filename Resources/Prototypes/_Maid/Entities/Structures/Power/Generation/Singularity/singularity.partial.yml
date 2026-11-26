@@ -1,7 +1,0 @@
-- type: !PartialOnly entity
-  id: Singularity
-  components:
-  - type: Singularity
-    radsPerLevel: 2
-  - type: RadiationSource
-    intensity: 2

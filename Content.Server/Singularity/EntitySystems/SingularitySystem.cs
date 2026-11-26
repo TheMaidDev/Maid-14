@@ -132,8 +132,6 @@ public sealed class SingularitySystem : SharedSingularitySystem
             return;
 
         singularity.Energy = value;
-        // MAID BEGIN singularity
-        /*
         SetLevel(uid, value switch
         {
 			// Normally, a level 6 singularity requires the supermatter + 3000 energy.
@@ -146,18 +144,6 @@ public sealed class SingularitySystem : SharedSingularitySystem
             > 0 => 1,
             _ => 0
         }, singularity);
-        */
-        SetLevel(uid, value switch
-        {
-            >= 2400 => 6,
-            >= 1600 => 5,
-            >= 900 => 4,
-            >= 300 => 3,
-            >= 200 => 2,
-            > 0 => 1,
-            _ => 0
-        }, singularity);
-        // MAID END singularity
     }
 
     /// <summary>
@@ -319,8 +305,6 @@ public sealed class SingularitySystem : SharedSingularitySystem
     /// <param name="args">The event arguments.</param>
     public void UpdateEnergyDrain(EntityUid uid, SingularityComponent comp, SingularityLevelChangedEvent args)
     {
-        // MAID BEGIN singularity
-        /*
         comp.EnergyDrain = args.NewValue switch
         {
             6 => 0,
@@ -331,18 +315,6 @@ public sealed class SingularitySystem : SharedSingularitySystem
             1 => 1,
             _ => 0
         };
-        */
-        comp.EnergyDrain = args.NewValue switch
-        {
-            6 => 20,
-            5 => 15,
-            4 => 12,
-            3 => 8,
-            2 => 2,
-            1 => 1,
-            _ => 0
-        };
-        // MAID END singularity
     }
 
     /// <summary>

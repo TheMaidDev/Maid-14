@@ -2,7 +2,7 @@
 
 # Displayed in the Character prefs window
 humanoid-character-profile-summary =
-    { $name }. { $gender ->
+    Это { $name }. { $gender ->
         [male] Ему
         [female] Ей
         [epicene] Им

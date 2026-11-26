@@ -150,12 +150,6 @@ public sealed class MaidCVars
     #region Client preferences
 
     /// <summary>
-    ///     Use the classic lobby layout instead of the WD-style one.
-    /// </summary>
-    public static readonly CVarDef<bool> LobbyClassicLayout =
-        CVarDef.Create("maid.lobby_classic_layout", false, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-    /// <summary>
     ///     Show the give item indicator next to the cursor while offering an item.
     /// </summary>
     public static readonly CVarDef<bool> OfferModeIndicatorsPointShow =

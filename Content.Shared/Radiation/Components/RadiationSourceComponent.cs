@@ -45,12 +45,4 @@ public sealed partial class RadiationSourceComponent : Component
 
     [DataField, ViewVariables(VVAccess.ReadWrite)]
     public bool Enabled = true;
-
-    // MAID BEGIN singularity
-    /// <summary>
-    ///     If set, rays lose this many rads per tile instead of the hyperbolic decay, as before the radiation overhaul.
-    /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
-    public float? Slope;
-    // MAID END singularity
 }

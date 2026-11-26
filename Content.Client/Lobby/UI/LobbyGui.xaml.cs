@@ -73,7 +73,6 @@ namespace Content.Client.Lobby.UI
 
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
-            MaidInitializeLayout(); // MAID lobby layout
         }
 
         public void SwitchState(LobbyGuiState state)
@@ -85,7 +84,7 @@ namespace Content.Client.Lobby.UI
             {
                 case LobbyGuiState.Default:
                     DefaultState.Visible = true;
-                    MaidSetBottomVisible(true); // MAID lobby layout
+                    BottomSide.Visible = true;
                     break;
                 case LobbyGuiState.CharacterSetup:
                     CharacterSetupState.Visible = true;
@@ -95,7 +94,7 @@ namespace Content.Client.Lobby.UI
 
                     if (1 - (setupWidth / actualWidth) > 0.30)
                     {
-                        MaidSetBottomVisible(false); // MAID lobby layout
+                        BottomSide.Visible = false;
                     }
 
                     UserInterfaceManager.GetUIController<LobbyUIController>().ReloadCharacterSetup();
