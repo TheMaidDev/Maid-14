@@ -43,10 +43,17 @@ public sealed class TgStunbatonThrowSystem : EntitySystem
 
     private void OnThrowHit(Entity<TgStunbatonComponent> ent, ref ThrowDoHitEvent args)
     {
-        if (!ent.Comp.Enabled || !_toggle.IsActivated(ent.Owner) || !_random.Prob(ent.Comp.ThrowStunChance))
+        if (!ent.Comp.Enabled || !_toggle.IsActivated(ent.Owner))
             return;
 
         if (!TryComp<StaminaComponent>(args.Target, out var stamina))
+            return;
+
+        // Thrown hits honor the same stun cooldown and same-user mark as melee.
+        if (!_baton.CanStun(ent, args.Target, args.Component.Thrower))
+            return;
+
+        if (!_random.Prob(ent.Comp.ThrowStunChance))
             return;
 
         if (!TryComp<StunbatonComponent>(ent.Owner, out var stun) ||
@@ -59,7 +66,7 @@ public sealed class TgStunbatonThrowSystem : EntitySystem
             sound = onHit.Sound;
 
         _stamina.TakeStaminaDamage(args.Target, ent.Comp.ThrowStaminaDamage, stamina,
-            source: args.Component.Thrower, with: ent.Owner, sound: sound);
+            source: args.Component.Thrower, with: ent.Owner, sound: sound, applyResistances: true);
         _baton.RegisterStun(ent, args.Target, args.Component.Thrower, predictedPopup: false);
     }
 

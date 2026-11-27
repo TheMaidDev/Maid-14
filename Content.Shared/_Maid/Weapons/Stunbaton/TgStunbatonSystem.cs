@@ -72,11 +72,23 @@ public sealed class TgStunbatonSystem : EntitySystem
         var user = ent.Comp.SwingUser;
         ent.Comp.SwingUser = null;
 
-        if (!ent.Comp.Enabled || user == null || args.HitEntities.Count == 0 || args.Direction != null)
+        if (!ent.Comp.Enabled || !_toggle.IsActivated(ent.Owner) || user == null || args.HitEntities.Count == 0 || args.Direction != null)
             return;
 
         foreach (var (target, _) in args.HitEntities)
             RegisterStun(ent, target, user);
+    }
+
+    /// <summary>
+    /// Whether this baton may stun the target right now: not on cooldown and, when the user is known,
+    /// not recently stunned by them.
+    /// </summary>
+    public bool CanStun(Entity<TgStunbatonComponent> baton, EntityUid target, EntityUid? user)
+    {
+        if (_timing.CurTime < baton.Comp.NextStun)
+            return false;
+
+        return user == null || !IsMarked(target, user.Value);
     }
 
     public void RegisterStun(Entity<TgStunbatonComponent> baton, EntityUid target, EntityUid? user, bool predictedPopup = true)
