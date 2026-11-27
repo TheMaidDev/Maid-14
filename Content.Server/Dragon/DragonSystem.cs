@@ -225,7 +225,9 @@ public sealed partial class DragonSystem : EntitySystem
         Roar(uid, component);
         _actions.AddAction(uid, ref component.SpawnRiftActionEntity, component.SpawnRiftAction);
         _actions.AddAction(uid, ref component.SpawnCarpsActionEntity, component.SpawnCarpsAction); // Goobstation
-        _actions.AddAction(uid, ref component.RoarActionEntity, component.RoarAction); // Goobstation
+        // MAID BEGIN dragon-roar
+        /* _actions.AddAction(uid, ref component.RoarActionEntity, component.RoarAction); // Goobstation */
+        // MAID END dragon-roar
     }
 
     private void OnShutdown(EntityUid uid, DragonComponent component, ComponentShutdown args)

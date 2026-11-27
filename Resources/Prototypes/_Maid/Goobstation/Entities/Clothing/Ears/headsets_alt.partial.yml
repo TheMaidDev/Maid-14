@@ -1,0 +1,4 @@
+- type: !PartialOnly entity
+  id: ClothingHeadsetAltLoudspeaker
+  components:
+  - !Remove type: Loudspeaker

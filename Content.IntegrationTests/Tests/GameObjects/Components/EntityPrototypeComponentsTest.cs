@@ -79,9 +79,13 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components
 
                         foreach (var component in components.Cast<YamlMappingNode>())
                         {
+                            // MAID: пропускаем partial-записи вида "- !Remove type: X"
+                            if (!component.TryGetNode<YamlScalarNode>("type", out var componentTypeNode))
+                                continue;
+
                             componentsValidated++;
 
-                            var componentType = component.GetNode("type").AsString();
+                            var componentType = componentTypeNode.AsString();
                             var clientAvailability = cComponentFactory.GetComponentAvailability(componentType);
 
                             if (clientAvailability == ComponentAvailability.Unknown)

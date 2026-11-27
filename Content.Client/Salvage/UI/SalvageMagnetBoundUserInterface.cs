@@ -76,7 +76,12 @@ public sealed class SalvageMagnetBoundUserInterface : BoundUserInterface
         for (var i = 0; i < current.Offers.Count; i++)
         {
             var seed = current.Offers[i];
-            var offer = i == 0 ? salvageSystem.GetSalvageOffering(seed, new DebrisOffering()) : salvageSystem.GetSalvageOffering(seed); // MAID better salvs
+            // MAID BEGIN local-magnet
+            /* var offer = i == 0 ? salvageSystem.GetSalvageOffering(seed, new DebrisOffering()) : salvageSystem.GetSalvageOffering(seed); // MAID better salvs */
+            var offer = current.Offers.Count > 1 && i == 0
+                ? salvageSystem.GetSalvageOffering(seed, new DebrisOffering())
+                : salvageSystem.GetSalvageOffering(seed);
+            // MAID END local-magnet
             var option = new OfferingWindowOption();
             option.MinWidth = 210f;
             option.Disabled = current.EndTime != null;
@@ -91,6 +96,8 @@ public sealed class SalvageMagnetBoundUserInterface : BoundUserInterface
                 });
             };
 
+            // MAID BEGIN local-magnet
+            /*
             // Begin DeltaV Additions: Mining points cost for wrecks
             if (offer.Cost > 0)
             {
@@ -105,6 +112,8 @@ public sealed class SalvageMagnetBoundUserInterface : BoundUserInterface
                 option.AddContent(label);
             }
             // End DeltaV Additions
+            */
+            // MAID END local-magnet
 
             switch (offer)
             {

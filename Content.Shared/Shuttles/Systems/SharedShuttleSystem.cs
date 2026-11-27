@@ -117,7 +117,11 @@ public abstract partial class SharedShuttleSystem : EntitySystem
         if (HasComp<FTLMapComponent>(mapUid))
             return false;
 
-        return _whitelistSystem.IsWhitelistPassOrNull(destination.Whitelist, shuttleUid);
+        // MAID BEGIN ftl-centcomm
+        /* return _whitelistSystem.IsWhitelistPassOrNull(destination.Whitelist, shuttleUid); */
+        return _whitelistSystem.IsWhitelistPassOrNull(destination.Whitelist, shuttleUid)
+            && _whitelistSystem.IsBlacklistFailOrNull(destination.Blacklist, shuttleUid);
+        // MAID END ftl-centcomm
     }
 
     /// <summary>

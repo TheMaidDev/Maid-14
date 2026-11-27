@@ -1,4 +1,4 @@
-﻿using Content.Shared.Mind;
+using Content.Shared.Mind;
 using Content.Shared.Roles;
 using Robust.Shared.GameObjects;
 using System.Linq;
@@ -15,6 +15,7 @@ using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
 using Content.Server._Maid.AdaptiveGameMode.ScoreCounters.Collector;
 using Content.Server._Maid.AdaptiveGameMode.ScoreCounters.Conditions;
+using Content.Shared.GameTicking.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Markdown.Value;
 using Robust.Shared.Timing;
@@ -49,6 +50,10 @@ public sealed class AdaptiveScoreStaticSystem : EntitySystem, IAdaptiveBalanceIn
         var enumerator = EntityQueryEnumerator<AdaptiveScoreStaticComponent>();
         while (enumerator.MoveNext(out var ent, out var comp))
         {
+            // Завершённые ивенты не должны продолжать добавлять хаос в выборку.
+            if (HasComp<EndedGameRuleComponent>(ent))
+                continue;
+
             if (!_adaptiveCollector.IsConditionsMet(comp.Conditions, ent))
                 continue;
 
