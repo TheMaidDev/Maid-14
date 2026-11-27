@@ -58,6 +58,7 @@ public sealed partial class SalvageSystem
         _mobStateQuery = GetEntityQuery<MobStateComponent>();
 
         SubscribeLocalEvent<SalvageMagnetDataComponent, MapInitEvent>(OnMagnetDataMapInit);
+        SubscribeLocalEvent<SalvageMagnetDataComponent, ComponentShutdown>(OnMagnetDataShutdown); // MAID local-magnet
 
         SubscribeLocalEvent<SalvageMagnetTargetComponent, GridSplitEvent>(OnMagnetTargetSplit);
 
@@ -68,6 +69,8 @@ public sealed partial class SalvageSystem
 
     private void OnMagnetClaim(EntityUid uid, SalvageMagnetComponent component, ref MagnetClaimOfferEvent args)
     {
+        // MAID BEGIN local-magnet
+        /*
         var station = _station.GetOwningStation(uid);
 
         if (!TryComp(station, out SalvageMagnetDataComponent? dataComp) ||
@@ -75,6 +78,10 @@ public sealed partial class SalvageSystem
         {
             return;
         }
+        */
+        if (!TryComp(uid, out SalvageMagnetDataComponent? dataComp) || dataComp.EndTime != null)
+            return;
+        // MAID END local-magnet
 
         var index = args.Index;
         var actor = args.Actor;
@@ -82,7 +89,7 @@ public sealed partial class SalvageSystem
         {
             try
             {
-                await TakeMagnetOffer((station.Value, dataComp), index, (uid, component), actor); // DeltaV: pass the user entity
+                await TakeMagnetOffer((uid, dataComp), index, (uid, component), actor); // DeltaV: pass the user entity // MAID local-magnet
             }
             catch (Exception e)
             {
@@ -109,6 +116,14 @@ public sealed partial class SalvageSystem
     {
         CreateMagnetOffers((uid, component));
     }
+
+    // MAID BEGIN local-magnet
+    private void OnMagnetDataShutdown(EntityUid uid, SalvageMagnetDataComponent component, ComponentShutdown args)
+    {
+        if (component.EndTime != null)
+            EndMagnet((uid, component));
+    }
+    // MAID END local-magnet
 
     private void OnMagnetTargetSplit(EntityUid uid, SalvageMagnetTargetComponent component, ref GridSplitEvent args)
     {
@@ -252,6 +267,8 @@ public sealed partial class SalvageSystem
     // Just need something to announce.
     private Entity<SalvageMagnetComponent>? GetMagnet(Entity<SalvageMagnetDataComponent> data)
     {
+        // MAID BEGIN local-magnet
+        /*
         var query = AllEntityQuery<SalvageMagnetComponent, TransformComponent>();
 
         while (query.MoveNext(out var magnetUid, out var magnet, out var xform))
@@ -265,14 +282,26 @@ public sealed partial class SalvageSystem
         }
 
         return null;
+        */
+        if (!TryComp<SalvageMagnetComponent>(data, out var magnet))
+            return null;
+
+        return (data.Owner, magnet);
+        // MAID END local-magnet
     }
 
     private void UpdateMagnetUI(Entity<SalvageMagnetComponent> entity, TransformComponent xform)
     {
+        // MAID BEGIN local-magnet
+        /*
         var station = _station.GetOwningStation(entity, xform);
 
         if (!TryComp(station, out SalvageMagnetDataComponent? dataComp))
             return;
+        */
+        if (!TryComp(entity, out SalvageMagnetDataComponent? dataComp))
+            return;
+        // MAID END local-magnet
 
         _ui.SetUiState(entity.Owner, SalvageMagnetUiKey.Key,
             new SalvageMagnetBoundUserInterfaceState(dataComp.Offered)
@@ -287,6 +316,8 @@ public sealed partial class SalvageSystem
 
     private void UpdateMagnetUIs(Entity<SalvageMagnetDataComponent> data)
     {
+        // MAID BEGIN local-magnet
+        /*
         var query = AllEntityQuery<SalvageMagnetComponent, TransformComponent>();
 
         while (query.MoveNext(out var magnetUid, out var magnet, out var xform))
@@ -306,17 +337,38 @@ public sealed partial class SalvageSystem
                     ActiveSeed = data.Comp.ActiveSeed,
                 });
         }
+        */
+        if (!HasComp<SalvageMagnetComponent>(data))
+            return;
+
+        _ui.SetUiState(data.Owner, SalvageMagnetUiKey.Key,
+            new SalvageMagnetBoundUserInterfaceState(data.Comp.Offered)
+            {
+                Cooldown = data.Comp.OfferCooldown,
+                Duration = data.Comp.ActiveTime,
+                EndTime = data.Comp.EndTime,
+                NextOffer = data.Comp.NextOffer,
+                ActiveSeed = data.Comp.ActiveSeed,
+            });
+        // MAID END local-magnet
     }
 
     private async Task TakeMagnetOffer(Entity<SalvageMagnetDataComponent> data, int index, Entity<SalvageMagnetComponent> magnet, EntityUid user) // DeltaV: add user param
     {
         var seed = data.Comp.Offered[index];
 
+        // MAID BEGIN local-magnet
+        /*
         var offering = index == 0 ? GetSalvageOffering(seed, new DebrisOffering()) : GetSalvageOffering(seed); // MAID: better magnet
         // Begin DeltaV Addition: make wrecks cost mining points to pull
         if (offering.Cost > 0 && !(_points.TryFindIdCard(user) is {} idCard && _points.RemovePoints(idCard, offering.Cost)))
             return;
         // End DeltaV Addition
+        */
+        var offering = data.Comp.Offered.Count > 1 && index == 0
+            ? GetSalvageOffering(seed, new DebrisOffering())
+            : GetSalvageOffering(seed);
+        // MAID END local-magnet
         var salvMap = _mapSystem.CreateMap();
         var salvMapXform = Transform(salvMap);
 

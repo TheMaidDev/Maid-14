@@ -1,0 +1,5 @@
+- type: !PartialOnly entity
+  id: ClownMegaphone
+  components:
+  - type: Loudspeaker
+    affectRadio: false

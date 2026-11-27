@@ -87,7 +87,7 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components
 
                             componentsValidated++;
 
-                            var componentType = component.GetNode("type").AsString();
+                            var componentType = componentTypeNode.AsString();
                             var clientAvailability = cComponentFactory.GetComponentAvailability(componentType);
 
                             if (clientAvailability == ComponentAvailability.Unknown)

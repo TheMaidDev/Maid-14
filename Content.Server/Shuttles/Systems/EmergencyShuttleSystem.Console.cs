@@ -305,10 +305,15 @@ public sealed partial class EmergencyShuttleSystem
                 if (Deleted(comp.Entity))
                     continue;
 
+                // MAID BEGIN ftl-centcomm
+                /*
                 if (_shuttle.TryAddFTLDestination(centcommXform.MapID, true, out var ftlComp))
                 {
                     _shuttle.SetFTLWhitelist((centcommXform.MapUid!.Value, ftlComp), null);
                 }
+                */
+                OpenCentcommFtl(centcommXform.MapID);
+                // MAID END ftl-centcomm
             }
         }
     }

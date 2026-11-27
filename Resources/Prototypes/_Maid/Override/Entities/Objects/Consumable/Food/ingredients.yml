@@ -1,0 +1,7 @@
+- type: !PartialOnly entity
+  id: ReagentContainerBase
+  components:
+  - type: Drink
+    useSound:
+      collection: !Remove
+      path: /Audio/_Maid/Override/Items/eating_1.ogg

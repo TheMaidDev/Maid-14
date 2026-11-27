@@ -8,6 +8,7 @@ using Content.Shared.UserInterface;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
+using Robust.Shared.Timing; // MAID internals sound prediction
 using InternalsComponent = Content.Shared.Body.Components.InternalsComponent;
 
 namespace Content.Shared.Atmos.EntitySystems;
@@ -20,6 +21,7 @@ public abstract class SharedGasTankSystem : EntitySystem
     [Dependency] private   readonly SharedInternalsSystem _internals = default!;
     [Dependency] protected readonly SharedUserInterfaceSystem UI = default!;
     [Dependency] private   readonly UseDelaySystem _delay = default!;
+    [Dependency] private IGameTiming _timing = default!; // MAID internals sound prediction
 
     public const string GasTankDelay = "gasTank";
 
@@ -141,8 +143,18 @@ public abstract class SharedGasTankSystem : EntitySystem
         if (!component.IsConnected)
             return false;
 
+        // MAID BEGIN internals sound prediction
+        // Prediction re-runs would stop the stream started on the first prediction.
+        if (_timing.IsFirstTimePredicted)
+        {
+            component.ConnectStream = _audio.Stop(component.ConnectStream);
+            component.ConnectStream = _audio.PlayPredicted(component.ConnectSound, owner, user)?.Entity;
+        }
+        /*
         component.ConnectStream = _audio.Stop(component.ConnectStream);
         component.ConnectStream = _audio.PlayPredicted(component.ConnectSound, owner, user)?.Entity;
+        */
+        // MAID END internals sound prediction
         UpdateUserInterface(ent);
         return true;
     }
@@ -210,8 +222,17 @@ public abstract class SharedGasTankSystem : EntitySystem
         if (internalsUid != null && internalsComp != null)
             _internals.DisconnectTank((internalsUid.Value, internalsComp), forced: forced);
 
+        // MAID BEGIN internals sound prediction
+        if (_timing.IsFirstTimePredicted)
+        {
+            component.DisconnectStream = _audio.Stop(component.DisconnectStream);
+            component.DisconnectStream = _audio.PlayPredicted(component.DisconnectSound, owner, user)?.Entity;
+        }
+        /*
         component.DisconnectStream = _audio.Stop(component.DisconnectStream);
         component.DisconnectStream = _audio.PlayPredicted(component.DisconnectSound, owner, user)?.Entity;
+        */
+        // MAID END internals sound prediction
         UpdateUserInterface(ent);
         return true;
     }
