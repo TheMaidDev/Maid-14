@@ -9,6 +9,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
 using Robust.Shared.ContentPack;
 using Robust.Shared.GameStates;
+using Robust.Shared.Network;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
@@ -23,6 +24,7 @@ public sealed class PlayerMusicSystem : EntitySystem
 {
     [Dependency] private readonly IResourceManager _res = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IClientNetManager _net = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
@@ -59,6 +61,7 @@ public sealed class PlayerMusicSystem : EntitySystem
 
     private static readonly TimeSpan RequestRetry = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan IncomingTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan UploadResultTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(0.5);
     private static readonly TimeSpan EndSlack = TimeSpan.FromMilliseconds(50);
 
@@ -86,7 +89,16 @@ public sealed class PlayerMusicSystem : EntitySystem
     private readonly HashSet<string> _failed = new();
     private readonly Dictionary<string, TimeSpan> _limitFailed = new();
     private readonly Dictionary<EntityUid, PlayingState> _playing = new();
-    private readonly Queue<EntityEventArgs> _outgoing = new();
+    private byte[]? _uploadData;
+    private NetEntity _uploadBoombox;
+    private string _uploadName = string.Empty;
+    private int _uploadOffset;
+    private int _uploadIndex;
+    private int _uploadTotal;
+    private int _lastUploadPercent = -1;
+    private bool _uploadStartPending;
+    private bool _uploadAwaiting;
+    private TimeSpan _uploadDeadline;
 
     private readonly record struct PlayingState(
         EntityUid AudioEntity,
@@ -110,9 +122,12 @@ public sealed class PlayerMusicSystem : EntitySystem
         _res.AddRoot(_prefix, _contentRoot);
 
         _cfg.OnValueChanged(PlayerMusicCVars.Volume, OnVolumeChanged, true);
+        _net.RegisterNetMessage<PlayerMusicUploadStartNetMessage>();
+        _net.RegisterNetMessage<PlayerMusicUploadChunkNetMessage>();
 
         SubscribeNetworkEvent<PlayerMusicFileStartEvent>(OnFileStart);
         SubscribeNetworkEvent<PlayerMusicFileChunkEvent>(OnFileChunk);
+        SubscribeNetworkEvent<PlayerMusicRecordStatusEvent>(OnRecordStatus);
         SubscribeLocalEvent<PlayerMusicBoomboxComponent, AfterAutoHandleStateEvent>(OnState);
         SubscribeLocalEvent<PlayerMusicBoomboxComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
@@ -128,7 +143,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         _failed.Clear();
         _limitFailed.Clear();
         _incoming.Clear();
-        _outgoing.Clear();
+        ResetUpload();
     }
 
     public override void Shutdown()
@@ -157,7 +172,7 @@ public sealed class PlayerMusicSystem : EntitySystem
         _failed.Clear();
         _limitFailed.Clear();
         _incoming.Clear();
-        _outgoing.Clear();
+        ResetUpload();
         _contentRoot.Clear();
         _contentRoot.Dispose();
     }
@@ -167,7 +182,8 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// </summary>
     private float GetVolume(PlayerMusicBoomboxComponent comp)
     {
-        return comp.Volume + SharedAudioSystem.GainToVolume(Math.Max(_userGain, 0.0001f));
+        var gain = Math.Max(_userGain * comp.VolumeScale, 0.0001f);
+        return comp.Volume + SharedAudioSystem.GainToVolume(gain);
     }
 
     private void OnVolumeChanged(float value)
@@ -189,17 +205,13 @@ public sealed class PlayerMusicSystem : EntitySystem
     public void RequestUpload(EntityUid boombox, string name, byte[] data)
     {
         // A new recording replaces anything that is still waiting to be sent
-        _outgoing.Clear();
-        _outgoing.Enqueue(new PlayerMusicUploadStartEvent(GetNetEntity(boombox), name, data.Length));
-
-        var index = 0;
-        for (var offset = 0; offset < data.Length; offset += PlayerMusicLimits.ChunkBytes)
-        {
-            var length = Math.Min(PlayerMusicLimits.ChunkBytes, data.Length - offset);
-            var chunk = new byte[length];
-            Array.Copy(data, offset, chunk, 0, length);
-            _outgoing.Enqueue(new PlayerMusicUploadChunkEvent(index++, chunk));
-        }
+        ResetUpload();
+        _uploadData = data;
+        _uploadBoombox = GetNetEntity(boombox);
+        _uploadName = name;
+        _uploadTotal = data.Length;
+        _lastUploadPercent = -1;
+        _uploadStartPending = true;
     }
 
     public override void FrameUpdate(float frameTime)
@@ -209,6 +221,8 @@ public sealed class PlayerMusicSystem : EntitySystem
         PumpUploadQueue(frameTime);
 
         var now = _timing.CurTime;
+        CheckUploadTimeout(now);
+
         if (now >= _nextCheck)
         {
             _nextCheck = now + CheckInterval;
@@ -222,26 +236,123 @@ public sealed class PlayerMusicSystem : EntitySystem
     /// </summary>
     private void PumpUploadQueue(float frameTime)
     {
-        if (_outgoing.Count == 0)
+        if (_uploadStartPending)
+        {
+            _uploadStartPending = false;
+            _net.ClientSendMessage(new PlayerMusicUploadStartNetMessage
+            {
+                Boombox = _uploadBoombox,
+                Name = _uploadName,
+                TotalBytes = _uploadData?.Length ?? 0,
+            });
+        }
+
+        if (_uploadData == null)
             return;
 
-        // The budget is capped at one chunk, so a frame hitch cannot turn into a burst
+        // The budget is capped at one protocol chunk, so a frame hitch cannot turn into a large burst
         _uploadBudget = Math.Min(_uploadBudget + UploadBytesPerSecond * frameTime, PlayerMusicLimits.ChunkBytes);
 
-        while (_outgoing.Count > 0)
+        while (_uploadData != null)
         {
-            var size = _outgoing.Peek() switch
+            var remaining = _uploadData.Length - _uploadOffset;
+            if (remaining <= 0)
             {
-                PlayerMusicUploadChunkEvent chunk => chunk.Data.Length,
-                _ => 0,
-            };
+                _uploadData = null;
+                _uploadAwaiting = true;
+                _uploadDeadline = _timing.CurTime + UploadResultTimeout;
+                break;
+            }
 
-            if (size > _uploadBudget)
+            var length = Math.Min(PlayerMusicLimits.ChunkBytes, remaining);
+            if (length > _uploadBudget)
                 break;
 
-            _uploadBudget -= size;
-            RaiseNetworkEvent(_outgoing.Dequeue());
+            var chunk = new byte[length];
+            Array.Copy(_uploadData, _uploadOffset, chunk, 0, length);
+            _uploadOffset += length;
+            _uploadBudget -= length;
+            _net.ClientSendMessage(new PlayerMusicUploadChunkNetMessage
+            {
+                Index = _uploadIndex++,
+                Data = chunk,
+            });
         }
+
+        ReportUploadProgress();
+    }
+
+    private void ReportUploadProgress()
+    {
+        if (_uploadTotal <= 0)
+            return;
+
+        var percent = (int) Math.Clamp(_uploadOffset * 100L / _uploadTotal, 0, 100);
+        if (percent == _lastUploadPercent)
+            return;
+
+        _lastUploadPercent = percent;
+
+        if (!TryGetEntity(_uploadBoombox, out var uid))
+            return;
+
+        if (_ui.TryGetOpenUi<PlayerMusicBoundUserInterface>(uid.Value, PlayerMusicUiKey.Key, out var bui))
+            bui.SetUploadProgress(percent);
+    }
+
+    private void ResetUpload()
+    {
+        _uploadData = null;
+        _uploadStartPending = false;
+        _uploadAwaiting = false;
+        _uploadDeadline = default;
+        _uploadOffset = 0;
+        _uploadIndex = 0;
+        _uploadTotal = 0;
+        _lastUploadPercent = -1;
+        _uploadBudget = 0f;
+    }
+
+    public void CancelUpload(NetEntity boombox)
+    {
+        // Only the window of the device being recorded to may cancel: closing any other
+        // player window must not silently kill an upload that is still in flight
+        if (boombox != _uploadBoombox)
+            return;
+
+        if (_uploadStartPending)
+        {
+            ResetUpload();
+            return;
+        }
+
+        if (_uploadData == null)
+            return;
+
+        if (_net.IsConnected)
+        {
+            _net.ClientSendMessage(new PlayerMusicUploadChunkNetMessage
+            {
+                Index = _uploadIndex,
+                Data = [],
+            });
+        }
+
+        ResetUpload();
+    }
+
+    private void CheckUploadTimeout(TimeSpan now)
+    {
+        if (!_uploadAwaiting || now < _uploadDeadline)
+            return;
+
+        if (TryGetEntity(_uploadBoombox, out var uid) &&
+            _ui.TryGetOpenUi<PlayerMusicBoundUserInterface>(uid.Value, PlayerMusicUiKey.Key, out var bui))
+        {
+            bui.SetStatus("maid-music-upload-failed", string.Empty, 0f);
+        }
+
+        ResetUpload();
     }
 
     /// <summary>
@@ -319,8 +430,22 @@ public sealed class PlayerMusicSystem : EntitySystem
     {
         Sync(ent);
 
+        if (_playing.TryGetValue(ent.Owner, out var state) && Exists(state.AudioEntity))
+            _audio.SetVolume(state.AudioEntity, GetVolume(ent.Comp));
+
         if (_ui.TryGetOpenUi<PlayerMusicBoundUserInterface>(ent.Owner, PlayerMusicUiKey.Key, out var bui))
             bui.Reload();
+    }
+
+    private void OnRecordStatus(PlayerMusicRecordStatusEvent ev)
+    {
+        ResetUpload();
+
+        if (!TryGetEntity(ev.Boombox, out var uid))
+            return;
+
+        if (_ui.TryGetOpenUi<PlayerMusicBoundUserInterface>(uid.Value, PlayerMusicUiKey.Key, out var bui))
+            bui.SetStatus(ev.LocKey, ev.Text, ev.Number);
     }
 
     private void OnShutdown(Entity<PlayerMusicBoomboxComponent> ent, ref ComponentShutdown args)
@@ -503,15 +628,9 @@ public sealed class PlayerMusicSystem : EntitySystem
         if (_incoming.ContainsKey(ev.SongId) || _incoming.Count >= MaxIncomingDownloads)
             return;
 
-        if (ev.TotalBytes <= 0 ||
-            ev.TotalBytes > Math.Min(PlayerMusicLimits.HardMaxSongBytes, _cfg.GetCVar(PlayerMusicCVars.MaxSongBytes)))
+        if (ev.TotalBytes <= 0 || ev.TotalBytes > PlayerMusicLimits.HardMaxSongBytes)
         {
-            // Above the hard ceiling the file can never be played: permanent failure.
-            // Above only the current server limit: retryable, the limit may be restored later.
-            if (ev.TotalBytes > PlayerMusicLimits.HardMaxSongBytes)
-                Fail(ev.SongId, "unexpected file size");
-            else
-                LimitFail(ev.SongId, "file exceeds the current server size limit");
+            Fail(ev.SongId, "unexpected file size");
             return;
         }
 
@@ -561,7 +680,6 @@ public sealed class PlayerMusicSystem : EntitySystem
 
         // Never give unchecked data to the decoder: it decodes the whole file into memory.
         // The hard limits bound what a hostile server can make the client allocate.
-        var maxSeconds = Math.Min(PlayerMusicLimits.HardMaxSongSeconds, _cfg.GetCVar(PlayerMusicCVars.MaxSongSeconds));
         var maxDecoded = Math.Min(PlayerMusicLimits.HardMaxDecodedBytes, (long) _cfg.GetCVar(PlayerMusicCVars.MaxDecodedBytes));
 
         if (!PlayerMusicOgg.TryAnalyze(data, out var info))
@@ -577,7 +695,7 @@ public sealed class PlayerMusicSystem : EntitySystem
             return;
         }
 
-        if (info.Seconds > maxSeconds || info.DecodedBytes > maxDecoded)
+        if (info.DecodedBytes > maxDecoded)
         {
             // A configurable limit was lowered below this song: retryable, not a broken file
             LimitFail(songId, "file exceeds the current server limits");

@@ -1,13 +1,18 @@
 <ui:FancyWindow xmlns="https://spacestation14.io"
                 xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
-                SetSize="400 420" MinSize="360 380" Title="{Loc 'maid-music-ui-title'}">
+                SetSize="400 500" MinSize="360 460" Title="{Loc 'maid-music-ui-title'}">
     <BoxContainer Orientation="Vertical" Margin="8">
-        <Label Name="CassetteLabel" />
-        <Label Name="NowPlayingLabel" />
-        <BoxContainer Name="TrackList" Orientation="Vertical" Margin="0 4 0 0" />
-        <BoxContainer Orientation="Horizontal" Margin="0 4 0 0">
+        <ScrollContainer VerticalExpand="True" MinSize="0 120" HScrollEnabled="False">
+            <BoxContainer Name="TrackList" Orientation="Vertical" />
+        </ScrollContainer>
+        <Label Name="VolumeLabel" Margin="0 8 0 0" />
+        <Slider Name="VolumeSlider" MinValue="0" MaxValue="200" Value="100" HorizontalExpand="True" />
+        <Label Name="SeekLabel" Margin="0 6 0 0" />
+        <Slider Name="SeekSlider" MinValue="0" MaxValue="600" Value="0" HorizontalExpand="True" />
+        <BoxContainer Orientation="Horizontal" Margin="0 6 0 0">
+            <Button Name="StartButton" Text="{Loc 'maid-music-ui-start'}" HorizontalExpand="True" />
             <Button Name="StopButton" Text="{Loc 'maid-music-ui-stop'}" HorizontalExpand="True" />
-            <CheckBox Name="RepeatBox" Text="{Loc 'maid-music-ui-repeat'}" />
+            <Button Name="RepeatButton" Text="{Loc 'maid-music-ui-repeat'}" ToggleMode="True" />
         </BoxContainer>
         <Label Text="{Loc 'maid-music-ui-record-header'}" Margin="0 12 0 0" />
         <LineEdit Name="NameField" PlaceHolder="{Loc 'maid-music-ui-name-placeholder'}" />

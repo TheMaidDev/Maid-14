@@ -10,7 +10,9 @@
       map: [ "enum.PlayerMusicVisualLayers.Overlay" ]
       visible: false
   - type: Item
-    size: Ginormous
+    size: Huge
+    shape:
+    - 0,0,3,3
     sprite: _Maid/Objects/Devices/player_music/boombox.rsi
     heldPrefix: boombox
   - type: Appearance
@@ -49,6 +51,17 @@
     size: Tiny
   - type: PlayerMusicCassette
   - type: Label
+
+- type: entity
+  parent: MaidBlankCassette
+  id: MaidBlankCassetteDebug
+  suffix: DEBUG
+  components:
+  - type: PlayerMusicCassette
+    maxTracks: 0
+    maxSongBytes: 8000000
+    maxSongSeconds: 600
+    allowTrackRemoval: true
 
 - type: entity
   parent: BaseItem

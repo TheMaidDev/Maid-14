@@ -9,6 +9,7 @@ using Content.Shared.Containers.ItemSlots;
 using Robust.Shared.Audio.Components;
 using Robust.Shared.ContentPack;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Localization;
 using Robust.Shared.Utility;
 
 // The client and the server systems have the same name
@@ -89,6 +90,13 @@ public sealed class PlayerMusicTest
 
         await pair.RunTicksSync(15);
 
+        await server.WaitAssertion(() =>
+        {
+            var loc = server.ResolveDependency<ILocalizationManager>();
+            Assert.That(loc.GetString("maid-music-disabled"), Is.Not.Empty);
+            Assert.That(loc.GetString("maid-music-upload-failed"), Is.Not.Empty);
+        });
+
         var cBoombox = pair.ToClientUid(boombox);
         Assert.That(client.EntMan.EntityExists(cBoombox), Is.True, "client must see the boombox");
 
@@ -113,7 +121,7 @@ public sealed class PlayerMusicTest
             Assert.That(
                 cUi.TryGetOpenUi<PlayerMusicBoundUserInterface>(cBoombox, PlayerMusicUiKey.Key, out var bui),
                 Is.True, "the device window must be open on the client");
-            bui!.SendMessage(new PlayerMusicPlayMessage(0, songId));
+            bui!.SendMessage(new PlayerMusicPlayMessage(0, songId, 0f));
         });
 
         // Nearby client downloads the song in chunks and decodes it; both sides have to tick
@@ -144,6 +152,91 @@ public sealed class PlayerMusicTest
             var boomboxComp = sEntMan.GetComponent<PlayerMusicBoomboxComponent>(boombox);
             Assert.That(boomboxComp.StartedAt, Is.Not.Null, "the server must consider the song playing");
             Assert.That(boomboxComp.SongId, Is.EqualTo(songId));
+        });
+
+        // The seek shares the play throttle: wait it out, and once more before the repeat
+        // toggle below so it does not fall into the seek's throttle window
+        await pair.RunTicksSync(20);
+
+        await client.WaitAssertion(() =>
+        {
+            Assert.That(
+                cUi.TryGetOpenUi<PlayerMusicBoundUserInterface>(cBoombox, PlayerMusicUiKey.Key, out var bui),
+                Is.True);
+            bui!.SendMessage(new PlayerMusicSeekMessage(3f));
+            bui.SendMessage(new PlayerMusicVolumeMessage(1.5f));
+        });
+
+        await pair.RunTicksSync(20);
+
+        await client.WaitAssertion(() =>
+        {
+            Assert.That(
+                cUi.TryGetOpenUi<PlayerMusicBoundUserInterface>(cBoombox, PlayerMusicUiKey.Key, out var bui),
+                Is.True);
+            bui!.SendMessage(new PlayerMusicRepeatMessage(false));
+        });
+
+        await pair.RunTicksSync(5);
+
+        await server.WaitAssertion(() =>
+        {
+            var comp = sEntMan.GetComponent<PlayerMusicBoomboxComponent>(boombox);
+            Assert.That(comp.VolumeScale, Is.EqualTo(1.5f).Within(0.001f));
+            Assert.That(comp.Repeat, Is.False);
+            Assert.That(comp.StartedAt, Is.Not.Null);
+            var position = (server.Timing.CurTime - comp.StartedAt!.Value).TotalSeconds;
+            Assert.That(position, Is.EqualTo(3.0).Within(1.0));
+        });
+
+        await pair.CleanReturnAsync();
+    }
+
+    [Test]
+    public async Task DebugCassetteDeletesTracks()
+    {
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        var server = pair.Server;
+        var client = pair.Client;
+
+        var sEntMan = server.EntMan;
+        var sPlayers = server.ResolveDependency<Robust.Server.Player.IPlayerManager>();
+        var sUi = server.System<SharedUserInterfaceSystem>();
+        var sSlots = server.System<ItemSlotsSystem>();
+        var cUi = client.System<SharedUserInterfaceSystem>();
+
+        EntityUid boombox = default;
+        EntityUid cassette = default;
+        await server.WaitPost(() =>
+        {
+            var session = sPlayers.Sessions.Single();
+            var coords = sEntMan.GetComponent<TransformComponent>(session.AttachedEntity!.Value).Coordinates;
+
+            cassette = sEntMan.SpawnEntity("MaidBlankCassetteDebug", coords);
+            sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette).Tracks.Add(new PlayerMusicTrack("track", "track"));
+            boombox = sEntMan.SpawnEntity("MaidBoombox", coords);
+            Assert.That(
+                sSlots.TryInsert(boombox, PlayerMusicBoomboxComponent.CassetteSlotId, cassette, null),
+                Is.True);
+            sUi.OpenUi(boombox, PlayerMusicUiKey.Key, session);
+        });
+
+        await pair.RunTicksSync(15);
+        var cBoombox = pair.ToClientUid(boombox);
+
+        await client.WaitAssertion(() =>
+        {
+            Assert.That(
+                cUi.TryGetOpenUi<PlayerMusicBoundUserInterface>(cBoombox, PlayerMusicUiKey.Key, out var bui),
+                Is.True);
+            bui!.SendMessage(new PlayerMusicDeleteTrackMessage(0, "track"));
+        });
+
+        await pair.RunTicksSync(5);
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette).Tracks, Is.Empty);
         });
 
         await pair.CleanReturnAsync();
@@ -211,7 +304,7 @@ public sealed class PlayerMusicTest
                 "recording without the device window must be denied");
         });
 
-        // The window is open now; a valid song above max_song_bytes is denied by the size check alone.
+        // The window is open now; a valid song above the cassette size limit is denied by the size check alone.
         // The limit is temporarily lowered below the length of the valid mono song: this way the denial
         // can only come from the size check, not from the ogg validation.
         await server.WaitPost(() => sUi.OpenUi(boombox, PlayerMusicUiKey.Key, sPlayers.Sessions.Single()));
@@ -220,8 +313,13 @@ public sealed class PlayerMusicTest
         // Wait out the upload start throttle so this attempt really reaches the size check
         await pair.RunTicksSync(310);
 
-        var originalMaxBytes = server.CfgMan.GetCVar(PlayerMusicCVars.MaxSongBytes);
-        await server.WaitPost(() => server.CfgMan.SetCVar(PlayerMusicCVars.MaxSongBytes, songBytes.Length - 1));
+        var originalMaxBytes = 0;
+        await server.WaitPost(() =>
+        {
+            var cassetteComp = sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette);
+            originalMaxBytes = cassetteComp.MaxSongBytes;
+            cassetteComp.MaxSongBytes = songBytes.Length - 1;
+        });
         await client.WaitPost(() => cSys.RequestUpload(cBoombox, "too big", songBytes));
         await pair.RunTicksSync(30);
 
@@ -231,7 +329,8 @@ public sealed class PlayerMusicTest
                 "oversized recording must be denied");
         });
 
-        await server.WaitPost(() => server.CfgMan.SetCVar(PlayerMusicCVars.MaxSongBytes, originalMaxBytes));
+        await server.WaitPost(() =>
+            sEntMan.GetComponent<PlayerMusicCassetteComponent>(cassette).MaxSongBytes = originalMaxBytes);
 
         // A structurally valid stereo file is rejected too: the engine only positions mono audio
         await pair.RunTicksSync(310);
