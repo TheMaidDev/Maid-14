@@ -64,7 +64,11 @@ public sealed class TgStunbatonSystem : EntitySystem
         if (!ent.Comp.Enabled)
             return;
 
-        ent.Comp.SwingUser = args.IsHit && args.Direction == null ? args.User : null;
+        var valid = args.IsHit && args.Direction == null;
+        ent.Comp.SwingUser = valid ? args.User : null;
+        // Captured before SharedStaminaSystem consumes this hit's charge: spending the last charge
+        // deactivates the baton mid-hit, and the live toggle state must not reject the hit afterwards.
+        ent.Comp.SwingActivated = valid && _toggle.IsActivated(ent.Owner);
     }
 
     private void OnStaminaHit(Entity<TgStunbatonComponent> ent, ref StaminaDamageMeleeHitEvent args)
@@ -72,7 +76,7 @@ public sealed class TgStunbatonSystem : EntitySystem
         var user = ent.Comp.SwingUser;
         ent.Comp.SwingUser = null;
 
-        if (!ent.Comp.Enabled || !_toggle.IsActivated(ent.Owner) || user == null || args.HitEntities.Count == 0 || args.Direction != null)
+        if (!ent.Comp.Enabled || !ent.Comp.SwingActivated || user == null || args.HitEntities.Count == 0 || args.Direction != null)
             return;
 
         foreach (var (target, _) in args.HitEntities)

@@ -65,6 +65,14 @@ public sealed partial class TgStunbatonComponent : Component
     /// </summary>
     [NonSerialized]
     public EntityUid? SwingUser;
+
+    /// <summary>
+    /// Whether the baton was activated when the current swing was resolved. Not networked; set alongside
+    /// <see cref="SwingUser"/> before the hit spends charge, so a hit that empties the battery and
+    /// deactivates the baton still registers its stun.
+    /// </summary>
+    [NonSerialized]
+    public bool SwingActivated;
 }
 
 /// <summary>
