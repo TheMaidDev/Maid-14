@@ -8,6 +8,7 @@ using Content.Shared.Popups;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Network;
+using Robust.Shared.Player;
 using Robust.Shared.Timing;
 
 namespace Content.Shared._Maid.Weapons.Stunbaton;
@@ -95,7 +96,7 @@ public sealed class TgStunbatonSystem : EntitySystem
         return user == null || !IsMarked(target, user.Value);
     }
 
-    public void RegisterStun(Entity<TgStunbatonComponent> baton, EntityUid target, EntityUid? user, bool predictedPopup = true)
+    public void RegisterStun(Entity<TgStunbatonComponent> baton, EntityUid target, EntityUid? user)
     {
         if (!baton.Comp.Enabled)
             return;
@@ -107,12 +108,15 @@ public sealed class TgStunbatonSystem : EntitySystem
         if (user != null)
             Mark(target, user.Value, until);
 
-        var selfMessage = Loc.GetString("tg-stunbaton-stun-self", ("user", user ?? baton.Owner), ("weapon", baton.Owner));
-        var otherMessage = Loc.GetString("tg-stunbaton-stun-other", ("user", user ?? baton.Owner), ("target", target), ("weapon", baton.Owner));
-        if (predictedPopup && user != null)
-            _popup.PopupPredicted(selfMessage, otherMessage, target, user);
-        else if (_net.IsServer)
-            _popup.PopupEntity(otherMessage, target);
+        // Server-authoritative: PopupPredicted's recipientMessage only ever reaches the client that
+        // predicts the swing (the user), so the victim would never see "stuns you" from prediction.
+        if (_net.IsServer)
+        {
+            var selfMessage = Loc.GetString("tg-stunbaton-stun-self", ("user", user ?? baton.Owner), ("weapon", baton.Owner));
+            var otherMessage = Loc.GetString("tg-stunbaton-stun-other", ("user", user ?? baton.Owner), ("target", target), ("weapon", baton.Owner));
+            _popup.PopupEntity(selfMessage, target, target);
+            _popup.PopupEntity(otherMessage, target, Filter.PvsExcept(target, entityManager: EntityManager), true);
+        }
 
         var landed = new TgStunbatonStunEvent(target);
         RaiseLocalEvent(baton, ref landed);

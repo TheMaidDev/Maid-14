@@ -67,7 +67,7 @@ public sealed class TgStunbatonThrowSystem : EntitySystem
 
         _stamina.TakeStaminaDamage(args.Target, ent.Comp.ThrowStaminaDamage, stamina,
             source: args.Component.Thrower, with: ent.Owner, sound: sound, applyResistances: true);
-        _baton.RegisterStun(ent, args.Target, args.Component.Thrower, predictedPopup: false);
+        _baton.RegisterStun(ent, args.Target, args.Component.Thrower);
     }
 
     private void ApplyStunEffects(Entity<TgStunbatonComponent> baton, EntityUid target)

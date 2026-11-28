@@ -22,5 +22,16 @@
 - type: entity
   id: StasisBaton
   components:
+  # The !Remove entries above cascade from the Stunbaton parent; restore the Goob stasis behavior.
+  # The parent's Maid tuning (no heavy/wide swings, lightAttackEnergyMultiplier 1) is intentional here too.
+  - type: DelayedKnockdownOnHit
+    useDelay: stunbaton
+  - type: UseDelayBlockMelee
+    delays:
+    - stunbaton
+  - type: UseDelay
+    delays:
+      stunbaton:
+        length: 2.5
   - type: TgStunbaton
     enabled: false
