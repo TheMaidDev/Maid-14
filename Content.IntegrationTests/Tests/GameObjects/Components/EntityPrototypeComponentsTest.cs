@@ -79,13 +79,15 @@ namespace Content.IntegrationTests.Tests.GameObjects.Components
 
                         foreach (var component in components.Cast<YamlMappingNode>())
                         {
-                            // MAID: пропускаем partial-записи вида "- !Remove type: X"
-                            if (!component.TryGetNode<YamlScalarNode>("type", out var componentTypeNode))
+                            // MAID BEGIN partial component removal
+                            // "- !Remove type: Foo" in partial prototypes tags the "type" key, so GetNode("type") can't find it
+                            if (component.Children.Keys.Any(k => k is YamlScalarNode { Value: "type", Tag: { IsEmpty: false, IsNonSpecific: false } tag } && tag.Value == "!Remove"))
                                 continue;
+                            // MAID END partial component removal
 
                             componentsValidated++;
 
-                            var componentType = componentTypeNode.AsString();
+                            var componentType = component.GetNode("type").AsString();
                             var clientAvailability = cComponentFactory.GetComponentAvailability(componentType);
 
                             if (clientAvailability == ComponentAvailability.Unknown)

@@ -1,0 +1,178 @@
+using Content.Goobstation.Common.Weapons;
+using Content.Shared._Shitcode.Weapons.Misc;
+using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
+using Content.Shared.Item.ItemToggle;
+using Content.Shared.Popups;
+using Content.Shared.Weapons.Melee;
+using Content.Shared.Weapons.Melee.Events;
+using Robust.Shared.Network;
+using Robust.Shared.Player;
+using Robust.Shared.Timing;
+
+namespace Content.Shared._Maid.Weapons.Stunbaton;
+
+public sealed class TgStunbatonSystem : EntitySystem
+{
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly ItemToggleSystem _toggle = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<TgStunbatonComponent, LightAttackSpecialInteractionEvent>(OnLightAttack);
+        SubscribeLocalEvent<TgStunbatonComponent, MeleeHitEvent>(OnMeleePrepare, before: [typeof(SharedStaminaSystem)]);
+        SubscribeLocalEvent<TgStunbatonComponent, StaminaDamageMeleeHitEvent>(OnStaminaHit);
+    }
+
+    private void OnLightAttack(Entity<TgStunbatonComponent> ent, ref LightAttackSpecialInteractionEvent args)
+    {
+        if (!ent.Comp.Enabled || !_toggle.IsActivated(ent.Owner))
+            return;
+
+        if (args.Target is not { } target || !HasComp<DamageableComponent>(target))
+        {
+            args.Cancel = true;
+            HoldSwing(ent.Owner);
+            return;
+        }
+
+        if (!HasComp<StaminaComponent>(target))
+            return;
+
+        if (_timing.CurTime < ent.Comp.NextStun)
+        {
+            args.Cancel = true;
+            HoldSwing(ent.Owner);
+            _popup.PopupClient(Loc.GetString("tg-stunbaton-still-charging"), args.User, args.User);
+            return;
+        }
+
+        if (IsMarked(target, args.User))
+        {
+            args.Cancel = true;
+            HoldSwing(ent.Owner);
+            _popup.PopupClient(Loc.GetString("tg-stunbaton-cant-stun"), args.User, args.User);
+        }
+    }
+
+    private void OnMeleePrepare(Entity<TgStunbatonComponent> ent, ref MeleeHitEvent args)
+    {
+        if (!ent.Comp.Enabled)
+            return;
+
+        var valid = args.IsHit && args.Direction == null;
+        ent.Comp.SwingUser = valid ? args.User : null;
+        // Captured before SharedStaminaSystem consumes this hit's charge: spending the last charge
+        // deactivates the baton mid-hit, and the live toggle state must not reject the hit afterwards.
+        ent.Comp.SwingActivated = valid && _toggle.IsActivated(ent.Owner);
+    }
+
+    private void OnStaminaHit(Entity<TgStunbatonComponent> ent, ref StaminaDamageMeleeHitEvent args)
+    {
+        var user = ent.Comp.SwingUser;
+        ent.Comp.SwingUser = null;
+
+        if (!ent.Comp.Enabled || !ent.Comp.SwingActivated || user == null || args.HitEntities.Count == 0 || args.Direction != null)
+            return;
+
+        foreach (var (target, _) in args.HitEntities)
+            RegisterStun(ent, target, user);
+    }
+
+    /// <summary>
+    /// Whether this baton may stun the target right now: not on cooldown and, when the user is known,
+    /// not recently stunned by them.
+    /// </summary>
+    public bool CanStun(Entity<TgStunbatonComponent> baton, EntityUid target, EntityUid? user)
+    {
+        if (_timing.CurTime < baton.Comp.NextStun)
+            return false;
+
+        return user == null || !IsMarked(target, user.Value);
+    }
+
+    public void RegisterStun(Entity<TgStunbatonComponent> baton, EntityUid target, EntityUid? user)
+    {
+        if (!baton.Comp.Enabled)
+            return;
+
+        var until = _timing.CurTime + TimeSpan.FromSeconds(baton.Comp.Cooldown);
+        baton.Comp.NextStun = until;
+        Dirty(baton);
+
+        if (user != null)
+            Mark(target, user.Value, until);
+
+        // Server-authoritative: PopupPredicted's recipientMessage only ever reaches the client that
+        // predicts the swing (the user), so the victim would never see "stuns you" from prediction.
+        if (_net.IsServer)
+        {
+            var selfMessage = Loc.GetString("tg-stunbaton-stun-self", ("user", user ?? baton.Owner), ("weapon", baton.Owner));
+            var otherMessage = Loc.GetString("tg-stunbaton-stun-other", ("user", user ?? baton.Owner), ("target", target), ("weapon", baton.Owner));
+            _popup.PopupEntity(selfMessage, target, target);
+            _popup.PopupEntity(otherMessage, target, Filter.PvsExcept(target, entityManager: EntityManager), true);
+        }
+
+        var landed = new TgStunbatonStunEvent(target);
+        RaiseLocalEvent(baton, ref landed);
+    }
+
+    private void HoldSwing(EntityUid weapon)
+    {
+        if (!TryComp<MeleeWeaponComponent>(weapon, out var melee))
+            return;
+
+        var retry = _timing.CurTime + TimeSpan.FromSeconds(0.4);
+        if (melee.NextAttack >= retry)
+            return;
+
+        melee.NextAttack = retry;
+        DirtyField(weapon, melee, nameof(MeleeWeaponComponent.NextAttack));
+    }
+
+    private void Mark(EntityUid target, EntityUid user, TimeSpan expires)
+    {
+        var mark = EnsureComp<TgStunbatonMarkComponent>(target);
+        var netUser = GetNetEntity(user);
+        var now = _timing.CurTime;
+
+        mark.Marks.RemoveAll(entry => entry.User == netUser || entry.Expires <= now);
+        mark.Marks.Add(new TgStunbatonMark { User = netUser, Expires = expires });
+        Dirty(target, mark);
+    }
+
+    private bool IsMarked(EntityUid target, EntityUid user)
+    {
+        if (!TryComp<TgStunbatonMarkComponent>(target, out var mark))
+            return false;
+
+        var netUser = GetNetEntity(user);
+        var now = _timing.CurTime;
+        var changed = false;
+
+        for (var i = mark.Marks.Count - 1; i >= 0; i--)
+        {
+            if (mark.Marks[i].Expires > now)
+                continue;
+
+            mark.Marks.RemoveAt(i);
+            changed = true;
+        }
+
+        if (changed)
+            Dirty(target, mark);
+
+        foreach (var entry in mark.Marks)
+        {
+            if (entry.User == netUser)
+                return true;
+        }
+
+        return false;
+    }
+}
