@@ -2292,3 +2292,11 @@ Entries:
       message: Огромный текст в рации больше не работает.
   id: 220
   time: '2026-11-27T19:05:14.0000000+00:00'
+- author: CREAsTIVE
+  changes:
+    - type: Fix
+      message: Внутренние фиксы
+    - type: Tweak
+      message: ТГ батон вернулся
+  id: 221
+  time: '2026-11-28T08:39:51.0000000+00:00'
